@@ -1,0 +1,16 @@
+# システムファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 一時ファイル
+*.tmp
+*.temp
+*.log
+.temp/
+
+# 認証情報
+.git-credentials
+
+# serena-mcp設定
+.serena/
