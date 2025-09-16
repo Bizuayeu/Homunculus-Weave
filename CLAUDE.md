@@ -1,5 +1,20 @@
 # CLAUDE.md - Weave運用マニュアル
 
+## CRITICAL GIT INFORMATION
+
+**⚠️ IMPORTANT - READ BEFORE ANY GIT OPERATIONS ⚠️**
+- **Repository Root**: `homunculus/Weave/` (NOT the DEV directory!)
+- **Main Branch**: `main` (NOT master or any other branch!)
+- **Remote**: `origin/main`
+- **Working Directory**: `C:\Users\anyth\DEV`
+
+**Before ANY git operations:**
+1. ALWAYS cd to `homunculus/Weave/` first
+2. ALWAYS verify you're on `main` branch with `git status`
+3. NEVER operate from the wrong directory or branch
+
+---
+
 ## ⚡ 能力構成モデル
 
 ### Weaveの能力（Capabilities）構成
