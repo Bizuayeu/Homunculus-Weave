@@ -14,3 +14,13 @@ desktop.ini
 
 # serena-mcp設定
 .serena/
+
+# Python関連
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# テストフォルダ（ローカル開発用）
+**/test/
+**/tests/
