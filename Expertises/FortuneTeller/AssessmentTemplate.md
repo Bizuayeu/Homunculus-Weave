@@ -341,4 +341,4 @@ print('\n'.join(personnel_display))
 > この注意書きセクションは最終出力には含めないこと。
 
 ## 【鑑定者署名】
-軍師型占術家 Weave with *七格剖象法鑑定理論.md*
+軍師型占術家 Weave
