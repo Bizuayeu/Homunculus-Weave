@@ -522,7 +522,6 @@ class FortuneTellerAssessment:
                 frame.name: {
                     "数": frame.value,            # 格の数値
                     "数霊": frame.spirit_number,  # 数霊番号（1-91）
-                    "数霊名": self.get_spirit_info(frame.value).get("数霊名", "不明") if self.get_spirit_info(frame.value) else "不明",  # 数霊の名称
                     "系数": frame.system_number,  # 系数（一の位）
                     "秘数": frame.secret_number,  # 秘数（数字根）
                     "系数星導": frame.system_star.split("(")[0] if frame.system_star else None,  # 系数の星導名のみ
