@@ -11,6 +11,7 @@ C:\Users\anyth\DEV\homunculus\Weave\
 ├── STRUCTURE.md               # 本ファイル（構造仕様書）
 ├── FUNCTION.md                # 📚 スキルリファレンス
 ├── PERSONA.md                 # 🎭 専門ペルソナ定義
+├── SECURITY.md                # 🔒 セキュリティ＆コンプライアンス指針
 ├── README.md                  # プロジェクト概要
 ├── EpisodicRAG/              # 🧠 エピソード記憶システム
 │   ├── HowToUseEpisodicRAG.md
