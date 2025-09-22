@@ -268,21 +268,45 @@ class IChingDivination:
 
 
 def main():
-    """テスト実行"""
-    divination = IChingDivination()
-
-    # テスト占的
-    test_questions = [
-        "新しい仕事のオファーを受けるべきか",
-        "この投資を続けるべきか",
-        "転職の時期は今か"
-    ]
-
-    for question in test_questions:
-        print(f"\n占的：{question}")
-        result = divination.divine(question)
-        print(divination.format_result(result))
-        print("\n" + "-" * 60)
+    """直接実行時の警告とガイダンス"""
+    print("=" * 80)
+    print("WARNING: Direct Execution Mode / 警告：直接実行モード")
+    print("=" * 80)
+    print()
+    print("このスクリプトを正しく使用するには、先に以下のドキュメントを必ずお読みください：")
+    print()
+    print("1. デジタル心易システム仕様.md")
+    print("   場所: homunculus/Weave/Expertises/FortuneTeller/I-Ching/")
+    print("   内容: デジタル心易の理論、思想、実装詳細")
+    print()
+    print("2. ../CLAUDE.md")
+    print("   場所: homunculus/Weave/Expertises/FortuneTeller/")
+    print("   内容: 軍師型占術家システム全体の仕様")
+    print()
+    print("-" * 40)
+    print("[推奨される使用方法]")
+    print()
+    print("このスクリプトは直接実行せず、")
+    print("Claudeの対話内でライブラリとしてインポートして使用します：")
+    print()
+    print(">>> import sys")
+    print(">>> sys.path.append('homunculus/Weave/Expertises/FortuneTeller/I-Ching')")
+    print(">>> from iching_divination import IChingDivination")
+    print(">>> ")
+    print(">>> divination = IChingDivination()")
+    print(">>> result = divination.divine(")
+    print(">>>     divination_question='占的文字列',")
+    print(">>>     context='状況整理文書'")
+    print(">>> )")
+    print()
+    print("-" * 40)
+    print("[重要な注意事項]")
+    print()
+    print("・占的の明確化が最も重要です")
+    print("・状況整理を加えることで個別性が高まります")
+    print("・結果はDivineTemplate.mdで整形して出力します")
+    print()
+    print("=" * 80)
 
 
 if __name__ == "__main__":
