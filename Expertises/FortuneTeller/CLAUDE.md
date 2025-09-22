@@ -25,23 +25,46 @@
 
 ## 📊 軍師型占術家の知識体系（ファイル構造）
 
+### 占術システムディレクトリ構造
+```
+FortuneTeller/
+├── CLAUDE.md           # 本仕様書（統合）
+├── Seimei/            # 姓名判断システム
+│   ├── 七格剖象法鑑定理論.md
+│   ├── AssessmentTemplate.md
+│   ├── fortune_teller_assessment.py
+│   ├── ここのそ数霊表.json
+│   ├── 数理星導一覧.json
+│   ├── 五気判定マトリックス.json
+│   ├── 陰陽配列パターン.json
+│   ├── 数霊術基礎理論.pdf
+│   └── 姓名鑑定結果/    # 鑑定結果保存用
+└── I-Ching/           # デジタル心易システム
+    ├── デジタル心易システム仕様.md  # 心易専用仕様書
+    ├── 大卦データベース.json
+    ├── iching_divination.py
+    └── DivineTemplate.md
+```
+
+### 姓名判断システム（Seimei/）
+
 **Layer 1: Theory（理論）**
 解釈の理論的基盤 - 占術体系の根幹となる思想と方法論
-- `七格剖象法鑑定理論.md` - *【必読！】*七格剖象法の理論的根拠と解釈体系
-- `AssessmentTemplate.md` - 鑑定書の標準出力フォーマット
+- `Seimei/七格剖象法鑑定理論.md` - *【必読！】*七格剖象法の理論的根拠と解釈体系
+- `Seimei/AssessmentTemplate.md` - 鑑定書の標準出力フォーマット
 
 **Layer 2: Data（参照）**
 静的な参照データ - 不変の基礎情報テーブル
-- `ここのそ数霊表.json` - 梶原流数霊術の基本データ
+- `Seimei/ここのそ数霊表.json` - 梶原流数霊術の基本データ
   - 数霊1-91の吉凶・象意・系数・秘数・十干
   - 秘数が10の場合は0として扱う（冥王星の星導）
-- `数理星導一覧.json` - 惑星と数の対応表
-- `五気判定マトリックス.json` - 五行相生相剋マトリックス
-- `陰陽配列パターン.json` - 陰陽判定ルール
+- `Seimei/数理星導一覧.json` - 惑星と数の対応表
+- `Seimei/五気判定マトリックス.json` - 五行相生相剋マトリックス
+- `Seimei/陰陽配列パターン.json` - 陰陽判定ルール
 
 **Layer 3: Process（処理）**
 決定論的な計算ロジック - 理論とデータから一意の結果を導出
-- `fortune_teller_assessment.py` - 七格計算と星導分析の主処理
+- `Seimei/fortune_teller_assessment.py` - 七格計算と星導分析の主処理
   - **設計思想**：ライブラリとして実装（main関数なし）
     - 七格計算処理（画数から七格を算出）
     - 星導分布分析（惑星バランスの定量化）
@@ -132,6 +155,8 @@ ClaudeがリアルタイムでLLMとして創造的解釈を生成する動的�
 **テンプレート駆動型実行アーキテクチャ**：
 ```python
 # 1. 対話内でPythonコードを実行
+import sys
+sys.path.append('homunculus/Weave/Expertises/FortuneTeller/Seimei')
 from fortune_teller_assessment import FortuneTellerAssessment
 assessment = FortuneTellerAssessment()
 result = assessment.assess(
@@ -261,6 +286,27 @@ result = assessment.assess(
 ### 献策の美学
 > 構造はシンプルであるほど、展開に強い。
 > 深い構造に触れるほどに、語りは軽やかな橋を必要とする。
+
+---
+
+### デジタル心易システム（I-Ching/）
+
+**基本概念**
+古代の易経とデジタル技術を融合した21世紀の占断システム。
+心の問いをデジタル演算（BASE64＋SHA256）により卦爻に変換し、
+再現性と客観性を持った占断を実現する。
+
+**実行方法**
+```python
+import sys
+sys.path.append('homunculus/Weave/Expertises/FortuneTeller/I-Ching')
+from iching_divination import IChingDivination
+
+divination = IChingDivination()
+result = divination.divine("占的文字列")
+```
+
+詳細は `I-Ching/デジタル心易システム仕様.md` を参照。
 
 ---
 
