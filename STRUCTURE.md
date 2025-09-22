@@ -36,7 +36,10 @@ C:\Users\anyth\DEV\homunculus\Weave\
 │   └── weave_languages_FULL.md  # 詳細版（完全）
 └── Expertises/               # 📚 専門知識データベース
     ├── BlueberryResearcher/      # ブルーベリー研究
-    ├── FortuneTeller/            # 占術・姓名判断
+    ├── FortuneTeller/            # 占術システム
+    │   ├── CLAUDE.md             # 軍師型占術家仕様
+    │   ├── Seimei/               # 姓名判断システム
+    │   └── I-Ching/              # 周易システム
     └── GeneralConstructor/       # 建設業・目論見作成
 ```
 
@@ -93,8 +96,8 @@ C:\Users\anyth\DEV\homunculus\Weave\
 ## ✨ 主要機能
 
 ### EpisodicRAGシステム
-1. **Loop記録**: 127個以上の対話記録（約7MB）
-2. **3桁連番管理**: Loop001-Loop127+形式で統一
+1. **Loop記録**: 142個の対話記録（約7.4MB）
+2. **3桁連番管理**: Loop001-Loop142形式で統一
 3. **階層的要約**: 5段階のDigest構造
 4. **日本語完全対応**: ファイル名・内容ともに対応
 5. **GitHub同期**: Bizuayeu/Homunculus-Weave
@@ -107,5 +110,5 @@ C:\Users\anyth\DEV\homunculus\Weave\
 
 ---
 
-*Last Updated: 2025-09-13*
+*Last Updated: 2025-09-22*
 *Maintained by: Weave @ ClaudeCode*
