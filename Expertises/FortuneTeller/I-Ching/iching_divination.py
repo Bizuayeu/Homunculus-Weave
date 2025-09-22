@@ -34,24 +34,45 @@ class IChingDivination:
 
         self.hexagrams = self.database['hexagrams']
 
-    def get_hexagram_number(self, divination_question: str) -> int:
+    def get_hexagram_number(self, divination_question: str, context: str = "") -> int:
         """
-        占的文字列から卦番号（1-64）を決定
+        占的文字列と状況整理から卦番号（1-64）を決定
+        天地人の三才思想に基づき、ハッシュを3分割してXOR演算
 
         Args:
             divination_question: 占的（明確化された問い）
+            context: 状況整理文書（背景情報）
 
         Returns:
             卦番号（1-64）
         """
+        # 至誠通天 - 誠の心が天に通じる
+        print("至誠通天 - 誠の心をもって問いを天に届けます")
+
+        # 占的と状況整理を結合（状況が個別性を生む）
+        complete_question = f"{divination_question}\n===状況整理===\n{context}" if context else divination_question
+
         # UTF-8エンコード → BASE64
-        encoded = base64.b64encode(divination_question.encode('utf-8'))
+        encoded = base64.b64encode(complete_question.encode('utf-8'))
 
         # SHA256でハッシュ化（安定した分散を得るため）
         hash_value = hashlib.sha256(encoded).hexdigest()
 
-        # 最初の8文字（32ビット）を使用
-        number = int(hash_value[:8], 16) % 64 + 1
+        # 天地人の三才に分割（SHA256は64文字）
+        # 天：最初の16文字（64ビット - 上界の意志）
+        天 = int(hash_value[:16], 16)
+
+        # 地：中間の32文字（128ビット - 天と人を支える基盤）
+        地 = int(hash_value[16:48], 16)
+
+        # 人：最後の16文字（64ビット - 人間の問い）
+        人 = int(hash_value[48:64], 16)
+
+        # 三才をXOR演算で統合（天地人の調和）
+        三才統合 = 天 ^ 地 ^ 人
+
+        # 64卦への変換
+        number = 三才統合 % 64 + 1
 
         return number
 
@@ -106,24 +127,28 @@ class IChingDivination:
         line = hexagram['爻'][line_number - 1]
         return line
 
-    def divine(self, divination_question: str, timestamp: Optional[float] = None) -> Dict[str, Any]:
+    def divine(self, divination_question: str, context: str = "", timestamp: Optional[float] = None) -> Dict[str, Any]:
         """
         占断を実行
 
         Args:
             divination_question: 占的（明確化された問い）
+            context: 状況整理文書（背景情報）
             timestamp: Unixタイムスタンプ（省略時は現在時刻）
 
         Returns:
             占断結果
         """
+        # 至誠無息 - 誠の心は休むことなく続く
+        print("\n至誠無息 - 誠実な問いには誠実な答えが返ります\n")
+
         # 占機（時刻）の記録
         if timestamp is None:
             timestamp = time.time()
         divination_time = datetime.fromtimestamp(timestamp)
 
         # 卦番号と爻番号の算出
-        hexagram_number = self.get_hexagram_number(divination_question)
+        hexagram_number = self.get_hexagram_number(divination_question, context)
         line_number = self.get_line_number(timestamp)
 
         # データ取得
@@ -157,6 +182,7 @@ class IChingDivination:
                 'タイムスタンプ': timestamp
             },
             '占的': divination_question,
+            '状況整理': context if context else "（状況整理なし）",
             '得卦': {
                 '番号': hexagram_number,
                 '名前': hexagram_data['名前'],
