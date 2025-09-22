@@ -579,43 +579,10 @@ def main():
     print("4. テンプレートに沿った鑑定書を生成")
     print("=" * 80)
     print()
-
-    # デモ実行の確認
-    response = input("それでもテスト実行しますか？ (y/N): ")
-    if response.lower() != 'y':
-        print("終了します。")
-        return
-
-    print("\n【テスト実行】")
-    print("※これは動作確認用です。実際の鑑定にはCLAUDE.mdの理解が必須です。\n")
-
-    # テストデータ
-    test_data = [
-        ("山田", "太郎", [3, 5], [4, 9]),
-        ("鈴木", "花子", [13, 4], [7, 3])
-    ]
-
-    for surname, given_name, surname_strokes, given_strokes in test_data:
-        print(f"\n--- {surname} {given_name} の判定 ---")
-        print(f"姓の画数: {surname_strokes}")
-        print(f"名の画数: {given_strokes}")
-
-        assessment = FortuneTellerAssessment()
-        result = assessment.assess(surname, given_name, surname_strokes, given_strokes)
-
-        print(f"\n七格:")
-        for key, value in result["七格"].items():
-            if isinstance(value, dict):
-                print(f"  {key}: {value.get('数霊', 'N/A')} ({value.get('吉凶', 'N/A')})")
-            else:
-                print(f"  {key}: {value}")
-
-        print(f"\n身強身弱: {result.get('身強身弱判定', {}).get('判定', 'N/A')}")
-        print(f"人材類型: 最高は「{max(result.get('人材4類型', {}), key=result.get('人材4類型', {}).get)}」")
-
-    print("\n" + "=" * 80)
-    print("テスト実行完了")
-    print("実際の鑑定にはCLAUDE.mdを読んでから使用してください。")
+    print("このスクリプトは直接実行せず、")
+    print("Claude APIまたはWebインターフェースから使用してください。")
+    print()
+    print("正しい使用方法の詳細はCLAUDE.mdを参照してください。")
     print("=" * 80)
 
 
