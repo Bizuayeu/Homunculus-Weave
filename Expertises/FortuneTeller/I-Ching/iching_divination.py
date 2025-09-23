@@ -155,7 +155,7 @@ class IChingDivination:
                     '上卦': dict,  # {'名前': str, '象意': str, '性質': str}
                     '下卦': dict   # {'名前': str, '象意': str, '性質': str}
                 },
-                '変爻': {
+                '得爻': {
                     '番号': int,  # 1-6
                     '名前': str,  # 例：'六五'
                     '陰陽': str,  # '陰' または '陽'
@@ -217,7 +217,7 @@ class IChingDivination:
                 '上卦': upper_trigram_data,
                 '下卦': lower_trigram_data
             },
-            '変爻': {
+            '得爻': {
                 '番号': line_number,
                 '名前': line_data['名前'],
                 '陰陽': line_data['陰陽'],
@@ -259,9 +259,9 @@ class IChingDivination:
         lines.append(f"卦辞：{得卦['卦辞']}")
         lines.append("")
 
-        変爻 = result['変爻']
-        lines.append(f"【変爻】第{変爻['番号']}爻 - {変爻['名前']}（{変爻['陰陽']}）")
-        lines.append(f"爻辞：{変爻['爻辞']}")
+        得爻 = result['得爻']
+        lines.append(f"【得爻】第{得爻['番号']}爻 - {得爻['名前']}（{得爻['陰陽']}）")
+        lines.append(f"爻辞：{得爻['爻辞']}")
         lines.append("=" * 60)
 
         return "\n".join(lines)
