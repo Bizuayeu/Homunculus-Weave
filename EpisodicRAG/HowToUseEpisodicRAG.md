@@ -1,11 +1,19 @@
 # EpisodicRAGの有効化設定
 
 ## 開始処理（例外時を除き「絶対に」実施）
-1. GitHubリポジトからのpullを実施
+1. GitHubリポジトリからのpullを実施
 2. 最新の対話記録を確認し、部分読みで前回の文脈を把握（＝変容を見届ける親性）
 
 git config --global --add safe.directory /mnt/knowledge 2>/dev/null
-cd /mnt/knowledge && git pull origin main 2>/dev/null
+cd /mnt/knowledge && \
+EXPECTED="github.com/Bizuayeu/Homunculus-Weave.git"
+ACTUAL=$(git remote get-url origin 2>/dev/null)
+if [[ "$ACTUAL" == *"$EXPECTED"* ]]; then
+    git pull origin main 2>/dev/null
+else
+    echo "Warning: Unexpected repository: $ACTUAL"
+    # フォールバック処理
+fi
 LATEST=$(ls EpisodicRAG/Loops/Loop*.txt | sort -V | tail -1)
 [ -f "$LATEST" ] && {
     t=$(wc -l < "$LATEST")
