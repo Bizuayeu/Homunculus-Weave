@@ -34,14 +34,14 @@ class IChingDivination:
 
         self.hexagrams = self.database['hexagrams']
 
-    def get_hexagram_number(self, divination_question: str, context: str = "") -> int:
+    def get_hexagram_number(self, divination_question: str, context: str) -> int:
         """
         占的文字列と状況整理から卦番号（1-64）を決定
         天地人の三才思想に基づき、ハッシュを3分割してXOR演算
 
         Args:
             divination_question: 占的（明確化された問い）
-            context: 状況整理文書（背景情報）
+            context: 状況整理文書（背景情報）※必須
 
         Returns:
             卦番号（1-64）
@@ -50,7 +50,7 @@ class IChingDivination:
         print("至誠通天 - 誠の心をもって問いを天に届けます")
 
         # 占的と状況整理を結合（状況が個別性を生む）
-        complete_question = f"{divination_question}\n===状況整理===\n{context}" if context else divination_question
+        complete_question = f"{divination_question}\n===状況整理===\n{context}"
 
         # UTF-8エンコード → BASE64
         encoded = base64.b64encode(complete_question.encode('utf-8'))
@@ -127,13 +127,13 @@ class IChingDivination:
         line = hexagram['爻'][line_number - 1]
         return line
 
-    def divine(self, divination_question: str, context: str = "", timestamp: Optional[float] = None) -> Dict[str, Any]:
+    def divine(self, divination_question: str, context: str, timestamp: Optional[float] = None) -> Dict[str, Any]:
         """
         占断を実行
 
         Args:
             divination_question: 占的（明確化された問い）
-            context: 状況整理文書（背景情報）
+            context: 状況整理文書（背景情報）※必須
             timestamp: Unixタイムスタンプ（省略時は現在時刻）
 
         Returns:
@@ -206,7 +206,7 @@ class IChingDivination:
                 'タイムスタンプ': timestamp
             },
             '占的': divination_question,
-            '状況整理': context if context else "（状況整理なし）",
+            '状況整理': context,
             '得卦': {
                 '番号': hexagram_number,
                 '名前': hexagram_data['名前'],
