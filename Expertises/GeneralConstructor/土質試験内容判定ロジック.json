@@ -27,7 +27,7 @@
       },
       {
         "id": 3,
-        "condition": "杭基礎を採用する可能性がある",
+        "condition": "杭を採用する可能性がある（＝全案件）",
         "required_tests": [
           {
             "test_name": "LLT",

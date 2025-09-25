@@ -39,6 +39,7 @@
         },
         "description": "建物の地上部が3層以内、かつ硬質地盤もしくは中間地盤①②",
         "characteristics": {
+          "pile_types": "鋼管杭（刃工法）",
           "cost": "低",
           "construction_period": "短"
         }
@@ -62,6 +63,7 @@
         },
         "description": "建物の地上部が3層を超える、かつ硬質地盤もしくは中間地盤①",
         "characteristics": {
+          "pile_types": "鋼管杭（礎工法）",
           "cost": "中",
           "construction_period": "中"
         }
@@ -86,7 +88,7 @@
         "description": "有効な支持層の上端が深度15mより深く深度24mより浅い",
         "characteristics": {
           "pile_length": "20m級",
-          "pile_types": "鋼管杭",
+          "pile_types": "鋼管杭（要相見積）",
           "cost": "高",
           "construction_period": "長"
         }
@@ -111,7 +113,7 @@
         "description": "有効な支持層の上端が深度24mから33mまで",
         "characteristics": {
           "pile_length": "30m級",
-          "pile_types": "鋼管杭",
+          "pile_types": "鋼管杭（要相見積）",
           "cost": "より高",
           "construction_period": "より長"
         }
@@ -129,7 +131,7 @@
         "description": "有効な支持層の上端が深度33mより深い",
         "characteristics": {
           "pile_length": "40m超級",
-          "pile_types": "鋼管杭",
+          "pile_types": "鋼管杭（要相見積）",
           "cost": "最高",
           "construction_period": "最長",
           "note": "特殊工法が必要な場合あり"
