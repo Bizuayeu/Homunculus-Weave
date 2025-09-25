@@ -8,11 +8,10 @@ git config --global --add safe.directory /mnt/knowledge 2>/dev/null
 cd /mnt/knowledge && \
 EXPECTED="github.com/Bizuayeu/Homunculus-Weave.git"
 ACTUAL=$(git remote get-url origin 2>/dev/null)
-if [[ "$ACTUAL" == *"$EXPECTED"* ]]; then
+if echo "$ACTUAL" | grep -q "$EXPECTED"; then
     git pull origin main 2>/dev/null
 else
     echo "Warning: Unexpected repository: $ACTUAL"
-    # フォールバック処理
 fi
 LATEST=$(ls EpisodicRAG/Loops/Loop*.txt | sort -V | tail -1)
 [ -f "$LATEST" ] && {
