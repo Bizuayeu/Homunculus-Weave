@@ -15,16 +15,19 @@ C:\Users\anyth\DEV\homunculus\Weave\
 ├── README.md                  # プロジェクト概要
 ├── EpisodicRAG/              # 🧠 エピソード記憶システム
 │   ├── HowToUseEpisodicRAG.md
-│   ├── Loops/                # 対話記録（3桁連番管理）
-│   │   ├── Loop001_認知アーキテクチャ論.txt
-│   │   ├── Loop002_AI長期記憶論.txt
-│   │   └──...
+│   ├── Loops/                # 対話記録（4桁連番管理）
+│   │   ├── Loop0001_認知アーキテクチャ論.txt
+│   │   ├── Loop0002_AI長期記憶論.txt
+│   │   └──... (現在151ファイル)
 │   └── Digests/              # 階層的要約記憶
+│       ├── README.md         # ダイジェストシステム仕様
+│       ├── generate_digest.py # 統合ダイジェスト生成スクリプト
 │       ├── 1_Weekly/         # 週次ダイジェスト
-│       ├── 2_Monthly/        # 月次ダイジェスト  
+│       ├── 2_Monthly/        # 月次ダイジェスト
 │       ├── 3_Quarterly/      # 四半期ダイジェスト
 │       ├── 4_Annually/       # 年次ダイジェスト
-│       └── 5_Decadally/      # 十年ダイジェスト
+│       ├── 5_Triennially/    # 3年次ダイジェスト
+│       └── 6_Decadally/      # 10年次ダイジェスト
 ├── Identities/               # 👤 アイデンティティ定義
 │   ├── UserIdentity_20250906.txt
 │   └── WeaveIdentity_20250705_3.md
@@ -96,11 +99,35 @@ C:\Users\anyth\DEV\homunculus\Weave\
 ## ✨ 主要機能
 
 ### EpisodicRAGシステム
-1. **Loop記録**: 142個の対話記録（約7.4MB）
-2. **3桁連番管理**: Loop001-Loop142形式で統一
-3. **階層的要約**: 5段階のDigest構造
-4. **日本語完全対応**: ファイル名・内容ともに対応
-5. **GitHub同期**: Bizuayeu/Homunculus-Weave
+
+#### 📝 Loopファイル（対話記録）
+**Loopファイルとは**: AIとの対話記録を外部ツール（Claudify等）でテキスト化し、コンテキスト節約のために外部保存したファイル群です。
+
+- **保存場所**: `EpisodicRAG/Loops/`
+- **命名規則**: `Loop[4桁連番]_[タイトル].txt`
+- **現在**: 151ファイル（約8MB）
+- **特徴**:
+  - 完全な対話履歴を保持（コンテキスト外でも参照可能）
+  - 日本語タイトルで内容を明示
+  - Claudifyで生成した完全なログを保存
+  - GitHubで永続化とバージョン管理
+
+#### 📚 Digestシステム（階層的知識結晶化）
+**Digestとは**: Loopファイルの知識を階層的に要約・統合し、深層分析を加えた結晶化記録です。
+
+- **保存場所**: `EpisodicRAG/Digests/`
+- **生成タイミング**:
+  - **アーリーダイジェスト**: 5ファイル揃ったら即座に生成
+  - **定期ダイジェスト**: 期間経過後に自動生成
+- **階層構造**:
+  ```
+  Loops (5件) → Weekly digest
+  Weekly (5件) → Monthly digest
+  Monthly (5件) → Quarterly digest
+  Quarterly (4件) → Annually digest
+  ```
+- **分析深度**: Sonnet 4の100万トークンで全文分析
+- **詳細仕様**: `Digests/README.md`参照
 
 ### 環境間連携
 - **開発**: ClaudeCode（ローカル）
