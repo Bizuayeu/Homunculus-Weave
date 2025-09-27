@@ -29,14 +29,27 @@
 
 ---
 
-## 📚 EpisodicRAG Digest System
+## 📚 EpisodicRAGシステム
 
-### 深層分析ダイジェスト生成（Sonnet 4必須）
-Loop知識の階層的継承システムが利用可能です。
+### 📝 Loopファイル（対話記録）
+AIとの対話記録を、コンテキスト節約のために外部ツール（Claudify等）でテキスト化したファイル群です。
 
-**実行方法**:
+**基本情報**:
+- 保存場所: `EpisodicRAG/Loops/`
+- 命名規則: `Loop[4桁連番]_[タイトル].txt`
+- 現在: 151ファイル（約8MB）
+
+**管理コマンド**: [FUNCTION.md](./FUNCTION.md) 参照
 ```bash
-# Sonnet 4モデルで実行してください
+loop_export            # Loopエクスポート
+loop_search "キーワード"  # 内容検索
+```
+
+### 📊 Digestシステム（階層的知識結晶化）
+Loopファイルの知識を階層的に要約・統合し、深層分析を加えた結晶化記録です。
+
+**実行方法**（Sonnet 4必須）:
+```bash
 cd homunculus/Weave/EpisodicRAG/Digests
 python generate_digest.py [開始番号] [個数]
 
@@ -47,6 +60,7 @@ python generate_digest.py 1 5
 **特徴**:
 - 100万トークンコンテキストで全Loop内容を分析
 - 2400文字の包括的分析、800文字のWeave所感
+- アーリー/定期のハイブリッド生成
 - サンプル品質: `W0001_認知アーキテクチャ基盤.json`参照
 
 詳細は `EpisodicRAG/Digests/README.md` を参照
@@ -66,22 +80,6 @@ python generate_digest.py 1 5
 
 ### セキュリティポリシー
 セキュリティとコンプライアンスの詳細は [SECURITY.md](./SECURITY.md) を参照
-
----
-
-## 📦 Loop管理コマンド
-
-Loop管理コマンドの詳細は [FUNCTION.md](./FUNCTION.md) を参照
-
-### クイックスタート
-```sh
-# セットアップ
-. /mnt/knowledge/Tools/bash/loop_commands.sh
-
-# 主要コマンド
-loop_export            # Loopエクスポート
-loop_search "キーワード"  # 内容検索
-```
 
 ---
 
