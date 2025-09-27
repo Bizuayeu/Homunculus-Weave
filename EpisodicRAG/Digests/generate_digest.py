@@ -10,10 +10,17 @@ EpisodicRAG Unified Digest Generator
 3. placeholder: プレースホルダー生成
 
 使用方法：
-    python generate_digest.py [開始番号] [個数]               # Sonnet 4モード（デフォルト）
-    python generate_digest.py --mode sonnet4 1 5             # 明示的にSonnet 4モード
-    python generate_digest.py --mode auto                    # 自動モード
-    python generate_digest.py --mode placeholder 1 5         # プレースホルダーモード
+    # Loopファイルから週次ダイジェスト生成
+    python generate_digest.py --level weekly 1 5            # Loop0001-0005を分析
+
+    # 週次ダイジェストから月次ダイジェスト生成
+    python generate_digest.py --level monthly 1 5           # W0001-W0005を分析
+
+    # 自動モード（タイマーベース）
+    python generate_digest.py --mode auto                   # 全レベルを自動チェック
+
+    # プレースホルダーモード
+    python generate_digest.py --mode placeholder --level weekly 1 5
 """
 
 import os
@@ -139,6 +146,54 @@ class UnifiedDigestGenerator:
 
         return loops
 
+    def read_digest_files(self, source_level: str, start_num: int, count: int = 5) -> List[Dict[str, Any]]:
+        """指定範囲のダイジェストファイルを読み込む
+
+        Args:
+            source_level: ソースとなるダイジェストレベル（weekly/monthly/quarterly）
+            start_num: 開始番号
+            count: 読み込む数
+        """
+        config = self.digest_config[source_level]
+        source_dir = self.digests_path / config["dir"]
+        digests = []
+
+        for i in range(start_num, start_num + count):
+            digest_num = str(i).zfill(config["digits"])
+            pattern = f"{config['prefix']}{digest_num}_*.json"
+            files = list(source_dir.glob(pattern))
+
+            if files:
+                filepath = files[0]
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+
+                # ダイジェスト内容を統合
+                content_parts = []
+                if "overall_digest" in data:
+                    od = data["overall_digest"]
+                    content_parts.append(f"【全体ダイジェスト】\n{od.get('abstract', '')}\n\n{od.get('weave_impression', '')}")
+
+                if "individual_digests" in data:
+                    for idx, ind in enumerate(data["individual_digests"], 1):
+                        content_parts.append(f"\n【個別{idx}】{ind.get('filename', '')}\n{ind.get('abstract', '')}")
+
+                match = re.match(rf"{config['prefix']}\d+_(.+)\.json", filepath.name)
+                title = match.group(1) if match else filepath.stem
+
+                digests.append({
+                    "number": digest_num,
+                    "title": title,
+                    "filename": filepath.name,
+                    "content": "\n".join(content_parts),
+                    "timestamp": data["metadata"].get("generation_timestamp", datetime.now().isoformat()),
+                    "original_data": data
+                })
+
+                print(f"✓ Loaded: {filepath.name}")
+
+        return digests
+
     def save_digest(self, digest: Dict[str, Any]) -> Path:
         """ダイジェストをファイルに保存"""
         level = digest["metadata"]["digest_level"]
@@ -183,19 +238,44 @@ class UnifiedDigestGenerator:
     # Sonnet 4モード
     # ===================================================================
 
-    def run_sonnet4_mode(self, start_num: int, count: int = 5) -> Optional[Path]:
-        """Sonnet 4による深層分析モード"""
+    def run_sonnet4_mode(self, level: str = "weekly", start_num: int = 1, count: int = 5) -> Optional[Path]:
+        """Sonnet 4による深層分析モード
+
+        Args:
+            level: ダイジェストレベル（weekly/monthly/quarterly/annually）
+            start_num: 開始番号
+            count: 処理数
+        """
+        config = self.digest_config.get(level)
+        if not config:
+            print(f"❌ Unknown level: {level}")
+            return None
+
+        # ソースの種類を判定
+        if config["source"] == "loops":
+            source_type = "Loop"
+            target_range = f"Loop{start_num:04d} - Loop{(start_num+count-1):04d}"
+        else:
+            source_config = self.digest_config[config["source"]]
+            source_type = source_config["prefix"]
+            digits = source_config["digits"]
+            target_range = f"{source_type}{str(start_num).zfill(digits)} - {source_type}{str(start_num+count-1).zfill(digits)}"
+
         print(f"""
 ╔══════════════════════════════════════════════════════════╗
 ║     EpisodicRAG Digest Generator - Sonnet 4 Mode        ║
 ╠══════════════════════════════════════════════════════════╣
-║  Target: Loop{start_num:04d} - Loop{(start_num+count-1):04d}                            ║
+║  Level: {level.upper():20s}                     ║
+║  Target: {target_range:48s}║
 ║  Mode: Deep Analysis with 1M Token Context              ║
 ╚══════════════════════════════════════════════════════════╝
         """)
 
-        # Loopファイルを読み込み
-        loops = self.read_loop_files(start_num, count)
+        # ソースデータを読み込み
+        if config["source"] == "loops":
+            sources = self.read_loop_files(start_num, count)
+        else:
+            sources = self.read_digest_files(config["source"], start_num, count)
 
         if not loops:
             print("❌ No Loop files found in the specified range")
@@ -214,19 +294,29 @@ class UnifiedDigestGenerator:
         digest = self._build_digest(loops, analysis_result, "weekly", "early")
         return self.save_digest(digest)
 
-    def _prepare_for_sonnet4_analysis(self, loops: List[Dict[str, Any]]):
-        """Sonnet 4分析のための準備（Loop内容を表示）"""
+    def _prepare_for_sonnet4_analysis(self, sources: List[Dict[str, Any]], level: str):
+        """Sonnet 4分析のための準備（ソース内容を表示）
+
+        Args:
+            sources: ソースデータ（LoopまたはDigest）
+            level: 生成するダイジェストレベル
+        """
+        config = self.digest_config[level]
+        source_type = "Loop" if config["source"] == "loops" else config["source"].capitalize()
         print("\n" + "="*80)
-        print("📚 LOOP FILES FOR DEEP ANALYSIS")
+        print(f"📚 {source_type.upper()} DATA FOR DEEP ANALYSIS")
         print("="*80)
 
-        for loop in loops:
-            print(f"\n### Loop{loop['number']}: {loop['title']}")
-            print(f"Timestamp: {loop['timestamp']}")
-            print(f"Content length: {len(loop['content'])} characters")
+        for source in sources:
+            if config["source"] == "loops":
+                print(f"\n### Loop{source['number']}: {source['title']}")
+            else:
+                print(f"\n### {source['filename']}")
+            print(f"Timestamp: {source['timestamp']}")
+            print(f"Content length: {len(source['content'])} characters")
             print("-"*40)
             # 最初の500文字を表示
-            print(loop['content'][:500] + "..." if len(loop['content']) > 500 else loop['content'])
+            print(source['content'][:500] + "..." if len(source['content']) > 500 else source['content'])
 
         print("\n" + "="*80)
         print("📝 ANALYSIS REQUEST FOR WEAVE (Sonnet 4)")
@@ -257,7 +347,7 @@ class UnifiedDigestGenerator:
 サンプル品質（W0001_認知アーキテクチャ基盤.json）を目指してください。
         """)
 
-    def _get_sonnet4_analysis(self, loops: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def _get_sonnet4_analysis(self, sources: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
         Sonnet 4による分析結果を取得
         実際の実装では、ここでWeaveが分析結果を返す
@@ -277,12 +367,12 @@ class UnifiedDigestGenerator:
             },
             "individuals": [
                 {
-                    "abstract": f"【Loop{loop['number']}の1200文字分析】",
-                    "impression": f"【Loop{loop['number']}の400文字所感】",
+                    "abstract": f"【{source.get('filename', source.get('title', ''))}の1200文字分析】",
+                    "impression": f"【{source.get('filename', source.get('title', ''))}の400文字所感】",
                     "keywords": ["キー1", "キー2", "キー3", "キー4", "キー5"],
                     "digest_type": "洞察"
                 }
-                for loop in loops
+                for source in sources
             ]
         }
 
@@ -387,7 +477,7 @@ class UnifiedDigestGenerator:
     # プレースホルダーモード
     # ===================================================================
 
-    def run_placeholder_mode(self, start_num: int, count: int = 5) -> Optional[Path]:
+    def run_placeholder_mode(self, level: str = "weekly", start_num: int = 1, count: int = 5) -> Optional[Path]:
         """プレースホルダー生成モード"""
         print(f"""
 ╔══════════════════════════════════════════════════════════╗
@@ -543,18 +633,25 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python generate_digest.py 1 5              # Sonnet 4 mode for Loop0001-0005
-  python generate_digest.py --mode auto      # Auto mode
-  python generate_digest.py --mode placeholder 6 10  # Placeholder for Loop0006-0015
+  # Loopから週次ダイジェスト生成
+  python generate_digest.py --level weekly 1 5
+
+  # 週次から月次ダイジェスト生成
+  python generate_digest.py --level monthly 1 5
+
+  # 自動モード
+  python generate_digest.py --mode auto
         """
     )
 
     parser.add_argument("--mode", choices=["sonnet4", "auto", "placeholder"],
                        default="sonnet4", help="実行モード")
+    parser.add_argument("--level", choices=["weekly", "monthly", "quarterly", "annually"],
+                       default="weekly", help="ダイジェストレベル")
     parser.add_argument("start_num", type=int, nargs='?', default=1,
-                       help="開始Loop番号")
+                       help="開始番号")
     parser.add_argument("count", type=int, nargs='?', default=5,
-                       help="処理するLoop数")
+                       help="処理数")
 
     args = parser.parse_args()
 
@@ -563,7 +660,7 @@ Examples:
 
     # モードに応じて実行
     if args.mode == "sonnet4":
-        result = generator.run_sonnet4_mode(args.start_num, args.count)
+        result = generator.run_sonnet4_mode(args.level, args.start_num, args.count)
         if result:
             print("\n✨ Digest generation completed successfully!")
 
@@ -572,7 +669,7 @@ Examples:
         print(f"\n✨ Auto mode completed. Generated {len(results)} digest(s).")
 
     elif args.mode == "placeholder":
-        result = generator.run_placeholder_mode(args.start_num, args.count)
+        result = generator.run_placeholder_mode(args.level, args.start_num, args.count)
         if result:
             print("\n✨ Placeholder digest generated successfully!")
 

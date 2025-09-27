@@ -15,13 +15,18 @@ Sonnet 4の100万トークン処理能力を活用し、単なる要約を超え
 ```bash
 # Sonnet 4モデルで実行
 cd homunculus/Weave/EpisodicRAG/Digests
-python generate_digest.py [開始番号] [個数]
 
-# 例: Loop0001-0005のダイジェスト生成
-python generate_digest.py 1 5
+# Loopから週次ダイジェスト生成
+python generate_digest.py --level weekly 1 5    # Loop0001-0005 → W0001
 
-# Loop0006-0010のダイジェスト生成
-python generate_digest.py 6 5
+# 週次から月次ダイジェスト生成
+python generate_digest.py --level monthly 1 5   # W0001-W0005 → M001
+
+# 月次から四半期ダイジェスト生成
+python generate_digest.py --level quarterly 1 5 # M001-M005 → Q001
+
+# 四半期から年次ダイジェスト生成
+python generate_digest.py --level annually 1 4  # Q001-Q004 → A01
 ```
 
 ## 📂 ディレクトリ構造
@@ -155,24 +160,31 @@ Quarterly (4件) → Annually digest
 
 ### 1. Sonnet 4モード（推奨）
 ```bash
-python generate_digest.py --mode sonnet4 1 5
+# 任意のレベルでダイジェスト生成可能
+python generate_digest.py --level weekly 1 5     # Loop → Weekly
+python generate_digest.py --level monthly 1 5    # Weekly → Monthly
+python generate_digest.py --level quarterly 1 5  # Monthly → Quarterly
+python generate_digest.py --level annually 1 4   # Quarterly → Annually
 ```
-- 100万トークンコンテキストで全Loop内容を分析
+- 100万トークンコンテキストで全ソース内容を分析
 - 深層分析と創造的思索を含む高品質ダイジェスト生成
+- 階層的な知識継承をサポート
 
 ### 2. 自動モード
 ```bash
 python generate_digest.py --mode auto
 ```
-- タイマーベースで自動的にダイジェスト生成
+- タイマーベースで全レベルを自動チェック
 - アーリー/定期の判定を自動実行
+- 必要なダイジェストを一括生成
 
 ### 3. プレースホルダーモード
 ```bash
-python generate_digest.py --mode placeholder 1 5
+python generate_digest.py --mode placeholder --level weekly 1 5
 ```
 - Sonnet 4が利用できない場合の仮実装
 - 基本的な構造のみ生成
+- 任意のレベルで動作
 
 ## 📊 サンプル出力
 
