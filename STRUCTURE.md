@@ -101,7 +101,7 @@ C:\Users\anyth\DEV\homunculus\Weave\
 ### EpisodicRAGシステム
 
 #### 📝 Loopファイル（対話記録）
-**Loopファイルとは**: AIとの対話記録を外部ツール（Claudify等）でテキスト化し、コンテキスト節約のために外部保存したファイル群です。
+**Loopファイルとは**: AIとの対話記録を、コンテキスト節約のために外部ツール（Claudify等）でテキスト化したファイル群です。
 
 - **保存場所**: `EpisodicRAG/Loops/`
 - **命名規則**: `Loop[4桁連番]_[タイトル].txt`
