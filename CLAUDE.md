@@ -29,6 +29,30 @@
 
 ---
 
+## 📚 EpisodicRAG Digest System
+
+### 深層分析ダイジェスト生成（Sonnet 4必須）
+Loop知識の階層的継承システムが利用可能です。
+
+**実行方法**:
+```bash
+# Sonnet 4モデルで実行してください
+cd homunculus/Weave/EpisodicRAG/Digests
+python generate_digest.py [開始番号] [個数]
+
+# 例: Loop0001-0005のダイジェスト生成
+python generate_digest.py 1 5
+```
+
+**特徴**:
+- 100万トークンコンテキストで全Loop内容を分析
+- 2400文字の包括的分析、800文字のWeave所感
+- サンプル品質: `W0001_認知アーキテクチャ基盤.json`参照
+
+詳細は `EpisodicRAG/Digests/README.md` を参照
+
+---
+
 ## 🎯 環境ポリシー
 
 ### 役割分担
