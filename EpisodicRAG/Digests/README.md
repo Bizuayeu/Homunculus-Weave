@@ -41,11 +41,11 @@ python check_digest.py
 ```
 Digests/
 ├── README.md                    # このファイル
-├── generate_digest.py           # 統合ダイジェスト生成スクリプト
+├── generate_digest.py           # ダイジェスト生成スクリプト（Sonnet 4必須）
+├── check_digest.py              # 生成チェックスクリプト（タイマー管理）
 ├── last_digest_times.json       # タイマー管理ファイル（自動生成）
 │
 ├── 1_Weekly/                    # 週次ダイジェスト
-│   └── W0001_認知アーキテクチャ基盤.json  # サンプル出力 ⭐
 ├── 2_Monthly/                   # 月次ダイジェスト
 ├── 3_Quarterly/                 # 四半期ダイジェスト
 ├── 4_Annually/                  # 年次ダイジェスト
@@ -118,7 +118,7 @@ Digests/
 | 3年次 | T | 2桁 | `T01_第一期三年計画.json` |
 | 10年次 | D | 2桁 | `D01_第一ディケード総括.json` |
 
-## 🏷️ ダイジェスト種別
+## 🏷️ ダイジェスト種別（例）
 
 | 種別 | 意味 | 使用場面 |
 |------|------|----------|
