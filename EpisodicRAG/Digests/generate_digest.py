@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-EpisodicRAG Unified Digest Generator
-=====================================
+EpisodicRAG Digest Generator
+=============================
 
-統合ダイジェスト生成スクリプト
-2つのモードをサポート：
-1. sonnet4: Sonnet 4による深層分析（実際の生成）
-2. auto: 生成が必要なダイジェストのチェック（生成は行わない）
+Sonnet 4による深層分析ダイジェスト生成スクリプト
 
 使用方法：
-    # Loopファイルから週次ダイジェスト生成（引数必須）
-    python generate_digest.py --level weekly 1 5            # Loop0001-0005を分析
+    python generate_digest.py LEVEL START_NUM COUNT
 
-    # 週次ダイジェストから月次ダイジェスト生成（引数必須）
-    python generate_digest.py --level monthly 1 5           # W0001-W0005を分析
+    LEVEL: weekly | monthly | quarterly | annually
+    START_NUM: 開始番号
+    COUNT: 処理数
 
-    # 自動モード（タイマーベースのチェックのみ、実際の生成は行わない）
-    python generate_digest.py --mode auto                   # 生成が必要なダイジェストを通知
+例：
+    python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001
+    python generate_digest.py monthly 1 5     # W0001-W0005 → M001
+    python generate_digest.py quarterly 1 5   # M001-M005 → Q001
+    python generate_digest.py annually 1 4    # Q001-Q004 → A01
 
-注意：意図しない生成を防ぐため、sonnet4モードではすべての引数が必須です
+注意：生成タイミングのチェック機能は check_digest.py を使用してください
 """
 
 import os
@@ -30,7 +30,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
-class UnifiedDigestGenerator:
+class DigestGenerator:
     """統合ダイジェスト生成クラス"""
 
     def __init__(self):
@@ -375,100 +375,6 @@ class UnifiedDigestGenerator:
             ]
         }
 
-    # ===================================================================
-    # 自動モード
-    # ===================================================================
-
-    def run_auto_mode(self) -> List[Path]:
-        """ダイジェスト生成の必要性をチェックして通知（実際の生成は行わない）"""
-        print(f"""
-╔══════════════════════════════════════════════════════════╗
-║     EpisodicRAG Digest Generator - Auto Mode            ║
-╠══════════════════════════════════════════════════════════╣
-║  Checking for early/periodic digest opportunities...    ║
-╚══════════════════════════════════════════════════════════╝
-        """)
-
-        generated = []
-
-        for level in ["weekly", "monthly", "quarterly", "annually"]:
-            files, reason = self._check_digest_trigger(level)
-
-            if files:
-                print(f"\n📌 {level.capitalize()} digest triggered: {reason}")
-                print(f"   Target files: {len(files)} items")
-
-                if level == "weekly" and reason == "early":
-                    # Loopファイルから週次ダイジェスト生成
-                    # 自動モードではSonnet 4分析が必要
-                    print("   ⚠️  Auto mode requires Sonnet 4 analysis. Please run in sonnet4 mode.")
-                    continue
-                # 他のレベルの実装も同様
-
-        if not generated:
-            print("\n✨ No digests needed at this time")
-        else:
-            print(f"\n✅ Generated {len(generated)} digest(s)")
-
-        return generated
-
-    def _check_digest_trigger(self, level: str) -> Tuple[List[Path], str]:
-        """ダイジェスト生成のトリガーをチェック"""
-        config = self.digest_config[level]
-
-        # ソースディレクトリを決定
-        if config["source"] == "loops":
-            source_dir = self.loops_path
-            pattern = "Loop*.txt"
-        else:
-            source_config = self.digest_config[config["source"]]
-            source_dir = self.digests_path / source_config["dir"]
-            pattern = f"{source_config['prefix']}*.json"
-
-        if not source_dir.exists():
-            return [], "none"
-
-        # 最終ダイジェスト時刻
-        last_time_str = self.last_digest_times.get(level)
-        if last_time_str:
-            last_time = datetime.fromisoformat(last_time_str)
-        else:
-            last_time = datetime.min
-
-        # 対象ファイルを収集
-        if last_time == datetime.min:
-            files = sorted(list(source_dir.glob(pattern)))
-        else:
-            files = sorted([f for f in source_dir.glob(pattern)
-                          if f.stat().st_mtime > last_time.timestamp()])
-
-        # トリガー判定
-        if len(files) >= config["early_threshold"]:
-            return files[:config["early_threshold"]], "early"
-        elif last_time != datetime.min:
-            days_passed = (datetime.now() - last_time).days
-            if days_passed >= config["period_days"] and files:
-                return files, "periodic"
-
-        return [], "none"
-
-    def _load_loops_from_files(self, files: List[Path]) -> List[Dict[str, Any]]:
-        """ファイルパスからLoop情報を読み込む"""
-        loops = []
-        for filepath in files:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            match = re.match(r'Loop(\d{4})_(.+)\.txt', filepath.name)
-            if match:
-                loops.append({
-                    "number": match.group(1),
-                    "title": match.group(2),
-                    "filename": filepath.name,
-                    "content": content,
-                    "timestamp": datetime.fromtimestamp(filepath.stat().st_mtime).isoformat()
-                })
-        return loops
 
 
     # ===================================================================
@@ -534,54 +440,38 @@ class UnifiedDigestGenerator:
 def main():
     """メイン実行関数"""
     parser = argparse.ArgumentParser(
-        description="EpisodicRAG Unified Digest Generator",
+        description="EpisodicRAG Digest Generator",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Loopから週次ダイジェスト生成 (Sonnet 4必須)
-  python generate_digest.py --level weekly 1 5
+  python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001
+  python generate_digest.py monthly 1 5     # W0001-W0005 → M001
+  python generate_digest.py quarterly 1 5   # M001-M005 → Q001
+  python generate_digest.py annually 1 4    # Q001-Q004 → A01
 
-  # 週次から月次ダイジェスト生成 (Sonnet 4必須)
-  python generate_digest.py --level monthly 1 5
-
-  # 自動モード（タイマーベースのチェックのみ、実際の生成は行わない）
-  python generate_digest.py --mode auto
+For checking: use check_digest.py
         """
     )
 
-    parser.add_argument("--mode", choices=["sonnet4", "auto"],
-                       default="sonnet4", help="実行モード")
-    parser.add_argument("--level", choices=["weekly", "monthly", "quarterly", "annually"],
-                       help="ダイジェストレベル（sonnet4モード時は必須）")
-    parser.add_argument("start_num", type=int, nargs='?',
-                       help="開始番号（sonnet4モード時は必須）")
-    parser.add_argument("count", type=int, nargs='?',
-                       help="処理数（sonnet4モード時は必須）")
+    parser.add_argument("level", choices=["weekly", "monthly", "quarterly", "annually"],
+                       help="Digest level to generate")
+    parser.add_argument("start_num", type=int,
+                       help="Starting number")
+    parser.add_argument("count", type=int,
+                       help="Number of items to process")
 
     args = parser.parse_args()
 
     # ジェネレータ初期化
-    generator = UnifiedDigestGenerator()
+    generator = DigestGenerator()
 
-    # モードに応じて実行
-    if args.mode == "sonnet4":
-        # Sonnet 4モードでは全引数が必須
-        if not args.level or args.start_num is None or args.count is None:
-            print("\nError: sonnet4 mode requires all arguments")
-            print("Usage: python generate_digest.py --level LEVEL start_num count")
-            print("Example: python generate_digest.py --level weekly 1 5")
-            print("\nRequired arguments:")
-            print("  --level {weekly,monthly,quarterly,annually}")
-            print("  start_num : Starting number (e.g., 1)")
-            print("  count     : Number of items to process (e.g., 5)")
-            sys.exit(1)
-        result = generator.run_sonnet4_mode(args.level, args.start_num, args.count)
-        if result:
-            print("\n✨ Digest generation completed successfully!")
-
-    elif args.mode == "auto":
-        results = generator.run_auto_mode()
-        print(f"\n✨ Auto mode completed. Generated {len(results)} digest(s).")
+    # ダイジェスト生成実行
+    result = generator.run_sonnet4_mode(args.level, args.start_num, args.count)
+    if result:
+        print("\n✨ Digest generation completed successfully!")
+    else:
+        print("\n❌ Digest generation failed")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

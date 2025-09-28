@@ -12,24 +12,29 @@ Sonnet 4の100万トークン処理能力を活用し、単なる要約を超え
 - ClaudeCodeの設定でモデルをSonnet 4に変更してください
 
 ### 基本的な使い方
+
+#### 1. ダイジェスト生成（generate_digest.py）
 ```bash
-# Sonnet 4モデルで実行
 cd homunculus/Weave/EpisodicRAG/Digests
 
-# Loopから週次ダイジェスト生成（全引数必須）
-python generate_digest.py --level weekly 1 5    # Loop0001-0005 → W0001
-
-# 週次から月次ダイジェスト生成（全引数必須）
-python generate_digest.py --level monthly 1 5   # W0001-W0005 → M001
-
-# 月次から四半期ダイジェスト生成
-python generate_digest.py --level quarterly 1 5 # M001-M005 → Q001
-
-# 四半期から年次ダイジェスト生成
-python generate_digest.py --level annually 1 4  # Q001-Q004 → A01
+# シンプルな位置引数形式
+python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001
+python generate_digest.py monthly 1 5     # W0001-W0005 → M001
+python generate_digest.py quarterly 1 5   # M001-M005 → Q001
+python generate_digest.py annually 1 4    # Q001-Q004 → A01
 ```
+**必須**: Claude Sonnet 4モデル設定
 
-**注意**: 意図しない生成を防ぐため、sonnet4モードではすべての引数が必須です。
+#### 2. 生成チェック（check_digest.py）
+```bash
+# 全レベルの生成必要性をチェック
+python check_digest.py
+
+# 出力例：
+# 📌 Weekly digest needed: early
+#    Target files: 5 items
+#    Run: python generate_digest.py weekly 1 5
+```
 
 ## 📂 ディレクトリ構造
 
@@ -156,30 +161,25 @@ Monthly (5件) → Quarterly digest
 Quarterly (4件) → Annually digest
 ```
 
-## 🎯 実行モード
+## 🎯 スクリプト構成
 
-`generate_digest.py`は以下の2つのモードで動作します：
-
-### 1. Sonnet 4モード（メイン機能）
+### generate_digest.py - 生成専用
 ```bash
-# 任意のレベルでダイジェスト生成可能
-python generate_digest.py --level weekly 1 5     # Loop → Weekly
-python generate_digest.py --level monthly 1 5    # Weekly → Monthly
-python generate_digest.py --level quarterly 1 5  # Monthly → Quarterly
-python generate_digest.py --level annually 1 4   # Quarterly → Annually
+python generate_digest.py LEVEL START_NUM COUNT
 ```
+- **役割**: Sonnet 4による深層分析とダイジェスト生成
 - **必須**: Claude Sonnet 4モデル設定
-- 100万トークンコンテキストで全ソース内容を分析
-- 深層分析と創造的思索を含む高品質ダイジェスト生成
+- 100万トークンコンテキストで全内容を分析
 - 階層的な知識継承をサポート
 
-### 2. 自動モード（チェック機能）
+### check_digest.py - チェック専用
 ```bash
-python generate_digest.py --mode auto
+python check_digest.py
 ```
+- **役割**: 生成が必要なダイジェストの検出と通知
 - タイマーベースで全レベルを自動チェック
-- アーリー/定期の判定を自動実行
-- 生成が必要なダイジェストを通知（実際の生成にはSonnet 4モードを使用）
+- アーリー条件（5ファイル）と定期条件（期間経過）を判定
+- 生成コマンドを提案（実際の生成は行わない）
 
 ## 📊 サンプル出力
 
