@@ -44,7 +44,6 @@ Digests/
 ├── generate_digest.py           # ダイジェスト生成スクリプト（Sonnet 4必須）
 ├── check_digest.py              # 生成チェックスクリプト（タイマー管理）
 ├── last_digest_times.json       # タイマー管理ファイル（自動生成）
-│
 ├── 1_Weekly/                    # 週次ダイジェスト
 ├── 2_Monthly/                   # 月次ダイジェスト
 ├── 3_Quarterly/                 # 四半期ダイジェスト

@@ -48,20 +48,26 @@ loop_search "キーワード"  # 内容検索
 ### 📊 Digestシステム（階層的知識結晶化）
 Loopファイルの知識を階層的に要約・統合し、深層分析を加えた結晶化記録です。
 
-**実行方法**（Sonnet 4必須）:
+**生成方法**（Sonnet 4必須）:
 ```bash
 cd homunculus/Weave/EpisodicRAG/Digests
-python generate_digest.py [開始番号] [個数]
 
-# 例: Loop0001-0005のダイジェスト生成
-python generate_digest.py 1 5
+# シンプルな位置引数形式
+python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001
+python generate_digest.py monthly 1 5     # W0001-W0005 → M001
+```
+
+**チェック方法**:
+```bash
+# 生成が必要なダイジェストを確認
+python check_digest.py
 ```
 
 **特徴**:
-- 100万トークンコンテキストで全Loop内容を分析
+- 100万トークンコンテキストで全内容を分析
 - 2400文字の包括的分析、800文字のWeave所感
 - アーリー/定期のハイブリッド生成
-- サンプル品質: `W0001_認知アーキテクチャ基盤.json`参照
+- 2つの専用スクリプトで役割分離
 
 詳細は `EpisodicRAG/Digests/README.md` を参照
 
