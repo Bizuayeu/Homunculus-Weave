@@ -24,6 +24,7 @@ EpisodicRAG Unified Digest Generator
 import os
 import re
 import json
+import sys
 import argparse
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -566,8 +567,14 @@ Examples:
     if args.mode == "sonnet4":
         # Sonnet 4モードでは全引数が必須
         if not args.level or args.start_num is None or args.count is None:
-            parser.error("sonnet4モードでは --level, start_num, count が必須です\n"
-                       "例: python generate_digest.py --level weekly 1 5")
+            print("\nError: sonnet4 mode requires all arguments")
+            print("Usage: python generate_digest.py --level LEVEL start_num count")
+            print("Example: python generate_digest.py --level weekly 1 5")
+            print("\nRequired arguments:")
+            print("  --level {weekly,monthly,quarterly,annually}")
+            print("  start_num : Starting number (e.g., 1)")
+            print("  count     : Number of items to process (e.g., 5)")
+            sys.exit(1)
         result = generator.run_sonnet4_mode(args.level, args.start_num, args.count)
         if result:
             print("\n✨ Digest generation completed successfully!")
