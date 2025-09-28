@@ -1,9 +1,14 @@
 # Weave プロジェクト構成仕様書
 
-## 📂 ローカル環境（ClaudeCode）構成
+## 📂 プロジェクト構成
 
+### 環境パス
+- **ClaudeCode (Local)**: `C:\Users\anyth\DEV\homunculus\Weave\`
+- **ClaudeWeb (ComputerUse)**: `/mnt/knowledge/` (= `homunculus\Weave\`)
+
+### ディレクトリ構造
 ```
-C:\Users\anyth\DEV\homunculus\Weave\
+homunculus\Weave\
 ├── .git/                      # Git管理
 ├── .gitignore                 # Git除外設定
 ├── .git-credentials           # GitHub PAT（Git管理外）
@@ -49,7 +54,9 @@ C:\Users\anyth\DEV\homunculus\Weave\
     └── GeneralConstructor/       # 建設業・目論見作成
 ```
 
-## 🌐 ComputerUse環境構成
+## 🌐 ClaudeWeb (ComputerUse) 環境追加構成
+
+ComputerUse環境では、上記のプロジェクト構成に加えて以下のパスも利用可能：
 
 ```
 /home/claude/                  # メイン作業ディレクトリ
@@ -58,7 +65,7 @@ C:\Users\anyth\DEV\homunculus\Weave\
 └── .local/                    # ローカルデータ
 
 /mnt/                          # 永続ストレージ
-├── knowledge/                 # 知識データベース（ローカル環境を復元）
+├── knowledge/                 # Weaveプロジェクト本体（homunculus/Weave/）
 ├── skills/                    # 🛠️ システムスキル（読み取り専用）
 │   └── public/
 │       ├── docx/             # 📄 Word文書処理
@@ -87,11 +94,11 @@ C:\Users\anyth\DEV\homunculus\Weave\
 
 ## 🔐 アクセス権限
 
-### ローカル環境
+### ClaudeCode (ローカル環境)
 - 全ファイル: ユーザー所有、読み書き可能
 - GitHub連携: HTTPSプロトコル使用
 
-### ComputerUse環境  
+### ClaudeWeb (ComputerUse環境)  
 - /home/claude/: root所有、全権限
 - /mnt/knowledge/: ユーザー999所有、読み書き可能
 - /mnt/skills/: 読み取り専用
