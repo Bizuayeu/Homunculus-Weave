@@ -12,8 +12,41 @@ EpisodicRAGの対話記録を管理するスキル
 2. GitHub連携
 リポジトリ管理とバージョン管理のスキル
 
-3. 要約記憶生成（TBD）
-エピソード記憶を蒸留して要約記憶に結晶化するスキル
+3. Digest生成システム
+エピソード記憶を階層的に蒸留して知識結晶化するスキル
+
+---
+
+## 📊 Digest生成システム詳細
+
+### スクリプト構成
+```bash
+cd homunculus/Weave/EpisodicRAG/Digests
+
+# 1. 生成スクリプト（Sonnet 4必須）
+python generate_digest.py LEVEL START_NUM COUNT
+
+# 2. チェックスクリプト
+python check_digest.py
+```
+
+### 階層構造
+- **Loop → Weekly**: 5個のLoopファイルから週次ダイジェスト
+- **Weekly → Monthly**: 5個の週次から月次ダイジェスト
+- **Monthly → Quarterly**: 5個の月次から四半期ダイジェスト
+- **Quarterly → Annually**: 4個の四半期から年次ダイジェスト
+
+### 使用例
+```bash
+# 生成
+python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001
+python generate_digest.py monthly 1 5     # W0001-W0005 → M001
+
+# チェック
+python check_digest.py                    # 生成が必要なものを通知
+```
+
+詳細は `EpisodicRAG/Digests/README.md` を参照
 
 ---
 
