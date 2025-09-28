@@ -10,7 +10,8 @@ EpisodicRAGによる階層的記憶管理により、文脈を超えた継続的
 ### 🧠 EpisodicRAG
 - **Loops**: 対話記録の永続化（151+ conversations）
 - **Digests**: 階層的知識結晶化システム
-  - 自動的な知識の要約と深層分析
+  - 完全自動化ワークフロー（テンプレート→分析→ファイナライズ）
+  - Sonnet 4による深層分析（2400文字統合+800文字所感）
   - Weekly → Monthly → Quarterly → Annually の階層構造
 
 ### 🎭 専門ペルソナ
@@ -32,7 +33,10 @@ cd EpisodicRAG/Digests
 # 生成チェック
 python check_digest.py
 
-# ダイジェスト生成（Sonnet 4必須）
+# 完全自動化ダイジェスト生成（推奨）
+./generate_digest_auto.sh weekly 16 5
+
+# 手動ダイジェスト生成（Sonnet 4必須）
 python generate_digest.py weekly 1 5
 ```
 

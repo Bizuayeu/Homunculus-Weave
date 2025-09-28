@@ -116,11 +116,11 @@ class DigestChecker:
     def run(self) -> int:
         """チェックを実行"""
         print(f"""
-╔══════════════════════════════════════════════════════════╗
-║        EpisodicRAG Digest Checker                        ║
-╠══════════════════════════════════════════════════════════╣
-║  Checking for early/periodic digest opportunities...     ║
-╚══════════════════════════════════════════════════════════╝
+========================================================
+       EpisodicRAG Digest Checker
+========================================================
+ Checking for early/periodic digest opportunities...
+========================================================
         """)
 
         found_triggers = []
@@ -130,7 +130,7 @@ class DigestChecker:
 
             if files:
                 found_triggers.append((level, files, reason))
-                print(f"\n📌 {level.capitalize()} digest needed: {reason}")
+                print(f"\n[TRIGGER] {level.capitalize()} digest needed: {reason}")
                 print(f"   Target files: {len(files)} items")
 
                 # 生成コマンドの提案
@@ -147,7 +147,7 @@ class DigestChecker:
                     print(f"   Run: python generate_digest.py {level} {first_num} {len(files)}")
 
         if not found_triggers:
-            print("\n✨ No digests needed at this time")
+            print("\n[OK] No digests needed at this time")
             print("\nNext check timing:")
             for level in ["weekly", "monthly", "quarterly", "annually"]:
                 config = self.digest_config[level]
@@ -171,7 +171,7 @@ def main():
     triggers_found = checker.run()
 
     if triggers_found > 0:
-        print(f"\n⚠️  Found {triggers_found} digest(s) ready for generation")
+        print(f"\n[WARNING] Found {triggers_found} digest(s) ready for generation")
         print("Use generate_digest.py with the suggested commands above")
         return 1  # Exit with non-zero to indicate action needed
 

@@ -23,10 +23,14 @@ EpisodicRAGの対話記録を管理するスキル
 ```bash
 cd homunculus/Weave/EpisodicRAG/Digests
 
-# 1. 生成スクリプト（Sonnet 4必須）
-python generate_digest.py LEVEL START_NUM COUNT
+# 1. 完全自動化スクリプト（推奨）
+./generate_digest_auto.sh LEVEL START_NUM COUNT
 
-# 2. チェックスクリプト
+# 2. 手動生成スクリプト（Sonnet 4必須）
+python generate_digest.py LEVEL START_NUM COUNT
+python finalize_with_title.py "分析済み.json" "タイトル"
+
+# 3. チェックスクリプト
 python check_digest.py
 ```
 
@@ -38,9 +42,13 @@ python check_digest.py
 
 ### 使用例
 ```bash
-# 生成
-python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001
-python generate_digest.py monthly 1 5     # W0001-W0005 → M001
+# 完全自動化生成（推奨）
+./generate_digest_auto.sh weekly 16 5     # Loop0016-0020 → W0004
+./generate_digest_auto.sh monthly 1 5     # W0001-W0005 → M001
+
+# 手動生成（2ステップ）
+python generate_digest.py weekly 1 5      # テンプレート生成
+python finalize_with_title.py "analyzed.json" "タイトル" # ファイナライズ
 
 # チェック
 python check_digest.py                    # 生成が必要なものを通知
