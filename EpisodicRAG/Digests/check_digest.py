@@ -117,9 +117,9 @@ class DigestChecker:
         """チェックを実行"""
         print(f"""
 ╔══════════════════════════════════════════════════════════╗
-║        EpisodicRAG Digest Checker                       ║
+║        EpisodicRAG Digest Checker                        ║
 ╠══════════════════════════════════════════════════════════╣
-║  Checking for early/periodic digest opportunities...    ║
+║  Checking for early/periodic digest opportunities...     ║
 ╚══════════════════════════════════════════════════════════╝
         """)
 
