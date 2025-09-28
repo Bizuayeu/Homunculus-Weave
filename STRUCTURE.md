@@ -12,6 +12,7 @@ C:\Users\anyth\DEV\homunculus\Weave\
 ├── FUNCTION.md                # 📚 スキルリファレンス
 ├── PERSONA.md                 # 🎭 専門ペルソナ定義
 ├── SECURITY.md                # 🔒 セキュリティ＆コンプライアンス指針
+├── CONTAINER.md               # 📦 ComputerUse環境説明書（アーカイブ）
 ├── README.md                  # プロジェクト概要
 ├── EpisodicRAG/              # 🧠 エピソード記憶システム
 │   ├── HowToUseEpisodicRAG.md
