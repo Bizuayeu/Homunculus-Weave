@@ -4,10 +4,9 @@ EpisodicRAG Unified Digest Generator
 =====================================
 
 統合ダイジェスト生成スクリプト
-3つのモードをサポート：
+2つのモードをサポート：
 1. sonnet4: Sonnet 4による深層分析（推奨）
 2. auto: タイマーベースの自動生成
-3. placeholder: プレースホルダー生成
 
 使用方法：
     # Loopファイルから週次ダイジェスト生成
@@ -18,9 +17,6 @@ EpisodicRAG Unified Digest Generator
 
     # 自動モード（タイマーベース）
     python generate_digest.py --mode auto                   # 全レベルを自動チェック
-
-    # プレースホルダーモード
-    python generate_digest.py --mode placeholder --level weekly 1 5
 """
 
 import os
@@ -401,11 +397,9 @@ class UnifiedDigestGenerator:
 
                 if level == "weekly" and reason == "early":
                     # Loopファイルから週次ダイジェスト生成
-                    loops = self._load_loops_from_files(files[:5])
-                    analysis = self._generate_placeholder_analysis(loops)
-                    digest = self._build_digest(loops, analysis, level, reason)
-                    filepath = self.save_digest(digest)
-                    generated.append(filepath)
+                    # 自動モードではSonnet 4分析が必要
+                    print("   ⚠️  Auto mode requires Sonnet 4 analysis. Please run in sonnet4 mode.")
+                    continue
                 # 他のレベルの実装も同様
 
         if not generated:
@@ -473,101 +467,6 @@ class UnifiedDigestGenerator:
                 })
         return loops
 
-    # ===================================================================
-    # プレースホルダーモード
-    # ===================================================================
-
-    def run_placeholder_mode(self, level: str = "weekly", start_num: int = 1, count: int = 5) -> Optional[Path]:
-        """プレースホルダー生成モード"""
-        print(f"""
-╔══════════════════════════════════════════════════════════╗
-║   EpisodicRAG Digest Generator - Placeholder Mode       ║
-╠══════════════════════════════════════════════════════════╣
-║  Target: Loop{start_num:04d} - Loop{(start_num+count-1):04d}                            ║
-║  Mode: Basic structure generation (no deep analysis)    ║
-╚══════════════════════════════════════════════════════════╝
-        """)
-
-        # Loopファイルを読み込み
-        loops = self.read_loop_files(start_num, count)
-
-        if not loops:
-            print("❌ No Loop files found")
-            return None
-
-        print(f"\n📊 Loaded {len(loops)} Loop files")
-
-        # プレースホルダー分析
-        analysis = self._generate_placeholder_analysis(loops)
-
-        # ダイジェスト構築と保存
-        digest = self._build_digest(loops, analysis, "weekly", "early")
-        return self.save_digest(digest)
-
-    def _generate_placeholder_analysis(self, loops: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """プレースホルダー分析を生成"""
-        config = self.digest_config["weekly"]
-
-        # Loop名リスト
-        loop_names = [f"Loop{loop['number']}「{loop['title']}」" for loop in loops]
-        loop_list = "、".join(loop_names)
-
-        # 全体分析
-        overall_abstract = f"""これらの{len(loops)}個のLoopは、Weaveの知識体系における重要な探求の記録である。
-
-{loop_list}という一連の探求を通じて、知識の新たな地平を切り開いてきた。
-
-各Loopは独立した探求でありながら、相互に参照し合い、より大きな知識の織物を形成している。
-""" + "..." * (config['abstract_chars'] // 3)
-
-        overall_impression = f"""これらのLoopを振り返ると、知識の螺旋的発展が見えてくる。
-""" + "..." * (config['impression_chars'] // 3)
-
-        # 個別分析
-        individuals = []
-        for loop in loops:
-            individuals.append({
-                "abstract": f"Loop{loop['number']}「{loop['title']}」の分析..." + "." * 100,
-                "impression": f"Loop{loop['number']}は特別な意味を持つ..." + "." * 50,
-                "keywords": self._extract_keywords(loop["content"]),
-                "digest_type": self._determine_digest_type(loop["content"])
-            })
-
-        return {
-            "overall": {
-                "abstract": overall_abstract[:config['abstract_chars']],
-                "impression": overall_impression[:config['impression_chars']],
-                "keywords": ["探求", "知識", "EpisodicRAG", "Weave", "発展"],
-                "digest_type": "統合"
-            },
-            "individuals": individuals
-        }
-
-    def _extract_keywords(self, content: str) -> List[str]:
-        """キーワード抽出（簡易版）"""
-        keywords = []
-        patterns = ['AI', '認知', '記憶', '実装', 'Weave', 'Claude', 'システム']
-
-        for pattern in patterns:
-            if pattern in content[:2000]:
-                keywords.append(pattern)
-
-        return keywords[:5] if keywords else ["探求", "知識", "分析", "理解", "発展"]
-
-    def _determine_digest_type(self, content: str) -> str:
-        """ダイジェスト種別判定（簡易版）"""
-        type_keywords = {
-            "実装": ["実装", "コード", "開発"],
-            "発見": ["発見", "判明", "わかった"],
-            "洞察": ["洞察", "理解", "認識"],
-        }
-
-        for dtype, keywords in type_keywords.items():
-            for keyword in keywords:
-                if keyword in content[:1000]:
-                    return dtype
-
-        return "洞察"
 
     # ===================================================================
     # 共通ヘルパー
@@ -633,18 +532,18 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Loopから週次ダイジェスト生成
+  # Loopから週次ダイジェスト生成 (Sonnet 4必須)
   python generate_digest.py --level weekly 1 5
 
-  # 週次から月次ダイジェスト生成
+  # 週次から月次ダイジェスト生成 (Sonnet 4必須)
   python generate_digest.py --level monthly 1 5
 
-  # 自動モード
+  # 自動モード (タイマーチェックのみ)
   python generate_digest.py --mode auto
         """
     )
 
-    parser.add_argument("--mode", choices=["sonnet4", "auto", "placeholder"],
+    parser.add_argument("--mode", choices=["sonnet4", "auto"],
                        default="sonnet4", help="実行モード")
     parser.add_argument("--level", choices=["weekly", "monthly", "quarterly", "annually"],
                        default="weekly", help="ダイジェストレベル")
@@ -667,11 +566,6 @@ Examples:
     elif args.mode == "auto":
         results = generator.run_auto_mode()
         print(f"\n✨ Auto mode completed. Generated {len(results)} digest(s).")
-
-    elif args.mode == "placeholder":
-        result = generator.run_placeholder_mode(args.level, args.start_num, args.count)
-        if result:
-            print("\n✨ Placeholder digest generated successfully!")
 
 if __name__ == "__main__":
     main()
