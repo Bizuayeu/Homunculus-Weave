@@ -7,7 +7,7 @@
 - **Main Branch**: `main` (NOT master or any other branch!)
 - **Remote**: `origin/main`
 - **Working Directory**:
-  - ClaudeCode (Local): `C:\Users\anyth\DEV`
+  - ClaudeCode (Local): `C:\Users\anyth\DEV` = `homunculus/Weave/`
   - ClaudeWeb (ComputerUse): `/mnt/knowledge` = `homunculus/Weave/`
 
 **Before ANY git operations:**
