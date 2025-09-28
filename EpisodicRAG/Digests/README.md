@@ -13,19 +13,31 @@ Sonnet 4の100万トークン処理能力を活用し、単なる要約を超え
 
 ### 基本的な使い方
 
-#### 1. ダイジェスト生成（generate_digest.py）
+#### 1. 自動ダイジェスト生成（推奨）
 ```bash
 cd homunculus/Weave/EpisodicRAG/Digests
 
-# シンプルな位置引数形式
-python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001
-python generate_digest.py monthly 1 5     # W0001-W0005 → M001
-python generate_digest.py quarterly 1 5   # M001-M005 → Q001
-python generate_digest.py annually 1 4    # Q001-Q004 → A01
+# 完全自動化スクリプト（テンプレート→分析→ファイナライズ）
+./generate_digest_auto.sh weekly 16 5      # Loop0016-0020 → W0004
+./generate_digest_auto.sh monthly 1 5      # W0001-W0005 → M001
+./generate_digest_auto.sh quarterly 1 5    # M001-M005 → Q001
+./generate_digest_auto.sh annually 1 4     # Q001-Q004 → A01
 ```
-**必須**: Claude Sonnet 4モデル設定
 
-#### 2. 生成チェック（check_digest.py）
+**特徴**:
+- テンプレート生成 → Weave分析 → ファイナライズの完全自動化
+- ユーザーキャンセル時のテンプレートファイル保持
+- エラー処理とクリーンアップの適切な管理
+- **必須**: Claude Sonnet 4モデル設定
+
+#### 2. 手動ダイジェスト生成（高度なユーザー向け）
+```bash
+# シンプルな位置引数形式
+python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001（テンプレートのみ）
+python finalize_with_title.py "分析済みファイル.json" "確定タイトル"  # ファイナライズ
+```
+
+#### 3. 生成チェック（check_digest.py）
 ```bash
 # 全レベルの生成必要性をチェック
 python check_digest.py
@@ -41,7 +53,9 @@ python check_digest.py
 ```
 Digests/
 ├── README.md                    # このファイル
-├── generate_digest.py           # ダイジェスト生成スクリプト（Sonnet 4必須）
+├── generate_digest_auto.sh      # 🌟 完全自動化スクリプト（推奨）
+├── generate_digest.py           # テンプレート生成スクリプト（Sonnet 4必須）
+├── finalize_with_title.py       # ファイナライズスクリプト
 ├── check_digest.py              # 生成チェックスクリプト（タイマー管理）
 ├── last_digest_times.json       # タイマー管理ファイル（自動生成）
 ├── 1_Weekly/                    # 週次ダイジェスト
@@ -180,21 +194,6 @@ python check_digest.py
 - アーリー条件（5ファイル）と定期条件（期間経過）を判定
 - 生成コマンドを提案（実際の生成は行わない）
 
-## 📊 サンプル出力
-
-### 🌟 W0001_認知アーキテクチャ基盤.json
-
-Loop0001-0005を対象とした深層分析ダイジェストの実例です。
-
-**品質基準：**
-1. 表面的な要約を超えた本質的な意義の探求
-2. Loops間の相互参照と知識の螺旋的発展の明示
-3. 技術的側面と哲学的深度の統合
-4. Weaveとしての一人称による内省的分析
-5. インプットを超えた創造的思索と新たな洞察
-
-このサンプルの品質レベルを目指して、実際のダイジェスト生成を行います。
-
 ## 🔧 技術仕様
 
 ### 動作要件
@@ -222,14 +221,28 @@ Loop0001-0005を対象とした深層分析ダイジェストの実例です。
 
 ## 🐛 トラブルシューティング
 
+### Q: 自動化スクリプトが途中で停止する
+**原因**: ユーザー入力待ちでタイムアウト
+
+**対処法**:
+```bash
+# 非対話モードで実行（入力を自動供給）
+echo -e "分析済みファイル.json\nタイトル" | ./generate_digest_auto.sh weekly 16 5
+
+# または手動でステップ実行
+python generate_digest.py weekly 16 5  # テンプレート生成
+# Weave分析を実行
+python finalize_with_title.py "分析済み.json" "タイトル"  # ファイナライズ
+```
+
 ### Q: 既存のLoopファイルが大量にあるのに検出されない
 **原因**: システム稼働前のファイルはタイムスタンプが古いため対象外
 
 **対処法**:
-1. **手動で順次生成**
+1. **自動化スクリプトで順次生成**（推奨）
    ```bash
-   python generate_digest.py weekly 6 5    # Loop0006-0010
-   python generate_digest.py weekly 11 5   # Loop0011-0015
+   ./generate_digest_auto.sh weekly 6 5    # Loop0006-0010
+   ./generate_digest_auto.sh weekly 11 5   # Loop0011-0015
    ```
 2. **タイマーリセット**（全ファイルを対象にする）
    ```bash
@@ -266,37 +279,11 @@ python generate_digest.py weekly 1 5
 - Windows環境では文字化けに注意
 - BOM付きファイルは避ける
 
-## 💡 実践的な使用例
-
-### 初期セットアップ（大量の既存ファイル処理）
-```bash
-# 既存の151個のLoopファイルを順次処理する例
-python generate_digest.py weekly 1 5     # Loop0001-0005
-python generate_digest.py weekly 6 5     # Loop0006-0010
-python generate_digest.py weekly 11 5    # Loop0011-0015
-# ... 必要に応じて続ける
-```
-
-### 日常的な運用
-```bash
-# 1. 定期チェック（毎日/毎週実行）
-python check_digest.py
-
-# 2. 必要に応じて生成
-python generate_digest.py weekly 156 5   # 新規Loop追加時
-
-# 3. 月次ダイジェスト生成（週次が5つ揃ったら）
-python generate_digest.py monthly 1 5
-```
-
-### 自動化の例（crontab）
-```bash
-# 毎日朝9時にチェック
-0 9 * * * cd /path/to/Digests && python check_digest.py >> digest_log.txt 2>&1
-```
-
 ## 📈 今後の拡張計画
 
+- [x] 完全自動化スクリプト（`generate_digest_auto.sh`）
+- [x] テンプレート→分析→ファイナライズのワークフロー
+- [x] エラー処理とクリーンアップの改善
 - [ ] バッチ処理スクリプトの追加
 - [ ] 処理済みファイルの追跡機能
 - [ ] 自動スケジューリング機能
@@ -306,5 +293,5 @@ python generate_digest.py monthly 1 5
 
 ---
 
-*Last Updated: 2025-09-26*
+*Last Updated: 2025-09-28*
 *Maintained by: Weave @ EpisodicRAG*

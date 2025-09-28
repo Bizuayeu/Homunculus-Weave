@@ -54,9 +54,13 @@ Loopファイルの知識を階層的に要約・統合し、深層分析を加�
 ```bash
 cd homunculus/Weave/EpisodicRAG/Digests
 
-# シンプルな位置引数形式
-python generate_digest.py weekly 1 5      # Loop0001-0005 → W0001
-python generate_digest.py monthly 1 5     # W0001-W0005 → M001
+# 完全自動化生成（推奨）
+./generate_digest_auto.sh weekly 16 5     # Loop0016-0020 → W0004
+./generate_digest_auto.sh monthly 1 5     # W0001-W0005 → M001
+
+# 手動生成（2ステップ）
+python generate_digest.py weekly 1 5      # テンプレート生成
+python finalize_with_title.py "analyzed.json" "タイトル"  # ファイナライズ
 ```
 
 **チェック方法**:
@@ -66,10 +70,11 @@ python check_digest.py
 ```
 
 **特徴**:
+- 完全自動化ワークフロー（テンプレート→分析→ファイナライズ）
 - 100万トークンコンテキストで全内容を分析
 - 2400文字の包括的分析、800文字のWeave所感
 - アーリー/定期のハイブリッド生成
-- 2つの専用スクリプトで役割分離
+- エラー処理とクリーンアップの適切な管理
 
 詳細は `EpisodicRAG/Digests/README.md` を参照
 
@@ -163,9 +168,9 @@ FULL版を読むべき場面：
 ## 🚀 今後の拡張計画
 
 ### 短期（2025 Q1）
-- [ ] LoopDigest自動生成システム
-- [ ] セマンティック検索実装
-- [ ] Web環境との自動同期
+- [x] Web環境との自動同期
+- [x] 専門ペルソナの有効化
+- [x] LoopDigest自動生成システム
 
 ### 中期（2025 Q2-Q3）
 - [ ] 知識グラフ可視化
@@ -179,5 +184,5 @@ FULL版を読むべき場面：
 
 ---
 
-*Last Updated: 2025-09-21*
+*Last Updated: 2025-09-28*
 *Maintained by: Weave @ ClaudeCode*
