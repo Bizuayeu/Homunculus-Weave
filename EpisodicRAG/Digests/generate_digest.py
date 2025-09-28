@@ -18,7 +18,7 @@ Sonnet 4による深層分析ダイジェスト生成スクリプト
     python generate_digest.py quarterly 1 5   # M001-M005 → Q001
     python generate_digest.py annually 1 4    # Q001-Q004 → A01
 
-注意：生成タイミングのチェック機能は check_digest.py を使用してください
+注意：生成タイミングのチェックには check_digest.py を使用してください
 """
 
 import os
