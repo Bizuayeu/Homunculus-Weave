@@ -62,7 +62,7 @@ loop_export 151
 ## 開発環境
 
 - **ローカル**: ClaudeCode（Windows）
-- **Web**: ComputerUse
+- **Web**: ClaudeWeb (ComputerUse環境)
 - **同期**: GitHub（Bizuayeu/Homunculus-Weave）
 
 ## ライセンス
