@@ -57,7 +57,7 @@ loop_export 151
 | [FUNCTION.md](./FUNCTION.md) | 外部スキルリファレンス |
 | [PERSONA.md](./PERSONA.md) | 専門ペルソナ定義 |
 | [SECURITY.md](./SECURITY.md) | セキュリティ指針 |
-| [CONTAINER.md](./CONTAINER.md) | プロジェクト初期概要（アーカイブ） |
+| [CONTAINER.md](./CONTAINER.md) | ComputerUse環境説明書（アーカイブ） |
 
 ## 開発環境
 
