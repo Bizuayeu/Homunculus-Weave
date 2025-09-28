@@ -5,8 +5,8 @@ EpisodicRAG Unified Digest Generator
 
 統合ダイジェスト生成スクリプト
 2つのモードをサポート：
-1. sonnet4: Sonnet 4による深層分析（推奨）
-2. auto: タイマーベースの自動生成
+1. sonnet4: Sonnet 4による深層分析（実際の生成）
+2. auto: 生成が必要なダイジェストのチェック（生成は行わない）
 
 使用方法：
     # Loopファイルから週次ダイジェスト生成
@@ -15,8 +15,8 @@ EpisodicRAG Unified Digest Generator
     # 週次ダイジェストから月次ダイジェスト生成
     python generate_digest.py --level monthly 1 5           # W0001-W0005を分析
 
-    # 自動モード（タイマーベース）
-    python generate_digest.py --mode auto                   # 全レベルを自動チェック
+    # 自動モード（チェックのみ、生成は行わない）
+    python generate_digest.py --mode auto                   # 生成が必要なダイジェストを通知
 """
 
 import os
@@ -377,7 +377,7 @@ class UnifiedDigestGenerator:
     # ===================================================================
 
     def run_auto_mode(self) -> List[Path]:
-        """タイマーベースの自動ダイジェスト生成モード"""
+        """ダイジェスト生成の必要性をチェックして通知（実際の生成は行わない）"""
         print(f"""
 ╔══════════════════════════════════════════════════════════╗
 ║     EpisodicRAG Digest Generator - Auto Mode            ║
