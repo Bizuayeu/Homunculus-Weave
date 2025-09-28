@@ -273,21 +273,21 @@ class UnifiedDigestGenerator:
         else:
             sources = self.read_digest_files(config["source"], start_num, count)
 
-        if not loops:
-            print("❌ No Loop files found in the specified range")
+        if not sources:
+            print(f"❌ No {source_type} files found in the specified range")
             return None
 
-        print(f"\n📊 Loaded {len(loops)} Loop files")
-        print(f"📏 Total content: {sum(len(loop['content']) for loop in loops)} characters")
+        print(f"\n📊 Loaded {len(sources)} {source_type} files")
+        print(f"📏 Total content: {sum(len(s['content']) for s in sources)} characters")
 
         # Sonnet 4用の分析準備
-        self._prepare_for_sonnet4_analysis(loops)
+        self._prepare_for_sonnet4_analysis(sources, level)
 
         # ここでWeave（Sonnet 4）による実際の分析が行われる
-        analysis_result = self._get_sonnet4_analysis(loops)
+        analysis_result = self._get_sonnet4_analysis(sources)
 
         # ダイジェスト構築と保存
-        digest = self._build_digest(loops, analysis_result, "weekly", "early")
+        digest = self._build_digest(sources, analysis_result, level, "early")
         return self.save_digest(digest)
 
     def _prepare_for_sonnet4_analysis(self, sources: List[Dict[str, Any]], level: str):
@@ -318,7 +318,7 @@ class UnifiedDigestGenerator:
         print("📝 ANALYSIS REQUEST FOR WEAVE (Sonnet 4)")
         print("="*80)
         print(f"""
-上記の{len(loops)}個のLoopファイル（Loop{loops[0]['number']}-{loops[-1]['number']}）について、
+上記の{len(sources)}個の{source_type}ファイルについて、
 以下の要件で深層分析ダイジェストを生成してください：
 
 【要件】
@@ -472,7 +472,7 @@ class UnifiedDigestGenerator:
     # 共通ヘルパー
     # ===================================================================
 
-    def _build_digest(self, loops: List[Dict[str, Any]], analysis: Dict[str, Any],
+    def _build_digest(self, sources: List[Dict[str, Any]], analysis: Dict[str, Any],
                      level: str, reason: str) -> Dict[str, Any]:
         """ダイジェスト構造を構築"""
         config = self.digest_config[level]
@@ -481,20 +481,23 @@ class UnifiedDigestGenerator:
         next_num = self.get_next_digest_number(level)
         digest_num = str(next_num).zfill(config["digits"])
 
-        if loops[0]["number"] == "0001" and len(loops) == 5:
+        if sources[0]["number"] == "0001" and len(sources) == 5:
             title = "認知アーキテクチャ基盤"
         else:
-            title = f"Loop{loops[0]['number']}-{loops[-1]['number']}統合"
+            if config["source"] == "loops":
+                title = f"Loop{sources[0]['number']}-{sources[-1]['number']}統合"
+            else:
+                title = f"{sources[0]['title']}_統合"
 
         digest_name = f"{config['prefix']}{digest_num}_{title}"
 
         # 個別ダイジェスト構築
         individual_digests = []
-        for i, loop in enumerate(loops):
+        for i, source in enumerate(sources):
             ind = analysis["individuals"][i]
             individual_digests.append({
-                "filename": loop["filename"],
-                "timestamp": loop["timestamp"],
+                "filename": source["filename"],
+                "timestamp": source["timestamp"],
                 "digest_type": ind["digest_type"],
                 "keywords": ind["keywords"],
                 "abstract": ind["abstract"],
@@ -506,7 +509,7 @@ class UnifiedDigestGenerator:
                 "digest_name": digest_name,
                 "digest_level": level,
                 "digest_reason": reason,
-                "input_files": [loop["filename"] for loop in loops],
+                "input_files": [source["filename"] for source in sources],
                 "generation_timestamp": datetime.now().isoformat(),
                 "version": "1.0"
             },
