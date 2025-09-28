@@ -16,10 +16,10 @@ Sonnet 4の100万トークン処理能力を活用し、単なる要約を超え
 # Sonnet 4モデルで実行
 cd homunculus/Weave/EpisodicRAG/Digests
 
-# Loopから週次ダイジェスト生成
+# Loopから週次ダイジェスト生成（全引数必須）
 python generate_digest.py --level weekly 1 5    # Loop0001-0005 → W0001
 
-# 週次から月次ダイジェスト生成
+# 週次から月次ダイジェスト生成（全引数必須）
 python generate_digest.py --level monthly 1 5   # W0001-W0005 → M001
 
 # 月次から四半期ダイジェスト生成
@@ -28,6 +28,8 @@ python generate_digest.py --level quarterly 1 5 # M001-M005 → Q001
 # 四半期から年次ダイジェスト生成
 python generate_digest.py --level annually 1 4  # Q001-Q004 → A01
 ```
+
+**注意**: 意図しない生成を防ぐため、sonnet4モードではすべての引数が必須です。
 
 ## 📂 ディレクトリ構造
 

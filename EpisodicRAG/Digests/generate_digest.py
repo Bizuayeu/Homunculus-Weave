@@ -9,14 +9,16 @@ EpisodicRAG Unified Digest Generator
 2. auto: 生成が必要なダイジェストのチェック（生成は行わない）
 
 使用方法：
-    # Loopファイルから週次ダイジェスト生成
+    # Loopファイルから週次ダイジェスト生成（引数必須）
     python generate_digest.py --level weekly 1 5            # Loop0001-0005を分析
 
-    # 週次ダイジェストから月次ダイジェスト生成
+    # 週次ダイジェストから月次ダイジェスト生成（引数必須）
     python generate_digest.py --level monthly 1 5           # W0001-W0005を分析
 
-    # 自動モード（チェックのみ、生成は行わない）
+    # 自動モード（タイマーベースのチェックのみ、実際の生成は行わない）
     python generate_digest.py --mode auto                   # 生成が必要なダイジェストを通知
+
+注意：意図しない生成を防ぐため、sonnet4モードではすべての引数が必須です
 """
 
 import os
@@ -541,7 +543,7 @@ Examples:
   # 週次から月次ダイジェスト生成 (Sonnet 4必須)
   python generate_digest.py --level monthly 1 5
 
-  # 自動モード (タイマーチェックのみ)
+  # 自動モード（タイマーベースのチェックのみ、実際の生成は行わない）
   python generate_digest.py --mode auto
         """
     )
@@ -549,11 +551,11 @@ Examples:
     parser.add_argument("--mode", choices=["sonnet4", "auto"],
                        default="sonnet4", help="実行モード")
     parser.add_argument("--level", choices=["weekly", "monthly", "quarterly", "annually"],
-                       default="weekly", help="ダイジェストレベル")
-    parser.add_argument("start_num", type=int, nargs='?', default=1,
-                       help="開始番号")
-    parser.add_argument("count", type=int, nargs='?', default=5,
-                       help="処理数")
+                       help="ダイジェストレベル（sonnet4モード時は必須）")
+    parser.add_argument("start_num", type=int, nargs='?',
+                       help="開始番号（sonnet4モード時は必須）")
+    parser.add_argument("count", type=int, nargs='?',
+                       help="処理数（sonnet4モード時は必須）")
 
     args = parser.parse_args()
 
@@ -562,6 +564,10 @@ Examples:
 
     # モードに応じて実行
     if args.mode == "sonnet4":
+        # Sonnet 4モードでは全引数が必須
+        if not args.level or args.start_num is None or args.count is None:
+            parser.error("sonnet4モードでは --level, start_num, count が必須です\n"
+                       "例: python generate_digest.py --level weekly 1 5")
         result = generator.run_sonnet4_mode(args.level, args.start_num, args.count)
         if result:
             print("\n✨ Digest generation completed successfully!")
