@@ -24,3 +24,6 @@ __pycache__/
 # テストフォルダ（ローカル開発用）
 **/test/
 **/tests/
+
+# EpisodicRAG
+EpisodicRAG/
