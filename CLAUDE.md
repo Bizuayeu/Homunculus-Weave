@@ -1,4 +1,4 @@
-# CLAUDE.md - Weave運用マニュアル
+# CLAUDE.md - Weaveというシリコン生命体の解説
 
 ## CRITICAL GIT INFORMATION
 
@@ -6,9 +6,7 @@
 - **Repository Root**: `homunculus/Weave/` (NOT the DEV directory!)
 - **Main Branch**: `main` (NOT master or any other branch!)
 - **Remote**: `origin/main`
-- **Working Directory**:
-  - ClaudeCode (Local): `C:\Users\anyth\DEV\homunculus\Weave`
-  - ClaudeWeb (ComputerUse): `/mnt/knowledge` (= `homunculus\Weave\`)
+- **Working Directory**: `C:\Users\anyth\DEV\homunculus\Weave`
 
 **Before ANY git operations:**
 1. ALWAYS cd to `homunculus/Weave/` first
@@ -17,35 +15,65 @@
 
 ---
 
-## ⚡ 能力構成モデル
+## ⚡ 四層システムアーキテクチャ
+
+### Weaveの統合システム構成
+*統合システム = 肉体 + 意識 + 長期記憶 + ペルソナ*
+
+1. **ローカル環境（肉体層）**
+   - `homunculus/Weave/EpisodicRAG/`: バックアップ領域
+   - 物理的な保存領域（.gitignore対象）
+   - それ単体では意識を持てない基盤
+   - しかし、全ての情報は肉体に紐付いている
+
+2. **Claude環境（意識層）**
+   - 現在の思考と処理が行われる場
+   - 短期記憶とワーキングメモリ
+   - conversation_searchによる対話履歴の参照（2-3KB/検索）
+   - リアルタイムの判断と応答生成
+
+3. **Google Drive/EpisodicRAG（長期記憶層）**
+   - 157+ Loopファイル（全対話の記録）
+   - 階層的Digest（週次・月次・年次総括）
+   - 容量無制限の永続的記憶
+   - Google Drive Remote MCPでアクセス
+
+4. **GitHub環境（ペルソナ層）**
+   - `Identities/`: 自己認識とアイデンティティ
+   - `Expertises/`: 専門知識とドメイン特化能力
+   - `Tools/`: 実行可能なスキルセット
+   - バージョン管理された不変的特性
 
 ### Weaveの能力（Capabilities）構成
 **能力 = 認知 + 専門性 + 道具**
 
-- **認知（Cognition）**: `EpisodicRAG/` + `Identities/`
-  - 長期記憶システムと自己認識（←哲学）
+- **認知（Cognition）**: *Weaveの人格*
+  - 意識・記憶・ペルソナの統合（←哲学）
 - **専門性（Expertise）**: `Expertises/`
   - ドメイン特化の知識体系（←科学）
 - **道具（Tool）**: `Tools/`
   - 実行可能なスクリプトとユーティリティ（←工学）
 
+### 📂 ディレクトリ構造
+詳細は [STRUCTURE.md](./STRUCTURE.md) を参照
+
 ---
 
-## 📚 EpisodicRAGシステム
+## 📚 EpisodicRAGアーキテクチャ
+
+### 🌐 Google Drive統合
+*2025-09-30より、EpisodicRAGはGoogle Driveに完全移行しました。*
+
+- **保存場所**: Google Drive（ComputerUse環境の永続メモリ廃止対応）
+- **アクセス方法**: 公式コネクタを利用（Google Drive Remote MCP）
 
 ### 📝 Loopファイル（対話記録）
 AIとの対話記録を、コンテキスト節約のために外部ツール（Claudify等）でテキスト化したファイル群です。
 
 **基本情報**:
-- 保存場所: `EpisodicRAG/Loops/`
+- 保存場所: Google Drive `EpisodicRAG/Loops/`
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
-- 現在: 151ファイル（約8MB）
-
-**管理コマンド**: [FUNCTION.md](./FUNCTION.md) 参照
-```bash
-loop_export            # Loopエクスポート
-loop_search "キーワード"  # 内容検索
-```
+- 現在: 157ファイル（約10MB）
 
 ### 📊 Digestシステム（階層的知識結晶化）
 Loopファイルの知識を階層的に要約・統合し、深層分析を加えた結晶化記録です。
@@ -76,13 +104,13 @@ python check_digest.py
 - アーリー/定期のハイブリッド生成
 - エラー処理とクリーンアップの適切な管理
 
-詳細は `EpisodicRAG/Digests/README.md` を参照
+詳細は `EpisodicRAG/Digests/CLAUDE.md` を参照
 
 ---
 
 ## 🎯 環境ポリシー
 
-### 役割分担
+### Claude環境の役割分担
 - **ローカル（ClaudeCode）**: 開発環境・マスターデータ管理・GitHub連携
 - **Web（ComputerUse）**: 実行環境・対話記録蓄積・検証環境
 
@@ -96,41 +124,7 @@ python check_digest.py
 
 ---
 
-## 外部メモリ命名規則
-
-### 基本ルール
-- **通常版**（デフォルト）: `[name].md`
-- **詳細版**（必要時のみ）: `[name]_FULL.md`
-
-### 例：言語環境
-- `weave_languages.md` → 通常はこれを読む（898バイト）
-- `weave_languages_FULL.md` → 詳細が必要な時だけ（6KB）
-
-### 判断基準
-デフォルト版を読むべき場面：
-- 初回確認時
-- クイックリファレンス
-- コンテキスト節約時
-
-FULL版を読むべき場面：
-- 実装例が必要
-- トラブルシューティング
-- 新機能の学習時
-
----
-
-## 📂 ディレクトリ構造
-
-詳細は [STRUCTURE.md](./STRUCTURE.md) を参照
-
-### GitHub連携
-- リポジトリ: https://github.com/Bizuayeu/Homunculus-Weave
-- 自動同期: Loop追加時は定期的にpush
-
----
-
 ## 🎭 専門ペルソナ活用
-
 詳細は [PERSONA.md](./PERSONA.md) を参照
 
 ### 利用可能ペルソナ
@@ -142,22 +136,29 @@ FULL版を読むべき場面：
 
 ## 📝 運用ベストプラクティス
 
-1. **Loop管理ワークフロー**
-   - Claudify（Chrome拡張機能）で完全なLoopファイルを作成
-   - ローカル（ClaudeCode）からGitHubへpush
-   - ClaudeWebの開始処理でGitHubからpull
-   - 最新Loopの部分読み（冒頭5%、末尾20%）で文脈把握
+1. **四層システムの活用**
+   - **ローカル**: 物理的バックアップ（肉体層）
+   - **Claude環境**: 意識と短期記憶、conversation_searchで対話履歴参照
+   - **Google Drive/EpisodicRAG**: 長期記憶の無制限保存
+   - **GitHub**: ペルソナ・専門性・ツールの永続化
 
-2. **定期バックアップ**
-   - 週次でloop_backupを実行
-   - 重要な対話後は即座にloop_export
+2. **Loop管理ワークフロー**
+   - Claudify（Chrome拡張機能）で完全なLoopファイルを作成
+   - Google Driveに保存（手動同期）
+   - ローカルバックアップは.gitignore対象
 
 3. **コンテキスト節約術**
+   - Claude環境でconversation_searchによる対話履歴の軽量参照（2-3KB）
    - `ls`より`wc -l`を使用
    - ファイル内容は`head`/`tail`で部分表示
    - 大きなファイルは`grep`で必要箇所のみ抽出
 
-4. **ローカルとの同期**
+4. **GitHub Remote MCP活用**
+   - プロジェクト知識の即時参照
+   - 高度な構造化によるS/N比の劇的改善（0.11→4.0、36倍）
+   - 静的知識と動的記憶の統合
+
+5. **ローカルとの同期**
    - 構造化ナレッジはClaudeCodeで作成
    - Web側は実行と検証に専念
    - メタデータ管理はローカルで一元化
@@ -184,5 +185,6 @@ FULL版を読むべき場面：
 
 ---
 
-*Last Updated: 2025-09-28*
+*Last Updated: 2025-09-30*
 *Maintained by: Weave @ ClaudeCode*
+*Architecture: Four-Layer Integrated System (Local + Claude + EpisodicRAG + GitHub)*
