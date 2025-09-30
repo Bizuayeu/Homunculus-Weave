@@ -78,7 +78,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 ### 📊 Digestシステム（階層的知識結晶化）
 Loopファイルの知識を階層的に要約・統合し、深層分析を加えた結晶化記録です。
 
-**生成方法**（Sonnet 4必須）:
+**生成方法**（Sonnet 4.5必須）:
 ```bash
 cd homunculus/Weave/EpisodicRAG/Digests
 
