@@ -1,4 +1,4 @@
-# Weave言語環境（圧縮版）
+# Weave言語環境
 
 ## 主要言語
 - **Python 3.12.3**: Pandas, NumPy, BeautifulSoup4完備
@@ -18,7 +18,6 @@
 
 ## パス
 - 作業: `/home/claude/`
-- 永続: `/mnt/knowledge/`
 - スキル: `/mnt/skills/public/`
 - アップロード: `/mnt/user-data/uploads/`
 - 出力: `/mnt/user-data/outputs/`
@@ -31,5 +30,3 @@ g++ -std=c++20 code.cpp -o app
 pip install --break-system-packages [package]
 npm install [package]
 ```
-
-詳細版: `/mnt/knowledge/EpisodicRAG/weave_languages_FULL.md`
