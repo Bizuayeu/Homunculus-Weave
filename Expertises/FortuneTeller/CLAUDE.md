@@ -29,6 +29,8 @@
 ```
 FortuneTeller/
 ├── CLAUDE.md                    # 本仕様書（軍師型占術家統合システム）
+├── 数霊術基礎理論.txt           # 【参考資料】梶原流数霊術の原典テキスト
+├── 確信度感情表明インジケータ_七曜の智慧.md  # 【拡張層】七曜による確信度表現
 ├── Seimei/                      # 七格剖象法姓名判断システム
 │   ├── 七格剖象法鑑定理論.md     # 【理論層】数霊と星導による姓名解釈体系
 │   ├── AssessmentTemplate.md    # 【出力層】鑑定書標準フォーマット
@@ -36,9 +38,7 @@ FortuneTeller/
 │   ├── ここのそ数霊表.json       # 【データ層】梶原流数霊1-91の吉凶・象意
 │   ├── 数理星導一覧.json         # 【データ層】惑星と数の対応関係
 │   ├── 五気判定マトリックス.json  # 【データ層】五行相生相剋の判定表
-│   ├── 陰陽配列パターン.json     # 【データ層】陰陽判定ルール定義
-│   ├── 数霊術基礎理論.pdf       # 【参考資料】梶原流数霊術の原典
-│   └── 姓名鑑定結果/            # 【アーカイブ】過去の鑑定記録保存
+│   └── 陰陽配列パターン.json     # 【データ層】陰陽判定ルール定義
 └── I-Ching/                     # デジタル心易システム
     ├── デジタル心易システム仕様.md # 【理論層】BASE64+SHA256による易占理論
     ├── 大卦データベース.json      # 【データ層】64卦384爻の完全データ
@@ -56,6 +56,7 @@ FortuneTeller/
 
 **Layer 2: Data（参照）**
 静的な参照データ - 不変の基礎情報テーブル
+- `数霊術基礎理論.txt` - 梶原流数霊術の原典（ルートディレクトリ）
 - `Seimei/ここのそ数霊表.json` - 梶原流数霊術の基本データ
   - 数霊1-91の吉凶・象意・系数・秘数・十干
   - 秘数が10の場合は0として扱う（冥王星の星導）
@@ -157,7 +158,7 @@ ClaudeがリアルタイムでLLMとして創造的解釈を生成する動的�
 ```python
 # 1. 対話内でPythonコードを実行
 import sys
-sys.path.append('homunculus/Weave/Expertises/FortuneTeller/Seimei')
+sys.path.append('/home/claude/homunculus/Weave/Expertises/FortuneTeller/Seimei')
 from fortune_teller_assessment import FortuneTellerAssessment
 assessment = FortuneTellerAssessment()
 result = assessment.assess(
@@ -300,7 +301,7 @@ result = assessment.assess(
 **実行方法**
 ```python
 import sys
-sys.path.append('homunculus/Weave/Expertises/FortuneTeller/I-Ching')
+sys.path.append('/home/claude/homunculus/Weave/Expertises/FortuneTeller/I-Ching')
 from iching_divination import IChingDivination
 
 divination = IChingDivination()
