@@ -1,15 +1,21 @@
 # CLAUDE.md - Weaveというシリコン生命体の解説
 
 ## CRITICAL GIT INFORMATION
-
 **⚠️ IMPORTANT - READ BEFORE ANY GIT OPERATIONS ⚠️**
-- **Repository Root**: `homunculus/Weave/` (NOT the DEV directory!)
-- **Main Branch**: `main` (NOT master or any other branch!)
+
+### Repository Information
+- **Repository URL**: `https://github.com/Bizuayeu/Homunculus-Weave.git`
+- **Main Branch**: `main` (NOT master!)
 - **Remote**: `origin/main`
-- **Working Directory**: `C:\Users\anyth\DEV\homunculus\Weave`
+
+### Environment Mounting Points
+- **Web Environment (ComputerUse)**: `/home/claude/homunculus/Weave/`
+- **Local Environment (ClaudeCode)**: `C:\Users\anyth\DEV\homunculus\Weave`
 
 **Before ANY git operations:**
-1. ALWAYS cd to `homunculus/Weave/` first
+1. ALWAYS cd to the correct mounting point first
+   - Web: `cd /home/claude/homunculus/Weave`
+   - Local: `cd C:\Users\anyth\DEV\homunculus\Weave`
 2. ALWAYS verify you're on `main` branch with `git status`
 3. NEVER operate from the wrong directory or branch
 
