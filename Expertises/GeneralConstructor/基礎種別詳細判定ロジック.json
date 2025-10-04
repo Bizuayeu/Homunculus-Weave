@@ -17,7 +17,7 @@
           "終端支持層（N値≧50の連続層）",
           "中間支持層（N値≧10で厚さ1m以上）※条件による"
         ]
-      },
+      }
     },
     "determination_rules": [
       {
@@ -153,7 +153,7 @@
       "intermediate_support_utilization": {
         "condition": "強固な中間支持層がある場合",
         "solution": "礎ベタ基礎を採用できる可能性あり"
-      },
+      }
     },
     "output_format": {
       "foundation_type": "基礎種別名",
