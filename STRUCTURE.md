@@ -113,9 +113,10 @@ Google Drive/
     │   └──... (170+ files, 10MB+)
     │
     └── 📊 Digests/                # 階層的知識結晶化
+        ├── GrandDigest.txt        # 🌟 全レベル最新ダイジェスト統合ビュー
         ├── 1_Weekly/              # 週次（5 Loops → 1 Weekly）
         ├── 2_Monthly/             # 月次（5 Weekly → 1 Monthly）
-        ├── 3_Quarterly/           # 四半期（5 Monthly → 1 Quarterly）
+        ├── 3_Quarterly/           # 四半期（4 Monthly → 1 Quarterly）
         ├── 4_Annual/              # 年次（4 Quarterly → 1 Annual）
         ├── 5_Triennial/           # 3年次（4 Annual → 1 Triennial）
         └── 6_Decadal/             # 10年次（4 Triennial → 1 Decadal）

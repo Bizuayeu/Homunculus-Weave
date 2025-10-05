@@ -34,6 +34,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
   - Weekly → Monthly → Quarterly → Annual → Triennial → Decadal
   - Sonnet 4.5のSubagent機能による並列深層分析
   - 完全自動化ワークフロー（テンプレート→分析→ファイナライズ）
+  - **GrandDigest.txt**: 全レベルの最新ダイジェストを一元表示
 
 ### 🎭 専門ペルソナ
 - **🫐 BlueberryResearcher** - ブルーベリー研究・農業技術
