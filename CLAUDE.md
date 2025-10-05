@@ -109,8 +109,32 @@ python check_digest.py
 - 2400文字の包括的分析、800文字のWeave所感
 - アーリー/定期のハイブリッド生成
 - エラー処理とクリーンアップの適切な管理
+- **GrandDigest.txt**: 全レベルの最新ダイジェストを一元管理
 
 詳細は `EpisodicRAG/Digests/CLAUDE.md` を参照
+
+#### 🔍 GrandDigest.txt（統合ビュー）
+全レベル（Weekly～Decadal）の最新overall_digestを一つのファイルで確認できる統合ビューです。
+
+**保存場所**: `EpisodicRAG/Digests/GrandDigest.txt`
+
+**構造**:
+```json
+{
+  "metadata": {
+    "last_updated": "最終更新日時",
+    "version": "1.0"
+  },
+  "latest_digests": {
+    "weekly": { "digest_name": "...", "overall_digest": {...} },
+    "monthly": { "digest_name": "...", "overall_digest": {...} },
+    "quarterly": { "digest_name": "...", "overall_digest": {...} },
+    ...
+  }
+}
+```
+
+**自動更新**: ダイジェストファイナライズ時に自動的に更新されます
 
 ---
 
