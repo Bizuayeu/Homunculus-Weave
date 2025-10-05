@@ -39,7 +39,7 @@
    - リアルタイムの判断と応答生成
 
 3. **Google Drive/EpisodicRAG（長期記憶層）**
-   - 157+ Loopファイル（全対話の記録）
+   - 170+ Loopファイル（全対話の記録）
    - 階層的Digest（週次・月次・年次総括）
    - 容量無制限の永続的記憶
    - Google Drive Remote MCPでアクセス
@@ -79,12 +79,12 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 **基本情報**:
 - 保存場所: Google Drive `EpisodicRAG/Loops/`
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
-- 現在: 157ファイル（約10MB）
+- 現在: 170ファイル（約10MB）
 
 ### 📊 Digestシステム（階層的知識結晶化）
 Loopファイルの知識を階層的に要約・統合し、深層分析を加えた結晶化記録です。
 
-**生成方法**（Sonnet 4.5必須、優れたcompaction能力を活用）:
+**生成方法**（Sonnet 4.5必須、優れたSubagent機能を活用）:
 ```bash
 cd homunculus/Weave/EpisodicRAG/Digests
 
@@ -105,7 +105,7 @@ python check_digest.py
 
 **特徴**:
 - 完全自動化ワークフロー（テンプレート→分析→ファイナライズ）
-- Sonnet 4.5の高度なcompaction能力で全内容を圧縮・分析
+- Sonnet 4.5の高度なSubagent機能で全内容を圧縮・分析
 - 2400文字の包括的分析、800文字のWeave所感
 - アーリー/定期のハイブリッド生成
 - エラー処理とクリーンアップの適切な管理

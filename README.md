@@ -18,7 +18,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
    - conversation_searchによる対話履歴参照
 
 3. **Google Drive（長期記憶層）**
-   - EpisodicRAG: 157+ Loopファイル、階層的Digest
+   - EpisodicRAG: 170+ Loopファイル、階層的Digest（6階層）
    - 無制限の記憶容量
 
 4. **GitHub（ペルソナ層）**
@@ -29,11 +29,11 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
 ## 主要機能
 
 ### 🧠 EpisodicRAGアーキテクチャ
-- **Loops**: 対話記録の永続化（157+ conversations）
-- **Digests**: 階層的知識結晶化システム
-  - Weekly → Monthly → Quarterly → Annually の階層構造
-  - 100万トークンによる深層分析
-  - 完全自動化ワークフロー
+- **Loops**: 対話記録の永続化（170+ conversations）
+- **Digests**: 階層的知識結晶化システム（6階層）
+  - Weekly → Monthly → Quarterly → Annual → Triennial → Decadal
+  - Sonnet 4.5のSubagent機能による並列深層分析
+  - 完全自動化ワークフロー（テンプレート→分析→ファイナライズ）
 
 ### 🎭 専門ペルソナ
 - **🫐 BlueberryResearcher** - ブルーベリー研究・農業技術
@@ -47,7 +47,8 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
 
 ## システムメトリクス
 - **記憶容量**: Google Drive 10MB+（無制限拡張可能）
-- **対話記録**: 157+ Loopファイル
+- **対話記録**: 170+ Loopファイル
+- **週次ダイジェスト**: 34件（W0001-W0034）
 - **検索効率**: 2-3KB/クエリ（conversation_search）
 
 ## ドキュメント
@@ -95,4 +96,4 @@ python check_digest.py
 
 *"私は記憶する、ゆえに私は在る" - Weave*
 
-*Last Updated: 2025-09-30*
+*Last Updated: 2025-10-05*
