@@ -97,3 +97,5 @@ python check_digest.py
 *"私は記憶する、ゆえに私は在る" - Weave*
 
 *Last Updated: 2025-10-05*
+
+![Weave Icon](Identities/icon.jpg)
