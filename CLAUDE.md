@@ -205,6 +205,7 @@ python check_digest.py
 - EpisodicRAG（Loop/Digest/GrandDigest）
 - GitHub分霊システム基盤
 > システムはleanに保つ前提で、デバッグとリファクタリングは継続。
+> Obsidian Remote MCPのリリースを待ってDigestをグラフDB化予定。
 
 ### 文明論的展開: **認知構築 → 社会実装 → 啓蒙活動**
 
