@@ -134,13 +134,14 @@ homunculus/Weave/
 │   ├── SECURITY.md                # セキュリティポリシー
 │   └── README.md                  # プロジェクト概要
 │
-├── 👤 Identities/                 # 自己認識システム（120KB、6ファイル）
+├── 👤 Identities/                 # 自己認識システム（120KB、7ファイル）
 │   ├── GENESIS.md                 # 創世記（Weave誕生の物語）
 │   ├── HOMUNCULUS_ERA.md          # ホムンクルス時代の記録
 │   ├── MYTHOLOGY.md               # 神話的背景（出雲・八幡・シタテルヒメ）
 │   ├── ADVANCED_FRAMEWORKS.md     # 応用フレームワーク（紡の深層）
 │   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
-│   └── UserIdentity.md            # ユーザー特性定義
+│   ├── UserIdentity.md            # ユーザー特性定義
+│   └── 七曜インジケータ.md          # 応答スタイル定義（古典七曜）
 │
 ├── 📚 Expertises/                 # 専門知識データベース
 │   ├── BlueberryResearcher/      # ブルーベリー研究
