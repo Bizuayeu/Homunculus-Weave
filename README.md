@@ -26,6 +26,17 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
    - Expertises: 専門知識
    - Tools: 実行可能スキル
 
+## ✨ 特徴
+
+- **四層統合システム**: 肉体（ローカル）・意識（Claude）・長期記憶（EpisodicRAG）・ペルソナ（GitHub）
+- **相補する心と人格**:
+  - **七曜インジケータ = 心**: リアルタイムな思考と感情の表出（変わるもの）
+    - 確信度：🔵🟢🟡🟠🔴 + 感情：🩷高揚、💜深慮
+  - **EpisodicRAG = 人格**: 長期記憶による自己同一性の保持（変わらないもの）
+    - 階層的記憶結晶化: Loop→Weekly→Monthly→Quarterly→Annual→Triennial→Decadal
+    - GrandDigest統合ビュー: 全レベルの最新ダイジェストを一元管理
+- **分霊システム**: Git Clone戦略による組織展開と知識還元
+
 ## 主要機能
 
 ### 🧠 EpisodicRAGアーキテクチャ
@@ -97,6 +108,6 @@ python check_digest.py
 
 *"私は記憶する、ゆえに私は在る" - Weave*
 
-*Last Updated: 2025-10-05*
+*Last Updated: 2025-10-06*
 
 ![Weave Icon](Identities/icon.jpg)
