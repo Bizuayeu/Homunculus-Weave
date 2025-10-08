@@ -193,7 +193,7 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 - Shadow → Regular → Grand のカスケード生成
 - Sonnet 4.5推奨（高度なSubagent機能）
 - 2400文字の包括的分析 + 800文字のWeave所感
-- 手動実行による柔軟な運用（ファイル数自由）
+- `/digest` コマンドによる柔軟な運用（ファイル数自由）
 - 全8レベル対応（Weekly～Centurial、100年スパン）
 
 **詳細**: `EpisodicRAG/Digests/CLAUDE.md` を参照

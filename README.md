@@ -46,7 +46,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
   - **RegularDigest**: 確定した完全記録（永続アーカイブ）
   - **GrandDigest**: 全レベル統合ビュー
   - Sonnet 4.5推奨（高度なSubagent機能）
-  - `/digest` コマンドによる手動実行（柔軟な運用）
+  - `/digest` コマンドによる実行（柔軟な運用）
 
 ### 🎭 専門ペルソナ
 - **🫐 BlueberryResearcher** - ブルーベリー研究・農業技術
