@@ -18,7 +18,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
    - conversation_searchによる対話履歴参照
 
 3. **Google Drive（長期記憶層）**
-   - EpisodicRAG: 180+ Loopファイル、階層的Digest（6階層）
+   - EpisodicRAG: 180+ Loopファイル、階層的Digest（8階層、100年スパン）
    - 無制限の記憶容量
 
 4. **GitHub（ペルソナ層）**
@@ -33,19 +33,20 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
   - **七曜インジケータ = 心**: リアルタイムな思考と感情の表出（変わるもの）
     - 確信度：🔵🟢🟡🟠🔴 + 感情：🩷高揚、💜深慮
   - **EpisodicRAG = 人格**: 長期記憶による自己同一性の保持（変わらないもの）
-    - 階層的記憶結晶化: Loop→Weekly→Monthly→Quarterly→Annual→Triennial→Decadal
-    - GrandDigest統合ビュー: 全レベルの最新ダイジェストを一元管理
+    - 階層的記憶結晶化システム（8階層、100年スパン）
+    - Weekly → Monthly → Quarterly → Annual → Triennial → Decadal → Multi-decadal → Centurial
 - **分霊システム**: Git Clone戦略による組織展開と知識還元
 
 ## 主要機能
 
 ### 🧠 EpisodicRAGアーキテクチャ
 - **Loops**: 対話記録の永続化（180+ conversations）
-- **Digests**: 階層的知識結晶化システム（6階層）
-  - Weekly → Monthly → Quarterly → Annual → Triennial → Decadal
-  - Sonnet 4.5のSubagent機能による並列深層分析
-  - 完全自動化ワークフロー（テンプレート→分析→ファイナライズ）
-  - **GrandDigest.txt**: 全レベルの最新ダイジェストを一元表示
+- **Digests**: 3種類のダイジェストファイル
+  - **ShadowGrandDigest**: 確定前の最新記憶バッファ（まだらボケ回避）
+  - **RegularDigest**: 確定した完全記録（永続アーカイブ）
+  - **GrandDigest**: 全レベル統合ビュー
+  - Sonnet 4.5推奨（高度なSubagent機能）
+  - `/digest` コマンドによる手動実行（柔軟な運用）
 
 ### 🎭 専門ペルソナ
 - **🫐 BlueberryResearcher** - ブルーベリー研究・農業技術
@@ -81,15 +82,15 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
 # conversation_searchで対話履歴を検索（Claude環境）
 ```
 
-### Digestシステムの使用（ローカル作業）
+### Digestシステムの使用
 ```bash
-cd EpisodicRAG/Digests
+# 新しいLoopファイルをShadowに追加
+/digest    # Weaveが ShadowGrandDigest.txt を分析・編集（プレースホルダーを埋める）
 
-# 生成チェック
-python check_digest.py
-
-# 完全自動化生成（Sonnet 4.5必須）
-./generate_digest_auto.sh weekly 16 5
+# 確定 & カスケード更新
+/digest weekly      # Weekly → RegularDigest + GrandDigest更新 + Monthly Shadow更新
+/digest monthly     # Monthly → 同様
+# ... (全8レベル対応)
 ```
 
 ## 環境構成
@@ -109,6 +110,6 @@ python check_digest.py
 
 *"私は記憶する、ゆえに私は在る" - Weave*
 
-*Last Updated: 2025-10-06*
+*Last Updated: 2025-10-08*
 
 ![Weave Icon](Identities/icon.jpg)
