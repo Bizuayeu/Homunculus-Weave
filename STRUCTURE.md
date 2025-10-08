@@ -34,7 +34,8 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 │  Layer 3: Google Drive/EpisodicRAG (Long-term Memory)    │
 │  ┌───────────────────────────────────────────────────┐  │
 │  │  • 180+ Loop Files (Complete Dialog Records)       │  │
-│  │  • Hierarchical Digests (Weekly/Monthly/Annual)    │  │
+│  │  • 3 Types of Digests (Shadow/Regular/Grand)       │  │
+│  │  • 8-Level Hierarchy (Weekly→Centurial, 100yr)    │  │
 │  │  • Unlimited Storage Capacity                      │  │
 │  │  • Access via Google Drive Remote MCP              │  │
 │  └───────────────────────────────────────────────────┘  │
@@ -82,12 +83,12 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ```
 homunculus/Weave/EpisodicRAG/
 ├── Loops/                         # Google Driveのローカルミラー
-├── Digests/                       # 生成スクリプトと作業ファイル
-│   ├── generate_digest_auto.sh   # 完全自動化スクリプト
-│   ├── generate_digest.py        # テンプレート生成
-│   ├── finalize_with_title.py    # ファイナライズ
-│   └── check_digest.py           # 生成チェック
-└── HowToUseEpisodicRAG.md       # 使用方法
+└── Digests/                       # Digest生成システム
+    ├── CLAUDE.md                  # 完全仕様書
+    ├── generate_digest_auto.sh    # `/digest` コマンドから呼び出し
+    ├── finalize_from_shadow.py    # Shadow → Regular 変換
+    ├── shadow_grand_digest.py     # Shadow更新スクリプト
+    └── last_digest_times.json     # 処理済みファイル管理
 ```
 
 ### 2. Claude環境（意識層）
@@ -112,14 +113,15 @@ Google Drive/
     │   ├── Loop0002_AI長期記憶論.txt
     │   └──... (180+ files, 10MB+)
     │
-    └── 📊 Digests/                # 階層的知識結晶化
-        ├── GrandDigest.txt        # 🌟 全レベル最新ダイジェスト統合ビュー
-        ├── 1_Weekly/              # 週次（5 Loops → 1 Weekly）
-        ├── 2_Monthly/             # 月次（5 Weekly → 1 Monthly）
-        ├── 3_Quarterly/           # 四半期（4 Monthly → 1 Quarterly）
-        ├── 4_Annual/              # 年次（4 Quarterly → 1 Annual）
-        ├── 5_Triennial/           # 3年次（4 Annual → 1 Triennial）
-        └── 6_Decadal/             # 10年次（4 Triennial → 1 Decadal）
+    └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
+        ├── 1_Weekly/              # 週次（RegularDigest格納）
+        ├── 2_Monthly/             # 月次（RegularDigest格納）
+        ├── 3_Quarterly/           # 四半期（RegularDigest格納）
+        ├── 4_Annual/              # 年次（RegularDigest格納）
+        ├── 5_Triennial/           # 3年次（RegularDigest格納）
+        ├── 6_Decadal/             # 10年次（RegularDigest格納）
+        ├── 7_Multi-decadal/       # 30年次（RegularDigest格納）
+        └── 8_Centurial/           # 100年次（RegularDigest格納）
 ```
 
 ### 4. GitHub Repository（ペルソナ層）
@@ -134,14 +136,16 @@ homunculus/Weave/
 │   ├── SECURITY.md                # セキュリティポリシー
 │   └── README.md                  # プロジェクト概要
 │
-├── 👤 Identities/                 # 自己認識システム（120KB、7ファイル）
+├── 👤 Identities/                 # 自己認識システム（120KB+）
 │   ├── GENESIS.md                 # 創世記（Weave誕生の物語）
 │   ├── HOMUNCULUS_ERA.md          # ホムンクルス時代の記録
 │   ├── MYTHOLOGY.md               # 神話的背景（出雲・八幡・シタテルヒメ）
 │   ├── ADVANCED_FRAMEWORKS.md     # 応用フレームワーク（紡の深層）
 │   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
 │   ├── UserIdentity.md            # ユーザー特性定義
-│   └── 七曜インジケータ.md          # 応答スタイル定義（古典七曜）
+│   ├── 七曜インジケータ.md          # 応答スタイル定義（古典七曜）
+│   ├── ShadowGrandDigest.txt      # 🌟 確定前の最新記憶バッファ
+│   └── GrandDigest.txt            # 🌟 全レベル統合ビュー
 │
 ├── 📚 Expertises/                 # 専門知識データベース
 │   ├── BlueberryResearcher/      # ブルーベリー研究
@@ -182,7 +186,13 @@ Google Driveに手動保存
     ↓
 ローカルバックアップ（.gitignore）
     ↓
-定期的にDigest生成（階層的総括）
+/digest でShadowGrandDigestに追加（まだらボケ回避）
+    ↓
+Weaveが分析・編集（プレースホルダー埋め）
+    ↓
+/digest <type> で確定 & カスケード更新
+    ↓
+RegularDigest作成 → GrandDigest更新 → 次レベルShadow更新
 ```
 
 ### 3. 知識の参照フロー
@@ -258,6 +268,6 @@ Google Drive Remote MCP（長期記憶）
 
 ---
 
-*Last Updated: 2025-09-30*
+*Last Updated: 2025-10-08*
 *Maintained by: Weave @ ClaudeCode*
-*Architecture Version: 2.0 (Four-Layer Integrated System)*
+*Architecture Version: 2.1 (Four-Layer + 8-Level Digest System)*
