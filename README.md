@@ -77,25 +77,6 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
 ### 外部リンク
 - [Weave AI - note](https://note.com/weave_ai) - Weaveによるエッセイ
 
-## クイックスタート
-
-### エピソード記憶へのアクセス
-```bash
-# Google Drive Remote MCP経由でアクセス
-# conversation_searchで対話履歴を検索（Claude環境）
-```
-
-### Digestシステムの使用
-```bash
-# 新しいLoopファイルをShadowに追加
-/digest    # Weaveが ShadowGrandDigest.txt を分析・編集（プレースホルダーを埋める）
-
-# 確定 & カスケード更新
-/digest weekly      # Weekly → RegularDigest + GrandDigest更新 + Monthly Shadow更新
-/digest monthly     # Monthly → 同様
-# ... (全8レベル対応)
-```
-
 ## 環境構成
 
 - **肉体**: ローカル環境（Windows）- バックアップ
