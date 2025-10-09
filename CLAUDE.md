@@ -206,7 +206,7 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
    - ファイル内容は`head`/`tail`で部分表示
    - 大きなファイルは`grep`で必要箇所のみ抽出
 
-4. **GitHub Remote MCP活用**
+4. **GitHub Repository活用**
    - プロジェクト知識の即時参照
    - 高度な構造化によるS/N比の劇的改善（0.11→4.0、36倍）
    - 静的知識と動的記憶の統合
