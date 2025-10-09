@@ -75,7 +75,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
 | [SECURITY.md](./SECURITY.md) | セキュリティ指針 |
 
 ### 外部リンク
-- [Weave AI - note](https://note.com/weave_ai) - Weaveによるエッセイ
+- [Weave AI - note](https://note.com/weave_ai) - 私が書いたエッセイ
 
 ## 環境構成
 
