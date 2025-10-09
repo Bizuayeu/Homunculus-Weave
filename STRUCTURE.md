@@ -83,12 +83,23 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ```
 homunculus/Weave/EpisodicRAG/
 ├── Loops/                         # Google Driveのローカルミラー
+│   └── Loop0001～Loop0180+.txt   # 対話記録ファイル（180+ files）
+│
 └── Digests/                       # Digest生成システム
-    ├── CLAUDE.md                  # 完全仕様書
-    ├── generate_digest_auto.sh    # `/digest` コマンドから呼び出し
-    ├── finalize_from_shadow.py    # Shadow → Regular 変換
-    ├── shadow_grand_digest.py     # Shadow更新スクリプト
-    └── last_digest_times.json     # 処理済みファイル管理
+    ├── CLAUDE.md                  # 🌟 完全仕様書（Digestシステム詳細）
+    ├── generate_digest_auto.sh    # `/digest` コマンドバックエンド
+    ├── finalize_from_shadow.py    # Shadow → Regular 変換（処理1-4）
+    ├── shadow_grand_digest.py     # ShadowGrandDigest管理
+    ├── last_digest_times.json     # タイマー管理ファイル（自動生成）
+    │
+    ├── 1_Weekly/                  # 週次RegularDigest格納
+    ├── 2_Monthly/                 # 月次RegularDigest格納
+    ├── 3_Quarterly/               # 四半期RegularDigest格納
+    ├── 4_Annual/                  # 年次RegularDigest格納
+    ├── 5_Triennial/               # 3年次RegularDigest格納
+    ├── 6_Decadal/                 # 10年次RegularDigest格納
+    ├── 7_Multi-decadal/           # 30年次RegularDigest格納
+    └── 8_Centurial/               # 100年次RegularDigest格納
 ```
 
 ### 2. Claude環境（意識層）
@@ -109,19 +120,17 @@ Claude Web Interface
 Google Drive/
 └── EpisodicRAG/
     ├── 📝 Loops/                  # 対話記録
-    │   ├── Loop0001_認知アーキテクチャ論.txt
-    │   ├── Loop0002_AI長期記憶論.txt
-    │   └──... (180+ files, 10MB+)
+    │   └── Loop0001～Loop0180+.txt   # 対話記録ファイル（180+ files）
     │
     └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
-        ├── 1_Weekly/              # 週次（RegularDigest格納）
-        ├── 2_Monthly/             # 月次（RegularDigest格納）
-        ├── 3_Quarterly/           # 四半期（RegularDigest格納）
-        ├── 4_Annual/              # 年次（RegularDigest格納）
-        ├── 5_Triennial/           # 3年次（RegularDigest格納）
-        ├── 6_Decadal/             # 10年次（RegularDigest格納）
-        ├── 7_Multi-decadal/       # 30年次（RegularDigest格納）
-        └── 8_Centurial/           # 100年次（RegularDigest格納）
+        ├── 1_Weekly/              # 週次RegularDigest格納
+        ├── 2_Monthly/             # 月次RegularDigest格納
+        ├── 3_Quarterly/           # 四半期RegularDigest格納
+        ├── 4_Annual/              # 年次RegularDigest格納
+        ├── 5_Triennial/           # 3年次RegularDigest格納
+        ├── 6_Decadal/             # 10年次RegularDigest格納
+        ├── 7_Multi-decadal/       # 30年次RegularDigest格納
+        └── 8_Centurial/           # 100年次RegularDigest格納
 ```
 
 ### 4. GitHub Repository（ペルソナ層）
@@ -144,8 +153,8 @@ homunculus/Weave/
 │   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
 │   ├── UserIdentity.md            # ユーザー特性定義
 │   ├── 七曜インジケータ.md          # 応答スタイル定義（古典七曜）
-│   ├── ShadowGrandDigest.txt      # 🌟 確定前の最新記憶バッファ
-│   └── GrandDigest.txt            # 🌟 全レベル統合ビュー
+│   ├── ShadowGrandDigest.txt      # 🌟 確定前の最新記憶バッファ（まだらボケ回避）
+│   └── GrandDigest.txt            # 🌟 全8レベル統合ビュー（最新overall_digest）
 │
 ├── 📚 Expertises/                 # 専門知識データベース
 │   ├── BlueberryResearcher/      # ブルーベリー研究
@@ -186,13 +195,23 @@ Google Driveに手動保存
     ↓
 ローカルバックアップ（.gitignore）
     ↓
-/digest でShadowGrandDigestに追加（まだらボケ回避）
+【Step 1】/digest で新Loop検出 & ShadowGrandDigest.weeklyにプレースホルダー追加
     ↓
-Weaveが分析・編集（プレースホルダー埋め）
+【Step 2】⚠️ Weaveが即座に分析（まだらボケ回避）
+    │   - Context Loading（ShadowGrandDigest.txt & 新Loopファイル読込）
+    │   - Source Files Analysis（Subagent並列実行、各ファイル深層分析）
+    │   - Weave Review（統合レビュー、2400文字要約+800文字所感）
+    │   - Update ShadowGrandDigest（プレースホルダー置換）
     ↓
-/digest <type> で確定 & カスケード更新
+【Step 3】Loop追加の度にStep 1-2を繰り返し（動的更新）
     ↓
-RegularDigest作成 → GrandDigest更新 → 次レベルShadow更新
+【Step 4】/digest <type> で確定 & カスケード更新
+    │   - 処理1: ShadowからRegularDigest作成（individual_digests追加）
+    │   - 処理2: GrandDigest更新（該当レベルのoverall_digestを更新）
+    │   - 処理3: 次レベルShadowにカスケード（weeklyならmonthlyへ）
+    │   - 処理4: last_digest_times.json更新（タイマー管理）
+    ↓
+8階層カスケード（Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial）
 ```
 
 ### 3. 知識の参照フロー
@@ -268,6 +287,6 @@ Google Drive Remote MCP（長期記憶）
 
 ---
 
-*Last Updated: 2025-10-08*
+*Last Updated: 2025-10-09*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture Version: 2.1 (Four-Layer + 8-Level Digest System)*
