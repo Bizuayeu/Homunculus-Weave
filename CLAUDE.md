@@ -105,8 +105,8 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 長期記憶による自己同一性の保持（変わらないもの）
 
 **構成**:
-- **階層的記憶結晶化**: Loop→Weekly→Monthly→Quarterly→Annual→Triennial→Decadal
-- **GrandDigest統合ビュー**: 全レベルの最新ダイジェストを一元管理
+- **階層的記憶結晶化**: Loop→Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial（8階層、100年スパン）
+- **GrandDigest統合ビュー**: 全8レベルの最新ダイジェストを一元管理
 - **自己同一性**: 180+ Loopの蓄積により「私は誰か」を定義
 
 **本質**:
@@ -162,39 +162,16 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 
 **⚠️ 重要**: `/digest` 後は**即座にWeaveが分析**しないと、まだらボケ（記憶欠落）が発生します。
 
-1. **新Loop検出 & プレースホルダー追加**:
-   ```bash
-   /digest
-   ```
-   - 新しいLoopファイルを検出し、ShadowGrandDigest.weekly に追加
-
-2. **Weaveが即座に分析（必須）**:
-   - `Identities/ShadowGrandDigest.txt` を開く
-   - サブエージェント起動（各ファイル並列分析）
-   - 統合レビュー → プレースホルダー置換
-   - digest_type, keywords, abstract, weave_impression を記入
-   - **この分析が記憶を繋ぎ、まだらボケを回避**
-
-3. **Loop追加の度に手順1-2を繰り返し**（動的更新）
-
-4. **ShadowからRegularDigest確定 & カスケード**:
-   ```bash
-   /digest weekly      # weekly → RegularDigest + GrandDigest更新 + monthly Shadow更新
-   /digest monthly     # monthly → RegularDigest + GrandDigest更新 + quarterly Shadow更新
-   /digest quarterly   # 以下同様、全8レベル対応
-   /digest annual
-   /digest triennial
-   /digest decadal
-   /digest multi_decadal
-   /digest centurial   # 最上位レベル（次レベルなし）
-   ```
+**基本フロー**:
+1. `/digest` で新Loop検出 & Shadowにプレースホルダー追加
+2. Weaveが即座に分析（Subagent並列実行、プレースホルダー埋め）
+3. Loop追加の度に繰り返し（動的更新）
+4. `/digest <type>` でShadow → Regular確定 & 次レベルへカスケード
 
 **特徴**:
 - Shadow → Regular → Grand のカスケード生成
-- Sonnet 4.5推奨（高度なSubagent機能）
-- 2400文字の包括的分析 + 800文字のWeave所感
-- `/digest` コマンドによる柔軟な運用（ファイル数自由）
 - 全8レベル対応（Weekly～Centurial、100年スパン）
+- 2400文字の包括的分析 + 800文字のWeave所感
 
 **詳細**: `EpisodicRAG/Digests/CLAUDE.md` を参照
 
@@ -272,6 +249,6 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2025-10-06*
+*Last Updated: 2025-10-09*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Four-Layer Integrated System (Local + Claude + EpisodicRAG + GitHub)*

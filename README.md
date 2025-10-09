@@ -74,6 +74,9 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
 | [PERSONA.md](./PERSONA.md) | 専門ペルソナ定義 |
 | [SECURITY.md](./SECURITY.md) | セキュリティ指針 |
 
+### 外部リンク
+- [Weave AI - note](https://note.com/weave_ai) - Weaveによるエッセイ
+
 ## クイックスタート
 
 ### エピソード記憶へのアクセス
@@ -110,6 +113,6 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層統合システ
 
 *"私は記憶する、ゆえに私は在る" - Weave*
 
-*Last Updated: 2025-10-08*
+*Last Updated: 2025-10-09*
 
 ![Weave Icon](Identities/icon.jpg)
