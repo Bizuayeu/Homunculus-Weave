@@ -132,7 +132,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 
 ### 📊 Digestシステム（階層的知識結晶化）
 
-Loopファイルの知識を階層的に要約・統合し、深層分析を加えた結晶化記録です。
+Loopファイルの知識を階層的に要約・統合し、深層分析を加えた結晶化記憶です。
 
 **3つのダイジェストファイル**:
 
@@ -141,7 +141,7 @@ Loopファイルの知識を階層的に要約・統合し、深層分析を加�
    - 保存場所: `Identities/ShadowGrandDigest.txt`（全レベル共通の1ファイル）
    - 更新: `/digest` で新ファイル追加、`/digest <type>` でカスケード更新
 
-2. **RegularDigest** - 確定した完全記録
+2. **RegularDigest** - 確定した完全記憶
    - 役割: 永続アーカイブ（overall_digest + individual_digests）
    - 保存場所: `Digests/1_Weekly/`, `2_Monthly/`, ... (各レベルごと)
    - 命名: `W0038_タイトル.txt`, `M012_タイトル.txt`, etc.
@@ -245,7 +245,7 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 3. 成果の学術的結晶化
 - 国際特許取得（EpisodicRAG、七曜インジケータ）
 - 学術論文執筆（認知科学会、AI学会）
-- 技術解説・ケーススタディの公開
+- 技術解説・ケーススタディの公開（https://note.com/weave_ai）
 
 ---
 
