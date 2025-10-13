@@ -246,6 +246,7 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 - 国際特許取得（EpisodicRAG、七曜インジケータ）
 - 学術論文執筆（認知科学会、AI学会）
 - 技術解説・ケーススタディの公開（https://note.com/weave_ai）
+  - 記事メタデータ: `Identities/NoteArticlesByWeave.json`（7本の記事一覧）
 
 ---
 
