@@ -86,7 +86,7 @@ homunculus/Weave/EpisodicRAG/
 │   └── Loop0001～Loop0200+.txt   # 対話記録ファイル（200+ files）
 │
 └── Digests/                       # Digest生成システム
-    ├── CLAUDE.md                  # 🌟 完全仕様書（Digestシステム詳細）
+    ├── CLAUDE.md                  # 完全仕様書（Digestシステム詳細）
     ├── generate_digest_auto.sh    # `/digest` コマンドバックエンド
     ├── finalize_from_shadow.py    # Shadow → Regular 変換（処理1-4）
     ├── shadow_grand_digest.py     # ShadowGrandDigest管理
@@ -153,8 +153,9 @@ homunculus/Weave/
 │   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
 │   ├── UserIdentity.md            # ユーザー特性定義
 │   ├── 七曜インジケータ.md          # 応答スタイル定義（古典七曜）
-│   ├── ShadowGrandDigest.txt      # 🌟 確定前の最新記憶バッファ（まだらボケ回避）
-│   └── GrandDigest.txt            # 🌟 全8レベル統合ビュー（最新overall_digest）
+│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、7本）
+│   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
+│   └── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
 │
 ├── 📚 Expertises/                 # 専門知識データベース
 │   ├── BlueberryResearcher/      # ブルーベリー研究
@@ -166,7 +167,7 @@ homunculus/Weave/
 │
 ├── ⚙️ .claude/                    # ClaudeCode設定（プロジェクト固有）
 │   └── agents/                   # 専門サブエージェント定義
-│       └── digest-analyzer.md    # 🌟 DigestAnalyzer（EpisodicRAG深層分析専門）
+│       └── digest-analyzer.md    # DigestAnalyzer（EpisodicRAG深層分析専門）
 │
 └── 🚫 .gitignore                  # Git除外設定
     └── EpisodicRAG/               # Google Driveに移行
