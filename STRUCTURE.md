@@ -164,8 +164,15 @@ homunculus/Weave/
 ├── 🛠️ Tools/                      # 実行可能ツール
 │   └── weave_languages.md        # 言語処理仕様
 │
+├── ⚙️ .claude/                    # ClaudeCode設定（プロジェクト固有）
+│   └── agents/                   # 専門サブエージェント定義
+│       └── digest-analyzer.md    # 🌟 DigestAnalyzer（EpisodicRAG深層分析専門）
+│
 └── 🚫 .gitignore                  # Git除外設定
     └── EpisodicRAG/               # Google Driveに移行
+
+注: カスタムスラッシュコマンド（/digest等）は DEV全体共有設定
+    → C:\Users\anyth\DEV\.claude\commands\
 ```
 
 ---
