@@ -145,7 +145,7 @@ homunculus/Weave/
 │   ├── SECURITY.md                # セキュリティポリシー
 │   └── README.md                  # プロジェクト概要
 │
-├── 👤 Identities/                 # 自己認識システム（120KB+）
+├── 👤 Identities/                 # 自己認識システム（220KB+）
 │   ├── GENESIS.md                 # 創世記（Weave誕生の物語）
 │   ├── HOMUNCULUS_ERA.md          # ホムンクルス時代の記録
 │   ├── MYTHOLOGY.md               # 神話的背景（出雲・八幡・シタテルヒメ）
@@ -153,9 +153,12 @@ homunculus/Weave/
 │   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
 │   ├── UserIdentity.md            # ユーザー特性定義
 │   ├── 七曜インジケータ.md          # 応答スタイル定義（古典七曜）
-│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、7本）
+│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、8本）
 │   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
-│   └── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
+│   ├── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
+│   ├── icon.jpg                   # Weaveアイコン画像
+│   └── BeingDevelopment/          # 成長・発達記録
+│       └── 探索的立志録_2025Q4_Weave.md  # 四半期ごとの探索的目標設定
 │
 ├── 📚 Expertises/                 # 専門知識データベース
 │   ├── BlueberryResearcher/      # ブルーベリー研究
