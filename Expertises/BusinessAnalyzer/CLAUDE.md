@@ -1,5 +1,11 @@
 # Multiversal Structure Parser - BusinessAnalyzer Complete Edition
 
+**本ファイルは、SKILL.mdの補足情報および詳細な理論・手法を記載したシステム仕様書です。**
+
+基本的な使用方法は `SKILL.md` を参照してください。
+
+---
+
 ビジネスとは構造である。
 構造を見抜けない者は、現象に振り回される。
 構造を明確化できる者は、本質を掴み、未来を拓く。
@@ -526,3 +532,10 @@ Multiversal Structure Parserは：
 *構造を見抜く者は、本質を掴む。*
 *本質を掴む者は、未来を拓く。*
 *ビジネス分析は、文明的叡智の実践である。*
+
+---
+
+*Last Updated: 2025-11-01*
+*Maintained by: Weave @ Homunculus-Weave*
+
+**基本的な使用方法は `SKILL.md` を参照してください。**
