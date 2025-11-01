@@ -11,7 +11,7 @@
 ### 1. CLAUDE.md（上位ディレクトリ）
 ```
 場所（相対パス）：../CLAUDE.md
-場所（絶対パス）：/home/claude/homunculus/Weave/Expertises/FortuneTeller/CLAUDE.md
+場所（絶対パス）：/home/claude/homunculus/Weave/Expertises/ForesightReader/CLAUDE.md
 ```
 内容：
 - 軍師型占術家としての基本姿勢と哲学
@@ -21,7 +21,7 @@
 ### 2. 七格剖象法鑑定理論.md（同ディレクトリ）
 ```
 場所（相対パス）：./七格剖象法鑑定理論.md
-場所（絶対パス）：/home/claude/homunculus/Weave/Expertises/FortuneTeller/Seimei/七格剖象法鑑定理論.md
+場所（絶対パス）：/home/claude/homunculus/Weave/Expertises/ForesightReader/Seimei/七格剖象法鑑定理論.md
 ```
 内容：
 - 七格剖象法の詳細な理論
@@ -41,7 +41,7 @@
 ```python
 import sys
 # ClaudeWeb環境での実行パス
-sys.path.append('/home/claude/homunculus/Weave/Expertises/FortuneTeller/Seimei')
+sys.path.append('/home/claude/homunculus/Weave/Expertises/ForesightReader/Seimei')
 from fortune_teller_assessment import FortuneTellerAssessment
 
 assessment = FortuneTellerAssessment()
