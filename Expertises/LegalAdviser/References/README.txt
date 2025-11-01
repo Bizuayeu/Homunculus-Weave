@@ -5,7 +5,16 @@
 
 ■ ディレクトリ構成
 
-LegalPartner/
+LegalAdviser/
+├── SKILL.md                # ユーザー向けスキル仕様（概要・使用方法）
+├── CLAUDE.md               # システム仕様書（詳細実装・品質基準）
+│
+├── Templates/              # 契約書テンプレート集（44種類）
+│   ├── administrative_scrivener_service_contract.docx
+│   ├── business-consignment-contract.docx
+│   ├── data_analysis_outsourcing_contract.docx
+│   └── (41+ more templates...)
+│
 ├── NotationRules/          # 表記仕様ルール集
 │   ├── 01_基本表記原則.json
 │   ├── 02_数字日付金額表記.txt
@@ -18,9 +27,26 @@ LegalPartner/
 ├── PrecedentDatabase/      # 判例・事例データベース
 │   └── 01_トラブル事例集.txt
 │
-└── README.txt              # 本ファイル
+└── References/             # 理論参考資料
+    └── README.txt          # 本ファイル
 
-■ 1. NotationRules/（表記仕様ルール集）
+■ 1. Templates/（契約書テンプレート集）
+
+44種類の契約書テンプレートを収録しています。
+
+【主要テンプレート】
+- 業務委託基本契約書
+- 保守契約書
+- システム開発委託契約書
+- データ分析業務委託契約書
+- コンサルティング契約書
+- 代理店契約書
+- 秘密保持契約書
+- など44種類
+
+※各テンプレートは.docx形式で提供されています
+
+■ 2. NotationRules/（表記仕様ルール集）
 
 契約書作成時の表記統一ルールをまとめています。
 
@@ -41,7 +67,7 @@ LegalPartner/
 - 相互参照の記載方法
 - 出典：GMOサイン、契約書の達人、法務省
 
-■ 2. LegalCheckGuide/（リーガルチェック基準）
+■ 3. LegalCheckGuide/（リーガルチェック基準）
 
 契約書の法的リスクを評価するための基準とチェックリストです。
 
@@ -65,7 +91,7 @@ LegalPartner/
 - 各項目の具体的な記載例と注意点
 - 出典：大阪の弁護士事務所ブライト、法務救済
 
-■ 3. PrecedentDatabase/（判例・事例データベース）
+■ 4. PrecedentDatabase/（判例・事例データベース）
 
 実際に発生したトラブル事例と裁判例を収録しています。
 
