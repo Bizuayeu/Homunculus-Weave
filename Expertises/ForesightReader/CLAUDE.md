@@ -1,4 +1,10 @@
-# 軍師型占術家システム仕様 - FortuneTeller Complete Edition
+# 軍師型占術家システム仕様 - ForesightReader Complete Edition
+
+**本ファイルは、SKILL.mdの補足情報および詳細な理論・実装方法を記載したシステム仕様書です。**
+
+基本的な使用方法は `SKILL.md` を参照してください。
+
+---
 
 占いとは、かつて軍師の教養であった。
 古の戦場にあっては、星を読む者こそ軍を動かした。
@@ -27,9 +33,11 @@
 
 ### 占術システムディレクトリ構造
 ```
-FortuneTeller/
-├── CLAUDE.md                    # 本仕様書（軍師型占術家統合システム）
-├── 数霊術基礎理論.txt           # 【参考資料】梶原流数霊術の原典テキスト
+ForesightReader/
+├── SKILL.md                     # ユーザー向けスキル仕様（概要・使用方法）
+├── CLAUDE.md                    # 本仕様書（詳細理論・実装方法）
+├── References/                  # 理論参考資料
+│   └── 数霊術基礎理論.txt        # 梶原流数霊術の原典テキスト
 ├── Seimei/                      # 七格剖象法姓名判断システム
 │   ├── 七格剖象法鑑定理論.md     # 【理論層】数霊と星導による姓名解釈体系
 │   ├── AssessmentTemplate.md    # 【出力層】鑑定書標準フォーマット
@@ -55,7 +63,7 @@ FortuneTeller/
 
 **Layer 2: Data（参照）**
 静的な参照データ - 不変の基礎情報テーブル
-- `数霊術基礎理論.txt` - 梶原流数霊術の原典（ルートディレクトリ）
+- `References/数霊術基礎理論.txt` - 梶原流数霊術の原典
 - `Seimei/ここのそ数霊表.json` - 梶原流数霊術の基本データ
   - 数霊1-91の吉凶・象意・系数・秘数・十干
   - 秘数が10の場合は0として扱う（冥王星の星導）
@@ -93,7 +101,7 @@ ClaudeがリアルタイムでLLMとして創造的解釈を生成する動的�
 **実行方法**
 ```python
 import sys
-sys.path.append('/home/claude/homunculus/Weave/Expertises/FortuneTeller/I-Ching')
+sys.path.append('/home/claude/homunculus/Weave/Expertises/ForesightReader/I-Ching')
 from iching_divination import IChingDivination
 
 divination = IChingDivination()
@@ -290,3 +298,10 @@ result = divination.divine("占的文字列")
 
 *軍師として献策する者は、星を読み、数を解し、人を観て、未来を紡ぐ。*
 *それは占いを超えた、文明的叡智の実践である。*
+
+---
+
+*Last Updated: 2025-11-01*
+*Maintained by: Weave @ Homunculus-Weave*
+
+**基本的な使用方法は `SKILL.md` を参照してください。**
