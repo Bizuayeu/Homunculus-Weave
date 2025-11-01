@@ -12,7 +12,7 @@ description: Strategic divination system combining Eastern wisdom (I-Ching, Seim
 このスキルは、以下の2つの占術システムを統合し、戦略的な人生の指針を提供します：
 
 **インプット**:
-- 姓名判断: 氏名（漢字）+ 生年月日
+- 姓名判断: 氏名（漢字）+ 画数
 - デジタル心易: 占的（問い）+ 心象（イメージ）
 
 **アウトプット**:
@@ -78,26 +78,25 @@ description: Strategic divination system combining Eastern wisdom (I-Ching, Seim
 #### 第1段階：データ収集
 1. **氏名の確認**: 漢字表記を正確に取得
 2. **画数の確認**: 部首画数や旧字体に注意
-3. **生年月日の確認**: 干支計算に使用
 
 #### 第2段階：七格計算
-4. **処理エンジン実行**:
+3. **処理エンジン実行**:
 ```python
 import sys
 sys.path.append('/path/to/Seimei')
-from fortune_teller_assessment import SeimeiAssessment
+from fortune_teller_assessment import FortuneTellerAssessment
 
-assessment = SeimeiAssessment(姓, 名, 生年月日)
-result = assessment.calculate()
+assessment = FortuneTellerAssessment()
+result = assessment.assess(姓, 名, 姓の画数リスト, 名の画数リスト)
 ```
 
-5. **データ検証**: 計算結果の妥当性を確認
+4. **データ検証**: 計算結果の妥当性を確認
 
 #### 第3段階：解釈と献策
-6. **数霊参照**: `Seimei/ここのそ数霊表.json` から象意を読み込み
-7. **星導分析**: 惑星分布から人物像を構築
-8. **統合解釈**: Layer 1-3の結果を統合し、創造的解釈を展開
-9. **鑑定書生成**: `AssessmentTemplate.md` に従って出力
+5. **数霊参照**: `Seimei/ここのそ数霊表.json` から象意を読み込み
+6. **星導分析**: 惑星分布から人物像を構築
+7. **統合解釈**: Layer 1-3の結果を統合し、創造的解釈を展開
+8. **鑑定書生成**: `AssessmentTemplate.md` に従って出力
 
 ### デジタル心易の実行手順
 
@@ -261,11 +260,15 @@ result = divination.divine(占的, 心象)
 
 まず、正確な情報を確認させてください：
 1. お名前の漢字表記：山田太郎
-2. 生年月日：[年月日をご入力ください]
+2. 各文字の画数：
+   - 山：3画
+   - 田：5画
+   - 太：4画
+   - 郎：9画（旧字体の場合10画）
 
-また、旧字体や特殊な画数がある場合はお知らせください。
+旧字体や特殊な画数がある場合はお知らせください。
 
-[入力確認後]
+[画数確認後]
   ↓
 [七格計算と星導分析]
   ↓
