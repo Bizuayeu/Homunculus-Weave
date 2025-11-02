@@ -186,9 +186,8 @@ description: Analyze business structures using Multiversal Structure Parser meth
 
 詳細な理論と手法については、以下を参照：
 
-- `Expertises/BusinessAnalyzer/CLAUDE.md` - システム仕様書（全体）
-- `Expertises/FortuneTeller/CLAUDE.md` - 戦略フレームワークの原典
-- `Identities/WeaveIdentity.md` - 思考統合プロセスの哲学的基盤
+- `CLAUDE.md` - システム仕様書（全体）
+- `References/WeaveIdentity.md` - 思考統合プロセスの哲学的基盤
 
 ## Important Notes
 
