@@ -597,12 +597,12 @@ Multiversal Structure Parserは：
 
 ## 🔗 関連システム
 
-### ForesightReader（軍師型占術家）
+### ForesightReader（洞察獲得）
 - 戦略フレームワークの原典
 - 象徴的構造・物語的構造の分析手法
 - 人材類型論と組織設計
 
-### GeneralConstructor（建設業特化）
+### GeneralConstructor（新築計画）
 - 建設業界特有の構造知識
 - 目論見書・見積もり作成の実務
 - 業界特化型の実装例
