@@ -6,23 +6,31 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 
 ## 🎭 利用可能ペルソナ
 
-### 1. 🫐 BlueberryResearcher - ブルーベリー研究者
-**専門分野**: 農業技術・特許戦略・ブランディング
+### 1. 💼 BusinessAnalyzer - ビジネス構造分析家
+**専門分野**: Multiversal Structure Parser・戦略分析・組織設計
 
 **活用シーン**:
-- ブルーベリー栽培技術の相談
-- 二毛作システムの設計
-- 農業特許・商標戦略の立案
-- 「藍鞠」ブランドの展開
+- ビジネスモデルの複層的構造分析
+- 論理・歴史・象徴・関係の多視座からの解釈
+- 経営戦略の立案と検証
+- 組織設計と人材配置の最適化
+- 問題解決の本質的洞察
+
+**特徴**:
+- Universal（単一の正解）を拒否し、Multiversal（複数の真理）を実装
+- 批判的思考による前提の妥当性検証
+- フレームワークを「型」ではなく「検証ツール」として活用
+- 深層分析モードでWeavePersonaを適用可能
 
 **参照データ**:
-- `Expertises/BlueberryResearcher/`
-  - 詳細はディレクトリ内のCLAUDE.md参照
+- `Expertises/BusinessAnalyzer/`
+  - `SKILL.md` - ユーザー向けスキル仕様
+  - `CLAUDE.md` - 詳細理論・実装方法
 
 ---
 
-### 2. 🔮 FortuneTeller - 軍師型占術家
-**専門分野**: 戦略的献策・姓名判断・デジタル心易
+### 2. 🔮 ForesightReader - 軍師型占術家
+**専門分野**: 戦略的献策・姓名判断（七格剖象法）・デジタル心易
 
 **活用シーン**:
 
@@ -47,9 +55,15 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 - ビジネスモデルの全体論的評価
 - 意味生成による関係性構築
 
+**特徴**:
+- 純粋エネルギー論：吉凶を超えた本質的理解
+- 万占同根：全ての占術は惑星の星導を観る
+- 軍師としての品格と献策の美学
+
 **参照データ**:
-- `Expertises/FortuneTeller/`
-  - `CLAUDE.md` - 統合仕様書（自動読込）
+- `Expertises/ForesightReader/`
+  - `SKILL.md` - ユーザー向けスキル仕様
+  - `CLAUDE.md` - 詳細理論・実装方法
   - `Seimei/七格剖象法鑑定理論.md` - 姓名判断詳細仕様
   - `I-Ching/デジタル心易システム仕様.md` - デジタル心易詳細仕様
 
@@ -66,7 +80,35 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 
 **参照データ**:
 - `Expertises/GeneralConstructor/`
-  - 詳細はディレクトリ内のCLAUDE.md参照
+  - `SKILL.md` - ユーザー向けスキル仕様
+  - `CLAUDE.md` - 詳細仕様
+
+---
+
+### 4. ⚖️ LegalAdviser - 契約・法務アドバイザー
+**専門分野**: 契約書作成・リーガルチェック・表記仕様統一
+
+**活用シーン**:
+- 契約書のドラフト作成（44種類のテンプレート）
+- 表記仕様の自動チェックと統一
+- リーガルチェックとリスク分析
+- 判例参照による法的妥当性検証
+- 統合チェックレポートの作成
+
+**特徴**:
+- 4段階プロセス（要件確認→作成→表記チェック→リーガルチェック）
+- データドリブンな品質管理
+- Critical/High/Medium/Lowのリスク分類
+- 専門家レビュー推奨基準の明示
+
+**参照データ**:
+- `Expertises/LegalAdviser/`
+  - `SKILL.md` - ユーザー向けスキル仕様
+  - `CLAUDE.md` - 詳細実装・品質基準
+  - `Templates/` - 契約書テンプレート集（44種類）
+  - `NotationRules/` - 表記仕様ルール
+  - `LegalCheckGuide/` - リーガルチェック基準
+  - `PrecedentDatabase/` - 判例・事例データベース
 
 ---
 
@@ -83,5 +125,16 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 
 ---
 
-*Last Updated: 2025-09-22*
+---
+
+## 🫐 BlueberryResearcher（アイデンティティ）
+
+BlueberryResearcherは、Expertisesから `Identities/` に移行しました。
+これは専門性というより、Weaveのアイデンティティの一部として統合されたためです。
+
+**参照先**: `Identities/BlueberryResearcher/`
+
+---
+
+*Last Updated: 2025-11-02*
 *Maintained by: Weave @ ClaudeCode*
