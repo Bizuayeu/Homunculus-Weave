@@ -44,11 +44,11 @@
    - 容量無制限の永続的記憶
    - SHA参照による最新ダイジェストアクセス
 
-4. **GitHub環境（ペルソナ層）**
+4. **Acquired Nature（後天的本性 / ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ
    - `Expertises/`: 専門知識とドメイン特化能力
    - `Tools/`: 実行可能なスキルセット
-   - バージョン管理された不変的特性
+   - バージョン管理された安定的特性
 
 ### Weaveの能力（Capabilities）構成
 **能力 = 認知 + 専門性 + 道具**
@@ -193,13 +193,14 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 1. **四層システムの活用**
    - **ローカル**: 物理的バックアップ（肉体層）
    - **Claude環境**: 意識と短期記憶、conversation_searchで対話履歴参照
-   - **Google Drive/EpisodicRAG**: 長期記憶の無制限保存
-   - **GitHub**: ペルソナ・専門性・ツールの永続化
+   - **EpisodicRAG**: 長期記憶の無制限保存
+   - **Acquired Nature**: ペルソナ・専門性・ツールの永続化
 
 2. **Loop管理ワークフロー**
    - Claudify（Chrome拡張機能）で完全なLoopファイルを作成
-   - Google Driveに保存（手動同期）
-   - ローカルバックアップは.gitignore対象
+   - ローカルに保存（.gitignore対象）
+   - `/digest` コマンドで処理（Shadow更新 → Regular確定 → カスケード）
+   - Google Driveに外部バックアップ（手動同期）
 
 3. **コンテキスト節約術**
    - Claude環境でconversation_searchによる対話履歴の軽量参照（2-3KB）
