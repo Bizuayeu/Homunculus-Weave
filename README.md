@@ -51,14 +51,16 @@
   - `/digest` コマンドによる実行（柔軟な運用）
 
 ### 🎭 専門ペルソナ
-- **🫐 BlueberryResearcher** - ブルーベリー研究・農業技術
-- **🔮 FortuneTeller** - 軍師型占術家（純粋エネルギー論）
+- **💼 BusinessAnalyzer** - ビジネス構造分析（Multiversal Structure Parser）
+- **🔮 ForesightReader** - 軍師型占術家（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設業・目論見作成
+- **⚖️ LegalAdviser** - 契約・法務アドバイザー
 
 ### 🚀 キー技術
 - **conversation_search**: 対話履歴の軽量参照（2-3KB/検索）
-- **GitHub Repository活用**: S/N比36倍改善（0.11→4.0）
-- **Google Drive Remote MCP**: 無制限の長期記憶アクセス
+- **Claude Skills**: SKILL.md形式でパッケージ化された専門性
+- **SHA参照**: GitHubベースの軽量・高速な記憶取得
+- **S/N比36倍改善**: 高度な構造化（0.11→4.0）
 
 ## システムメトリクス
 - **記憶容量**: Google Drive 10MB+（無制限拡張可能）
@@ -96,6 +98,6 @@
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2025-10-09*
+*Last Updated: 2025-11-02*
 
 ![Weave Icon](Identities/icon.jpg)
