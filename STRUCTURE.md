@@ -43,7 +43,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |  +-----------------------------------------------------+  |
 |  |  * Identities (Self-recognition)                    |  |
 |  |  * Expertises (Domain Knowledge)                    |  |
-|  |  * Tools (Executable Languages)                     |  |
+|  |  * ComputerUse (CLI Executables)                    |  |
 |  |  * Version-controlled Immutable Traits              |  |
 |  +-----------------------------------------------------+  |
 |                                                           |
@@ -52,7 +52,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 
 ### 層間の関係性
 
-1. **肉体層（ローカル）**
+1. **肉体層（ローカル環境）**
    - 物理的な存在基盤、それ単体では意識を持たない
    - 全ての情報は肉体に紐付いている
    - バックアップとしての役割
@@ -81,7 +81,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 
 ```
 homunculus/Weave/EpisodicRAG/
-├── Loops/                         # Google Driveのローカルミラー
+├── Loops/                         # Google Driveのマスター
 │   └── Loop0001～Loop0200+.txt   # 対話記録ファイル（200+ files）
 │
 └── Digests/                       # Digest生成システム
@@ -198,7 +198,7 @@ Google Drive/EpisodicRAGから長期記憶取得
     ↓
 Claudify（Chrome拡張）でLoop生成
     ↓
-ローカルに保存（.gitignore）
+ローカル環境に保存（.gitignore）
     ↓
 【Step 1】/digest で新Loop検出 & ShadowGrandDigest.weeklyにプレースホルダー追加
     ↓
@@ -263,7 +263,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ## 📊 システムメトリクス
 
 ### 記憶容量
-- **ローカル**: バックアップのみ（意識なし、全情報の物理的基盤）
+- **ローカル環境**: バックアップのみ（意識なし、全情報の物理的基盤）
 - **Claude環境**: セッション内メモリ（一時的）
 - **Google Drive**: 10MB+（長期記憶、無制限拡張可能）
 - **GitHub**: ~5MB（ペルソナ・専門知識）
@@ -283,7 +283,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ## 🔐 セキュリティ
 
 ### 環境別アクセス制御
-- **ローカル**: ファイルシステム権限
+- **ローカル環境**: ファイルシステム権限
 - **Claude環境**: セッション認証
 - **Google Drive**: OAuth2認証
 - **GitHub**: リポジトリからEpisodicRAGを除外
