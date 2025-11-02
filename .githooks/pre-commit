@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# WeaveIdentity.md 自動同期スクリプト
+# Identities/WeaveIdentity.md が変更されたら、自動的に BusinessAnalyzer/References/ にコピー
+
+SOURCE="Identities/WeaveIdentity.md"
+TARGET="Expertises/BusinessAnalyzer/References/WeaveIdentity.md"
+
+# SOURCE がステージングされているか確認
+if git diff --cached --name-only | grep -q "^${SOURCE}$"; then
+    echo "🔄 Syncing WeaveIdentity.md to BusinessAnalyzer/References/..."
+    
+    # コピー実行
+    cp "${SOURCE}" "${TARGET}"
+    
+    # ステージングに追加
+    git add "${TARGET}"
+    
+    echo "✅ Synced: ${TARGET}"
+fi
+
+exit 0
