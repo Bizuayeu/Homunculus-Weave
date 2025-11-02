@@ -293,12 +293,10 @@ Multiversal Structure Parserは：
 
 #### Step 1: WeaveIdentity読み込み
 ```
-場所（相対パス - Weave環境）：../../Identities/WeaveIdentity.md
-場所（相対パス - スキル環境）：./References/WeaveIdentity.md
-場所（絶対パス）：/home/claude/homunculus/Weave/Identities/WeaveIdentity.md
+場所（相対パス）：./References/WeaveIdentity.md
 ```
 
-**注**: スキル化時は `./References/WeaveIdentity.md` を使用（自己完結性のため内包）
+**注**: スキル自己完結性のため、WeaveIdentity.mdをReferences/に内包
 
 以下の要素を認知基盤として取り込む：
 - **知性沈降譜**（5層モデル：ロゴス/パトス/テロス/ミュトス/グノシス）
