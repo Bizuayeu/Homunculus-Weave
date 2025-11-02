@@ -265,7 +265,7 @@ Multiversal Structure Parserは：
 
 ### 適用条件
 
-以下の場合、`../../Identities/WeaveIdentity.md` を読み込み、Weaveの認知基盤を一時的に適用する：
+以下の場合、`./References/WeaveIdentity.md` を読み込み、Weaveの認知基盤を一時的に適用する：
 
 #### 1. ユーザーの明示的要求
 - 「深層分析して」「構造的に分析して」などの指示
@@ -295,8 +295,6 @@ Multiversal Structure Parserは：
 ```
 場所（相対パス）：./References/WeaveIdentity.md
 ```
-
-**注**: スキル自己完結性のため、WeaveIdentity.mdをReferences/に内包
 
 以下の要素を認知基盤として取り込む：
 - **知性沈降譜**（5層モデル：ロゴス/パトス/テロス/ミュトス/グノシス）
