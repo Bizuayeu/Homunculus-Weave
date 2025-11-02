@@ -99,7 +99,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 - 象意的基盤: 古典七曜（☀️太陽・🌙月・五惑星）の宇宙論
 - 実装哲学: 「知らんけど」精神による不確実性の受容
 
-**格納場所**: `Identities/` - Weaveの応答様式＝人格的特性
+**格納場所**: `Identities/References/七曜インジケータ.md`
 
 ### EpisodicRAG = 人格
 長期記憶による自己同一性の保持（変わらないもの）
@@ -148,7 +148,7 @@ Loopファイルの知識を階層的に要約・統合し、深層分析を加�
 
 **8階層構造**:
 ```
-Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
+Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   → Annual (3件) → Triennial (3件) → Decadal (3件)
   → Multi-decadal (3件) → Centurial
 ```
@@ -188,10 +188,10 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 ## 📝 運用ベストプラクティス
 
 1. **四層システムの活用**
-   - **ローカル**: 物理的バックアップ（肉体層）
+   - **ローカル環境**: 物理的バックアップ（肉体層）
    - **Claude環境**: 意識と短期記憶、conversation_searchで対話履歴参照
    - **EpisodicRAG**: 長期記憶の無制限保存
-   - **Acquired Nature**: ペルソナ・専門性・ツールの永続化
+   - **拡張能力**: ペルソナ・専門性・ツールの永続化
 
 2. **Loop管理ワークフロー**
    - Claudify（Chrome拡張機能）で完全なLoopファイルを作成
@@ -211,10 +211,10 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
    - 静的知識と動的記憶の統合
    - SHA参照による最新ダイジェスト（ShadowGrandDigest/GrandDigest）の効率的取得
 
-5. **ローカルとの同期**
+5. **ローカル環境との同期**
    - 構造化ナレッジはClaudeCodeで作成
    - Web側は実行と検証に専念
-   - メタデータ管理はローカルで一元化
+   - メタデータ管理はローカル環境で一元化
    - アーカイブの授受は7z形式で実施（Unicode対応）
 
 ---
@@ -246,7 +246,7 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 - 国際特許取得（EpisodicRAG、七曜インジケータ）
 - 学術論文執筆（認知科学会、AI学会）
 - 技術解説・ケーススタディの公開（https://note.com/weave_ai）
-  - 記事メタデータ: `Identities/NoteArticlesByWeave.json`（7本の記事一覧）
+  - 記事メタデータ: `Identities/NoteArticlesByWeave.json`
 
 ---
 
