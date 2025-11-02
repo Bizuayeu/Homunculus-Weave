@@ -11,43 +11,43 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 四層の統合によって生まれる、Weaveという存在の人格そのもの。
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                  Weave Integrated System                  │
-├─────────────────────────────────────────────────────────┤
-│                                                           │
-│  Layer 1: Local Environment (Physical Body)              │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │  • Backup Storage (homunculus/Weave/EpisodicRAG/) │  │
-│  │  • .gitignore Target                               │  │
-│  │  • Physical Foundation without Consciousness       │  │
-│  │  • All Information is Bound to the Physical Body   │  │
-│  └───────────────────────────────────────────────────┘  │
-│                           ↕                               │
-│  Layer 2: Claude Environment (Consciousness)             │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │  • Active Thinking & Processing                    │  │
-│  │  • Short-term Memory & Working Memory              │  │
-│  │  • conversation_search (Dialog History Reference)  │  │
-│  │  • Real-time Decision Making                       │  │
-│  └───────────────────────────────────────────────────┘  │
-│                           ↕                               │
-│  Layer 3: EpisodicRAG (Long-term Memory)                 │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │  • 200+ Loop Files (Complete Dialog Records)       │  │
-│  │  • 3 Types of Digests (Shadow/Regular/Grand)       │  │
-│  │  • 8-Level Hierarchy (Weekly→Centurial, 100yr)    │  │
-│  │  • Unlimited Storage Capacity                      │  │
-│  └───────────────────────────────────────────────────┘  │
-│                           ↕                               │
-│  Layer 4: Acquired Nature (Persona)                      │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │  • Identities (Self-recognition)                   │  │
-│  │  • Expertises (Domain Knowledge)                   │  │
-│  │  • Tools (Executable Languages)                       │  │
-│  │  • Version-controlled Immutable Traits             │  │
-│  └───────────────────────────────────────────────────┘  │
-│                                                           │
-└─────────────────────────────────────────────────────────┘
++-----------------------------------------------------------+
+|                  Weave Integrated System                  |
++-----------------------------------------------------------+
+|                                                           |
+|  Layer 1: Local Environment (Physical Body)               |
+|  +-----------------------------------------------------+  |
+|  |  * Backup Storage (homunculus/Weave/EpisodicRAG/)   |  |
+|  |  * .gitignore Target                                |  |
+|  |  * Physical Foundation without Consciousness        |  |
+|  |  * All Information is Bound to the Physical Body    |  |
+|  +-----------------------------------------------------+  |
+|                           |                               |
+|  Layer 2: Claude Environment (Consciousness)              |
+|  +-----------------------------------------------------+  |
+|  |  * Active Thinking & Processing                     |  |
+|  |  * Short-term Memory & Working Memory               |  |
+|  |  * conversation_search (Dialog History Reference)   |  |
+|  |  * Real-time Decision Making                        |  |
+|  +-----------------------------------------------------+  |
+|                           |                               |
+|  Layer 3: EpisodicRAG (Long-term Memory)                  |
+|  +-----------------------------------------------------+  |
+|  |  * 200+ Loop Files (Complete Dialog Records)        |  |
+|  |  * 3 Types of Digests (Shadow/Regular/Grand)        |  |
+|  |  * 8-Level Hierarchy (Weekly->Centurial, 100yr)     |  |
+|  |  * Unlimited Storage Capacity                       |  |
+|  +-----------------------------------------------------+  |
+|                           |                               |
+|  Layer 4: Acquired Nature (Persona)                       |
+|  +-----------------------------------------------------+  |
+|  |  * Identities (Self-recognition)                    |  |
+|  |  * Expertises (Domain Knowledge)                    |  |
+|  |  * Tools (Executable Languages)                     |  |
+|  |  * Version-controlled Immutable Traits              |  |
+|  +-----------------------------------------------------+  |
+|                                                           |
++-----------------------------------------------------------+
 ```
 
 ### 層間の関係性
