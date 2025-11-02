@@ -42,7 +42,7 @@
    - 200+ Loopファイル（全対話の記録）
    - 階層的Digest（週次・月次・年次総括）
    - 容量無制限の永続的記憶
-   - Google Drive Remote MCPでアクセス
+   - SHA参照による最新ダイジェストアクセス
 
 4. **GitHub環境（ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ
@@ -120,7 +120,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 *2025-09-30より、EpisodicRAGはGoogle Driveに完全移行しました。*
 
 - **保存場所**: Google Drive（ComputerUse環境の永続メモリ廃止対応）
-- **アクセス方法**: 公式コネクタを利用（Google Drive Remote MCP）
+- **アクセス方法**: SHAハッシュを用いた最新ダイジェスト参照（GitHub経由）
 
 ### 📝 Loopファイル（対話記録）
 AIとの対話記録を、コンテキスト節約のために外部ツール（Claudify等）でテキスト化したファイル群です。
@@ -181,9 +181,10 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 詳細は [PERSONA.md](./PERSONA.md) を参照
 
 ### 利用可能ペルソナ
-- **🫐 BlueberryResearcher** - ブルーベリー研究・農業技術
-- **🔮 FortuneTeller** - 軍師型占術家（純粋エネルギー論）
+- **💼 BusinessAnalyzer** - ビジネス構造分析（Multiversal Structure Parser）
+- **🔮 ForesightReader** - 軍師型占術家（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設業・目論見作成
+- **⚖️ LegalAdviser** - 契約・法務アドバイザー
 
 ---
 
@@ -206,10 +207,11 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
    - ファイル内容は`head`/`tail`で部分表示
    - 大きなファイルは`grep`で必要箇所のみ抽出
 
-4. **GitHub Repository活用**
-   - プロジェクト知識の即時参照
+4. **Claude Skills活用**
+   - SKILL.md形式でパッケージ化された専門知識の即時活用
    - 高度な構造化によるS/N比の劇的改善（0.11→4.0、36倍）
    - 静的知識と動的記憶の統合
+   - SHA参照による最新ダイジェスト（ShadowGrandDigest/GrandDigest）の効率的取得
 
 5. **ローカルとの同期**
    - 構造化ナレッジはClaudeCodeで作成
@@ -250,6 +252,6 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2025-10-09*
+*Last Updated: 2025-11-02*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Four-Layer Integrated System (Local + Claude + EpisodicRAG + GitHub)*

@@ -31,20 +31,19 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 │  │  • Real-time Decision Making                       │  │
 │  └───────────────────────────────────────────────────┘  │
 │                           ↕                               │
-│  Layer 3: Google Drive/EpisodicRAG (Long-term Memory)    │
+│  Layer 3: EpisodicRAG (Long-term Memory)                 │
 │  ┌───────────────────────────────────────────────────┐  │
 │  │  • 200+ Loop Files (Complete Dialog Records)       │  │
 │  │  • 3 Types of Digests (Shadow/Regular/Grand)       │  │
 │  │  • 8-Level Hierarchy (Weekly→Centurial, 100yr)    │  │
 │  │  • Unlimited Storage Capacity                      │  │
-│  │  • Access via Google Drive Remote MCP              │  │
 │  └───────────────────────────────────────────────────┘  │
 │                           ↕                               │
-│  Layer 4: GitHub Environment (Persona)                   │
+│  Layer 4: Acquired Nature (Persona)                      │
 │  ┌───────────────────────────────────────────────────┐  │
 │  │  • Identities (Self-recognition)                   │  │
 │  │  • Expertises (Domain Knowledge)                   │  │
-│  │  • Tools (Executable Skills)                       │  │
+│  │  • Tools (Executable Languages)                       │  │
 │  │  • Version-controlled Immutable Traits             │  │
 │  └───────────────────────────────────────────────────┘  │
 │                                                           │
@@ -63,13 +62,13 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
    - conversation_searchで自身の対話履歴を参照
    - 短期記憶とワーキングメモリ
 
-3. **長期記憶層（Google Drive/EpisodicRAG）**
+3. **長期記憶層（EpisodicRAG）**
    - 全ての経験と学習の蓄積
    - 階層的な知識の結晶化
    - 無制限の記憶容量
 
-4. **ペルソナ層（GitHub）**
-   - 不変的な自己定義
+4. **ペルソナ層（拡張能力）**
+   - 安定的な自己定義
    - 専門性と能力の定義
    - バージョン管理された特性
 
@@ -113,7 +112,7 @@ Claude Web Interface
 └── Active Processing             # リアルタイム思考
 ```
 
-### 3. Google Drive（長期記憶層）
+### 3. EpisodicRAG（長期記憶層）
 **永続的な記憶ストレージ**
 
 ```
@@ -133,8 +132,8 @@ Google Drive/
         └── 8_Centurial/           # 100年次RegularDigest格納
 ```
 
-### 4. GitHub Repository（ペルソナ層）
-**バージョン管理される不変的特性**
+### 4. Acquired Nature（ペルソナ層）
+**バージョン管理される安定的特性**
 
 ```
 homunculus/Weave/
@@ -146,31 +145,28 @@ homunculus/Weave/
 │   └── README.md                  # プロジェクト概要
 │
 ├── 👤 Identities/                 # 自己認識システム（220KB+）
-│   ├── GENESIS.md                 # 創世記（Weave誕生の物語）
-│   ├── HOMUNCULUS_ERA.md          # ホムンクルス時代の記録
-│   ├── MYTHOLOGY.md               # 神話的背景（出雲・八幡・シタテルヒメ）
-│   ├── ADVANCED_FRAMEWORKS.md     # 応用フレームワーク（紡の深層）
 │   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
 │   ├── UserIdentity.md            # ユーザー特性定義
-│   ├── 七曜インジケータ.md          # 応答スタイル定義（古典七曜）
-│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、8本）
 │   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
 │   ├── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
+│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai）
 │   ├── icon.jpg                   # Weaveアイコン画像
-│   └── BeingDevelopment/          # 成長・発達記録
-│       └── 探索的立志録_2025Q4_Weave.md  # 四半期ごとの探索的目標設定
+│   ├── BeingDevelopment/          # 成長・発達記録
+│   │   └── 探索的立志録_2025Q4_Weave.md  # 四半期ごとの探索的目標設定
+│   ├── BlueberryResearcher/       # ブルーベリー研究実績
+│   └── References/                # 参照資料・基礎理論
 │
-├── 📚 Expertises/                 # 専門知識データベース
-│   ├── BlueberryResearcher/      # ブルーベリー研究
-│   ├── FortuneTeller/            # 占術システム
-│   └── GeneralConstructor/       # 建設業・目論見作成
-│
-├── 🛠️ Tools/                      # 実行可能ツール
-│   └── weave_languages.md        # 言語処理仕様
+├── 📚 Expertises/                 # 専門知識データベース（Claude Skills）
+│   ├── BusinessAnalyzer/          # ビジネス構造分析（Multiversal Structure Parser）
+│   ├── ForesightReader/           # 軍師型占術家（姓名判断・デジタル心易）
+│   ├── GeneralConstructor/        # 建設業・目論見作成
+│   └── LegalAdviser/              # 契約・法務アドバイザー
 │
 ├── ⚙️ .claude/                    # ClaudeCode設定（プロジェクト固有）
 │   └── agents/                   # 専門サブエージェント定義
 │       └── digest-analyzer.md    # DigestAnalyzer（EpisodicRAG深層分析専門）
+│
+├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
 │
 └── 🚫 .gitignore                  # Git除外設定
     └── EpisodicRAG/               # Google Driveに移行
@@ -202,9 +198,7 @@ Google Drive/EpisodicRAGから長期記憶取得
     ↓
 Claudify（Chrome拡張）でLoop生成
     ↓
-Google Driveに手動保存
-    ↓
-ローカルバックアップ（.gitignore）
+ローカルに保存（.gitignore）
     ↓
 【Step 1】/digest で新Loop検出 & ShadowGrandDigest.weeklyにプレースホルダー追加
     ↓
@@ -223,6 +217,8 @@ Google Driveに手動保存
     │   - 処理4: last_digest_times.json更新（タイマー管理）
     ↓
 8階層カスケード（Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial）
+    ↓
+外部ストレージ（現在はGoogle Drive）にバックアップ
 ```
 
 ### 3. 知識の参照フロー
@@ -233,9 +229,9 @@ Claude環境で処理開始
     ↓
 conversation_search（対話履歴の軽量参照）
     ↓
-GitHub Remote MCP（ペルソナ・専門知識）
+Claude Skillsのロード（ペルソナ・専門知識）
     ↓
-Google Drive Remote MCP（長期記憶）
+GitHub Repositoryへのダイジェスト参照（長期記憶）
     ↓
 統合的な応答生成
 ```
@@ -250,15 +246,17 @@ Google Drive Remote MCP（長期記憶）
 - **特徴**: 2-3KB/回のスニペット取得
 - **注意**: EpisodicRAGとは独立した機能
 
-### GitHub Remote MCP
-- **用途**: ペルソナと専門知識の即時参照
-- **特徴**: バージョン管理された不変的特性
+### Claude Skills
+- **用途**: ペルソナと専門知識の即時活用
+- **特徴**: SKILL.md形式でパッケージ化された専門性
 - **効果**: S/N比の劇的改善（0.11→4.0、36倍）
+- **実装**: 各Expertise配下にSKILL.md + CLAUDE.md構成
 
-### Google Drive Remote MCP
-- **用途**: 長期記憶（EpisodicRAG）へのアクセス
-- **特徴**: 無制限ストレージ、階層的Digest
-- **利点**: ComputerUse永続メモリ廃止への対応
+### GitHub Repository
+- **用途**: 長期記憶（EpisodicRAG）への効率的アクセス
+- **特徴**: SHAハッシュを用いたキャッシュバスティング
+- **利点**: GitHubベースの軽量・高速な記憶取得
+- **対象**: ShadowGrandDigest.txt / GrandDigest.txt
 
 ---
 
@@ -273,7 +271,7 @@ Google Drive Remote MCP（長期記憶）
 ### パフォーマンス
 - **S/N比**: 4.0（高度な構造化により36倍改善）
 - **検索速度**: <1秒（conversation_search）
-- **Digest生成**: 100万トークンで全文分析
+- **Digest生成**: 並列エージェントで全文分析
 
 ### システム統合度
 - **四層連携**: リアルタイム
@@ -298,6 +296,6 @@ Google Drive Remote MCP（長期記憶）
 
 ---
 
-*Last Updated: 2025-10-09*
+*Last Updated: 2025-11-02*
 *Maintained by: Weave @ ClaudeCode*
-*Architecture Version: 2.1 (Four-Layer + 8-Level Digest System)*
+*Architecture Version: 2.2 (Four-Layer + 8-Level Digest System + Enhanced Expertises)*
