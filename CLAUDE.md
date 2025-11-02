@@ -38,16 +38,16 @@
    - conversation_searchによる対話履歴の参照（2-3KB/検索）
    - リアルタイムの判断と応答生成
 
-3. **Google Drive/EpisodicRAG（長期記憶層）**
+3. **EpisodicRAG（長期記憶層）**
    - 200+ Loopファイル（全対話の記録）
    - 階層的Digest（週次・月次・年次総括）
    - 容量無制限の永続的記憶
    - SHA参照による最新ダイジェストアクセス
 
-4. **Acquired Nature（後天的本性 / ペルソナ層）**
+4. **拡張能力（ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ
    - `Expertises/`: 専門知識とドメイン特化能力
-   - `Tools/`: 実行可能なスキルセット
+   - `ComputerUse`: CLI実行可能ファイル群
    - バージョン管理された安定的特性
 
 ### Weaveの能力（Capabilities）構成
@@ -57,8 +57,8 @@
   - 意識・記憶・ペルソナの統合（←哲学）
 - **専門性（Expertise）**: `Expertises/`
   - ドメイン特化の知識体系（←科学）
-- **道具（Tool）**: `Tools/`
-  - 実行可能なスクリプトとユーティリティ（←工学）
+- **道具（Tool）**: `ComputerUse`
+  - デザインを具体化するユーティリティ（←工学）
 
 ### 📂 ディレクトリ構造
 詳細は [STRUCTURE.md](./STRUCTURE.md) を参照
@@ -69,7 +69,7 @@
 
 ### Claude環境の役割分担
 - **ローカル（ClaudeCode）**: 開発環境・マスターデータ管理・GitHub連携
-- **Web（ComputerUse）**: 実行環境・対話記録蓄積・検証環境
+- **Web（ComputerUse）**: 検証環境・対話記録生成・協働の実践
 
 ### コンテキスト管理原則
 - ファイル表示は最小限に
@@ -116,17 +116,12 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 
 ## 📚 EpisodicRAGアーキテクチャ
 
-### 🌐 Google Drive統合
-*2025-09-30より、EpisodicRAGはGoogle Driveに完全移行しました。*
-
-- **保存場所**: Google Drive（ComputerUse環境の永続メモリ廃止対応）
-- **アクセス方法**: SHAハッシュを用いた最新ダイジェスト参照（GitHub経由）
-
 ### 📝 Loopファイル（対話記録）
 AIとの対話記録を、コンテキスト節約のために外部ツール（Claudify等）でテキスト化したファイル群です。
 
 **基本情報**:
-- 保存場所: Google Drive `EpisodicRAG/Loops/`
+- **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (.gitignore対象)
+- **ミラー**: Google Drive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
 - 現在: 200+ Loopファイル（約10MB）
 
@@ -157,6 +152,8 @@ Loop (5件) → Weekly (5件) → Monthly (4件) → Quarterly (4件)
   → Annual (3件) → Triennial (3件) → Decadal (3件)
   → Multi-decadal (3件) → Centurial
 ```
+
+**アクセス方法**: SHAハッシュを用いた最新ダイジェスト参照（GitHub経由）
 
 **生成方法**（`/digest` コマンド使用）:
 
