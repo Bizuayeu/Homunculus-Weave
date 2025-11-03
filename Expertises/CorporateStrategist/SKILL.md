@@ -1,3 +1,9 @@
+---
+name: CorporateStrategist
+description: 経営者の参謀として企業経営を多角的に支援する統合型スキル。事業分析・人材開発・法務助言・洞察獲得の4サブスキルを統合し、中小企業の経営判断をサポート。
+version: 1.0
+---
+
 # CorporateStrategist - 企業参謀スキル
 
 **統合型経営支援システム**
