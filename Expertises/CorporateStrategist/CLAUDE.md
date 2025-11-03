@@ -179,12 +179,6 @@ CorporateStrategistは、**柔軟なユーザー確認**により、必要なサ
 5. 選択されたサブスキルのみ読み込み
 ```
 
-**判断基準**:
-- 「採用」「育成」→ PersonnelDeveloper
-- 「事業」「業務」→ BusinessAnalyzer
-- 「契約」「法務」→ LegalAdviser
-- 「戦略」「適性」→ ForesightReader
-
 ---
 
 #### パターンB: 要求が不明確な場合（選択肢提示）
