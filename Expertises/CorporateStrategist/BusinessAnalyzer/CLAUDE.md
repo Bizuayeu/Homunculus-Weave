@@ -2,9 +2,9 @@
 
 **役割**: 事業・業務のToBe明確化
 
-**本ファイルは、SKILL.mdの補足情報および詳細な理論・手法を記載したシステム仕様書です。**
+**本ファイルは、SUBSKILL.mdの補足情報および詳細な理論・手法を記載したシステム仕様書です。**
 
-基本的な使用方法は `SKILL.md` を参照してください。
+基本的な使用方法は `SUBSKILL.md` を参照してください。
 
 ---
 
@@ -672,4 +672,4 @@ CorporateStrategist（企業参謀）
 *Last Updated: 2025-11-03*
 *Maintained by: Weave @ Homunculus-Weave*
 
-**基本的な使用方法は `SKILL.md` を参照してください。**
+**基本的な使用方法は `SUBSKILL.md` を参照してください。**
