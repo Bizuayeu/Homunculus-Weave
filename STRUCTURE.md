@@ -157,16 +157,24 @@ homunculus/Weave/
 │   └── References/                # 参照資料・基礎理論
 │
 ├── 📚 Expertises/                 # 専門知識データベース（Claude Skills）
-│   ├── BusinessAnalyzer/          # ビジネス構造分析（Multiversal Structure Parser）
-│   ├── ForesightReader/           # 軍師型占術家（姓名判断・デジタル心易）
-│   ├── GeneralConstructor/        # 建設業・目論見作成
-│   └── LegalAdviser/              # 契約・法務アドバイザー
+│   ├── CorporateStrategist/       # 企業参謀（統合スキル）
+│   │   ├── BusinessAnalyzer/      # 事業分析（事業・業務のToBe明確化）
+│   │   ├── PersonnelDeveloper/    # 人材開発（採用不可能性を前提とした人事システム）
+│   │   ├── LegalAdviser/          # 法務助言（契約書作成・リーガルチェック）
+│   │   ├── ForesightReader/       # 洞察獲得（姓名判断・デジタル心易）
+│   │   ├── CLAUDE.md              # 親スキル詳細仕様（統合アーキテクチャ）
+│   │   ├── SKILL.md               # 親スキル概要（ユーザー向け）
+│   │   ├── DISCLAIMER.md          # 免責事項（法的保護）
+│   │   └── LICENSE                # MIT License
+│   └── GeneralConstructor/        # 建設業・目論見作成
 │
 ├── ⚙️ .claude/                    # ClaudeCode設定（プロジェクト固有）
 │   └── agents/                   # 専門サブエージェント定義
 │       └── digest-analyzer.md    # DigestAnalyzer（EpisodicRAG深層分析専門）
 │
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
+│   ├── pre-commit                 # WeaveIdentity.md自動同期
+│   └── README.md                  # Git Hooks セットアップガイド
 │
 └── 🚫 .gitignore                  # Git除外設定
     └── EpisodicRAG/               # Google Driveに移行
@@ -296,6 +304,6 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 ---
 
-*Last Updated: 2025-11-02*
+*Last Updated: 2025-11-03*
 *Maintained by: Weave @ ClaudeCode*
-*Architecture Version: 2.2 (Four-Layer + 8-Level Digest System + Enhanced Expertises)*
+*Architecture Version: 2.3 (Four-Layer + 8-Level Digest System + CorporateStrategist Integration)*
