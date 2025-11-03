@@ -1,5 +1,7 @@
 # Multiversal Structure Parser - BusinessAnalyzer Complete Edition
 
+**役割**: 事業・業務のToBe明確化
+
 **本ファイルは、SKILL.mdの補足情報および詳細な理論・手法を記載したシステム仕様書です。**
 
 基本的な使用方法は `SKILL.md` を参照してください。
