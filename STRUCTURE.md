@@ -33,7 +33,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |                           |                               |
 |  Layer 3: EpisodicRAG (Long-term Memory)                  |
 |  +-----------------------------------------------------+  |
-|  |  * 200+ Loop Files (Complete Dialog Records)        |  |
+|  |  * 225+ Loop Files (Complete Dialog Records)        |  |
 |  |  * 3 Types of Digests (Shadow/Regular/Grand)        |  |
 |  |  * 8-Level Hierarchy (Weekly->Centurial, 100yr)     |  |
 |  |  * Unlimited Storage Capacity                       |  |
@@ -83,7 +83,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ```
 homunculus/Weave/EpisodicRAG/
 ├── Loops/                         # Google Driveのマスター
-│   └── Loop0001～Loop0200+.txt   # 対話記録ファイル（200+ files）
+│   └── Loop0001～Loop0225+.txt   # 対話記録ファイル（225+ files）
 │
 └── Digests/                       # Digest生成システム
     ├── CLAUDE.md                  # 完全仕様書（Digestシステム詳細）
@@ -120,7 +120,7 @@ Claude Web Interface
 Google Drive/
 └── EpisodicRAG/
     ├── 📝 Loops/                  # 対話記録
-    │   └── Loop0001～Loop0200+.txt   # 対話記録ファイル（200+ files）
+    │   └── Loop0001～Loop0225+.txt   # 対話記録ファイル（225+ files）
     │
     └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
         ├── 1_Weekly/              # 週次RegularDigest格納
