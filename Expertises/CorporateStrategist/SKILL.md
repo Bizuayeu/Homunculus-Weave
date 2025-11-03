@@ -40,7 +40,7 @@ CorporateStrategistは意思決定の支援ツールであり、専門家の助�
 - 業務フローの最適化提案
 - 市場分析と競合分析
 
-**詳細**: `BusinessAnalyzer/SKILL.md` を参照
+**詳細**: `BusinessAnalyzer/SUBSKILL.md` を参照
 
 ---
 
@@ -55,7 +55,7 @@ CorporateStrategistは意思決定の支援ツールであり、専門家の助�
 - AIスキル化/マニュアル化による育成加速
 - オペレーター → スペシャリスト への育成支援
 
-**詳細**: `PersonnelDeveloper/SKILL.md` を参照
+**詳細**: `PersonnelDeveloper/SUBSKILL.md` を参照
 
 ---
 
@@ -69,7 +69,7 @@ CorporateStrategistは意思決定の支援ツールであり、専門家の助�
 - 人事制度の法的妥当性の確認
 - 契約書のレビューと助言
 
-**詳細**: `LegalAdviser/SKILL.md` を参照
+**詳細**: `LegalAdviser/SUBSKILL.md` を参照
 
 ---
 
@@ -84,7 +84,7 @@ CorporateStrategistは意思決定の支援ツールであり、専門家の助�
 - 人材4類型判定（軍人・天才・秀才・凡人）
 - 戦略的人材配置の助言
 
-**詳細**: `ForesightReader/SKILL.md` を参照
+**詳細**: `ForesightReader/SUBSKILL.md` を参照
 
 ---
 
@@ -204,11 +204,11 @@ LegalAdviser: 組織変更の法的確認
 
 ### Q4: 各サブスキルの詳細な機能を知りたい
 
-**A**: 各サブスキルのSKILL.mdを参照してください：
-- `BusinessAnalyzer/SKILL.md`
-- `PersonnelDeveloper/SKILL.md`
-- `LegalAdviser/SKILL.md`
-- `ForesightReader/SKILL.md`
+**A**: 各サブスキルのSUBSKILL.mdを参照してください：
+- `BusinessAnalyzer/SUBSKILL.md`
+- `PersonnelDeveloper/SUBSKILL.md`
+- `LegalAdviser/SUBSKILL.md`
+- `ForesightReader/SUBSKILL.md`
 
 ---
 
@@ -241,23 +241,23 @@ LegalAdviser: 組織変更の法的確認
 各サブスキルの詳細は、以下のファイルを参照してください：
 
 1. **BusinessAnalyzer**
-   - `BusinessAnalyzer/SKILL.md` - ユーザー向け概要
+   - `BusinessAnalyzer/SUBSKILL.md` - ユーザー向け概要
    - `BusinessAnalyzer/CLAUDE.md` - システム仕様書
 
 2. **PersonnelDeveloper**
-   - `PersonnelDeveloper/SKILL.md` - ユーザー向け概要
+   - `PersonnelDeveloper/SUBSKILL.md` - ユーザー向け概要
    - `PersonnelDeveloper/CLAUDE.md` - システム仕様書
    - `PersonnelDeveloper/Templates/` - 実務テンプレート集
    - `PersonnelDeveloper/References/` - 理論参考資料
 
 3. **LegalAdviser**
-   - `LegalAdviser/SKILL.md` - ユーザー向け概要
+   - `LegalAdviser/SUBSKILL.md` - ユーザー向け概要
    - `LegalAdviser/CLAUDE.md` - システム仕様書
    - `LegalAdviser/Templates/` - 実務テンプレート集
    - `LegalAdviser/References/` - 理論参考資料
 
 4. **ForesightReader**
-   - `ForesightReader/SKILL.md` - ユーザー向け概要
+   - `ForesightReader/SUBSKILL.md` - ユーザー向け概要
    - `ForesightReader/CLAUDE.md` - システム仕様書
 
 ---

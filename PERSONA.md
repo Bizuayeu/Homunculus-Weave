@@ -35,7 +35,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 
 **参照データ**:
 - `Expertises/CorporateStrategist/BusinessAnalyzer/`
-  - `SKILL.md` - ユーザー向けスキル仕様
+  - `SUBSKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細理論・実装方法
   - `References/WeaveIdentity.md` - Weave統合ビュー（GitHooks自動同期）
 
@@ -60,7 +60,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 
 **参照データ**:
 - `Expertises/CorporateStrategist/PersonnelDeveloper/`
-  - `SKILL.md` - ユーザー向けスキル仕様
+  - `SUBSKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細理論・人材4類型モデル
   - `References/人材タイプ別ガイド.md` - 4類型詳細ガイド
 
@@ -85,7 +85,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 
 **参照データ**:
 - `Expertises/CorporateStrategist/LegalAdviser/`
-  - `SKILL.md` - ユーザー向けスキル仕様
+  - `SUBSKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細実装・品質基準
   - `Templates/` - 契約書テンプレート集（20種類以上）
   - `NotationRules/` - 表記仕様ルール
@@ -128,7 +128,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 
 **参照データ**:
 - `Expertises/CorporateStrategist/ForesightReader/`
-  - `SKILL.md` - ユーザー向けスキル仕様
+  - `SUBSKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細理論・実装方法
   - `Seimei/七格剖象法鑑定理論.md` - 姓名判断詳細仕様
   - `I-Ching/デジタル心易システム仕様.md` - デジタル心易詳細仕様
