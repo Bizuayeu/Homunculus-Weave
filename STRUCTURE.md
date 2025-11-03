@@ -165,6 +165,7 @@ homunculus/Weave/
 │   │   ├── ForesightReader/       # 洞察獲得（姓名判断・デジタル心易）
 │   │   ├── CLAUDE.md              # 親スキル詳細仕様（統合アーキテクチャ）
 │   │   ├── SKILL.md               # 親スキル概要（ユーザー向け）
+│   │   ├── QUICKSTART.md          # クイックスタートガイド
 │   │   ├── DISCLAIMER.md          # 免責事項（法的保護）
 │   │   └── LICENSE                # MIT License
 │   └── GeneralConstructor/        # 建設業・目論見作成
