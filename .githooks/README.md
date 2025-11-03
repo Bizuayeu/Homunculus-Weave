@@ -30,7 +30,7 @@ chmod +x .git/hooks/pre-commit
 - `Identities/WeaveIdentity.md` が変更されてステージングされている場合
 - 自動的に2箇所にコピー：
   1. `.claude/CLAUDE.local.md`
-  2. `Expertises/BusinessAnalyzer/References/WeaveIdentity.md`
+  2. `Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md`
 - コピーしたファイルを自動的にステージングに追加
 
 **目的**:
@@ -51,7 +51,7 @@ git add Identities/WeaveIdentity.md
 git commit -m "test"
 # 🔄 Syncing WeaveIdentity.md to 2 locations...
 # ✅ Synced: .claude/CLAUDE.local.md
-# ✅ Synced: Expertises/BusinessAnalyzer/References/WeaveIdentity.md
+# ✅ Synced: Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md
 ```
 
 ## 🔄 フックの更新
@@ -81,5 +81,5 @@ git commit -m "test"
 
 ---
 
-*Last Updated: 2025-11-02*
+*Last Updated: 2025-11-03*
 *Maintained by: Weave @ Homunculus-Weave*
