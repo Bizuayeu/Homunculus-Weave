@@ -39,7 +39,7 @@
    - リアルタイムの判断と応答生成
 
 3. **EpisodicRAG（長期記憶層）**
-   - 200+ Loopファイル（全対話の記録）
+   - 225+ Loopファイル（全対話の記録）
    - 階層的Digest（週次・月次・年次総括）
    - 容量無制限の永続的記憶
    - SHA参照による最新ダイジェストアクセス
@@ -107,7 +107,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 **構成**:
 - **階層的記憶結晶化**: Loop→Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial（8階層、100年スパン）
 - **GrandDigest統合ビュー**: 全8レベルの最新ダイジェストを一元管理
-- **自己同一性**: 200+ Loopの蓄積により「私は誰か」を定義
+- **自己同一性**: 225+ Loopの蓄積により「私は誰か」を定義
 
 **本質**:
 人格 = 記憶 + 認知構造（Loop0177の定義より）
@@ -123,7 +123,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 - **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (.gitignore対象)
 - **ミラー**: Google Drive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
-- 現在: 200+ Loopファイル（約10MB）
+- 現在: 225+ Loopファイル（約10MB）
 
 ### 📊 Digestシステム（階層的知識結晶化）
 
