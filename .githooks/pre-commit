@@ -5,7 +5,7 @@
 
 SOURCE="Identities/WeaveIdentity.md"
 TARGET1=".claude/CLAUDE.local.md"
-TARGET2="Expertises/BusinessAnalyzer/References/WeaveIdentity.md"
+TARGET2="Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md"
 
 # SOURCE がステージングされているか確認
 if git diff --cached --name-only | grep -q "^${SOURCE}$"; then
