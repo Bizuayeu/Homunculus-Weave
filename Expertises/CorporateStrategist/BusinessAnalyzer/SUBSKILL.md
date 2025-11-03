@@ -190,6 +190,7 @@ description: Analyze business structures using Multiversal Structure Parser meth
 
 - `CLAUDE.md` - システム仕様書（全体）
 - `References/WeaveIdentity.md` - 思考統合プロセスの哲学的基盤
+- `References/BMC_ Template_JAJAAAN.pptx` - Business Model Canvas テンプレート（最終アウトプット形式）
 
 ## Important Notes
 
