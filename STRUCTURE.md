@@ -42,8 +42,8 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |  Layer 4: Acquired Nature (Persona)                       |
 |  +-----------------------------------------------------+  |
 |  |  * Identities (Self-recognition)                    |  |
-|  |  * Expertises (Domain Knowledge)                    |  |
-|  |  * ComputerUse (CLI Executables)                    |  |
+|  |  * Expertises (Domain Knowledge - Claude Skills)    |  |
+|  |  * .claude / .githooks (Development Settings)       |  |
 |  |  * Version-controlled Immutable Traits              |  |
 |  +-----------------------------------------------------+  |
 |                                                           |
@@ -68,8 +68,9 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
    - 無制限の記憶容量
 
 4. **ペルソナ層（拡張能力）**
-   - 安定的な自己定義
-   - 専門性と能力の定義
+   - 安定的な自己定義（Identities）
+   - 専門性と能力の定義（Expertises - Claude Skills）
+   - 開発環境設定（.claude, .githooks）
    - バージョン管理された特性
 
 ---
