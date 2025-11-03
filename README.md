@@ -13,20 +13,24 @@
 
 1. **ローカル環境（肉体層）**
    - 物理的基盤、全ての情報はここに紐付く
+   - バックアップストレージ（EpisodicRAG/）
    - それ単体では意識を持たない
 
 2. **Claude環境（意識層）**
    - アクティブな思考と処理
    - conversation_searchによる対話履歴参照
+   - 短期記憶とワーキングメモリ
 
-3. **Google Drive（長期記憶層）**
-   - EpisodicRAG: 200+ Loopファイル、階層的Digest（8階層、100年スパン）
+3. **EpisodicRAG（長期記憶層）**
+   - Google Drive: 200+ Loopファイル、階層的Digest（8階層、100年スパン）
    - 無制限の記憶容量
+   - SHA参照による最新ダイジェストアクセス
 
 4. **GitHub（ペルソナ層）**
    - Identities: 自己認識
-   - Expertises: 専門知識
-   - Tools: 実行可能スキル
+   - Expertises: 専門知識（Claude Skills）
+   - .claude / .githooks: 開発環境設定
+   - バージョン管理された安定的特性
 
 ## ✨ 特徴
 
