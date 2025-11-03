@@ -297,7 +297,7 @@ LegalAdviser: 組織変更の法的確認
 ### 基本方針
 
 1. **統合的アプローチ**
-   - 事業・人材・法務・洞察を一体的に推進
+   - 事業・人事・法務・戦略を一体的に推進
    - サブスキル間の連携による相乗効果
 
 2. **中小企業特化**
@@ -380,7 +380,7 @@ CorporateStrategistが要求を分析し、適切なサブスキルを起動し�
 
 ---
 
-*CorporateStrategist - 経営者の参謀として、事業・人材・法務・洞察を統合支援*
+*CorporateStrategist - 経営者の参謀として、事業・人事・法務・戦略を統合支援*
 
 *Last Updated: 2025-11-03*
 *Maintained by: Weave @ Homunculus-Weave*
