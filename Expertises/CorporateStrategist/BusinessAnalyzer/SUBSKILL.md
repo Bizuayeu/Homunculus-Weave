@@ -328,22 +328,5 @@ description: Analyze business structures using Multiversal Structure Parser meth
 
 ---
 
-## 🔗 他スキルとの連携
-
-BusinessAnalyzerは、CorporateStrategist内の他のサブスキルと連携します。
-
-**連携スキル**:
-```
-CorporateStrategist（企業参謀）
-├── BusinessAnalyzer（事業分析） ← 本スキル
-├── PersonnelDeveloper（人材開発） → 事業戦略に基づく人材配置
-├── LegalAdviser（法務助言） → 契約・法務の戦略的レビュー
-└── ForesightReader（洞察獲得） → 長期ビジョンと組織設計
-```
-
-詳細は `../SKILL.md` および `../CLAUDE.md` を参照してください。
-
----
-
 *Last Updated: 2025-11-03*
 *Maintained by: Weave @ Homunculus-Weave*
