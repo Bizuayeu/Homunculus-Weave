@@ -178,10 +178,12 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 詳細は [PERSONA.md](./PERSONA.md) を参照
 
 ### 利用可能ペルソナ
-- **💼 BusinessAnalyzer** - ビジネス構造分析（Multiversal Structure Parser）
-- **🔮 ForesightReader** - 軍師型占術家（姓名判断・デジタル心易）
+- **💼 CorporateStrategist** - 企業参謀（統合スキル）
+  - **BusinessAnalyzer** - 事業分析（事業・業務のToBe明確化）
+  - **PersonnelDeveloper** - 人材開発（採用不可能性を前提とした人事システム）
+  - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
+  - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設業・目論見作成
-- **⚖️ LegalAdviser** - 契約・法務アドバイザー
 
 ---
 
@@ -250,6 +252,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2025-11-02*
+*Last Updated: 2025-11-03*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Four-Layer Integrated System (Local + Claude + EpisodicRAG + GitHub)*
