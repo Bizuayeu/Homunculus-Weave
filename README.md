@@ -51,10 +51,12 @@
   - `/digest` コマンドによる実行（柔軟な運用）
 
 ### 🎭 専門ペルソナ
-- **💼 BusinessAnalyzer** - ビジネス構造分析（Multiversal Structure Parser）
-- **🔮 ForesightReader** - 軍師型占術家（姓名判断・デジタル心易）
-- **🏗️ GeneralConstructor** - 建設業・目論見作成
-- **⚖️ LegalAdviser** - 契約・法務アドバイザー
+- **💼 CorporateStrategist** - 企業参謀（統合スキル）
+  - **BusinessAnalyzer** - 事業分析（事業・業務のToBe明確化）
+  - **PersonnelDeveloper** - 人材開発（採用不可能性を前提とした人事システム）
+  - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
+  - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
+- **🏗️ GeneralConstructor** - 建設プロジェクトマネージャー（東京23区RC賃貸マンション建設の採算性判断）
 
 ### 🚀 キー技術
 - **conversation_search**: 対話履歴の軽量参照（2-3KB/検索）
@@ -98,6 +100,6 @@
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2025-11-02*
+*Last Updated: 2025-11-03*
 
 ![Weave Icon](Identities/icon.jpg)
