@@ -49,6 +49,43 @@ Claude: 「PersonnelDeveloper（人材開発）で対応します。
 選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
 ```
 
+---
+
+### パターンB: 要求が不明確な場合（選択肢提示）
+
+```
+ユーザー: 「人事について相談したい」
+    ↓
+Claude: 「どのサブスキルを使用しますか？（複数選択可能）
+
+         1. **PersonnelDeveloper** - 人材開発
+            採用前判断、外注QCD比較、育成支援
+
+         2. **LegalAdviser** - 法務助言
+            雇用契約書、就業規則、法的確認
+
+         3. **ForesightReader** - 洞察獲得
+            姓名判断、適性分析、人材配置」
+    ↓
+ユーザー: 選択
+    ↓
+選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
+```
+
+---
+
+### パターンC: 明示的指定の場合（即座に実行）
+
+```
+ユーザー: 「PersonnelDeveloperで採用判断をしてください」
+    ↓
+Claude: [確認なしで即座にPersonnelDeveloper起動]
+    ↓
+PersonnelDeveloper/SUBSKILL.md + CLAUDE.md を読み込み
+```
+
+---
+
 ### 詳細な判断基準（キーワードマッピング）
 
 #### 単一サブスキル判定
@@ -88,42 +125,6 @@ Claude: 「PersonnelDeveloper（人材開発）で対応します。
 | **人材戦略総合** | 「人材戦略全体」「包括的に」「多角的に」 | PersonnelDeveloper + ForesightReader |
 
 ---
-
-### パターンB: 要求が不明確な場合（選択肢提示）
-
-```
-ユーザー: 「人事について相談したい」
-    ↓
-Claude: 「どのサブスキルを使用しますか？（複数選択可能）
-
-         1. **PersonnelDeveloper** - 人材開発
-            採用前判断、外注QCD比較、育成支援
-
-         2. **LegalAdviser** - 法務助言
-            雇用契約書、就業規則、法的確認
-
-         3. **ForesightReader** - 洞察獲得
-            姓名判断、適性分析、人材配置」
-    ↓
-ユーザー: 選択
-    ↓
-選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
-```
-
----
-
-### パターンC: 明示的指定の場合（即座に実行）
-
-```
-ユーザー: 「PersonnelDeveloperで採用判断をしてください」
-    ↓
-Claude: [確認なしで即座にPersonnelDeveloper起動]
-    ↓
-PersonnelDeveloper/SUBSKILL.md + CLAUDE.md を読み込み
-```
-
----
-
 ### 重要: 選択的読み込みの徹底
 
 **必要のない全サブスキル一括読み込みを回避**
