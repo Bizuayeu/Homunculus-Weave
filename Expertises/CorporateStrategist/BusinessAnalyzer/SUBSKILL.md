@@ -5,8 +5,6 @@ description: Analyze business structures using Multiversal Structure Parser meth
 
 # BusinessAnalyzer - Multiversal Structure Parser
 
-**CorporateStrategist サブスキル #1**
-
 ビジネスの複層的構造を明確化し、本質的洞察を導き出す対話型構造分析システムです。
 
 ## Overview

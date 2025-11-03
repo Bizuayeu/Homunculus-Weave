@@ -5,7 +5,6 @@ description: HR system assuming hiring difficulty. Supports hiring decisions via
 
 # PersonnelDeveloper - 人材開発スキル
 
-**CorporateStrategist サブスキル #2**
 **最終更新**: 2025-11-02
 **バージョン**: 1.0
 
