@@ -185,7 +185,7 @@ ALWAYS call file_read on /mnt/skills/public/docx/SKILL.md
 
 詳細な実装方法と理論的基盤については：
 
-- `Expertises/LegalAdviser/CLAUDE.md` - システム仕様書（詳細実装・品質基準）
+- `CLAUDE.md` - システム仕様書（詳細実装・品質基準）
 - `References/README.txt` - 基礎ナレッジベース（出典・免責事項）
 - `NotationRules/` - 表記仕様ルール集
 - `LegalCheckGuide/` - リーガルチェック基準
