@@ -22,60 +22,92 @@ CorporateStrategistは、**経営者の参謀として企業経営を多角的�
 
 ---
 
-## 🎯 サブスキル選択（必須手順）
+## 🎯 サブスキル選択（推奨手順）
 
-**CRITICAL**: トークン消費を最適化するため、以下の手順に従ってサブスキルを選択してください。
+**CRITICAL**: トークン消費を最適化するため、以下の柔軟なフローに従ってサブスキルを選択してください。
 
-### ステップ1: ユーザーに確認
+### 基本原則
 
-**まず、AskUserQuestionツールを使って、ユーザーに必要なサブスキルを確認してください**：
-
-**質問内容**:
-```
-question: "どのサブスキルを使用しますか？（複数選択可能）"
-header: "サブスキル選択"
-multiSelect: true
-```
-
-**選択肢**:
-1. **BusinessAnalyzer** - 事業分析
-   - 説明: 事業・業務のToBe明確化、Multiversal Structure Parserによる多次元構造分析
-
-2. **PersonnelDeveloper** - 人材開発
-   - 説明: 採用不可能性を前提とした人事システム、外注QCD比較、人材4類型モデル
-
-3. **LegalAdviser** - 法務助言
-   - 説明: 契約書作成・リーガルチェック、労働法規の遵守確認
-
-4. **ForesightReader** - 洞察獲得
-   - 説明: 古典的洞察に基づいた意思決定支援、姓名判断、星導分析、デジタル心易
+**ユーザーの要求からサブスキルを推定し、確認を求める**
 
 ---
 
-### ステップ2: 選択されたサブスキルのみ読み込む
+### パターンA: 要求が明確な場合（推定+確認）
 
-**ユーザーが選択したサブスキルの `SUBSKILL.md` と `CLAUDE.md` のみを読み込んでください**。
+```
+ユーザー: 「営業事務を採用すべきか判断したい」
+    ↓
+Claude: 「PersonnelDeveloper（人材開発）で対応します。
+         採用前判断と外注QCD比較を実施しますが、よろしいですか？
 
-**重要**: 全サブスキルを一括読み込みしないでください。選択されたもののみ読み込むことで、トークン消費を最適化します。
+         必要に応じて他のサブスキルも追加できます：
+         - LegalAdviser（雇用契約書作成）
+         - ForesightReader（候補者の適性分析）」
+    ↓
+ユーザー: 「OK」または「LegalAdviserも追加して」
+    ↓
+選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
+```
+
+**判断基準**:
+- 「採用」「育成」→ PersonnelDeveloper
+- 「事業」「業務」→ BusinessAnalyzer
+- 「契約」「法務」→ LegalAdviser
+- 「適性」「相性」→ ForesightReader
+
+---
+
+### パターンB: 要求が不明確な場合（選択肢提示）
+
+```
+ユーザー: 「人事について相談したい」
+    ↓
+Claude: 「どのサブスキルを使用しますか？（複数選択可能）
+
+         1. **PersonnelDeveloper** - 人材開発
+            採用前判断、外注QCD比較、育成支援
+
+         2. **LegalAdviser** - 法務助言
+            雇用契約書、就業規則、法的確認
+
+         3. **ForesightReader** - 洞察獲得
+            姓名判断、適性分析、人材配置」
+    ↓
+ユーザー: 選択
+    ↓
+選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
+```
+
+---
+
+### パターンC: 明示的指定の場合（即座に実行）
+
+```
+ユーザー: 「PersonnelDeveloperで採用判断をしてください」
+    ↓
+Claude: [確認なしで即座にPersonnelDeveloper起動]
+    ↓
+PersonnelDeveloper/SUBSKILL.md + CLAUDE.md を読み込み
+```
+
+---
+
+### 重要: 選択的読み込みの徹底
+
+**全サブスキル一括読み込みを絶対に回避してください**
 
 **読み込み例**:
-- BusinessAnalyzerが選択された場合:
-  - `BusinessAnalyzer/SUBSKILL.md` を読む
-  - `BusinessAnalyzer/CLAUDE.md` を読む
+- **BusinessAnalyzerのみ**:
+  - `BusinessAnalyzer/SUBSKILL.md`
+  - `BusinessAnalyzer/CLAUDE.md`
 
-- PersonnelDeveloper + LegalAdviserが選択された場合:
-  - `PersonnelDeveloper/SUBSKILL.md` を読む
-  - `PersonnelDeveloper/CLAUDE.md` を読む
-  - `LegalAdviser/SUBSKILL.md` を読む
-  - `LegalAdviser/CLAUDE.md` を読む
+- **PersonnelDeveloper + LegalAdviser**:
+  - `PersonnelDeveloper/SUBSKILL.md`
+  - `PersonnelDeveloper/CLAUDE.md`
+  - `LegalAdviser/SUBSKILL.md`
+  - `LegalAdviser/CLAUDE.md`
 
----
-
-### ステップ3: 選択されたサブスキルで対応
-
-読み込んだサブスキルの機能を使って、ユーザーの要求に対応してください。
-
-複数のサブスキルが選択された場合は、サブスキル間の連携パターン（後述）を参照し、統合的な提案を行ってください。
+**選択されていないサブスキルは読み込まない** = トークン最適化
 
 ---
 
@@ -154,22 +186,25 @@ CorporateStrategistは意思決定の支援ツールであり、専門家の助�
 
 ### 基本的な利用フロー（選択的読み込み方式）
 
-CorporateStrategistは、**明示的なサブスキル選択**により、トークン消費を最適化します。
+CorporateStrategistは、**柔軟なサブスキル選択**により、トークン消費を最適化します。
 
 #### 標準フロー
 
 ```
 ステップ1: スキル起動
-  ユーザーが CorporateStrategist を起動
+  ユーザーが要求を伝える
     ↓
-ステップ2: サブスキル選択
-  AskUserQuestionで、使用するサブスキルをユーザーに確認
-  （複数選択可能）
+ステップ2: サブスキル推定/選択
+  Claudeが要求を分析し、適切なサブスキルを提案（パターンA）
+  または選択肢を提示（パターンB）
     ↓
-ステップ3: 選択的読み込み
+ステップ3: ユーザー確認
+  ユーザーが承認または追加/変更を指示
+    ↓
+ステップ4: 選択的読み込み
   選択されたサブスキルのSUBSKILL.mdとCLAUDE.mdのみ読み込み
     ↓
-ステップ4: 実行
+ステップ5: 実行
   読み込んだサブスキルの機能でユーザー要求に対応
 ```
 
@@ -177,26 +212,26 @@ CorporateStrategistは、**明示的なサブスキル選択**により、トー
 
 ### 利用パターン例
 
-#### パターン1: 事業・業務の構造分析
+#### パターン1: 要求が明確（推定+確認）
 
 ```
 ユーザー: 「事業モデルを整理したい」
     ↓
-CorporateStrategist: サブスキル選択を提示
+CorporateStrategist: 「BusinessAnalyzer（事業分析）で対応します。よろしいですか？」
     ↓
-ユーザー: BusinessAnalyzer を選択
+ユーザー: 「OK」
     ↓
 BusinessAnalyzer/SUBSKILL.md と CLAUDE.md を読み込み
     ↓
 事業分析の実施
 ```
 
-#### パターン2: 人材採用・育成・評価
+#### パターン2: 要求が不明確（選択肢提示）
 
 ```
-ユーザー: 「採用すべきか判断したい」
+ユーザー: 「人事について相談したい」
     ↓
-CorporateStrategist: サブスキル選択を提示
+CorporateStrategist: サブスキル選択肢を提示
     ↓
 ユーザー: PersonnelDeveloper を選択
     ↓
@@ -210,9 +245,9 @@ PersonnelDeveloper/SUBSKILL.md と CLAUDE.md を読み込み
 ```
 ユーザー: 「採用判断をして、契約書も作成したい」
     ↓
-CorporateStrategist: サブスキル選択を提示
+CorporateStrategist: 「PersonnelDeveloperとLegalAdviserで対応します。よろしいですか？」
     ↓
-ユーザー: PersonnelDeveloper + LegalAdviser を選択
+ユーザー: 「OK」
     ↓
 両サブスキルのSUBSKILL.mdとCLAUDE.mdを読み込み
     ↓
@@ -255,7 +290,7 @@ LegalAdviser: 組織変更の法的確認
 
 ### Q1: どのサブスキルを使えばいいかわからない場合は？
 
-**A**: CorporateStrategist起動時に、AskUserQuestionで選択肢が提示されます。各サブスキルの説明を見て、必要なものを選択してください。
+**A**: CorporateStrategist起動時に、選択肢が提示されます（パターンB）。各サブスキルの説明を見て、必要なものを選択してください。
 
 **選択の目安**:
 - 「営業事務を採用すべきか迷っている」→ PersonnelDeveloper
@@ -267,7 +302,7 @@ LegalAdviser: 組織変更の法的確認
 
 ### Q2: 複数のサブスキルを同時に使いたい場合は？
 
-**A**: AskUserQuestionで複数選択（multiSelect: true）が可能です。
+**A**: 複数選択が可能です。
 
 例：「採用判断をして契約書も作成したい」場合：
 1. PersonnelDeveloper を選択
@@ -354,13 +389,14 @@ CorporateStrategistに、やりたいことを自然言語で伝えてくださ�
 - 「雇用契約書を作成したい」
 - 「候補者の適性を判断したい」
 
-### ステップ2: 自動ルーティング
+### ステップ2: サブスキル選択の確認
 
-CorporateStrategistが要求を分析し、適切なサブスキルを起動します。
+CorporateStrategistが要求を分析し、適切なサブスキルを提案します（パターンA）。
+要求が不明確な場合は、選択肢を提示します（パターンB）。
 
-### ステップ3: 結果の取得
+### ステップ3: 選択的読み込みと実行
 
-選択されたサブスキルが、専門的な支援を提供します。
+ユーザーが確認/選択したサブスキルのみを読み込み、専門的な支援を提供します。
 
 ---
 

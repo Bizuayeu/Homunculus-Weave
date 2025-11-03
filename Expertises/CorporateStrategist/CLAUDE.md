@@ -163,57 +163,67 @@ CorporateStrategist（企業参謀）
 
 **CRITICAL**: Anthropic推奨の「選択的段階読み込み」を実装しています。
 
-CorporateStrategistは、**明示的なユーザー確認**により、必要なサブスキルのみを読み込みます。
+CorporateStrategistは、**柔軟なユーザー確認**により、必要なサブスキルのみを読み込みます。
 
-### 選択的読み込みフロー
+### 選択的読み込みフロー（3パターン）
 
-#### ステップ1: ユーザーに明示的に確認
+#### パターンA: 要求が明確な場合（推定+確認）
 
-**AskUserQuestionツールを使用**してサブスキルを選択：
+```
+1. ユーザー要求を分析
+2. 適切なサブスキルを推定
+3. ユーザーに確認を求める
+   「PersonnelDeveloper（人材開発）で対応します。よろしいですか？
+    必要に応じて他のサブスキルも追加できます」
+4. ユーザー確認/追加
+5. 選択されたサブスキルのみ読み込み
+```
 
-```javascript
-AskUserQuestion({
-  questions: [{
-    question: "どのサブスキルを使用しますか？（複数選択可能）",
-    header: "サブスキル選択",
-    multiSelect: true,
-    options: [
-      {
-        label: "BusinessAnalyzer",
-        description: "事業・業務のToBe明確化、Multiversal Structure Parserによる多次元構造分析"
-      },
-      {
-        label: "PersonnelDeveloper",
-        description: "採用不可能性を前提とした人事システム、外注QCD比較、人材4類型モデル"
-      },
-      {
-        label: "LegalAdviser",
-        description: "契約書作成・リーガルチェック、労働法規の遵守確認"
-      },
-      {
-        label: "ForesightReader",
-        description: "古典的洞察に基づいた意思決定支援、姓名判断、星導分析、デジタル心易"
-      }
-    ]
-  }]
-})
+**判断基準**:
+- 「採用」「育成」→ PersonnelDeveloper
+- 「事業」「業務」→ BusinessAnalyzer
+- 「契約」「法務」→ LegalAdviser
+- 「適性」「相性」→ ForesightReader
+
+---
+
+#### パターンB: 要求が不明確な場合（選択肢提示）
+
+```
+1. ユーザー要求が曖昧/複合的
+2. サブスキル選択肢を提示
+   「どのサブスキルを使用しますか？（複数選択可能）
+    1. BusinessAnalyzer - 事業分析
+    2. PersonnelDeveloper - 人材開発
+    3. LegalAdviser - 法務助言
+    4. ForesightReader - 洞察獲得」
+3. ユーザーが選択
+4. 選択されたサブスキルのみ読み込み
 ```
 
 ---
 
-#### ステップ2: 選択されたサブスキルのみ読み込み
+#### パターンC: 明示的指定の場合（即座に実行）
 
-**重要**: 全サブスキル一括読み込みを回避し、選択されたもののみ読み込む。
+```
+ユーザー: 「PersonnelDeveloperで採用判断をしてください」
+    ↓
+確認なしで即座に読み込み
+```
 
-**読み込み例**:
+---
 
-- **BusinessAnalyzerのみ選択**:
+### 読み込み例
+
+**全サブスキル一括読み込みを絶対に回避**
+
+- **BusinessAnalyzerのみ**:
   ```
   1. BusinessAnalyzer/SUBSKILL.md を読む
   2. BusinessAnalyzer/CLAUDE.md を読む
   ```
 
-- **PersonnelDeveloper + LegalAdviser を選択**:
+- **PersonnelDeveloper + LegalAdviser**:
   ```
   1. PersonnelDeveloper/SUBSKILL.md を読む
   2. PersonnelDeveloper/CLAUDE.md を読む
@@ -221,13 +231,7 @@ AskUserQuestion({
   4. LegalAdviser/CLAUDE.md を読む
   ```
 
----
-
-#### ステップ3: 選択されたサブスキルで対応
-
-読み込んだサブスキルの機能を使って、ユーザーの要求に対応。
-
-複数のサブスキルが選択された場合は、**サブスキル間の連携パターン**（後述）を参照し、統合的な提案を行う。
+**選択されていないサブスキルは読み込まない** = トークン最適化
 
 ---
 
@@ -238,12 +242,13 @@ AskUserQuestion({
 - 不要なCLAUDE.mdの読み込みを回避
 
 ✅ **明確な判定条件**
-- ユーザーが明示的に選択
-- Claude向けの曖昧な「推測」を排除
+- ユーザー要求からの推定 + 明示的確認
+- 曖昧な「推測して動く」状態を排除
 
-✅ **一貫性の保証**
-- 「なんとなく推測して動く」状態を回避
-- 明確なユーザー意図に基づく動作
+✅ **柔軟性と一貫性の両立**
+- 明確な要求には即応（パターンA/C）
+- 不明確な要求には選択肢提示（パターンB）
+- すべてのパターンでユーザー意図に基づく動作
 
 ---
 
@@ -251,10 +256,10 @@ AskUserQuestion({
 
 | 項目 | 旧方式（自動判定） | 新方式（選択的読み込み） |
 |------|-------------------|------------------------|
-| **判定方法** | キーワードベースの推測 | ユーザーの明示的選択 |
+| **判定方法** | キーワードベースの推測のみ | 推定+確認、または選択肢提示 |
 | **読み込み** | 全サブスキル一括読み込み？ | 選択されたもののみ |
 | **トークン消費** | 非効率（全CLAUDE.md読み込み） | 効率的（必要なもののみ） |
-| **一貫性** | 推測に依存（不安定） | ユーザー意図に基づく（安定） |
+| **柔軟性** | 硬直的 | 3パターンで柔軟に対応 |
 | **Anthropic推奨** | ❌ | ✅ |
 
 ---
