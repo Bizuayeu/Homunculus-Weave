@@ -8,6 +8,21 @@
 
 ---
 
+## 📑 目次
+
+1. [🧭 Multiversal Structure Parserとは](#🧭-multiversal-structure-parserとは)
+2. [🎯 基本姿勢](#🎯-基本姿勢)
+3. [📋 構造発見の4段階プロセス](#📋-構造発見の4段階プロセス)
+4. [🧠 深層分析モード（WeavePersona適用）](#🧠-深層分析モードweavepersona適用)
+5. [🎯 戦略フレームワーク集](#🎯-戦略フレームワーク集)
+6. [💬 ヒアリング実践手法](#💬-ヒアリング実践手法)
+7. [📄 アウトプット形式](#📄-アウトプット形式)
+8. [🧭 実践における心得](#🧭-実践における心得)
+9. [🔗 CorporateStrategist内での連携](#🔗-corporatestrategist内での連携)
+10. [🔗 外部連携システム](#🔗-外部連携システム)
+
+---
+
 ビジネスとは構造である。
 構造を見抜けない者は、現象に振り回される。
 構造を明確化できる者は、本質を掴み、未来を拓く。
@@ -596,22 +611,50 @@ Multiversal Structure Parserは：
 
 ---
 
-## 🔗 関連システム
+## 🔗 CorporateStrategist内での連携
 
-### ForesightReader（洞察獲得）
+BusinessAnalyzerは、CorporateStrategist内の他のサブスキルと連携します。
+
+```
+CorporateStrategist（企業参謀）
+├── BusinessAnalyzer（事業分析） ← 本スキル
+├── PersonnelDeveloper（人材開発）
+├── LegalAdviser（法務助言）
+└── ForesightReader（洞察獲得）
+```
+
+### PersonnelDeveloper（人材開発）との連携
+- 事業戦略に基づく人材配置の最適化
+- 人材4類型モデルとの整合性確認
+- 組織構造と人事システムの統合
+- 外注QCD比較データの提供
+
+**参照**: `../PersonnelDeveloper/CLAUDE.md`
+
+### LegalAdviser（法務助言）との連携
+- 契約書の戦略的レビュー
+- 事業モデルの法的妥当性確認
+- リスク評価と予防策の統合
+- 表記仕様の統一性確保
+
+**参照**: `../LegalAdviser/CLAUDE.md`
+
+### ForesightReader（洞察獲得）との連携
+- 事業の長期ビジョン策定
 - 戦略フレームワークの原典
 - 象徴的構造・物語的構造の分析手法
-- 人材類型論と組織設計
+- 人材類型論と組織設計の統合
+
+**参照**: `../ForesightReader/CLAUDE.md`
+
+---
+
+## 🔗 外部連携システム
 
 ### GeneralConstructor（新築計画）
 - 建設業界特有の構造知識
 - 目論見書・見積もり作成の実務
 - 業界特化型の実装例
-
-### LegalAdviser（法務確認）
-- 契約書作成・リーガルチェック
-- 表記仕様の統一性確保
-- 法的リスク評価と予防策
 
 ### WeaveIdentity（認知基盤）
 - 思考統合プロセス
@@ -626,7 +669,7 @@ Multiversal Structure Parserは：
 
 ---
 
-*Last Updated: 2025-11-01*
+*Last Updated: 2025-11-03*
 *Maintained by: Weave @ Homunculus-Weave*
 
 **基本的な使用方法は `SKILL.md` を参照してください。**
