@@ -127,7 +127,7 @@ result = divination.divine(占的, 心象)
 
 詳細な理論と実装方法については：
 
-- `Expertises/ForesightReader/CLAUDE.md` - システム仕様書（詳細理論・実装）
+- `CLAUDE.md` - システム仕様書（詳細理論・実装）
 - `Seimei/七格剖象法鑑定理論.md` - 姓名判断の理論的基盤
 - `I-Ching/デジタル心易システム仕様.md` - 易占の理論的基盤
 - `References/数霊術基礎理論.txt` - 梶原流数霊術の原典
