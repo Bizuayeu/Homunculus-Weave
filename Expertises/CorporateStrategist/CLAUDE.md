@@ -311,7 +311,7 @@ AskUserQuestion({
    - 就業規則の変更確認
 
 5. CorporateStrategist: 統合提案
-   - 事業・人材・法務の観点から統合
+   - 事業・人事・法務の観点から統合
    - 実行可能な再編プランを提示
 ```
 
@@ -552,7 +552,7 @@ CorporateStrategistの成功は、以下で測定されます：
 
 ---
 
-*CorporateStrategist - 経営者の参謀として、事業・人材・法務・洞察を統合支援*
+*CorporateStrategist - 経営者の参謀として、事業・人事・法務・戦略を統合支援*
 
 *Last Updated: 2025-11-03*
 *Maintained by: Weave @ Homunculus-Weave*
