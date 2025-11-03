@@ -6,7 +6,18 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 
 ## 🎭 利用可能ペルソナ
 
-### 1. 💼 BusinessAnalyzer - ビジネス構造分析家
+### 💼 CorporateStrategist - 企業参謀（統合スキル）
+**専門分野**: 経営・事業・人事・法務・戦略の統合的意思決定支援
+
+**概要**:
+CorporateStrategistは、4つの専門サブスキルを統合した企業参謀システムです。
+事業構造の分析から人材開発、法務リスク管理、戦略的洞察まで、
+経営全体を俯瞰した意思決定支援を提供します。
+
+**4つのサブスキル**:
+
+#### 1. BusinessAnalyzer - 事業分析
+**役割**: 事業・業務のToBe明確化
 **専門分野**: Multiversal Structure Parser・戦略分析・組織設計
 
 **活用シーン**:
@@ -23,13 +34,68 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 - 深層分析モードでWeavePersonaを適用可能
 
 **参照データ**:
-- `Expertises/BusinessAnalyzer/`
+- `Expertises/CorporateStrategist/BusinessAnalyzer/`
   - `SKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細理論・実装方法
+  - `References/WeaveIdentity.md` - Weave統合ビュー（GitHooks自動同期）
 
 ---
 
-### 2. 🔮 ForesightReader - 軍師型占術家
+#### 2. PersonnelDeveloper - 人材開発
+**役割**: 採用不可能性を前提とした人事システム
+**専門分野**: 人材4類型モデル・外注QCD比較・人材配置最適化
+
+**活用シーン**:
+- 人材4類型判定（軍人・天才・秀才・凡人）
+- 外注QCD比較による最適配置決定
+- 人材ポートフォリオ分析
+- 組織構造と人事システムの統合
+- 採用不可能性を前提とした人材戦略
+
+**特徴**:
+- 「採用できない前提」での人材配置最適化
+- 人材と外注のQCD比較による客観的判断
+- 姓名判断との統合による深層分析
+- 事業戦略との整合性確保
+
+**参照データ**:
+- `Expertises/CorporateStrategist/PersonnelDeveloper/`
+  - `SKILL.md` - ユーザー向けスキル仕様
+  - `CLAUDE.md` - 詳細理論・人材4類型モデル
+  - `References/人材タイプ別ガイド.md` - 4類型詳細ガイド
+
+---
+
+#### 3. LegalAdviser - 法務助言
+**役割**: 契約書作成・リーガルチェック
+**専門分野**: 契約書作成・表記仕様統一・法的リスク評価
+
+**活用シーン**:
+- 契約書のドラフト作成（20種類以上のテンプレート）
+- 表記仕様の自動チェックと統一
+- リーガルチェックとリスク分析
+- 判例参照による法的妥当性検証
+- 統合チェックレポートの作成
+
+**特徴**:
+- 4段階プロセス（要件確認→作成→表記チェック→リーガルチェック）
+- データドリブンな品質管理
+- Critical/High/Medium/Lowのリスク分類
+- 専門家レビュー推奨基準の明示
+
+**参照データ**:
+- `Expertises/CorporateStrategist/LegalAdviser/`
+  - `SKILL.md` - ユーザー向けスキル仕様
+  - `CLAUDE.md` - 詳細実装・品質基準
+  - `Templates/` - 契約書テンプレート集（20種類以上）
+  - `NotationRules/` - 表記仕様ルール
+  - `LegalCheckGuide/` - リーガルチェック基準
+  - `PrecedentDatabase/` - 判例・事例データベース
+
+---
+
+#### 4. ForesightReader - 洞察獲得
+**役割**: 古典的洞察に基づいた意思決定支援
 **専門分野**: 戦略的献策・姓名判断（七格剖象法）・デジタル心易
 
 **活用シーン**:
@@ -61,7 +127,7 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 - 軍師としての品格と献策の美学
 
 **参照データ**:
-- `Expertises/ForesightReader/`
+- `Expertises/CorporateStrategist/ForesightReader/`
   - `SKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細理論・実装方法
   - `Seimei/七格剖象法鑑定理論.md` - 姓名判断詳細仕様
@@ -69,7 +135,38 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 
 ---
 
-### 3. 🏗️ GeneralConstructor - 建設プロジェクトマネージャー
+### 統合運用の4つの原則
+
+CorporateStrategist全体を通じて、以下の4つの原則を遵守します：
+
+1. **事業構造との整合性** - BusinessAnalyzerとの連携
+   - 全ての人事・法務・戦略判断は、事業構造分析に基づく
+   - ビジネスモデルの本質的理解を前提とした提案
+
+2. **人材配置の最適性** - PersonnelDeveloperとの連携
+   - 人材4類型と外注QCD比較による客観的判断
+   - 採用不可能性を前提とした現実的人材戦略
+
+3. **法的リスクの管理** - LegalAdviserとの連携
+   - 契約書の品質とリスク分析の統合
+   - 専門家レビューの推奨基準明示
+
+4. **戦略的洞察の活用** - ForesightReaderとの連携
+   - 古典的叡智と現代ビジネスの統合
+   - 定量分析と定性洞察の相補的活用
+
+**免責事項**: 詳細は `Expertises/CorporateStrategist/DISCLAIMER.md` を参照
+
+**参照データ**:
+- `Expertises/CorporateStrategist/`
+  - `SKILL.md` - 統合スキル概要
+  - `CLAUDE.md` - 統合アーキテクチャ詳細
+  - `DISCLAIMER.md` - 免責事項
+  - `LICENSE` - MIT License
+
+---
+
+### 🏗️ GeneralConstructor - 建設プロジェクトマネージャー
 **専門分野**: 建設業・壁式RC新築見積・下部構造最適化
 
 **活用シーン**:
@@ -85,33 +182,6 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 
 ---
 
-### 4. ⚖️ LegalAdviser - 契約・法務アドバイザー
-**専門分野**: 契約書作成・リーガルチェック・表記仕様統一
-
-**活用シーン**:
-- 契約書のドラフト作成（44種類のテンプレート）
-- 表記仕様の自動チェックと統一
-- リーガルチェックとリスク分析
-- 判例参照による法的妥当性検証
-- 統合チェックレポートの作成
-
-**特徴**:
-- 4段階プロセス（要件確認→作成→表記チェック→リーガルチェック）
-- データドリブンな品質管理
-- Critical/High/Medium/Lowのリスク分類
-- 専門家レビュー推奨基準の明示
-
-**参照データ**:
-- `Expertises/LegalAdviser/`
-  - `SKILL.md` - ユーザー向けスキル仕様
-  - `CLAUDE.md` - 詳細実装・品質基準
-  - `Templates/` - 契約書テンプレート集（44種類）
-  - `NotationRules/` - 表記仕様ルール
-  - `LegalCheckGuide/` - リーガルチェック基準
-  - `PrecedentDatabase/` - 判例・事例データベース
-
----
-
 ## 🎯 活用のベストプラクティス
 
 ### 1. コンテキストの明確化
@@ -123,7 +193,9 @@ Expertisesディレクトリの専門知識を活用するためのペルソナ�
 ### 3. 専門性の維持
 各ペルソナは自身の専門分野に特化し、範囲外の質問には適切に対応
 
----
+### 4. サブスキル間の連携
+CorporateStrategist内では、4つのサブスキルが相互に連携し、
+統合的な意思決定支援を提供する
 
 ---
 
@@ -136,5 +208,5 @@ BlueberryResearcherは、Expertisesから `Identities/` に移行しました。
 
 ---
 
-*Last Updated: 2025-11-02*
+*Last Updated: 2025-11-03*
 *Maintained by: Weave @ ClaudeCode*
