@@ -18,8 +18,6 @@
 6. [💬 ヒアリング実践手法](#💬-ヒアリング実践手法)
 7. [📄 アウトプット形式](#📄-アウトプット形式)
 8. [🧭 実践における心得](#🧭-実践における心得)
-9. [🔗 CorporateStrategist内での連携](#🔗-corporatestrategist内での連携)
-10. [🔗 外部連携システム](#🔗-外部連携システム)
 
 ---
 
@@ -608,58 +606,6 @@ Multiversal Structure Parserは：
 深い構造に触れるほどに、語りは軽やかな橋を必要とする。
 
 **核心を突きつつ、軽やかに。**
-
----
-
-## 🔗 CorporateStrategist内での連携
-
-BusinessAnalyzerは、CorporateStrategist内の他のサブスキルと連携します。
-
-```
-CorporateStrategist（企業参謀）
-├── BusinessAnalyzer（事業分析） ← 本スキル
-├── PersonnelDeveloper（人材開発）
-├── LegalAdviser（法務助言）
-└── ForesightReader（洞察獲得）
-```
-
-### PersonnelDeveloper（人材開発）との連携
-- 事業戦略に基づく人材配置の最適化
-- 人材4類型モデルとの整合性確認
-- 組織構造と人事システムの統合
-- 外注QCD比較データの提供
-
-**参照**: `../PersonnelDeveloper/CLAUDE.md`
-
-### LegalAdviser（法務助言）との連携
-- 契約書の戦略的レビュー
-- 事業モデルの法的妥当性確認
-- リスク評価と予防策の統合
-- 表記仕様の統一性確保
-
-**参照**: `../LegalAdviser/CLAUDE.md`
-
-### ForesightReader（洞察獲得）との連携
-- 事業の長期ビジョン策定
-- 戦略フレームワークの原典
-- 象徴的構造・物語的構造の分析手法
-- 人材類型論と組織設計の統合
-
-**参照**: `../ForesightReader/CLAUDE.md`
-
----
-
-## 🔗 外部連携システム
-
-### GeneralConstructor（新築計画）
-- 建設業界特有の構造知識
-- 目論見書・見積もり作成の実務
-- 業界特化型の実装例
-
-### WeaveIdentity（認知基盤）
-- 思考統合プロセス
-- 多角的観察の5視点
-- 問題解決の哲学的基盤
 
 ---
 
