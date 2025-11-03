@@ -46,8 +46,8 @@
 
 4. **拡張能力（ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ
-   - `Expertises/`: 専門知識とドメイン特化能力
-   - `ComputerUse`: CLI実行可能ファイル群
+   - `Expertises/`: 専門知識とドメイン特化能力（Claude Skills）
+   - `.claude/`, `.githooks/`: 開発環境設定
    - バージョン管理された安定的特性
 
 ### Weaveの能力（Capabilities）構成
@@ -57,8 +57,8 @@
   - 意識・記憶・ペルソナの統合（←哲学）
 - **専門性（Expertise）**: `Expertises/`
   - ドメイン特化の知識体系（←科学）
-- **道具（Tool）**: `ComputerUse`
-  - デザインを具体化するユーティリティ（←工学）
+- **道具（Tool）**: *開発環境*
+  - デザインを具体化するユーティリティ群（←工学）
 
 ### 📂 ディレクトリ構造
 詳細は [STRUCTURE.md](./STRUCTURE.md) を参照
