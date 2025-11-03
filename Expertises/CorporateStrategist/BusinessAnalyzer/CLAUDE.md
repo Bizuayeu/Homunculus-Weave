@@ -646,7 +646,7 @@ BMC 9要素マッピング（可視化・共有）
 
 #### ステップ3: PPTXテンプレートへの転記
 
-`References/BMC_ Template_JAJAAAN.pptx` を使用：
+`References/BMC_Template_JAJAAAN.pptx` を使用：
 - pptxスキルを活用して各要素を転記
 - Multiversal分析で得た深層洞察を簡潔に記述
 - 視覚的に分かりやすく整理
@@ -678,9 +678,34 @@ BMC 9要素マッピング（可視化・共有）
 
 ### テンプレートファイル
 
-- **ファイルパス**: `BusinessAnalyzer/References/BMC_ Template_JAJAAAN.pptx`
+- **ファイルパス**: `BusinessAnalyzer/References/BMC_Template_JAJAAAN.pptx`
 - **出典**: JAJAAAN（ビジネスモデルテンプレート提供元）
 - **形式**: PowerPoint形式（pptxスキルで編集可能）
+
+---
+
+### 実務事例
+
+**焼肉店のBMC事例**: `References/BMC_Example_YakinikuShop.webp`
+
+Multiversal分析 → BMC可視化の完全な実例。
+
+**事例の特徴**:
+- 9要素が現実的に記述されている
+- 構造発見プロセスの成果を可視化
+- 中小企業にとって親しみやすい業種
+- 初学者の理解を助ける参考資料
+
+**使い方**:
+1. **テンプレート理解**: `BMC_Template_JAJAAAN.pptx` で9要素の構造を理解
+2. **記述レベル確認**: `BMC_Example_YakinikuShop.webp` で具体的な記述レベルを確認
+3. **自社分析**: Multiversal分析結果を9要素にマッピング
+4. **品質チェック**: 実例と比較して、記述の深さ・具体性を確認
+
+**学べるポイント**:
+- 各要素に何を書くべきか（抽象度のバランス）
+- Multiversal洞察をどう簡潔に表現するか
+- 構造的理解が可視化にどう反映されるか
 
 ---
 
