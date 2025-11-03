@@ -83,7 +83,16 @@ description: Strategic divination system combining Eastern wisdom (I-Ching, Seim
 3. **処理エンジン実行**:
 ```python
 import sys
-sys.path.append('/path/to/Seimei')
+from pathlib import Path
+
+# Weaveプロジェクトルートを探す（環境非依存）
+cwd = Path.cwd()
+weave_root = cwd if cwd.name == 'Weave' else next((p for p in cwd.parents if p.name == 'Weave'), cwd)
+
+# Seimeiディレクトリのパスを設定
+seimei_path = weave_root / 'Expertises/CorporateStrategist/ForesightReader/Seimei'
+sys.path.append(str(seimei_path))
+
 from fortune_teller_assessment import FortuneTellerAssessment
 
 assessment = FortuneTellerAssessment()

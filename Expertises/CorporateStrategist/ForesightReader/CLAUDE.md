@@ -103,7 +103,16 @@ ClaudeがリアルタイムでLLMとして創造的解釈を生成する動的�
 **実行方法**
 ```python
 import sys
-sys.path.append('/home/claude/homunculus/Weave/Expertises/ForesightReader/I-Ching')
+from pathlib import Path
+
+# Weaveプロジェクトルートを探す（環境非依存）
+cwd = Path.cwd()
+weave_root = cwd if cwd.name == 'Weave' else next((p for p in cwd.parents if p.name == 'Weave'), cwd)
+
+# I-Chingディレクトリのパスを設定
+iching_path = weave_root / 'Expertises/CorporateStrategist/ForesightReader/I-Ching'
+sys.path.append(str(iching_path))
+
 from iching_divination import IChingDivination
 
 divination = IChingDivination()
