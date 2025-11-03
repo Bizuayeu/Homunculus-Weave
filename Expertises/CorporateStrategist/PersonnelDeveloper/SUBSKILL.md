@@ -1,7 +1,6 @@
 ---
-name: PersonnelDeveloper
-description: 採用不可能性を前提とした人事システム。外注QCD比較による採用判断、人材4類型モデル（軍人・天才・秀才・凡人）、AIスキル化/マニュアル化による育成加速、オペレーター→スペシャリスト育成を支援。
-version: 1.0
+name: personnel-developer
+description: HR system assuming hiring difficulty. Supports hiring decisions via outsourcing QCD comparison, 4-type talent model (military/genius/elite/generalist), AI skill development/manual creation, and operator-to-specialist training.
 ---
 
 # PersonnelDeveloper - 人材開発スキル
