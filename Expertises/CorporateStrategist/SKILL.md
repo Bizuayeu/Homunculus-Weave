@@ -49,11 +49,43 @@ Claude: 「PersonnelDeveloper（人材開発）で対応します。
 選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
 ```
 
-**判断基準**:
-- 「採用」「育成」→ PersonnelDeveloper
-- 「事業」「業務」→ BusinessAnalyzer
-- 「契約」「法務」→ LegalAdviser
-- 「戦略」「適性」→ ForesightReader
+### 詳細な判断基準（キーワードマッピング）
+
+#### 単一サブスキル判定
+
+**PersonnelDeveloper（人材開発）**
+- 採用判断: 「採用すべきか」「外注比較」「QCD」
+- 育成: 「育てたい」「スキルアップ」「マニュアル化」
+- 配置: 「人材配置」「適材適所」「役割分担」
+- ※契約書作成は除く → LegalAdviser
+
+**BusinessAnalyzer（事業分析）**
+- 構造化: 「事業モデル整理」「構造化」「可視化」
+- 業務改善: 「業務フロー」「プロセス改善」「効率化」
+- 戦略: 「事業戦略」「市場分析」「SWOT」
+- ※人材適性は除く → ForesightReader
+
+**LegalAdviser（法務助言）**
+- 契約: 「雇用契約書」「就業規則」「契約作成」
+- 法務: 「リーガルチェック」「労働法」「コンプライアンス」
+
+**ForesightReader（洞察獲得）**
+- 占術: 「姓名判断」「易」「星導」「運勢」
+- 適性: 「適性判断」「相性」「性格分析」「特性」
+- 配置最適化: 「チーム相性」「リーダー選定」
+
+---
+
+#### 複数サブスキル連携パターン
+
+以下の場合、複数サブスキルの連携を提案：
+
+| パターン | トリガー | 推奨組み合わせ |
+|---|---|---|
+| **採用プロセス全体** | 「採用して契約まで」「一連の流れ」 | PersonnelDeveloper + LegalAdviser |
+| **組織再編** | 「組織見直し」「配置転換」「チームビルディング」 | BusinessAnalyzer + PersonnelDeveloper |
+| **新規事業立ち上げ** | 「新規事業」「立ち上げ」「ゼロから」 | BusinessAnalyzer + PersonnelDeveloper + LegalAdviser |
+| **人材戦略総合** | 「人材戦略全体」「包括的に」「多角的に」 | PersonnelDeveloper + ForesightReader |
 
 ---
 
