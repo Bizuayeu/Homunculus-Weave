@@ -53,7 +53,7 @@ Claude: 「PersonnelDeveloper（人材開発）で対応します。
 - 「採用」「育成」→ PersonnelDeveloper
 - 「事業」「業務」→ BusinessAnalyzer
 - 「契約」「法務」→ LegalAdviser
-- 「適性」「相性」→ ForesightReader
+- 「戦略」「適性」→ ForesightReader
 
 ---
 
@@ -94,7 +94,7 @@ PersonnelDeveloper/SUBSKILL.md + CLAUDE.md を読み込み
 
 ### 重要: 選択的読み込みの徹底
 
-**全サブスキル一括読み込みを絶対に回避してください**
+**必要のない全サブスキル一括読み込みを回避**
 
 **読み込み例**:
 - **BusinessAnalyzerのみ**:
