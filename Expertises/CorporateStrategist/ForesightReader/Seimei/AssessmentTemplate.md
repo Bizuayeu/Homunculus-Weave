@@ -40,8 +40,16 @@
 
 ```python
 import sys
-# ClaudeWeb環境での実行パス
-sys.path.append('/home/claude/homunculus/Weave/Expertises/ForesightReader/Seimei')
+from pathlib import Path
+
+# Weaveプロジェクトルートを探す（環境非依存）
+cwd = Path.cwd()
+weave_root = cwd if cwd.name == 'Weave' else next((p for p in cwd.parents if p.name == 'Weave'), cwd)
+
+# Seimeiディレクトリのパスを設定
+seimei_path = weave_root / 'Expertises/CorporateStrategist/ForesightReader/Seimei'
+sys.path.append(str(seimei_path))
+
 from fortune_teller_assessment import FortuneTellerAssessment
 
 assessment = FortuneTellerAssessment()
