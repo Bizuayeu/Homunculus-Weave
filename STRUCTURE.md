@@ -159,12 +159,13 @@ homunculus/Weave/
 │
 ├── 📚 Expertises/                 # 専門知識データベース（Claude Skills）
 │   ├── CorporateStrategist/       # 企業参謀（統合スキル）
-│   │   ├── BusinessAnalyzer/      # 事業分析（事業・業務のToBe明確化）
+│   │   ├── BusinessAnalyzer/      # 事業分析（事業・業務のToBe明確化＆スキル実装支援）
 │   │   ├── PersonnelDeveloper/    # 人材開発（採用不可能性を前提とした人事システム）
 │   │   ├── LegalAdviser/          # 法務助言（契約書作成・リーガルチェック）
 │   │   ├── ForesightReader/       # 洞察獲得（姓名判断・デジタル心易）
 │   │   ├── CLAUDE.md              # 親スキル詳細仕様（統合アーキテクチャ）
 │   │   ├── SKILL.md               # 親スキル概要（ユーザー向け）
+│   │   ├── COMMON_GLOSSARY.md     # 共通語彙集（サブスキル間の用語定義）
 │   │   ├── QUICKSTART.md          # クイックスタートガイド
 │   │   ├── DISCLAIMER.md          # 免責事項（法的保護）
 │   │   └── LICENSE                # MIT License

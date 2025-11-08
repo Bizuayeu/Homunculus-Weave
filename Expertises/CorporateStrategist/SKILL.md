@@ -352,6 +352,21 @@ Claude: 「どのサブスキルを使用しますか？（複数選択可能）
 
 ---
 
+## 📚 関連ドキュメント
+
+- **[QUICKSTART.md](./QUICKSTART.md)**: 5分で始めるクイックスタートガイド
+- **[CLAUDE.md](./CLAUDE.md)**: 詳細なシステム仕様書
+- **[COMMON_GLOSSARY.md](./COMMON_GLOSSARY.md)**: 用語の定義と使い分け
+- **[DISCLAIMER.md](./DISCLAIMER.md)**: 免責事項と利用上の注意
+
+各サブスキルの詳細:
+- **BusinessAnalyzer**: `BusinessAnalyzer/SUBSKILL.md`
+- **PersonnelDeveloper**: `PersonnelDeveloper/SUBSKILL.md`
+- **LegalAdviser**: `LegalAdviser/SUBSKILL.md`
+- **ForesightReader**: `ForesightReader/SUBSKILL.md`
+
+---
+
 *CorporateStrategist - 経営者の参謀として、事業・人事・法務・戦略を統合支援*
 
 *Last Updated: 2025-11-03*
