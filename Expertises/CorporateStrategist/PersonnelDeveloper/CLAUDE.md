@@ -647,6 +647,8 @@ CorporateStrategist（企業参謀）
 - 事業戦略に基づく人材配置の最適化
 - 外注QCD比較のデータ提供
 - 事業・業務のToBeに合わせた人材開発計画
+- スキル化推奨時は BusinessAnalyzer Phase 2 & 3（スキル化設計）へ連携
+  - 詳細: `BusinessAnalyzer/SOLUTIONIZER.md` を参照
 
 **LegalAdviser（法務助言）との連携**
 - 労働法規の遵守確認（労働基準法、労働契約法等）

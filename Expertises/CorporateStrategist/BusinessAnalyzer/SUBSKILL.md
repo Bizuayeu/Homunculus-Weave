@@ -114,7 +114,37 @@ description: Analyze business structures using Multiversal Structure Parser meth
 
 詳細は `CLAUDE.md` の「深層分析モード」セクションを参照してください。
 
-## Usage Workflow
+### 6. Phase 2 & 3: Solution Design（解決策設計）
+
+**戦略から戦術へ - 構造的洞察を実装可能な解決策に変換**
+
+Phase 1で得た構造的洞察を基に、具体的な問題特定と解決策設計を行います。
+
+**Phase 2: Bottleneck & Tacit Knowledge Identification（ボトルネック・暗黙知の特定）**
+
+Phase 1の構造分析結果から、具体的な改善対象を抽出：
+- 問題構造の特定（ボトルネック分析）
+- 暗黙知の可視化（属人化リスクの洗い出し）
+- 改善機会の抽出（効率化・リスク低減・競争力強化）
+
+**Phase 3: Skill Architecture Design（スキル化設計支援）**
+
+Phase 2で特定した暗黙知・ボトルネック業務のスキル化を設計：
+- スキル化対象の特定と優先順位付け（インパクト × 実装容易性 × 緊急度）
+- SKILL.md/CLAUDE.md構造設計
+- 運用戦略の策定（トリガー・権限・更新・品質・フォールバック）
+- 実装ロードマップの作成
+
+**使用タイミング**:
+- Phase 1で構造的課題を発見し、具体的な解決策が必要
+- ユーザーが「スキル化設計」「ボトルネック解消」を明示的に依頼
+- PersonnelDeveloperからの連携要求
+
+**詳細**: `SOLUTIONIZER.md` を参照
+
+## Phase 1: Usage Workflow（構造発見プロセス）
+
+**Phase 1は戦略レベルの分析 - 「何が本質的問題か？」を明らかにする**
 
 ### 第1段階：ヒアリングによる情報収集
 
@@ -186,12 +216,49 @@ description: Analyze business structures using Multiversal Structure Parser meth
 
 詳細な理論と手法については、以下を参照：
 
-- `CLAUDE.md` - システム仕様書（全体）
-- `References/WeaveIdentity.md` - 思考統合プロセスの哲学的基盤
-- `References/BMC_Template_JAJAAAN.pptx` - Business Model Canvas テンプレート（最終アウトプット形式）
+### Phase 1: 構造分析（戦略レベル）
+
+- `CLAUDE.md` - Phase 1の詳細理論・手法（Multiversal Structure Parser、深層分析モード、戦略フレームワーク）
+- `References/WeaveIdentity.md` - 深層分析モードの哲学的基盤
+- `References/BMC_Template_JAJAAAN.pptx` - Business Model Canvas テンプレート（Phase 1分析結果の可視化形式）
 - `References/BMC_Example_YakinikuShop.webp` - 焼肉店のBMC実例（Multiversal分析 → BMC可視化の完全事例）
 
+### Phase 2 & 3: 解決策設計（戦術レベル）
+
+- `SOLUTIONIZER.md` - Phase 2 & 3の完全な理論・手法
+  - Phase 2: ボトルネック・暗黙知の特定
+  - Phase 3: スキル化設計支援
+- `References/SkillArchitectureTemplate_SKILL.md` - SKILL.md標準構造テンプレート
+- `References/SkillArchitectureTemplate_CLAUDE.md` - CLAUDE.md標準構造テンプレート
+- `References/SkillPriorityScoringMatrix.md` - 優先度スコアリング詳細評価マトリクス
+
 ## Important Notes
+
+### ⚠️ Phase 1の重要性 - 戦略なき戦術は虚しい
+
+**CRITICAL**: BusinessAnalyzerの**主機能はPhase 1（構造分析）**です。
+
+Phase 2 & 3（解決策設計）は、**Phase 1で正しい問題を特定できた場合にのみ価値があります**。
+
+**戦略レベルの判断を誤ると、戦術的にどれだけ完璧にスキルを作成しても無意味どころか、リソースを浪費するだけです。**
+
+#### 原則
+
+1. **Phase 1が不十分なまま Phase 2 & 3 に進まない**
+   - 「何が本質的問題か？」が明確になるまで Phase 1 を続ける
+   - 不明確なまま解決策設計に進むことは、間違った問題を正しく解くことになる
+
+2. **Phase 2 & 3 は補助機能**
+   - Phase 1で発見した構造的洞察を実装可能な形式に変換するツール
+   - Phase 1なしでは方向性が定まらない
+
+3. **戦略的判断の質が、戦術的実行の価値を決める**
+   - Phase 1で本質を掴めば、Phase 2 & 3は効果的
+   - Phase 1で本質を見誤れば、Phase 2 & 3は無駄
+
+**まず構造を見抜け。それから動け。**
+
+---
 
 ### 分析の性質
 

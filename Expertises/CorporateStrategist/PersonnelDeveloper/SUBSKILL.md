@@ -191,11 +191,18 @@ PersonnelDeveloperは、CorporateStrategist内の他のサブスキルと連携�
 
 ```
 CorporateStrategist（企業参謀）
-├── BusinessAnalyzer（事業分析） → 事業・業務のToBe明確化
-├── PersonnelDeveloper（人材開発） ← 本スキル
-├── LegalAdviser（法務助言） → 労働法規の遵守確認
-└── ForesightReader（洞察獲得） → 人間理解に基づく人材配置
+├── BusinessAnalyzer（事業分析）
+├── PersonnelDeveloper（人材開発）    # 本スキル
+├── LegalAdviser（法務助言）
+└── ForesightReader（洞察獲得）
 ```
+
+**主な連携パターン**:
+- **BusinessAnalyzer**: 事業戦略に基づく人材配置、スキル化推奨時の連携（Phase 2 & 3へ）
+- **LegalAdviser**: 労働法規の遵守確認、契約書作成
+- **ForesightReader**: 人間理解に基づく人材配置の助言
+
+詳細は `CLAUDE.md` の「🔗 他スキルとの連携」セクションを参照してください。
 
 ---
 
