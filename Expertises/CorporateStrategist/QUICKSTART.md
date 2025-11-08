@@ -55,12 +55,13 @@ Weave: [PersonnelDeveloperを起動し、以下を実施]
 
 Weave: [BusinessAnalyzerを起動し、以下を実施]
 1. 現状業務フローのヒアリング
-2. Multiversal Structure Parserで構造分析
-3. AIスキル化可能な部分の特定
+2. Multiversal Structure Parserで構造分析（Phase 1）
+3. ボトルネック・暗黙知の特定（Phase 2）
 4. 業務フロー最適化案の提示
+5. スキル化設計支援（Phase 3: SKILL.md/CLAUDE.md構造提案）
 ```
 
-**期待成果**: 業務時間を50%削減できる構造化案を即座に入手
+**期待成果**: 業務時間を50%削減できる構造化案 + スキル化設計を即座に入手
 
 ---
 

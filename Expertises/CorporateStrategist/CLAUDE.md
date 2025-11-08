@@ -410,6 +410,112 @@ Claude: 「PersonnelDeveloper（人材開発）+ ForesightReader（洞察獲得�
 
 ---
 
+### パターン4: スキル化判断の二つの経路
+
+**PersonnelDeveloperとBusinessAnalyzerのスキル化連携**
+
+CorporateStrategistでは、スキル化判断に**二つの異なる経路**があります。
+
+#### 経路1: PersonnelDeveloper起点（人材コスト最適化）
+
+**トリガー**: 採用判断、育成計画
+**文脈**: 「人を採用する前にスキル化できないか？」
+
+**フロー**:
+```
+1. PersonnelDeveloper: 採用前判断
+   - 外注QCD比較
+   - AI活用可能性の検討
+   - スキル化の推奨判断
+   ↓
+   スキル化推奨 → BusinessAnalyzer Phase 3へ
+   ↓
+2. BusinessAnalyzer Phase 3: スキル化設計
+   - スキル化対象の特定・優先順位付け
+   - SKILL.md/CLAUDE.md構造設計
+   - 運用戦略・実装ロードマップ
+   ↓
+3. PersonnelDeveloper: 採用判断への統合
+   - スキル化コスト vs 採用コストの比較
+   - 最終的な採用判断
+```
+
+**特徴**:
+- 人材コストの最適化が主目的
+- 外注QCD比較の枠組みで評価
+- 採用の代替手段としてのスキル化
+
+---
+
+#### 経路2: BusinessAnalyzer起点（事業戦略・組織資産化）
+
+**トリガー**: 事業分析、ボトルネック発見
+**文脈**: 「事業構造を分析した結果、この暗黙知をスキル化すべき」
+
+**フロー**:
+```
+1. BusinessAnalyzer Phase 1: Multiversal Structure Analysis
+   - ビジネスの複層的構造分析
+   - 本質的洞察の獲得
+   ↓
+2. BusinessAnalyzer Phase 2: Bottleneck & Tacit Knowledge Identification
+   - ボトルネック分析
+   - 暗黙知の可視化
+   - 改善機会の抽出
+   ↓
+   スキル化適性あり → Phase 3へ
+   ↓
+3. BusinessAnalyzer Phase 3: Skill Architecture Design
+   - スキル化対象の特定・優先順位付け
+   - SKILL.md/CLAUDE.md構造設計
+   - 運用戦略・実装ロードマップ
+```
+
+**特徴**:
+- 事業戦略との整合性が主目的
+- Multiversal Structure Parserによる構造的理解
+- 組織の知識資産化・競争力強化
+
+---
+
+#### 二つの経路の統合
+
+両経路で得られた知見は、CorporateStrategistで統合可能：
+
+**統合シナリオ例**:
+```
+PersonnelDeveloper: 「営業事務を採用すべきか？」
+    ↓
+外注QCD比較 → スキル化推奨
+    ↓
+BusinessAnalyzer Phase 3: スキル化設計
+    ↓
+    【並行実施】
+    ↓
+BusinessAnalyzer Phase 1-2: 営業プロセス全体の構造分析
+    - 見積書作成業務のボトルネック発見
+    - 営業支援業務の暗黙知可視化
+    ↓
+    【統合】
+    ↓
+CorporateStrategist: 総合提案
+    - 営業事務採用は見送り
+    - 見積書作成スキル + 営業支援スキルを優先開発
+    - 段階的な営業プロセス最適化プラン
+```
+
+---
+
+#### 経路選択の判断基準
+
+| 状況 | 推奨経路 |
+|------|---------|
+| **採用判断の文脈** | PersonnelDeveloper → BusinessAnalyzer Phase 3 |
+| **事業改善の文脈** | BusinessAnalyzer Phase 1 → 2 → 3 |
+| **包括的な組織最適化** | 両経路を並行実施 → CorporateStrategistで統合 |
+
+---
+
 ## 📊 統合判断のフレームワーク
 
 ### 統合的意思決定の原則
