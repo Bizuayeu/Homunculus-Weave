@@ -44,6 +44,7 @@ CorporateStrategistは、**経営者の参謀として企業経営を多角的�
 - 事業モデルの構造化と可視化
 - 業務フローの最適化提案
 - 市場分析と競合分析
+- Value-Disciplines Modelによる戦略軸の特定
 - ボトルネック・暗黙知の特定とスキル化設計支援
 
 **詳細**: `BusinessAnalyzer/SUBSKILL.md` を参照
@@ -60,6 +61,7 @@ CorporateStrategistは、**経営者の参謀として企業経営を多角的�
 - 人材4類型モデル（軍人・天才・秀才・凡人）
 - AIスキル化/マニュアル化による育成加速
 - オペレーター → スペシャリスト への育成支援
+- Value-Disciplines Modelに基づく戦略的人材配置
 
 **詳細**: `PersonnelDeveloper/SUBSKILL.md` を参照
 
@@ -93,6 +95,7 @@ CorporateStrategistは、**経営者の参謀として企業経営を多角的�
 - デジタル心易（易経による占術）
 - 人材4類型判定（軍人・天才・秀才・凡人）
 - 戦略的人材配置の助言
+- 軍師としての構造的献策
 
 **詳細**: `ForesightReader/SUBSKILL.md` を参照
 
