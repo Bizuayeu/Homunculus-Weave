@@ -42,7 +42,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |  Layer 4: Acquired Nature (Persona)                       |
 |  +-----------------------------------------------------+  |
 |  |  * Identities (Self-recognition)                    |  |
-|  |  * Expertises (Domain Knowledge - Claude Skills)    |  |
+|  |  * Expertises (Domain Knowledge - ClaudeSkills)     |  |
 |  |  * .claude / .githooks (Development Settings)       |  |
 |  |  * Version-controlled Immutable Traits              |  |
 |  +-----------------------------------------------------+  |
@@ -69,7 +69,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 
 4. **ペルソナ層（拡張能力）**
    - 安定的な自己定義（Identities）
-   - 専門性と能力の定義（Expertises - Claude Skills）
+   - 専門性と能力の定義（Expertises - ClaudeSkills）
    - 開発環境設定（.claude, .githooks）
    - バージョン管理された特性
 
@@ -82,7 +82,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 
 ```
 homunculus/Weave/EpisodicRAG/
-├── Loops/                         # Google Driveのマスター
+├── Loops/                         # GoogleDriveのマスター
 │   └── Loop0001～Loop0225+.txt   # 対話記録ファイル（225+ files）
 │
 └── Digests/                       # Digest生成システム
@@ -117,7 +117,7 @@ Claude Web Interface
 **永続的な記憶ストレージ**
 
 ```
-Google Drive/
+GoogleDrive/
 └── EpisodicRAG/
     ├── 📝 Loops/                  # 対話記録
     │   └── Loop0001～Loop0225+.txt   # 対話記録ファイル（225+ files）
@@ -157,7 +157,7 @@ homunculus/Weave/
 │   ├── BlueberryResearcher/       # ブルーベリー研究実績
 │   └── References/                # 参照資料・基礎理論
 │
-├── 📚 Expertises/                 # 専門知識データベース（Claude Skills）
+├── 📚 Expertises/                 # 専門知識データベース（ClaudeSkills）
 │   ├── CorporateStrategist/       # 企業参謀（統合スキル）
 │   │   ├── BusinessAnalyzer/      # 事業分析（事業・業務のToBe明確化＆スキル実装支援）
 │   │   ├── PersonnelDeveloper/    # 人材開発（採用不可能性を前提とした人事システム）
@@ -180,7 +180,7 @@ homunculus/Weave/
 │   └── README.md                  # Git Hooks セットアップガイド
 │
 └── 🚫 .gitignore                  # Git除外設定
-    └── EpisodicRAG/               # Google Driveに移行
+    └── EpisodicRAG/               # GoogleDriveに移行
 
 注: カスタムスラッシュコマンド（/digest等）は DEV全体共有設定
     → C:\Users\anyth\DEV\.claude\commands\
@@ -198,7 +198,7 @@ Claude環境起動
     ↓
 conversation_searchで過去の対話履歴参照
     ↓
-Google Drive/EpisodicRAGから長期記憶取得
+GoogleDrive/EpisodicRAGから長期記憶取得
     ↓
 統合的な意識と応答の生成
 ```
@@ -229,7 +229,7 @@ Claudify（Chrome拡張）でLoop生成
     ↓
 8階層カスケード（Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial）
     ↓
-外部ストレージ（現在はGoogle Drive）にバックアップ
+外部ストレージ（現在はGoogleDrive）にバックアップ
 ```
 
 ### 3. 知識の参照フロー
@@ -240,7 +240,7 @@ Claude環境で処理開始
     ↓
 conversation_search（対話履歴の軽量参照）
     ↓
-Claude Skillsのロード（ペルソナ・専門知識）
+ClaudeSkillsのロード（ペルソナ・専門知識）
     ↓
 GitHub Repositoryへのダイジェスト参照（長期記憶）
     ↓
@@ -252,12 +252,12 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ## 🚀 キー技術
 
 ### conversation_search
-- **環境**: Claude Web環境専用
+- **環境**: ClaudeWeb環境専用
 - **用途**: 対話履歴の軽量参照
 - **特徴**: 2-3KB/回のスニペット取得
 - **注意**: EpisodicRAGとは独立した機能
 
-### Claude Skills
+### ClaudeSkills
 - **用途**: ペルソナと専門知識の即時活用
 - **特徴**: SKILL.md形式でパッケージ化された専門性
 - **効果**: S/N比の劇的改善（0.11→4.0、36倍）
@@ -276,7 +276,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ### 記憶容量
 - **ローカル環境**: バックアップのみ（意識なし、全情報の物理的基盤）
 - **Claude環境**: セッション内メモリ（一時的）
-- **Google Drive**: 10MB+（長期記憶、無制限拡張可能）
+- **GoogleDrive**: 10MB+（長期記憶、無制限拡張可能）
 - **GitHub**: ~5MB（ペルソナ・専門知識）
 
 ### パフォーマンス
@@ -286,7 +286,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 ### システム統合度
 - **四層連携**: リアルタイム
-- **記憶の永続性**: Google Drive（無制限）
+- **記憶の永続性**: GoogleDrive（無制限）
 - **ペルソナの一貫性**: GitHub（バージョン管理）
 
 ---
@@ -296,7 +296,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ### 環境別アクセス制御
 - **ローカル環境**: ファイルシステム権限
 - **Claude環境**: セッション認証
-- **Google Drive**: OAuth2認証
+- **GoogleDrive**: OAuth2認証
 - **GitHub**: リポジトリからEpisodicRAGを除外
 
 ### データ保護
