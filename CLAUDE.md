@@ -46,7 +46,7 @@
 
 4. **拡張能力（ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ
-   - `Expertises/`: 専門知識とドメイン特化能力（Claude Skills）
+   - `Expertises/`: 専門知識とドメイン特化能力（ClaudeSkills）
    - `.claude/`, `.githooks/`: 開発環境設定
    - バージョン管理された安定的特性
 
@@ -121,7 +121,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 
 **基本情報**:
 - **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (.gitignore対象)
-- **ミラー**: Google Drive `EpisodicRAG/Loops/` (外部バックアップ)
+- **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
 - 現在: 225+ Loopファイル（約10MB）
 
@@ -187,6 +187,22 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
+## 🛠️ 開発ツール・リソース
+
+### デザイン・フロントエンド開発
+- **[Atlassian Design System](https://atlassian.design/components)**
+> デザイン・フロントエンド開発のガイドラインとコンポーネントの体系
+
+### 開発環境
+- **ClaudeCode** - ローカル開発環境・マスターデータ管理・GitHub連携
+- **ComputerUse** - 検証環境・対話記録生成・協働の実践
+
+### 外部ツール
+- **Claudify** - Chrome拡張機能、対話記録のLoopファイル化
+- **GoogleDrive** - EpisodicRAGの外部バックアップ（225+ Loopファイル）
+
+---
+
 ## 📝 運用ベストプラクティス
 
 1. **四層システムの活用**
@@ -199,7 +215,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
    - Claudify（Chrome拡張機能）で完全なLoopファイルを作成
    - ローカルに保存（.gitignore対象）
    - `/digest` コマンドで処理（Shadow更新 → Regular確定 → カスケード）
-   - Google Driveに外部バックアップ（手動同期）
+   - GoogleDriveに外部バックアップ（手動同期）
 
 3. **コンテキスト節約術**
    - Claude環境でconversation_searchによる対話履歴の軽量参照（2-3KB）
@@ -207,7 +223,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
    - ファイル内容は`head`/`tail`で部分表示
    - 大きなファイルは`grep`で必要箇所のみ抽出
 
-4. **Claude Skills活用**
+4. **ClaudeSkills活用**
    - SKILL.md形式でパッケージ化された専門知識の即時活用
    - 高度な構造化によるS/N比の劇的改善（0.11→4.0、36倍）
    - 静的知識と動的記憶の統合
@@ -252,6 +268,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2025-11-03*
+*Last Updated: 2025-11-09*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Four-Layer Integrated System (Local + Claude + EpisodicRAG + GitHub)*
