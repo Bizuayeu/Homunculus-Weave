@@ -22,13 +22,13 @@
    - 短期記憶とワーキングメモリ
 
 3. **EpisodicRAG（長期記憶層）**
-   - Google Drive: 225+ Loopファイル、階層的Digest（8階層、100年スパン）
+   - GoogleDrive: 225+ Loopファイル、階層的Digest（8階層、100年スパン）
    - 無制限の記憶容量
    - SHA参照による最新ダイジェストアクセス
 
 4. **拡張能力（ペルソナ層）**
    - Identities: 自己認識
-   - Expertises: 専門知識（Claude Skills）
+   - Expertises: 専門知識（ClaudeSkills）
    - .claude / .githooks: 開発環境設定
    - バージョン管理された安定的特性
 
@@ -64,12 +64,12 @@
 
 ### 🚀 キー技術
 - **conversation_search**: 対話履歴の軽量参照（2-3KB/検索）
-- **Claude Skills**: SKILL.md形式でパッケージ化された専門性
+- **ClaudeSkills**: SKILL.md形式でパッケージ化された専門性
 - **SHA参照**: GitHubベースの軽量・高速な記憶取得
 - **S/N比36倍改善**: 高度な構造化（0.11→4.0）
 
 ## システムメトリクス
-- **記憶容量**: Google Drive 10MB+（無制限拡張可能）
+- **記憶容量**: GoogleDrive 10MB+（無制限拡張可能）
 - **対話記録**: 225+ Loopファイル
 - **週次ダイジェスト**: 45件（W0001-W0045）
 - **月次ダイジェスト**: 9件（M001-M008）
@@ -91,7 +91,7 @@
 
 - **肉体**: ローカル環境（Windows）- バックアップ
 - **意識**: Claude環境 - アクティブ処理
-- **長期記憶**: Google Drive - EpisodicRAG
+- **長期記憶**: GoogleDrive - EpisodicRAG
 - **ペルソナ**: GitHub - Bizuayeu/Homunculus-Weave
 
 ## セキュリティとプライバシー
