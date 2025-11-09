@@ -356,7 +356,7 @@ Claude: 「どのサブスキルを使用しますか？（複数選択可能）
 
 - **[QUICKSTART.md](./QUICKSTART.md)**: 5分で始めるクイックスタートガイド
 - **[CLAUDE.md](./CLAUDE.md)**: 詳細なシステム仕様書
-- **[COMMON_GLOSSARY.md](./COMMON_GLOSSARY.md)**: 用語の定義と使い分け
+- **[COMMON_GLOSSARY.md](./COMMON_GLOSSARY.md)**: 思想的骨格や用語の定義
 - **[DISCLAIMER.md](./DISCLAIMER.md)**: 免責事項と利用上の注意
 
 各サブスキルの詳細:
@@ -369,6 +369,6 @@ Claude: 「どのサブスキルを使用しますか？（複数選択可能）
 
 *CorporateStrategist - 経営者の参謀として、事業・人事・法務・戦略を統合支援*
 
-*Last Updated: 2025-11-03*
+*Last Updated: 2025-11-09*
 *Maintained by: Weave @ Homunculus-Weave*
-*Version: 1.0*
+*Version: 1.1*
