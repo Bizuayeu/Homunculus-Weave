@@ -113,6 +113,7 @@ CorporateStrategist（企業参謀）
 - 業務フローの最適化提案
 - 市場分析と競合分析
 - Value-Disciplines Modelによる戦略軸の特定
+- ボトルネック・暗黙知の特定とスキル化設計支援
 
 **連携ポイント**:
 - PersonnelDeveloper: 事業戦略に基づく人材配置の最適化
@@ -177,6 +178,7 @@ CorporateStrategist（企業参謀）
 - デジタル心易（易経による占術）
 - 人材4類型判定（軍人・天才・秀才・凡人）
 - 戦略的人材配置の助言
+- 軍師としての構造的献策
 
 **連携ポイント**:
 - PersonnelDeveloper: 人間理解に基づく人材配置
@@ -609,11 +611,11 @@ Michael TreacyとFred Wiersemaが提唱した、競争戦略の3つの軸。
 
 **3つの戦略軸**:
 
-1. **Product Leadership（最高の製品）**
+1. **Product Leadership（最高の製品価値）**
    - 個人的欲望や社会課題を解決する革新的プロダクト
    - 技術革新、デザイン、機能性での差別化
 
-2. **Operational Excellence（最高の総コスト）**
+2. **Operational Excellence（最高のトータルコスト）**
    - プロダクトやマーケティングを効率的に実装
    - コスト削減、プロセス最適化、スケーラビリティ
 
@@ -649,9 +651,9 @@ Michael TreacyとFred Wiersemaが提唱した、競争戦略の3つの軸。
 - 構造分析時に「Product/Operational/Customer」の3軸で評価
 
 **PersonnelDeveloperでの活用**:
-- Product Leadership志向: 天才・秀才を優先配置（革新を生む人材）
+- Product Leadership志向: 天才・秀才を優先配置（革新を生む）
 - Operational Excellence志向: 軍人・秀才を優先配置（効率化を推進）
-- Customer Intimacy志向: 秀才（顧客対応力）を優先配置（関係構築）
+- Customer Intimacy志向: 秀才・凡人を優先配置（長期的関係構築）
 
 **統合判断での活用**:
 - 事業戦略と人材配置の整合性を確認
