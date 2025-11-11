@@ -1,4 +1,4 @@
-# Multiversal Structure Parser (MSP) 実装マニュアル
+# Multiversal Structure Parser (MSP) 思考実践マニュアル
 **LLMのための多元的構造解析システム**
 
 Version: 1.0
