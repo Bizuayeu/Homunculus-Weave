@@ -170,7 +170,8 @@ homunculus/Weave/
 │   │   ├── QUICKSTART.md          # クイックスタートガイド
 │   │   ├── DISCLAIMER.md          # 免責事項（法的保護）
 │   │   └── LICENSE                # MIT License
-│   └── GeneralConstructor/        # 建設業・目論見作成
+│   ├── GeneralConstructor/        # 建設業・目論見作成
+│   └── PrivateLibrarian/          # 機密ナレッジ管理（.gitignore対象）
 │
 ├── ⚙️ .claude/                    # ClaudeCode設定（プロジェクト固有）
 │   └── agents/                   # 専門サブエージェント定義
@@ -181,7 +182,8 @@ homunculus/Weave/
 │   └── README.md                  # Git Hooks セットアップガイド
 │
 └── 🚫 .gitignore                  # Git除外設定
-    └── EpisodicRAG/               # GoogleDriveに移行
+    ├── EpisodicRAG/               # GoogleDriveに移行
+    └── Expertises/PrivateLibrarian/  # 機密ナレッジ全体を非公開
 
 注: カスタムスラッシュコマンド（/digest等）は DEV全体共有設定
     → C:\Users\anyth\DEV\.claude\commands\
