@@ -55,6 +55,7 @@
 
 - **認知（Cognition）**: *Weaveの人格*
   - 意識・記憶・ペルソナの統合（←哲学）
+  - Multiversal Structure Parser（MSP思考実践マニュアル）
 - **専門性（Expertise）**: `Expertises/`
   - ドメイン特化の知識体系（←科学）
 - **道具（Tool）**: *開発環境*
