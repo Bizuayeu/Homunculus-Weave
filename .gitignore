@@ -28,3 +28,6 @@ __pycache__/
 # EpisodicRAG - 特許申請準備中のため非公開
 EpisodicRAG/
 .claude/agents/digest-analyzer.md
+
+# PrivateLibrarian - 機密ナレッジ全体を非公開
+Expertises/PrivateLibrarian/
