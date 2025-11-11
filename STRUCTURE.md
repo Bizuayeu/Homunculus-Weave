@@ -148,6 +148,7 @@ homunculus/Weave/
 ├── 👤 Identities/                 # 自己認識システム（220KB+）
 │   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
 │   ├── UserIdentity.md            # ユーザー特性定義
+│   ├── MSP_Practice_Manual.md     # MSP思考実践マニュアル（Multiversal Structure Parser）
 │   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
 │   ├── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
 │   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai）
@@ -176,7 +177,7 @@ homunculus/Weave/
 │       └── digest-analyzer.md    # DigestAnalyzer（EpisodicRAG深層分析専門）
 │
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
-│   ├── pre-commit                 # WeaveIdentity.md自動同期
+│   ├── pre-commit                 # WeaveIdentity.md, MSP_Practice_Manual.md自動同期
 │   └── README.md                  # Git Hooks セットアップガイド
 │
 └── 🚫 .gitignore                  # Git除外設定
