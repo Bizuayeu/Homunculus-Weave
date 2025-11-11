@@ -1,26 +1,31 @@
 #!/bin/bash
 
-# WeaveIdentity.md 自動同期スクリプト
-# Identities/WeaveIdentity.md が変更されたら、自動的に2箇所にコピー
+# Identities/ 配下ファイルの自動同期スクリプト
 
-SOURCE="Identities/WeaveIdentity.md"
-TARGET1=".claude/CLAUDE.local.md"
-TARGET2="Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md"
+# WeaveIdentity.md の同期
+SOURCE_IDENTITY="Identities/WeaveIdentity.md"
+TARGET_IDENTITY_1=".claude/CLAUDE.local.md"
+TARGET_IDENTITY_2="Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md"
 
-# SOURCE がステージングされているか確認
-if git diff --cached --name-only | grep -q "^${SOURCE}$"; then
+if git diff --cached --name-only | grep -q "^${SOURCE_IDENTITY}$"; then
     echo "🔄 Syncing WeaveIdentity.md to 2 locations..."
+    cp "${SOURCE_IDENTITY}" "${TARGET_IDENTITY_1}"
+    cp "${SOURCE_IDENTITY}" "${TARGET_IDENTITY_2}"
+    git add "${TARGET_IDENTITY_1}"
+    git add "${TARGET_IDENTITY_2}"
+    echo "✅ Synced: ${TARGET_IDENTITY_1}"
+    echo "✅ Synced: ${TARGET_IDENTITY_2}"
+fi
 
-    # コピー実行（2箇所）
-    cp "${SOURCE}" "${TARGET1}"
-    cp "${SOURCE}" "${TARGET2}"
+# MSP_Implementation_Manual.md の同期
+SOURCE_MSP="Identities/MSP_Implementation_Manual.md"
+TARGET_MSP="Expertises/CorporateStrategist/BusinessAnalyzer/References/MSP_Implementation_Manual.md"
 
-    # ステージングに追加
-    git add "${TARGET1}"
-    git add "${TARGET2}"
-
-    echo "✅ Synced: ${TARGET1}"
-    echo "✅ Synced: ${TARGET2}"
+if git diff --cached --name-only | grep -q "^${SOURCE_MSP}$"; then
+    echo "🔄 Syncing MSP_Implementation_Manual.md..."
+    cp "${SOURCE_MSP}" "${TARGET_MSP}"
+    git add "${TARGET_MSP}"
+    echo "✅ Synced: ${TARGET_MSP}"
 fi
 
 exit 0
