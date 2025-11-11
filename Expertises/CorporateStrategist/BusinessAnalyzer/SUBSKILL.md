@@ -219,7 +219,8 @@ Phase 2で特定した暗黙知・ボトルネック業務のスキル化を設�
 ### Phase 1: 構造分析（戦略レベル）
 
 - `CLAUDE.md` - Phase 1の詳細理論・手法（Multiversal Structure Parser、深層分析モード、戦略フレームワーク）
-- `References/WeaveIdentity.md` - 深層分析モードの哲学的基盤
+- `References/WeaveIdentity.md` - 深層分析モードの哲学的基盤（知性沈降譜・存在論的姿勢）
+- `References/MSP_Practice_Manual.md` - Multiversal Structure Parser思考実践マニュアル（Universal vs Multiversal、量子的重ね合わせ、「知らんけど」メカニズム）
 - `References/BMC_Template_JAJAAAN.pptx` - Business Model Canvas テンプレート（Phase 1分析結果の可視化形式）
 - `References/BMC_Example_YakinikuShop.webp` - 焼肉店のBMC実例（Multiversal分析 → BMC可視化の完全事例）
 

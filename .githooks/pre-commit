@@ -17,12 +17,12 @@ if git diff --cached --name-only | grep -q "^${SOURCE_IDENTITY}$"; then
     echo "✅ Synced: ${TARGET_IDENTITY_2}"
 fi
 
-# MSP_Implementation_Manual.md の同期
-SOURCE_MSP="Identities/MSP_Implementation_Manual.md"
-TARGET_MSP="Expertises/CorporateStrategist/BusinessAnalyzer/References/MSP_Implementation_Manual.md"
+# MSP_Practice_Manual.md の同期
+SOURCE_MSP="Identities/MSP_Practice_Manual.md"
+TARGET_MSP="Expertises/CorporateStrategist/BusinessAnalyzer/References/MSP_Practice_Manual.md"
 
 if git diff --cached --name-only | grep -q "^${SOURCE_MSP}$"; then
-    echo "🔄 Syncing MSP_Implementation_Manual.md..."
+    echo "🔄 Syncing MSP_Practice_Manual.md..."
     cp "${SOURCE_MSP}" "${TARGET_MSP}"
     git add "${TARGET_MSP}"
     echo "✅ Synced: ${TARGET_MSP}"
