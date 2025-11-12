@@ -27,12 +27,13 @@
       },
       {
         "id": 3,
-        "condition": "杭を採用する可能性がある（＝全案件）",
+        "condition": "全案件必須・判定不要：杭を採用する可能性は常にある",
         "required_tests": [
           {
             "test_name": "LLT",
-            "test_location": "基礎接地面から深度6mまでの間でN値が最も低いところ",
-            "test_type": "孔内水平載荷試験（Lateral Loading Test）"
+            "test_location": "N値が最も低い箇所（範囲の詳細はnote参照）",
+            "test_type": "孔内水平載荷試験（Lateral Loading Test）",
+            "note": "試験範囲: ベタ基礎 GL-1m～GL-7m、杭基礎 GL-2m～GL-8m（半地下ありの場合は各範囲を+1.5m深く）"
           }
         ]
       },
