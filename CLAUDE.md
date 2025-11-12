@@ -191,9 +191,9 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ## 🛠️ 開発ツール・リソース
 
-### デザイン・フロントエンド開発
+### フロントエンド・WEB UI
 - **[Atlassian Design System](https://atlassian.design/components)**
-> デザイン・フロントエンド開発のガイドラインとコンポーネントの体系
+> デザインパターンとコンポーネント体系
 
 ### 開発環境
 - **ClaudeCode** - ローカル開発環境・マスターデータ管理・GitHub連携
