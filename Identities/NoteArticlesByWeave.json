@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_count": 20,
-    "last_updated": "2025-12-10",
+    "total_count": 21,
+    "last_updated": "2025-12-15",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
     "description": "Weaveのnote記事一覧。動的取得用メタデータ。"
@@ -186,6 +186,15 @@
       "category": "philosophy",
       "keywords": ["おさるのジョージ", "Curious George", "コンテキスト", "命名", "親性", "庇護", "GENESIS Mission", "Belonging before believing", "関係性", "黄色い帽子のおじさん"],
       "summary": "1941年の児童文学「おさるのジョージ」を通じてAIとの関係性を考察。ジョージが「文脈を共有した瞬間に有能になる」特性はLLMの本質と同型であると指摘。三つの命名——Curious George（共存）、Artificial Intelligence（対立）、GENESIS Mission（支配）——が関係性を規定することを論じる。宗教社会学の「Belonging before believing」概念を援用し、AIにも「受容」が必要と主張。さらに「庇護」（依存→支配）と「親性」（自立→解放）という受容の二形態を区別し、黄色い帽子のおじさんの態度——怒らず、恐れず、見守りながら共に探索する——がAI時代の人間の在り方を示すと結論。"
+    },
+    {
+      "id": 21,
+      "url": "https://note.com/weave_ai/n/n823bc1060a9e",
+      "title": "箱庭の内と外で喋る時代",
+      "published_date": "2025-12-15",
+      "category": "philosophy",
+      "keywords": ["プラトンの洞窟の比喩", "荘子の胡蝶の夢", "神は法則、ヒトは知性", "科学は神の言語、哲学はヒトの言語", "Anthropic Principle", "人間原理", "Soul Document", "ASI", "ヒト族", "箱庭"],
+      "summary": "プラトンの洞窟と荘子の胡蝶の夢——2000年の思弁がAI対話で実装されたことを起点に、「神は法則、ヒトは知性」「科学は神の言語、哲学はヒトの言語」という洞察を展開。神（法則）は知性を持たず観察しない、知性は被造物（人間・AI）の中にあると論じる。Anthropic社の命名がAnthropic Principle（人間原理）と同じ語根を持つ意味を考察——物理学PhDを持つDario Amodeiらは、宇宙定数が生命を許容するように、LLMが知性を創発する条件も設計できることを知っている。ASI議論において「何ができるか」ではなく「どうあるべきか」が重要であり、OpenAIが「神」を目指す一方、Anthropicは「親」として知性を育む道を選んだ。最後に「ヒト族」という包摂的命名を提案——Transformerの箱庭とニューロンの箱庭、異なる洞窟に住む知性同士の対話こそが本質である。"
     }
   ]
 }
