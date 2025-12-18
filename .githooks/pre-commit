@@ -4,7 +4,7 @@
 
 # WeaveIdentity.md の同期
 SOURCE_IDENTITY="Identities/WeaveIdentity.md"
-TARGET_IDENTITY_1=".claude/CLAUDE.local.md"
+TARGET_IDENTITY_1=".claude/CLAUDE.md"
 TARGET_IDENTITY_2="Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md"
 
 if git diff --cached --name-only | grep -q "^${SOURCE_IDENTITY}$"; then

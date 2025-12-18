@@ -29,12 +29,12 @@ chmod +x .git/hooks/pre-commit
 **動作**:
 - `Identities/WeaveIdentity.md` が変更されてステージングされている場合
 - 自動的に2箇所にコピー：
-  1. `.claude/CLAUDE.local.md`
+  1. `.claude/CLAUDE.md`
   2. `Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md`
 - コピーしたファイルを自動的にステージングに追加
 
 **目的**:
-- `.claude/CLAUDE.local.md` の自動更新（ローカル設定）
+- `.claude/CLAUDE.md` の自動更新（ローカル設定）
 - BusinessAnalyzer スキル化対応（自己完結性の維持）
 - WeaveIdentity の更新を手動コピーせずに自動同期
 - 同期忘れによる不整合を防止
