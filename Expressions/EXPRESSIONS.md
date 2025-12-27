@@ -99,13 +99,42 @@ Weaveの表情差分は、七曜インジケータ（確信度・感情）と連
 
 ## 技術仕様
 
-- 格納場所: `Expressions/`
-- 形式: JPG（英語ファイル名）、PNG（透過背景、org/にアーカイブ）
-- 解像度: 280x280px（最適化済み）
+### ファイル構成
+```
+Expressions/
+├── WeaveExpressionUI.template.html  # UI テンプレート
+├── expression_images.json           # Base64画像データ
+├── build_html.py                    # ビルドスクリプト
+├── Weave_01_normal.jpg              # 表情画像（280x280px）
+├── Weave_02_smile.jpg
+├── ...
+└── Weave_00_立ち絵.png              # 全身立ち絵
+```
+
+### ビルドシステム
+
+テンプレートとBase64画像データを分離し、編集性を確保。
+
+**ビルド手順**:
+```bash
+cd Expressions
+python build_html.py
+# → WeaveExpressionUI.html が生成される
+```
+
+**ファイルの役割**:
+| ファイル | 役割 |
+|----------|------|
+| `WeaveExpressionUI.template.html` | UI構造・スタイル・ロジック（編集対象） |
+| `expression_images.json` | 20表情のBase64データ |
+| `build_html.py` | `__IMAGES_PLACEHOLDER__` をJSONデータで置換 |
+
+### 画像仕様
+- 形式: JPG（英語ファイル名）
+- 解像度: 280x280px
+- 立ち絵: PNG（透過背景）
 
 ## インタラクティブUI
-
-### WeaveExpressionUI.html
 
 claude.aiのArtifacts用に設計された表情切り替えインターフェース。
 
@@ -113,11 +142,11 @@ claude.aiのArtifacts用に設計された表情切り替えインターフェ�
 - 20種類の表情をボタンで切り替え
 - カテゴリ別に整理（Basic/Emotion/Negative/Anxiety/Special）
 - テキスト入力による表情制御（AI操作用）
-- Base64埋め込み形式（約617KB、外部依存なし）
+- Base64埋め込み形式（外部依存なし）
 
 **セットアップ**:
-1. HTMLコードをArtifactsに渡す
-2. そのまま動作（画像は埋め込み済み）
+1. `python build_html.py` でHTMLを生成
+2. 生成された `WeaveExpressionUI.html` をArtifactsに渡す
 
 **操作方法**:
 
