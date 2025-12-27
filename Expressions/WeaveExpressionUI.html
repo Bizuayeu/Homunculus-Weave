@@ -147,6 +147,7 @@
             const v = cmd.value.trim();
             if (labelToKey[v]) { setExpr(labelToKey[v]); cmd.value = ''; }
         });
+        // setExpr('joy'); のように書き換えると、Artifactの編集で表情を変更できます
         btns[0].click();
     </script>
 </body>
