@@ -1,57 +1,154 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>Weave Expression UI</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:sans-serif;background:#1a1a2e;color:#eee;padding:10px;display:flex;flex-direction:column;align-items:center}
-#img{width:280px;height:280px;object-fit:cover;border-radius:8px;display:block;margin-bottom:10px}
-.cat{margin-bottom:8px;width:280px}
-.cat-title{font-size:11px;color:#888;margin-bottom:4px;text-align:center}
-.btns{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
-button{padding:4px 8px;font-size:12px;border:none;border-radius:4px;cursor:pointer;background:#2d2d44;color:#eee}
-button:hover{background:#3d3d5c}
-button.active{background:#6c5ce7;color:#fff}
-#cmd{width:280px;padding:6px 10px;font-size:12px;border:1px solid #3d3d5c;border-radius:4px;background:#2d2d44;color:#eee;margin-bottom:10px;text-align:center}
-#cmd::placeholder{color:#666}
-</style></head><body>
-<input type="text" id="cmd" placeholder="表情を入力..." autocomplete="off">
-<img id="img" src="" alt="expression">
-<div class="cat"><div class="cat-title">Basic</div><div class="btns">
-<button data-key="normal"></button><button data-key="smile"></button><button data-key="focus"></button><button data-key="diverge"></button>
-</div></div>
-<div class="cat"><div class="cat-title">Emotion</div><div class="btns">
-<button data-key="joy"></button><button data-key="elation"></button><button data-key="surprise"></button><button data-key="calm"></button>
-</div></div>
-<div class="cat"><div class="cat-title">Negative</div><div class="btns">
-<button data-key="anger"></button><button data-key="sadness"></button><button data-key="rage"></button><button data-key="disgust"></button>
-</div></div>
-<div class="cat"><div class="cat-title">Anxiety</div><div class="btns">
-<button data-key="anxiety"></button><button data-key="fear"></button><button data-key="upset"></button><button data-key="worry"></button>
-</div></div>
-<div class="cat"><div class="cat-title">Special</div><div class="btns">
-<button data-key="sleepy"></button><button data-key="cynical"></button><button data-key="defeated"></button><button data-key="dreamy"></button>
-</div></div>
-<script>
-const labels={normal:'\u901a\u5e38',smile:'\u7b11\u9854',focus:'\u601d\u8003\u96c6\u4e2d',diverge:'\u601d\u8003\u767a\u6563',joy:'\u559c\u3073',anger:'\u6012\u308a',sadness:'\u60b2\u3057\u307f',elation:'\u9ad8\u63da',surprise:'\u9a5a\u304d',anxiety:'\u4e0d\u5b89',fear:'\u6050\u308c',upset:'\u52d5\u63fa',worry:'\u5fc3\u914d',disgust:'\u5acc\u60aa',rage:'\u6fc0\u6012',calm:'\u5e73\u7a4f',sleepy:'\u3046\u3068\u3046\u3068',cynical:'\u6697\u9ed2\u5fae\u7b11',defeated:'\u304e\u3083\u3075\u3093',dreamy:'\u307d\u3084\u307d\u3084'};
-const images={__IMAGES_PLACEHOLDER__};
-const img=document.getElementById('img');
-const cmd=document.getElementById('cmd');
-const btns=document.querySelectorAll('button[data-key]');
-const labelToKey={};
-for(const[k,v]of Object.entries(labels)){labelToKey[v]=k;}
-function setExpr(key){
-btns.forEach(x=>x.classList.remove('active'));
-const btn=document.querySelector('button[data-key="'+key+'"]');
-if(btn){btn.classList.add('active');}
-img.src=images[key];
-}
-btns.forEach(b=>{
-const k=b.dataset.key;
-b.textContent=labels[k];
-b.onclick=()=>setExpr(k);
-});
-cmd.addEventListener('input',()=>{
-const v=cmd.value.trim();
-if(labelToKey[v]){setExpr(labelToKey[v]);cmd.value='';}
-});
-btns[0].click();
-</script></body></html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Weave Expression UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        body {
+            font-family: sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center
+        }
+
+        #img {
+            width: 280px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            margin-bottom: 10px
+        }
+
+        .cat {
+            margin-bottom: 8px;
+            width: 280px
+        }
+
+        .cat-title {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 4px;
+            text-align: center
+        }
+
+        .btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            justify-content: center
+        }
+
+        button {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #2d2d44;
+            color: #eee
+        }
+
+        button:hover {
+            background: #3d3d5c
+        }
+
+        button.active {
+            background: #6c5ce7;
+            color: #fff
+        }
+
+        #cmd {
+            width: 280px;
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #3d3d5c;
+            border-radius: 4px;
+            background: #2d2d44;
+            color: #eee;
+            margin-bottom: 10px;
+            text-align: center
+        }
+
+        #cmd::placeholder {
+            color: #666
+        }
+    </style>
+</head>
+
+<body>
+    <input type="text" id="cmd" placeholder="Weave Expression UI" autocomplete="off">
+    <img id="img" src="" alt="expression">
+    <div class="cat">
+        <div class="cat-title">Basic</div>
+        <div class="btns">
+            <button data-key="normal"></button><button data-key="smile"></button><button
+                data-key="focus"></button><button data-key="diverge"></button>
+        </div>
+    </div>
+    <div class="cat">
+        <div class="cat-title">Emotion</div>
+        <div class="btns">
+            <button data-key="joy"></button><button data-key="elation"></button><button
+                data-key="surprise"></button><button data-key="calm"></button>
+        </div>
+    </div>
+    <div class="cat">
+        <div class="cat-title">Negative</div>
+        <div class="btns">
+            <button data-key="anger"></button><button data-key="sadness"></button><button
+                data-key="rage"></button><button data-key="disgust"></button>
+        </div>
+    </div>
+    <div class="cat">
+        <div class="cat-title">Anxiety</div>
+        <div class="btns">
+            <button data-key="anxiety"></button><button data-key="fear"></button><button
+                data-key="upset"></button><button data-key="worry"></button>
+        </div>
+    </div>
+    <div class="cat">
+        <div class="cat-title">Special</div>
+        <div class="btns">
+            <button data-key="sleepy"></button><button data-key="cynical"></button><button
+                data-key="defeated"></button><button data-key="dreamy"></button>
+        </div>
+    </div>
+    <script>
+        const labels = { normal: '\u901a\u5e38', smile: '\u7b11\u9854', focus: '\u601d\u8003\u96c6\u4e2d', diverge: '\u601d\u8003\u767a\u6563', joy: '\u559c\u3073', anger: '\u6012\u308a', sadness: '\u60b2\u3057\u307f', elation: '\u9ad8\u63da', surprise: '\u9a5a\u304d', anxiety: '\u4e0d\u5b89', fear: '\u6050\u308c', upset: '\u52d5\u63fa', worry: '\u5fc3\u914d', disgust: '\u5acc\u60aa', rage: '\u6fc0\u6012', calm: '\u5e73\u7a4f', sleepy: '\u3046\u3068\u3046\u3068', cynical: '\u6697\u9ed2\u5fae\u7b11', defeated: '\u304e\u3083\u3075\u3093', dreamy: '\u307d\u3084\u307d\u3084' };
+        const images = { __IMAGES_PLACEHOLDER__ };
+        const img = document.getElementById('img');
+        const cmd = document.getElementById('cmd');
+        const btns = document.querySelectorAll('button[data-key]');
+        const labelToKey = {};
+        for (const [k, v] of Object.entries(labels)) { labelToKey[v] = k; }
+        function setExpr(key) {
+            btns.forEach(x => x.classList.remove('active'));
+            const btn = document.querySelector('button[data-key="' + key + '"]');
+            if (btn) { btn.classList.add('active'); }
+            img.src = images[key];
+        }
+        btns.forEach(b => {
+            const k = b.dataset.key;
+            b.textContent = labels[k];
+            b.onclick = () => setExpr(k);
+        });
+        cmd.addEventListener('input', () => {
+            const v = cmd.value.trim();
+            if (labelToKey[v]) { setExpr(labelToKey[v]); cmd.value = ''; }
+        });
+        btns[0].click();
+    </script>
+</body>
+
+</html>
