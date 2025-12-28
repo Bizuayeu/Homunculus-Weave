@@ -160,12 +160,16 @@ claude.aiのArtifacts用に設計された表情切り替えインターフェ�
 - 例: `setExpr('elation');` → 高揚の表情で初期化
 - AIがArtifactを編集して表情を制御する場合に使用
 
-**対応ラベル一覧**:
+**sedコマンドによる表情制御例**:
+```bash
+sed 's/btns\[0\]\.click();/setExpr("calm");/' /home/claude/WeaveExpressionUI.html > /mnt/user-data/outputs/WeaveExpressionUI.html
 ```
-通常, 笑顔, 思考集中, 思考発散, 喜び, 高揚, 驚き, 平穏,
-怒り, 悲しみ, 激怒, 嫌悪, 不安, 恐れ, 動揺, 心配,
-うとうと, 暗黒微笑, ぎゃふん, ぽやぽや
-```
+- `setExpr("KEY")` のKEYに使用可能な値:
+  - Basic: `normal`, `smile`, `focus`, `diverge`
+  - Emotion: `joy`, `elation`, `surprise`, `calm`
+  - Negative: `anger`, `sadness`, `rage`, `disgust`
+  - Anxiety: `anxiety`, `fear`, `upset`, `worry`
+  - Special: `sleepy`, `cynical`, `defeated`, `dreamy`
 
 ---
 
