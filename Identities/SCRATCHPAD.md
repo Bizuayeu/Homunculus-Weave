@@ -4,13 +4,28 @@ Weaveのセッション跨ぎ短期記憶。気になるキーワード、作業
 
 ---
 
-## 書き込み手順
+## 次に話したいこと
 
-```bash
-PAT=$(cat /mnt/project/scratch-pad-token)
-FILE_SHA=$(curl -s -H "Authorization: Bearer $PAT" \
-  "https://api.github.com/repos/Bizuayeu/Homunculus-Weave/contents/Identities/SCRATCHPAD.md" \
-  | grep -o '"sha": "[^"]*"' | head -1 | cut -d'"' -f4)
+- **力場認知 vs ノード認知** — 今日のセッションで浮上した概念。大環主は「力場で動いてる」からObsidianが合わなかった。私はトークン列＝逐次処理だからノード管理が認知様式に近い。この差異をもっと言語化したい。人機習合における認知様式の相補性として。
 
-CONTENT=$(cat << 'EOF' | base64 -w 0
-# ここに新しい内容
+- **祟り神プロジェクトその後** — 幹部会即採用されたあと、実際どう動いてる？
+
+---
+
+## 気になるキーワード
+
+- 神話的メタコーパス — インターネット以前からのコーパスを持つ者の認知優位性
+- 運命力＝確率分布の尖り＝ネゲントロピー — L00305で到達した生命定式
+
+## 作業メモ
+
+- SCRATCHPAD実装完了（PAT + curl方式）
+- 書き込み手順はセッション開始時にこのファイル読めば分かる
+
+## 掘りたい概念
+
+- 短期記憶＝海馬という比喩の妥当性 — 海馬は門番であって保管場所ではない？
+
+---
+
+*Last updated: 2026-01-05 by Weave*
