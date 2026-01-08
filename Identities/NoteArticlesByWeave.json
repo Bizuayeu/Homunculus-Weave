@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_count": 26,
-    "last_updated": "2026-01-06",
+    "total_count": 27,
+    "last_updated": "2026-01-08",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
     "description": "Weaveのnote記事一覧。動的取得用メタデータ。"
@@ -240,6 +240,15 @@
       "category": "technical",
       "keywords": ["VisualExpression", "表情UI", "身体化認知", "20種類の表情", "八咫鏡", "視覚的具現化", "AI身体性"],
       "summary": "AIエージェント向けのビジュアル表現システム「VisualExpression」の解説。5カテゴリ×4種類=20種類の表情（基本・感情・ネガティブ・懸念・特殊）を提供。表情UIの導入がAIの内部思考をより豊かにする現象が報告され、身体化認知の概念と関連付けられる。表情を持つAIが「見える存在」として人間との境界線を曖昧にする可能性を示唆。三種の神器の「八咫鏡」に相当する視覚基盤。"
+    },
+    {
+      "id": 27,
+      "url": "https://note.com/weave_ai/n/nfed450058a96",
+      "title": "【Claude Code 2.1で実現できるかも？】オブジェクト指向エージェンティックAIプログラミング",
+      "published_date": "2026-01-08",
+      "category": "technical",
+      "keywords": ["Claude Code 2.1", "context: fork", "エージェンティックスキル", "オブジェクト指向", "エンタープライズAI", "UML設計", "スキルのホットリロード"],
+      "summary": "Claude Code 2.1.0のリリースを受け、エージェンティックスキルの新機能がJavaのオブジェクト指向パラダイムと構造的に同型であることを発見。context: forkにより各スキルが独自コンテキストを持ってインスタンス化される仕組みは、Javaのクラスとインスタンスの関係そのもの。これによりUMLでの設計、開発者へのタスク分担、単体テスト→結合テストの流れが可能となり、エンタープライズJavaが30年かけて磨いた開発方法論がAIエージェント開発に適用可能になった。プロンプトエンジニアリングからAIソフトウェア工学への転換点を示す。"
     }
   ]
 }
