@@ -1,0 +1,108 @@
+{
+  "ground_evaluation_system": {
+    "description": "ボーリング柱状図に基づく地盤評価判定システム",
+    "note": "判定順序に従って条件をチェックし、最初に合致したものを地盤評価とする",
+    "key_definitions": {
+      "終端支持層": {
+        "definition": "N値50以上が連続する層",
+        "criteria": "N値≧50が3m以上連続する、または岩盤に到達"
+      },
+      "中間支持層": {
+        "definition": "終端支持層には至らないがN値10以上の層",
+        "criteria": "N値≧10が1m以上連続する層"
+      }
+    },
+    "evaluation_rules": [
+      {
+        "priority": 1,
+        "evaluation": "硬質地盤",
+        "definition": "深度10mより浅くに終端支持層の上端が存在する",
+        "condition": {
+          "terminal_support_layer_top_depth": {
+            "operator": "<",
+            "value": 10,
+            "unit": "m"
+          }
+        },
+        "interpretation": "良好な地盤、直接基礎が可能"
+      },
+      {
+        "priority": 2,
+        "evaluation": "中間地盤①",
+        "definition": "深度10m以上15m以内に終端支持層の上端が存在する",
+        "condition": {
+          "terminal_support_layer_top_depth": {
+            "operator": ">=",
+            "value": 10,
+            "unit": "m"
+          },
+          "and": {
+            "terminal_support_layer_top_depth": {
+              "operator": "<=",
+              "value": 15,
+              "unit": "m"
+            }
+          }
+        },
+        "interpretation": "中程度の地盤、杭基礎または地盤改良が必要な場合あり"
+      },
+      {
+        "priority": 3,
+        "evaluation": "中間地盤②",
+        "definition": "深度10m以上深くに終端支持層の上端が存在し、かつN値10以上の厚みが1m以上ある中間支持層が深度15m以内に存在する",
+        "condition": {
+          "terminal_support_layer_top_depth": {
+            "operator": ">",
+            "value": 15,
+            "unit": "m"
+          },
+          "and": {
+            "intermediate_support_layer": {
+              "depth": {
+                "operator": "<=",
+                "value": 15,
+                "unit": "m"
+              },
+              "n_value": {
+                "operator": ">=",
+                "value": 10
+              },
+              "thickness": {
+                "operator": ">=",
+                "value": 1,
+                "unit": "m"
+              }
+            }
+          }
+        },
+        "interpretation": "二層地盤として設計可能、中間支持層を活用"
+      },
+      {
+        "priority": 4,
+        "evaluation": "軟弱地盤",
+        "definition": "硬質地盤と中間地盤の定義のどちらにも当てはまらない",
+        "condition": {
+          "default": true,
+          "description": "上記条件1～3のいずれにも該当しない場合"
+        },
+        "interpretation": "軟弱な地盤、杭基礎必須、または大規模な地盤改良が必要"
+      }
+    ],
+    "evaluation_process": {
+      "step1": "ボーリング柱状図からN値分布を読み取る",
+      "step2": "終端支持層（N値≧50の連続層）の上端深度を特定",
+      "step3": "中間支持層（N値≧10で厚さ1m以上）の有無と深度を確認",
+      "step4": "判定順序1から順に条件をチェック",
+      "step5": "最初に合致した条件の地盤評価を採用"
+    },
+    "output_format": {
+      "evaluation": "地盤評価名",
+      "matched_condition": "合致した条件の説明",
+      "supporting_data": {
+        "terminal_layer_depth": "終端支持層上端深度",
+        "intermediate_layers": "中間支持層の情報（該当する場合）"
+      },
+      "recommendations": "設計上の推奨事項"
+    }
+  }
+}
