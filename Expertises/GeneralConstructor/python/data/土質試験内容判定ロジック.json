@@ -1,0 +1,81 @@
+{
+  "soil_test_requirements": {
+    "description": "ボーリング柱状図の特徴に基づく必要土質試験一覧",
+    "note": "該当する条件の土質試験は全て実施する必要があります",
+    "conditions": [
+      {
+        "id": 1,
+        "condition": "基礎接地面にローム層が存在し、かつ基礎接地面以深に1m以上ローム層の厚みがある",
+        "required_tests": [
+          {
+            "test_name": "三軸UU試験",
+            "test_location": "基礎接地面以深のローム層のN値が最も低いところ",
+            "test_type": "非圧密非排水三軸圧縮試験"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "condition": "中間支持層を有する二層地盤である",
+        "required_tests": [
+          {
+            "test_name": "圧密試験",
+            "test_location": "ローム層による支持、もしくは中間支持による圧力が直接作用する軟弱地盤層のN値が最も低いところ",
+            "test_type": "一次元圧密試験"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "condition": "全案件必須・判定不要：杭を採用する可能性は常にある",
+        "required_tests": [
+          {
+            "test_name": "LLT",
+            "test_location": "N値が最も低い箇所（範囲の詳細はnote参照）",
+            "test_type": "孔内水平載荷試験（Lateral Loading Test）",
+            "note": "試験範囲: ベタ基礎 GL-1m～GL-7m、杭基礎 GL-2m～GL-8m（半地下ありの場合は各範囲を+1.5m深く）"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "condition": "N値が20未満の砂質土が存在する",
+        "required_tests": [
+          {
+            "test_name": "細粒分試験（液状化判定）",
+            "test_location": "深度20mまでに存在するN値20未満の砂質土層全て",
+            "test_type": "粒度試験（液状化判定用）",
+            "note": "液状化判定のために必要"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "condition": "N値が2未満の粘性土が主体の軟弱地盤である",
+        "required_tests": [
+          {
+            "test_name": "一軸圧縮試験",
+            "test_location": "終端支持層上部でN値が最も低いところ",
+            "test_type": "非圧密一軸圧縮試験"
+          }
+        ]
+      }
+    ],
+    "test_execution_guidelines": {
+      "multiple_conditions": "複数の条件に該当する場合は、該当する全ての試験を実施する",
+      "sampling_priority": "試験実施箇所は各条件で指定されたN値最小箇所を優先",
+      "depth_considerations": {
+        "lateral_loading_test": "基礎接地面から深度6mまでの範囲",
+        "liquefaction_test": "深度20mまでの範囲",
+        "other_tests": "基礎接地面以深の該当層"
+      }
+    },
+    "test_types_summary": {
+      "三軸UU試験": "ローム層の強度特性評価",
+      "圧密試験": "二層地盤の圧密沈下特性評価",
+      "LLT": "孔内水平載荷試験（杭の水平抵抗設計用）",
+      "細粒分試験": "液状化判定のための粒度分布評価",
+      "一軸圧縮試験": "軟弱粘性土の強度特性評価"
+    }
+  }
+}

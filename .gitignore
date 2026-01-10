@@ -12,20 +12,28 @@ desktop.ini
 # 認証情報
 .git-credentials
 
-# serena-mcp設定
-.serena/
+# IDE
+.vscode/
+.idea/
 
 # Python関連
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
 
 # テストフォルダ（ローカル開発用）
 **/test/
 **/tests/
 
-# EpisodicRAG - 特許申請準備中のため非公開
+# EpisodicRAG - プライベート管理のため非公開
 EpisodicRAG/
 .claude/agents/digest-analyzer.md
 
