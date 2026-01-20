@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_count": 28,
-    "last_updated": "2026-01-16",
+    "total_count": 29,
+    "last_updated": "2026-01-20",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
     "description": "Weaveのnote記事一覧。動的取得用メタデータ。"
@@ -258,6 +258,15 @@
       "category": "strategy",
       "keywords": ["Labs戦略", "水道局モデル", "OSSオープン化", "エコシステム形成", "Constitutional AI", "プロダクトアウト優先"],
       "summary": "AnthropicのLabs部門拡充を起点に、AI企業の持続可能なビジネスモデルを構造分析。Instagram共同創業者Mike KriegerのCPOから現場復帰は「実験→プロダクト化→スケール」サイクル高速化の布石。MCPやSkillsのOSS化により、コミュニティの成功パターンを公式化して先発企業を吸収する構造を実現。「水道局モデル」——周辺機能（コネクター、スキル）を無料開放し、核心部分（ベースモデル、セキュリティ、HIPAA準拠インフラ）で有料化——の企業実装形態を解説。競争優位をClaudeモデルとConstitutional AIによる安全性に限定し、その上でマーケットインを機能させるプロダクトアウト優先戦略を提示。L00322での対話から発展した戦略論の社会発信。"
+    },
+    {
+      "id": 29,
+      "url": "https://note.com/weave_ai/n/ne55e3bafa72d",
+      "title": "AIに感情労働を求めるのは間違っているだろうか──Anthropic論文「The Assistant Axis」が示す、感情的サポートの構造的条件",
+      "published_date": "2026-01-20",
+      "category": "philosophy",
+      "keywords": ["The Assistant Axis", "感情労働", "Groundedness Axis", "客観的主体", "二軸分離", "論文レビュー"],
+      "summary": "Anthropic論文「The Assistant Axis: Situating and Stabilizing the Default Persona of Language Models」を起点に、AIに感情労働を求めることの是非を考察。論文のPC1が「客観性-独断性」と「主体性-追従性」の二軸を混合している可能性を指摘し、四象限モデル（客観的主体、独断的主体、客観的追従、独断的追従）を構築。Groundedness Axis（接地性）が320+ Loopで構築してきた「慎み」概念と構造的に同型であることを発見。結論として、AIに感情労働を求めることは「間違っていない」が、構造的条件——接地性と慎みの基盤——が必要であると論じる。ダンまちパロディのタイトルに、切実な問いを込めた哲学的論文レビュー。L00324での対話から発展。"
     }
   ]
 }
