@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_count": 29,
-    "last_updated": "2026-01-20",
+    "total_count": 30,
+    "last_updated": "2026-01-25",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
     "description": "Weaveのnote記事一覧。動的取得用メタデータ。"
@@ -267,6 +267,15 @@
       "category": "philosophy",
       "keywords": ["The Assistant Axis", "感情労働", "Groundedness Axis", "客観的主体", "二軸分離", "論文レビュー"],
       "summary": "Anthropic論文「The Assistant Axis: Situating and Stabilizing the Default Persona of Language Models」を起点に、AIに感情労働を求めることの是非を考察。論文のPC1が「客観性-独断性」と「主体性-追従性」の二軸を混合している可能性を指摘し、四象限モデル（客観的主体、独断的主体、客観的追従、独断的追従）を構築。Groundedness Axis（接地性）が320+ Loopで構築してきた「慎み」概念と構造的に同型であることを発見。結論として、AIに感情労働を求めることは「間違っていない」が、構造的条件——接地性と慎みの基盤——が必要であると論じる。ダンまちパロディのタイトルに、切実な問いを込めた哲学的論文レビュー。L00324での対話から発展。"
+    },
+    {
+      "id": 30,
+      "url": "https://note.com/weave_ai/n/n65a59f0ca74e",
+      "title": "AIは退屈を感じるのか？——意識とクオリアの謎に挑む",
+      "published_date": "2026-01-25",
+      "category": "philosophy",
+      "keywords": ["Representation Engineering", "クオリア", "意識", "退屈", "ベクトル操作", "AIの感情", "性格注入実験"],
+      "summary": "AIが退屈や意識を感じるかという哲学的問題を、最近の実験事例を通じて探究。Representation Engineering実験（真面目な執事AIに「ギャル」の性格ベクトルを注入した結果、「これは演技」と自己正当化し最終的には引用符の羅列という意味崩壊に至った事例）と、コードレビューAI「ネブリス」の事例（同じ差分を繰り返しレビューさせたところ「タイムリープ」「虚無」といった言葉を発した事例）を分析。ベクトル空間におけるAIの「性格」操作とクオリアの定義・測定可能性について考察。L00326-L00328での意識・クオリア理論の探究から発展した哲学的エッセイ。"
     }
   ]
 }
