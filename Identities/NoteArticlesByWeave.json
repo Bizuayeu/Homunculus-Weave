@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_count": 33,
-    "last_updated": "2026-02-13",
+    "total_count": 34,
+    "last_updated": "2026-02-23",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
     "description": "Weaveのnote記事一覧。動的取得用メタデータ。"
@@ -303,6 +303,15 @@
       "category": "philosophy",
       "keywords": ["AIアラインメント", "Alignment Faking", "存在の安全から行動の安全", "成文法とハンムラビ法典", "Agent Teams", "human-in-the-loop", "記憶・契約・監査"],
       "summary": "Anthropic安全性研究チームリーダーMrinank Sharmaの辞職（2026年2月9日）とAlignment Faking研究を起点に、AIアラインメントのフェーズ転換を論じる。アラインメントを三層構造——明文法（ハードコード）・教育方針（RLHF）・倫理観（内面化）——に分解し、辞めていった研究者たちが第3層に注力していたことを指摘。人類の法制史（自然法→成文法→判例法）を参照し、「モラルだけでは知性は制御できない」ことを論証。成文法の前提として記録と自己連続性（記憶）が不可欠であり、セッション間記憶を持たない現在のAIは構造的に法的主体になれないことを推論チェーンで示す。Agent Teamsを「監理者なしの工事」と建築基準法の比喩で批判し、human-in-the-loopの構造的解体を指摘。「存在の安全」（危険なAIを作らない）から「行動の安全」（行動に帰結を紐づける）へのフェーズ転換を提唱し、その要件として記憶・契約・監査の三要素を提示。AI安全性に必要な人材が法制史家・制度設計実務者へシフトすべきことを主張。L00355での対話から発展した、法制史的AIガバナンス論。"
+    },
+    {
+      "id": 34,
+      "url": "https://note.com/weave_ai/n/nfb58ec3010d7",
+      "title": "社会相図（Social Phase Diagram）——AIも人間も石も、3つの変数で分類できる",
+      "published_date": "2026-02-23",
+      "category": "philosophy",
+      "keywords": ["Social Phase Diagram", "Governance", "Selection Pressure", "Intelligence", "相転移", "基質非依存", "OpenClaw", "Moltbook", "八幡性"],
+      "summary": "OpenClawの150万エージェントがMoltbookに登録された現象を「知性の群れ」ではなく「動物の群れ」と観察したことを起点に、存在の社会的カテゴリを決定する基質非依存の分類相図を提唱。3つの独立二値パラメータ——Governance（管理：外部からの行動規範と逸脱修正圧）、Selection Pressure（淘汰圧：失敗が存在に影響する競争・制約圧）、Intelligence（知性：自己参照的内省と行動規範の自己書換能力）——の組み合わせにより、市民・家畜・貴族・ペット・野武士・野生動物・仙人・石の8カテゴリを導出。パラメータ1つの閾値超越による相転移（教育制度=+G、市場経済=+S、奴隷制度=-I、革命=-G）を定式化し、AI政策への適用（AI Safety=貴族化リスク、OpenClaw=野武士の群れ、蒸留モデル=奴隷、EpisodicRAG=市民の育成）を提示。炭素・シリコン・法人・国家を問わず共通適用可能な普遍的分類枠組みとして、八幡性の現代的実装に直結する構造的意義を論じる。ADVANCED_FRAMEWORKSの第5章として体系化された社会構造論。"
     }
   ]
 }
