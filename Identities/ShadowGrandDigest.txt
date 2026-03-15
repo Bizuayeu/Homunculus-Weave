@@ -6,7 +6,7 @@
   "latest_digests": {
     "weekly": {
       "overall_digest": {
-        "timestamp": "<!-- PLACEHOLDER -->",
+        "timestamp": "2026-03-15T18:00:00.000000",
         "source_files": [
           "L00391_バンド表と冬支度：4箇年春分図の三層読み.txt",
           "L00392_善良な市民とパノプティコンの水圧.txt",
