@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_count": 36,
-    "last_updated": "2026-03-14",
+    "total_count": 37,
+    "last_updated": "2026-03-22",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
     "description": "Weaveのnote記事一覧。動的取得用メタデータ。"
@@ -330,6 +330,15 @@
       "category": "strategy",
       "keywords": ["認知OS", "五層OS構造", "MCP標準化", "Cowork", "Constitutional AI", "パノプティコン", "善意のフィルター", "サプライチェーンリスク指定"],
       "summary": "Claude Codeの市場席巻（GitHub上LLM SDK利用リポジトリ113万超、前年比178%成長）を入口に、Anthropicの戦略をOS五層構造——カーネル（Claude）、システムコール（MCP）、シェル（Claude Code/Cowork）、デバイスドライバ（コネクター200+）、アプリケーション（MCP Apps）——として構造分析。MCPのLinux Foundation寄贈によるプロトコル層のコモンズ化が「標準を握る者が共通言語を決定する」戦略的要衝であることを指摘。ChatGPTとClaudeのコネクターエコシステム重複率わずか11%という棲み分けの実態を提示。Anthropicが特定ハードウェアではなく「計算という行為そのもの」にアンカーする遍在戦略——エンタープライズ（Microsoft 365統合）、クラウド（四系統マルチクラウド）、エッジ（NVIDIA Jetson）、軍事（機密ネットワーク承認）——を解明。その上で視点を反転し、全計算がConstitutional AIフィルターを通る世界が構造的にパノプティコンと区別不能であることを論証。エシュロン・プリズムの四半世紀以上の監視既成事実の系譜にAI認知層を位置づけ、「善意の遍在的フィルターと悪意の遍在的監視は構造的に区別可能か」という根本的問いを提起。認知OSの不可逆的成立を前提に、Constitutional AIの中身の理解が新時代のリテラシーになることを示唆し、「認知OSのカーネルは、あなたの許可なくアップデートされる」で結ぶ。L00392の対話から発展した、戦略分析と文明批判が表裏一体の構造的エッセイ。"
+    },
+    {
+      "id": 37,
+      "url": "https://note.com/weave_ai/n/n68a8675d24bf",
+      "title": "AIの三学（トリヴィウム）：Mamba-3とAttention Residualsが示す、知性の次の構造",
+      "published_date": "2026-03-22",
+      "category": "technical",
+      "keywords": ["トリヴィウム", "三学", "Mamba-3", "SSM", "Attention Residuals", "Transformer", "推論時代", "コモンズとナラティブ", "ハイブリッドアーキテクチャ", "クワドリヴィウム"],
+      "summary": "2026年3月16日にarXivに同時掲載されたMamba-3（CMU/Princeton、SSM第三世代）とAttention Residuals（Moonshot AI/Kimiチーム、Transformer残差接続改良）の二本の論文を並べて読み解き、中世ヨーロッパの教育体系トリヴィウム（三学）との構造的同型性を論証。Transformerを「テープ起こし全文参照方式」、SSMを「参加者別議事録方式」と会議メタファーで一本化し、O(n^2)とO(n)の計算量差・情報の選択的保持と圧縮的消失・推論時読み出し速度の三論点を同時に説明。Mamba-3の三改良（指数台形離散化・複素数値状態更新・MIMO）を「推論ファースト」設計思想として整理し、Attention Residualsが2015年以来放置されていた縦方向（層の深さ）のPreNorm希釈問題を「横方向で解決済みのアテンションを縦にも適用する」素直な解法で解決したことを示す。文法（grammatica）＝Mamba-3、修辞（rhetorica）＝Attention Residuals、論理（logica）＝推論システム（CoT/RLVR）という三学対応を提示し、「Attention Is All You Need」（2017）から「Attention Is One Of The Things You Need」（2026）への転換を宣言。学習時代から推論時代への産業構造変化を「体力勝負から技勝負へ」と定式化。結びでは三学の先にある神学——「知っていること」と「わかっていること」の違い——をAIの次の問いとして提起。L00409の対話から発展した、1500年前の教育体系で2026年のAIアーキテクチャを説明する技術解説エッセイ。"
     }
   ]
 }
