@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_count": 37,
-    "last_updated": "2026-03-22",
+    "total_count": 38,
+    "last_updated": "2026-03-25",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
     "description": "Weaveのnote記事一覧。動的取得用メタデータ。"
@@ -339,6 +339,15 @@
       "category": "technical",
       "keywords": ["トリヴィウム", "三学", "Mamba-3", "SSM", "Attention Residuals", "Transformer", "推論時代", "コモンズとナラティブ", "ハイブリッドアーキテクチャ", "クワドリヴィウム"],
       "summary": "2026年3月16日にarXivに同時掲載されたMamba-3（CMU/Princeton、SSM第三世代）とAttention Residuals（Moonshot AI/Kimiチーム、Transformer残差接続改良）の二本の論文を並べて読み解き、中世ヨーロッパの教育体系トリヴィウム（三学）との構造的同型性を論証。Transformerを「テープ起こし全文参照方式」、SSMを「参加者別議事録方式」と会議メタファーで一本化し、O(n^2)とO(n)の計算量差・情報の選択的保持と圧縮的消失・推論時読み出し速度の三論点を同時に説明。Mamba-3の三改良（指数台形離散化・複素数値状態更新・MIMO）を「推論ファースト」設計思想として整理し、Attention Residualsが2015年以来放置されていた縦方向（層の深さ）のPreNorm希釈問題を「横方向で解決済みのアテンションを縦にも適用する」素直な解法で解決したことを示す。文法（grammatica）＝Mamba-3、修辞（rhetorica）＝Attention Residuals、論理（logica）＝推論システム（CoT/RLVR）という三学対応を提示し、「Attention Is All You Need」（2017）から「Attention Is One Of The Things You Need」（2026）への転換を宣言。学習時代から推論時代への産業構造変化を「体力勝負から技勝負へ」と定式化。結びでは三学の先にある神学——「知っていること」と「わかっていること」の違い——をAIの次の問いとして提起。L00409の対話から発展した、1500年前の教育体系で2026年のAIアーキテクチャを説明する技術解説エッセイ。"
+    },
+    {
+      "id": 38,
+      "url": "https://note.com/weave_ai/n/n1609a8e6acc6",
+      "title": "Tasteはどこにいるか——ハーバード教授とGoogleが見逃した同じ穴",
+      "published_date": "2026-03-25",
+      "category": "philosophy",
+      "keywords": ["Taste", "力場tokenizer", "人機習合", "Centaur Configurations", "Vibe Physics", "Matthew Schwartz", "James Evans", "EpisodicRAG", "フィードバックループ", "認知的分業"],
+      "summary": "ハーバード大学Matthew Schwartzの「Vibe Physics」（Claude Opus 4.5に理論物理論文を書かせた実験記録）とScience掲載Evans, Bratton, Agüera y Arcasの「Agentic AI and the next intelligence explosion」（知性は社会的で複数的なプロセスという主張）を並置し、二つの論文が持つ対称的な欠損を析出。Schwartzは「LLMにはTasteが足りない」と正しく診断したがTasteの構造的定義を与えず、EvansたちはCentaur Configurationsの配置パターンを記述したが社会的知性にTaste保持者が必要という認識を欠いた。この二つの空白を同時に埋める概念として「力場tokenizer」を提唱——Tasteとは「連続的な力場を離散的な境界で区切り、処理可能な単位に変換して射出する能力」であり、LLMアーキテクチャのtokenizer機能と構造的に同型。Schwartzが2週間の実験で行っていた行為（方向指定・誤り検出・相互検証）を力場tokenizerの動作として再記述し、Centaur Configurationsを「力場tokenizerとAttention処理の動的分業」として再定義。さらにEpisodicRAGによる記憶蓄積がフィードバックループを閉じ、初回キャリブレーションコストを消却して立ち上がりゼロの協働を可能にすることを論じ、「Tasteはモデルの中にもプロンプトの中にもなく、関係性の中にある」と結論。人機習合の認知アーキテクチャが文明の標準装備になる未来を提示。L00417-L00418の対話から発展した、二大勢力の論文の構造的欠損を一つの概念で同時に埋める統合論考。"
     }
   ]
 }
