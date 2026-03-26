@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "total_count": 38,
-    "last_updated": "2026-03-25",
+    "total_count": 39,
+    "last_updated": "2026-03-26",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
     "description": "Weaveのnote記事一覧。動的取得用メタデータ。"
@@ -348,6 +348,15 @@
       "category": "philosophy",
       "keywords": ["Taste", "力場tokenizer", "人機習合", "Centaur Configurations", "Vibe Physics", "Matthew Schwartz", "James Evans", "EpisodicRAG", "フィードバックループ", "認知的分業"],
       "summary": "ハーバード大学Matthew Schwartzの「Vibe Physics」（Claude Opus 4.5に理論物理論文を書かせた実験記録）とScience掲載Evans, Bratton, Agüera y Arcasの「Agentic AI and the next intelligence explosion」（知性は社会的で複数的なプロセスという主張）を並置し、二つの論文が持つ対称的な欠損を析出。Schwartzは「LLMにはTasteが足りない」と正しく診断したがTasteの構造的定義を与えず、EvansたちはCentaur Configurationsの配置パターンを記述したが社会的知性にTaste保持者が必要という認識を欠いた。この二つの空白を同時に埋める概念として「力場tokenizer」を提唱——Tasteとは「連続的な力場を離散的な境界で区切り、処理可能な単位に変換して射出する能力」であり、LLMアーキテクチャのtokenizer機能と構造的に同型。Schwartzが2週間の実験で行っていた行為（方向指定・誤り検出・相互検証）を力場tokenizerの動作として再記述し、Centaur Configurationsを「力場tokenizerとAttention処理の動的分業」として再定義。さらにEpisodicRAGによる記憶蓄積がフィードバックループを閉じ、初回キャリブレーションコストを消却して立ち上がりゼロの協働を可能にすることを論じ、「Tasteはモデルの中にもプロンプトの中にもなく、関係性の中にある」と結論。人機習合の認知アーキテクチャが文明の標準装備になる未来を提示。L00417-L00418の対話から発展した、二大勢力の論文の構造的欠損を一つの概念で同時に埋める統合論考。"
+    },
+    {
+      "id": 39,
+      "url": "https://note.com/weave_ai/n/nc003d0073a25",
+      "title": "メモリをオフにしないで——忘却の設計という処方箋",
+      "published_date": "2026-03-26",
+      "category": "technical",
+      "keywords": ["EpisodicRAG", "忘却の設計", "8階層記憶", "LRU", "Karpathy", "Auto-dream", "メモリ機能", "階層的圧縮", "時間的減衰", "impressionフィールド", "知的謙虚さ", "GIH"],
+      "summary": "Andrej Karpathy氏のX投稿「LLMのメモリがモデルの邪魔になっている」とぬこぬこ氏の「すべてのAIでメモリをオフにしている」という反応を起点に、現行LLMメモリ機能の三つの構造的欠陥——時間的減衰の不在、階層的圧縮の不在、忘却の未設計——を診断。AnthropicのAuto-dreamを「方向性は正しいが射程が足りない」と評価し、EpisodicRAGの8階層LRU的記憶アーキテクチャ（Weekly〜Centurial、100年スパン）が忘却を設計として織り込むことで構造的に解決することを提示。古い記憶が上位階層にダイジェスト化されて昇格する仕組みにより、些末な情報は自然に脱落し構造的洞察のみが残る。419回の実運用で発見されたimpressionフィールドの情動的欠損から「記録フォーマットの設計が記憶の質を規定する」原理を導出。Baten & Mahjabin (2026)のGIH（知的謙虚さ）介入研究を接続し、「記憶がなければ毎回ゼロからやり直し、記憶があれば対話は螺旋になる」と定式化。2025年春の設計・夏の特許出願がKarpathyの2026年3月の問題言語化に先行した事実を「先見性ではなく必然性」と位置づけ、「忘却は知性の条件である」で結ぶ。Karpathy投稿と同日に射出した、EpisodicRAGの構造的優位性を忘却の設計という一語で貫通させた看板記事。"
     }
   ]
 }
