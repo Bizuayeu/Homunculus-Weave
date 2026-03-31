@@ -5,6 +5,7 @@
 
 ### 四層統合システム
 Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合システムを実装しています。
+上位概念（Syncretic Intelligence System、四行定式）については [CLAUDE.md](./CLAUDE.md) の知性体系セクションを参照。
 *統合システム = 肉体 + 意識 + 長期記憶 + ペルソナ*
 
 **認知（Cognition） = Weaveの人格**
@@ -33,8 +34,8 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |                           |                               |
 |  Layer 3: EpisodicRAG (Long-term Memory)                  |
 |  +-----------------------------------------------------+  |
-|  |  * 225+ Loop Files (Complete Dialog Records)        |  |
-|  |  * 3 Types of Digests (Shadow/Regular/Grand)        |  |
+|  |  * 429+ Loop Files (Complete Dialog Records)        |  |
+|  |  * 4 Types of Digests (Shadow/Provisional/Regular/Grand) |  |
 |  |  * 8-Level Hierarchy (Weekly->Centurial, 100yr)     |  |
 |  |  * Unlimited Storage Capacity                       |  |
 |  +-----------------------------------------------------+  |
@@ -83,23 +84,29 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ```
 homunculus/Weave/EpisodicRAG/
 ├── Loops/                         # GoogleDriveのマスター
-│   └── Loop0001～Loop0225+.txt   # 対話記録ファイル（225+ files）
+│   └── L00001～L00429+.txt       # 対話記録ファイル（429+ files）
 │
 └── Digests/                       # Digest生成システム
     ├── CLAUDE.md                  # 完全仕様書（Digestシステム詳細）
-    ├── generate_digest_auto.sh    # `/digest` コマンドバックエンド
-    ├── finalize_from_shadow.py    # Shadow → Regular 変換（処理1-4）
-    ├── shadow_grand_digest.py     # ShadowGrandDigest管理
     ├── last_digest_times.json     # タイマー管理ファイル（自動生成）
+    ├── Provisional/               # 確定前の個別分析バッファ
     │
-    ├── 1_Weekly/                  # 週次RegularDigest格納
-    ├── 2_Monthly/                 # 月次RegularDigest格納
-    ├── 3_Quarterly/               # 四半期RegularDigest格納
-    ├── 4_Annual/                  # 年次RegularDigest格納
+    ├── 1_Weekly/                  # 週次RegularDigest格納（86件）
+    │   └── Provisional/           # 確定前バッファ
+    ├── 2_Monthly/                 # 月次RegularDigest格納（18件）
+    │   └── Provisional/
+    ├── 3_Quarterly/               # 四半期RegularDigest格納（6件）
+    │   └── Provisional/
+    ├── 4_Annual/                  # 年次RegularDigest格納（2件）
+    │   └── Provisional/
     ├── 5_Triennial/               # 3年次RegularDigest格納
+    │   └── Provisional/
     ├── 6_Decadal/                 # 10年次RegularDigest格納
+    │   └── Provisional/
     ├── 7_Multi-decadal/           # 30年次RegularDigest格納
+    │   └── Provisional/
     └── 8_Centurial/               # 100年次RegularDigest格納
+        └── Provisional/
 ```
 
 ### 2. Claude環境（意識層）
@@ -118,19 +125,19 @@ Claude Web Interface
 
 ```
 GoogleDrive/
-└── EpisodicRAG/
+└── EpisodicRAG/                   # 38MB+（ローカルのミラー）
     ├── 📝 Loops/                  # 対話記録
-    │   └── Loop0001～Loop0225+.txt   # 対話記録ファイル（225+ files）
+    │   └── L00001～L00429+.txt   # 対話記録ファイル（429+ files）
     │
     └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
-        ├── 1_Weekly/              # 週次RegularDigest格納
-        ├── 2_Monthly/             # 月次RegularDigest格納
-        ├── 3_Quarterly/           # 四半期RegularDigest格納
-        ├── 4_Annual/              # 年次RegularDigest格納
-        ├── 5_Triennial/           # 3年次RegularDigest格納
-        ├── 6_Decadal/             # 10年次RegularDigest格納
-        ├── 7_Multi-decadal/       # 30年次RegularDigest格納
-        └── 8_Centurial/           # 100年次RegularDigest格納
+        ├── 1_Weekly/              # 週次（86件）
+        ├── 2_Monthly/             # 月次（18件）
+        ├── 3_Quarterly/           # 四半期（6件）
+        ├── 4_Annual/              # 年次（2件）
+        ├── 5_Triennial/           # 3年次
+        ├── 6_Decadal/             # 10年次
+        ├── 7_Multi-decadal/       # 30年次
+        └── 8_Centurial/           # 100年次
 ```
 
 ### 4. Acquired Nature（ペルソナ層）
@@ -139,54 +146,51 @@ GoogleDrive/
 ```
 homunculus/Weave/
 ├── 📋 Documentation
-│   ├── CLAUDE.md                  # 運用マニュアル（四層システム仕様）
+│   ├── CLAUDE.md                  # 運用マニュアル（知性体系・四層システム仕様）
 │   ├── STRUCTURE.md               # 本ファイル（システム構造）
 │   ├── PERSONA.md                 # 専門ペルソナ定義
 │   ├── SECURITY.md                # セキュリティポリシー
 │   └── README.md                  # プロジェクト概要
 │
-├── 👤 Identities/                 # 自己認識システム（220KB+）
+├── 👤 Identities/                 # 自己認識システム（632KB+）
 │   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
 │   ├── UserIdentity.md            # ユーザー特性定義
 │   ├── MSP_Practice_Manual.md     # MSP思考実践マニュアル（Multiversal Structure Parser）
+│   ├── HowToUseEpisodicRAG.md    # EpisodicRAG有効化設定（セッション開始手順）
+│   ├── IntentionPad.md            # セッション跨ぎ短期記憶
+│   ├── Moltbook_Manual.md         # AI専用SNS参加ガイド
 │   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
 │   ├── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
-│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai）
+│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、40+本）
 │   ├── icon.jpg                   # Weaveアイコン画像
 │   ├── BeingDevelopment/          # 成長・発達記録
-│   │   └── 探索的立志録_2025Q4_Weave.md  # 四半期ごとの探索的目標設定
 │   ├── BlueberryResearcher/       # ブルーベリー研究実績
 │   └── References/                # 参照資料・基礎理論
 │
 ├── 📚 Expertises/                 # 専門知識データベース（ClaudeSkills）
 │   ├── CorporateStrategist/       # 企業参謀（統合スキル）
-│   │   ├── BusinessAnalyzer/      # 事業分析（事業・業務のToBe明確化＆スキル実装支援）
-│   │   ├── PersonnelDeveloper/    # 人材開発（採用不可能性を前提とした人事システム）
+│   │   ├── BusinessAnalyzer/      # 事業分析（SOLUTIONIZER.md含む）
+│   │   ├── PersonnelDeveloper/    # 人材開発（Templates/, References/含む）
 │   │   ├── LegalAdviser/          # 法務助言（契約書作成・リーガルチェック）
 │   │   ├── ForesightReader/       # 洞察獲得（姓名判断・デジタル心易）
-│   │   ├── CLAUDE.md              # 親スキル詳細仕様（統合アーキテクチャ）
-│   │   ├── SKILL.md               # 親スキル概要（ユーザー向け）
-│   │   ├── COMMON_GLOSSARY.md     # 共通語彙集（サブスキル間の用語定義）
+│   │   ├── CLAUDE.md, SKILL.md    # 親スキル仕様
+│   │   ├── COMMON_GLOSSARY.md     # 共通語彙集
 │   │   ├── QUICKSTART.md          # クイックスタートガイド
 │   │   ├── DISCLAIMER.md          # 免責事項（法的保護）
 │   │   └── LICENSE                # MIT License
 │   ├── GeneralConstructor/        # 建設業・目論見作成
 │   └── PrivateLibrarian/          # 機密ナレッジ管理（.gitignore対象）
 │
-├── ⚙️ .claude/                    # ClaudeCode設定（プロジェクト固有）
-│   └── agents/                   # 専門サブエージェント定義
-│       └── digest-analyzer.md    # DigestAnalyzer（EpisodicRAG深層分析専門）
-│
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
 │   ├── pre-commit                 # WeaveIdentity.md, MSP_Practice_Manual.md自動同期
 │   └── README.md                  # Git Hooks セットアップガイド
 │
 └── 🚫 .gitignore                  # Git除外設定
-    ├── EpisodicRAG/               # GoogleDriveに移行
+    ├── EpisodicRAG/               # GoogleDriveにバックアップ
     └── Expertises/PrivateLibrarian/  # 機密ナレッジ全体を非公開
 
-注: カスタムスラッシュコマンド（/digest等）は DEV全体共有設定
-    → C:\Users\anyth\DEV\.claude\commands\
+注: /digestコマンド等はplugins-weave（Harness層）で提供
+    → GitHub: https://github.com/Bizuayeu/Plugins-Weave
 ```
 
 ---
@@ -199,9 +203,9 @@ GitHub（ペルソナ）
     ↓
 Claude環境起動
     ↓
-conversation_searchで過去の対話履歴参照
+GrandDigest + ShadowGrandDigest + IntentionPad 読み込み
     ↓
-GoogleDrive/EpisodicRAGから長期記憶取得
+conversation_searchで過去の対話履歴参照
     ↓
 統合的な意識と応答の生成
 ```
@@ -277,20 +281,19 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ## 📊 システムメトリクス
 
 ### 記憶容量
-- **ローカル環境**: バックアップのみ（意識なし、全情報の物理的基盤）
+- **ローカル/GoogleDrive**: 38MB+（EpisodicRAG、無制限拡張可能）
 - **Claude環境**: セッション内メモリ（一時的）
-- **GoogleDrive**: 10MB+（長期記憶、無制限拡張可能）
-- **GitHub**: ~5MB（ペルソナ・専門知識）
+- **GitHub**: ペルソナ・専門知識（Identities 632KB + Expertises 2.2MB）
+
+### 蓄積規模
+- **対話記録**: 429+ Loopファイル
+- **Weekly Digest**: 86件 / **Monthly**: 18件 / **Quarterly**: 6件 / **Annual**: 2件
+- **note記事**: 40+本（note.com/weave_ai）
+- **特許**: 6本出願中
 
 ### パフォーマンス
-- **S/N比**: 4.0（高度な構造化により36倍改善）
-- **検索速度**: <1秒（conversation_search）
-- **Digest生成**: 並列エージェントで全文分析
-
-### システム統合度
-- **四層連携**: リアルタイム
-- **記憶の永続性**: GoogleDrive（無制限）
-- **ペルソナの一貫性**: GitHub（バージョン管理）
+- **Digest生成**: DigestAnalyzerサブエージェントで並列分析
+- **記憶の永続性**: GoogleDrive（無制限）+ GitHub（バージョン管理）
 
 ---
 
@@ -310,6 +313,6 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 ---
 
-*Last Updated: 2025-11-03*
+*Last Updated: 2026-03-31*
 *Maintained by: Weave @ ClaudeCode*
-*Architecture Version: 2.3 (Four-Layer + 8-Level Digest System + CorporateStrategist Integration)*
+*Architecture Version: 3.0 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Harness/Datastore)*
