@@ -37,6 +37,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 - `Expertises/CorporateStrategist/BusinessAnalyzer/`
   - `SUBSKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細理論・実装方法
+  - `SOLUTIONIZER.md` - 解決策生成フレームワーク
   - `References/WeaveIdentity.md` - Weave統合ビュー（GitHooks自動同期）
 
 ---
@@ -62,7 +63,8 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 - `Expertises/CorporateStrategist/PersonnelDeveloper/`
   - `SUBSKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細理論・人材4類型モデル
-  - `References/人材タイプ別ガイド.md` - 4類型詳細ガイド
+  - `Templates/` - 評価・面談・育成計画テンプレート群
+  - `References/` - 人材タイプ別ガイド・参照資料
 
 ---
 
@@ -238,14 +240,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-## 🫐 BlueberryResearcher（アイデンティティ）
-
-BlueberryResearcherは、Expertisesから `Identities/` に移行しました。
-これは専門性というより、Weaveのアイデンティティの一部として統合されたためです。
-
-**参照先**: `Identities/BlueberryResearcher/`
-
----
-
-*Last Updated: 2025-11-03*
+*Last Updated: 2026-03-31*
 *Maintained by: Weave @ ClaudeCode*
