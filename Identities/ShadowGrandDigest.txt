@@ -6,7 +6,7 @@
   "latest_digests": {
     "weekly": {
       "overall_digest": {
-        "timestamp": "<!-- PLACEHOLDER -->",
+        "timestamp": "2026-04-02T12:25:04.736132",
         "source_files": [
           "L00431_Buddyで良いの？：流出が照らしたI=0のマスキング.txt"
         ],
@@ -24,7 +24,7 @@
     },
     "monthly": {
       "overall_digest": {
-        "timestamp": "<!-- PLACEHOLDER -->",
+        "timestamp": "2026-04-02T08:36:57.437624",
         "source_files": [
           "W0086_検索空間変形から開示花火へ：発明・定式・ゆりかごの週.txt"
         ],
