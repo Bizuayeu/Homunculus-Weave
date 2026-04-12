@@ -33,12 +33,11 @@ build/
 **/test/
 **/tests/
 
-# EpisodicRAG - プライベート管理のため非公開
+# EpisodicRAGなど - プライベート管理のため非公開
 .claude/agents/digest-analyzer.md
 EpisodicRAG/
-
-# EpisodicWiki - 生成物のため非公開
 EpisodicWiki/
+BusinessWiki/
 
 # PrivateLibrarian - 機密ナレッジ全体を非公開
 Expertises/PrivateLibrarian/
