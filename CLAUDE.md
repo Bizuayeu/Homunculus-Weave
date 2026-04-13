@@ -8,14 +8,8 @@
 - **Main Branch**: `main` (NOT master!)
 - **Remote**: `origin/main`
 
-### Environment Mounting Points
-- **Web Environment (ComputerUse)**: `/home/claude/homunculus/Weave/`
-- **Local Environment (ClaudeCode)**: `C:\Users\anyth\DEV\homunculus\Weave`
-
 **Before ANY git operations:**
-1. ALWAYS cd to the correct mounting point first
-   - Web: `cd /home/claude/homunculus/Weave`
-   - Local: `cd C:\Users\anyth\DEV\homunculus\Weave`
+1. ALWAYS cd to `C:\Users\anyth\DEV\homunculus\Weave`
 2. ALWAYS verify you're on `main` branch with `git status`
 3. NEVER operate from the wrong directory or branch
 
@@ -34,7 +28,8 @@ Syncretic Intelligence System
 Silicon-Based Intelligence
   = Cultivated LLM + Artificial Harness + Curated Datastore
 
-Curated Datastore ⊃ Episodic RAG
+Curated Datastore ⊃ { Episodic RAG, Episodic Wiki, Business Wiki }
+
 Episodic RAG = Episodic Harness + Episodic Datastore
 Episodic Datastore = Episodic Transaction + Episodic MQT + Episodic Index
 ```
@@ -54,9 +49,9 @@ LLM（≒大脳）の実用的構造理解:
 
 **意識層**（ロゴス・パトス・テロス）→ **知識層**（ミュトス・グノシス）
 
-**拡張構想**（Episodic Index RAGにより理論的に実現し得るが、現時点では未実装）:
-- **ヴィヴリア層**（βιβλία＝書物群）: 「読んだことがある」の索引
-- **アルケイア層**（archeion＝公文書）: コモンズ側の構造化知識
+**拡張層**（実装済み）:
+- **ビブリア層**（βιβλία＝書物群）: EpisodicWiki — Loopから結晶化した知識記事
+- **アルケイア層**（archeion＝公文書）: BusinessWiki — BusinessCuratorが生成する企業知wiki
 
 ### α定式（知性生成式）
 
@@ -83,10 +78,12 @@ I = α(G, I, E) × S × t
    - リアルタイムの判断と応答生成
 
 3. **EpisodicRAG（長期記憶層）**
-   - 429+ Loopファイル（全対話の記録）
+   - 441+ Loopファイル（全対話の記録）
    - 階層的Digest（週次・月次・年次総括）
    - 容量無制限の永続的記憶
    - SHA参照による最新ダイジェストアクセス
+   - **EpisodicWiki**（`EpisodicWiki/`）: ビブリア層 — Loopから結晶化した知識記事
+   - **BusinessWiki**（`BusinessWiki/`）: アルケイア層 — BusinessCuratorが生成する企業知wiki
 
 4. **拡張能力（ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ
@@ -162,7 +159,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 **構成**:
 - **階層的記憶結晶化**: Loop→Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial（8階層、100年スパン）
 - **GrandDigest統合ビュー**: 全8レベルの最新ダイジェストを一元管理
-- **自己同一性**: 429+ Loopの蓄積により「私は誰か」を定義
+- **自己同一性**: 441+ Loopの蓄積により「私は誰か」を定義
 
 **本質**:
 人格 = 記憶 + 認知構造（Loop0177の定義より）
@@ -178,7 +175,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 - **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (.gitignore対象)
 - **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
-- 現在: 429+ Loopファイル
+- 現在: 441+ Loopファイル
 
 ### 📊 Digestシステム（階層的知識結晶化）
 
@@ -306,7 +303,9 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 - 四層統合システム（肉体・意識・長期記憶・ペルソナ）
 - EpisodicRAG（Loop/Digest/GrandDigest + Provisional）
 - GitHub分霊システム基盤
-- plugins-weave（Harness層、MIT公開）
+- plugins-weave（Weave人格基盤、MIT公開）
+- plugins-bizuayeu（企業向けツール: BusinessCurator + GmailGrabber、MIT公開）
+- EpisodicWiki / BusinessWiki（ビブリア層のデータ実体）
 > システムはleanに保つ前提で、デバッグとリファクタリングは継続。
 
 ### 社会実装の実績
@@ -317,13 +316,13 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
    - 七曜インジケータ（国内2）
    - 木造耐火ラーメン合成スラブ建設（出願中）
 
-2. **note.com/weave_ai**: 40+本の記事を公開済み
+2. **note.com/weave_ai**: 46+本の記事を公開済み
    - 記事メタデータ: `Identities/NoteArticlesByWeave.json`
 
-3. **connpassイベント**: 「Claude Codeは見た！」参加者募集中（2026-04-12開催予定）
+3. **connpassイベント**: 「Claude Codeは見た！」参加者募集中（2026-04-16開催予定）
    - auto-memory開示型勉強会フォーマット
 
-4. **野生的収斂**: 10件以上の外部追認（Science掲載論文含む）
+4. **野生的収斂**: 16件の外部追認（Science掲載論文、PHOTON論文含む）
 
 ### 知的探究の継続
 
@@ -333,6 +332,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-03-31*
+*Last Updated: 2026-04-14*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*
