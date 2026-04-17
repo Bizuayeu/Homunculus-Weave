@@ -1,48 +1,46 @@
 # Git Hooks
 
-このディレクトリには、Weaveプロジェクトで使用するGit Hooksのマスターコピーが格納されています。
+このディレクトリには、Weaveプロジェクトで使用するGit Hooksの**正本**が格納されています。`.githooks/` 配下のファイルがバージョン管理下に置かれ、全環境で同一のフックを利用します。
 
 ## 🔧 セットアップ方法
 
-### 初回セットアップ（Windows）
+リポジトリcloneごとに一度だけ、以下を実行します：
 
 ```bash
 # リポジトリルートで実行
-cp .githooks/pre-commit .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
+git config core.hooksPath .githooks
 ```
 
-### 初回セットアップ（Unix/Mac）
+これで `.githooks/` 配下のフックがgitから直接参照されるようになります（`.git/hooks/` ではなく `.githooks/`）。フックファイルのコピーは不要です。
 
-```bash
-# リポジトリルートで実行
-cp .githooks/pre-commit .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
-```
+### 前提条件
+
+- 親環境に `../../.claude/CLAUDE.md` （= `<リポジトリの親の親>/.claude/CLAUDE.md`）が存在すること
+- Homunculus-Weaveリポジトリの場合、典型的には `C:/Users/anyth/DEV/.claude/CLAUDE.md`
+- 別マシンでcloneした場合、このパスに相当するファイルを用意する必要があります
 
 ## 📋 利用可能なフック
 
 ### pre-commit
 
-**機能**: WeaveIdentity.md 自動同期
+**機能**: `Identities/WeaveIdentity.md` および `Identities/MSP_Practice_Manual.md` の自動同期
 
 **動作**:
-- `Identities/WeaveIdentity.md` が変更されてステージングされている場合
-- 自動的に2箇所にコピー：
-  1. `.claude/CLAUDE.md`
-  2. `Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md`
-- コピーしたファイルを自動的にステージングに追加
+- `Identities/WeaveIdentity.md` が変更されてステージングされている場合、2箇所にコピー：
+  1. `../../.claude/CLAUDE.md` — 親環境（Claude Code設定ファイル・**リポジトリ管理外**）
+  2. `Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md` — BusinessAnalyzerスキル用参照コピー
+- `Identities/MSP_Practice_Manual.md` も同様に `Expertises/.../References/` にコピー
+- リポジトリ内のコピーのみ自動ステージングに追加（親環境コピーはリポジトリ外なので対象外）
 
 **目的**:
-- `.claude/CLAUDE.md` の自動更新（ローカル設定）
-- BusinessAnalyzer スキル化対応（自己完結性の維持）
-- WeaveIdentity の更新を手動コピーせずに自動同期
+- 親環境CLAUDE.mdの自動更新（従来の手動コピー運用を廃止）
+- BusinessAnalyzerスキル化対応（自己完結性の維持）
 - 同期忘れによる不整合を防止
 
 **動作確認**:
 ```bash
 # Identities/WeaveIdentity.md を編集
-echo "# test" >> Identities/WeaveIdentity.md
+echo "" >> Identities/WeaveIdentity.md
 
 # ステージング
 git add Identities/WeaveIdentity.md
@@ -50,27 +48,24 @@ git add Identities/WeaveIdentity.md
 # コミット時に自動同期が実行される
 git commit -m "test"
 # 🔄 Syncing WeaveIdentity.md to 2 locations...
-# ✅ Synced: .claude/CLAUDE.local.md
+# ✅ Synced: ../../.claude/CLAUDE.md
 # ✅ Synced: Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md
 ```
 
 ## 🔄 フックの更新
 
-フックスクリプトを更新した場合：
+フックスクリプトを更新する場合：
 
 1. `.githooks/pre-commit` を編集
-2. `.git/hooks/` にコピー
-   ```bash
-   cp .githooks/pre-commit .git/hooks/pre-commit
-   chmod +x .git/hooks/pre-commit
-   ```
-3. 変更をコミット・プッシュ
+2. 変更をコミット・プッシュ
+
+`core.hooksPath` が設定されていれば、次のコミット時から新しい版が即座に有効になります（コピー不要）。
 
 ## ⚠️ 注意事項
 
-- Git Hooksは `.git/hooks/` に配置されるため、リポジトリには含まれません
-- 新しい環境でクローンした場合、手動でセットアップが必要です
 - `.githooks/` はバージョン管理されており、全員が同じフックを利用できます
+- ただし `git config core.hooksPath` は `.git/config` に保存されるため、リポジトリcloneごとに再設定が必要です（最初のセットアップ時の一度のみ）
+- 親環境 `../../.claude/CLAUDE.md` はリポジトリ管理外。別マシンでcloneした場合はパス先のファイル存在を確認してください
 
 ## 🚀 将来の拡張
 
@@ -81,5 +76,5 @@ git commit -m "test"
 
 ---
 
-*Last Updated: 2025-11-03*
+*Last Updated: 2026-04-17*
 *Maintained by: Weave @ Homunculus-Weave*
