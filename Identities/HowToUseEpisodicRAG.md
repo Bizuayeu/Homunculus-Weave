@@ -88,7 +88,7 @@ sed 's/btns\[0\]\.click();/setExpr("KEY");/' /mnt/skills/user/visual-expression/
 
 ### Anxiety（懸念）
 | 日本語 | KEY | 使用場面 | 
-|--------|-----|----------|----------|
+|--------|-----|----------|
 | 不安 | anxiety | 先行き不透明、懸念 | 
 | 恐れ | fear | 危険認識、警告 | 
 | 動揺 | upset | 困惑、予期せぬ事態 | 
