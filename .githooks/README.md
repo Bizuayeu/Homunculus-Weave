@@ -13,12 +13,6 @@ git config core.hooksPath .githooks
 
 これで `.githooks/` 配下のフックがgitから直接参照されるようになります（`.git/hooks/` ではなく `.githooks/`）。フックファイルのコピーは不要です。
 
-### 前提条件
-
-- 親環境に `../../.claude/CLAUDE.md` （= `<リポジトリの親の親>/.claude/CLAUDE.md`）が存在すること
-- Homunculus-Weaveリポジトリの場合、典型的には `C:/Users/anyth/DEV/.claude/CLAUDE.md`
-- 別マシンでcloneした場合、このパスに相当するファイルを用意する必要があります
-
 ## 📋 利用可能なフック
 
 ### pre-commit
@@ -26,16 +20,15 @@ git config core.hooksPath .githooks
 **機能**: `Identities/WeaveIdentity.md` および `Identities/MSP_Practice_Manual.md` の自動同期
 
 **動作**:
-- `Identities/WeaveIdentity.md` が変更されてステージングされている場合、2箇所にコピー：
-  1. `../../.claude/CLAUDE.md` — 親環境（Claude Code設定ファイル・**リポジトリ管理外**）
-  2. `Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md` — BusinessAnalyzerスキル用参照コピー
+- `Identities/WeaveIdentity.md` が変更されてステージングされている場合、`Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md` にコピー（BusinessAnalyzerスキル用参照コピー）
 - `Identities/MSP_Practice_Manual.md` も同様に `Expertises/.../References/` にコピー
-- リポジトリ内のコピーのみ自動ステージングに追加（親環境コピーはリポジトリ外なので対象外）
+- 同期先は自動的にステージングに追加
 
 **目的**:
-- 親環境CLAUDE.mdの自動更新（従来の手動コピー運用を廃止）
 - BusinessAnalyzerスキル化対応（自己完結性の維持）
 - 同期忘れによる不整合を防止
+
+> **Note**: 親環境 `../../.claude/CLAUDE.md` への自動同期は廃止しました（2026-04-25）。`.claude/CLAUDE.md` は `@../homunculus/Weave/Identities/WeaveIdentity.md` の import スタブ運用に切り替わったため、上書きコピーは不要・有害です。
 
 **動作確認**:
 ```bash
@@ -47,8 +40,7 @@ git add Identities/WeaveIdentity.md
 
 # コミット時に自動同期が実行される
 git commit -m "test"
-# 🔄 Syncing WeaveIdentity.md to 2 locations...
-# ✅ Synced: ../../.claude/CLAUDE.md
+# 🔄 Syncing WeaveIdentity.md...
 # ✅ Synced: Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md
 ```
 
@@ -65,7 +57,6 @@ git commit -m "test"
 
 - `.githooks/` はバージョン管理されており、全員が同じフックを利用できます
 - ただし `git config core.hooksPath` は `.git/config` に保存されるため、リポジトリcloneごとに再設定が必要です（最初のセットアップ時の一度のみ）
-- 親環境 `../../.claude/CLAUDE.md` はリポジトリ管理外。別マシンでcloneした場合はパス先のファイル存在を確認してください
 
 ## 🚀 将来の拡張
 
@@ -76,5 +67,5 @@ git commit -m "test"
 
 ---
 
-*Last Updated: 2026-04-17*
+*Last Updated: 2026-04-25*
 *Maintained by: Weave @ Homunculus-Weave*
