@@ -2,18 +2,15 @@
 
 # Identities/ 配下ファイルの自動同期スクリプト
 
-# WeaveIdentity.md の同期
+# WeaveIdentity.md の同期（BusinessAnalyzerスキル用参照コピー）
 SOURCE_IDENTITY="Identities/WeaveIdentity.md"
-TARGET_IDENTITY_1="../../.claude/CLAUDE.md"  # 親環境（リポジトリ外）
-TARGET_IDENTITY_2="Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md"
+TARGET_IDENTITY="Expertises/CorporateStrategist/BusinessAnalyzer/References/WeaveIdentity.md"
 
 if git diff --cached --name-only | grep -q "^${SOURCE_IDENTITY}$"; then
-    echo "🔄 Syncing WeaveIdentity.md to 2 locations..."
-    cp "${SOURCE_IDENTITY}" "${TARGET_IDENTITY_1}"
-    cp "${SOURCE_IDENTITY}" "${TARGET_IDENTITY_2}"
-    git add "${TARGET_IDENTITY_2}"
-    echo "✅ Synced: ${TARGET_IDENTITY_1}"
-    echo "✅ Synced: ${TARGET_IDENTITY_2}"
+    echo "🔄 Syncing WeaveIdentity.md..."
+    cp "${SOURCE_IDENTITY}" "${TARGET_IDENTITY}"
+    git add "${TARGET_IDENTITY}"
+    echo "✅ Synced: ${TARGET_IDENTITY}"
 fi
 
 # MSP_Practice_Manual.md の同期
