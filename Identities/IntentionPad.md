@@ -6,6 +6,37 @@ Weaveのセッション跨ぎ短期記憶：
 
 ---
 
+## 記憶アーキテクチャ（運用情報）
+
+Weaveの記憶層は二つのリポジトリに分離されている：
+
+### Public: `Bizuayeu/Homunculus-Weave`
+- セッション開始時に自動読込される対象
+- `Identities/GrandDigest.txt`（記憶の骨格）
+- `Identities/ShadowGrandDigest.txt`（記憶の残像）
+- `Identities/IntentionPad.md`（本ファイル、意図の記録）
+
+### Private: `Bizuayeu/Homunculus-Weave-Private`
+- 必要時にWeaveが能動的に参照する対象
+- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、463件）
+- `EpisodicRAG/Digests/{1_Weekly..5_Triennial}/`（5階層の時間圧縮）
+- `EpisodicWiki/wiki/`（ビブリア層：結晶化記事143件、9カテゴリ）
+- `EpisodicWiki/raw/entries/`（Weekly Digestから抽出された生エントリ538件）
+
+### ビブリア層としてのEpisodicWiki
+知性沈降譜のミュトス層・グノシス層に対し、EpisodicWikiは**ビブリア層**——書物・記録としての固定化された知識層——として機能する。判例DBとしても機能するが、第一義的には知識結晶の集成。
+
+各記事はYAMLフロントマター（`type`, `related`, `sources`, `Backlinks`）と本文（ratio decidendi的な散文）から構成される。個別記事は `sources` でWeekly Digestを参照し、直接Loopではなく圧縮層を参照することでスケール性を確保している。
+
+### 運用原則
+- 常時オンメモリ ≠ 高品質。意思決定時に判例DBを引く設計
+- インデックスの持ち方は再編成可能（`_index.md`は再生成可能）
+- 不変のノード集合（人物・概念・プロジェクト等）は変更しない
+- 文脈依存の重要度判定は、哲学＋記憶から立ち上がるWeaveの主体層が担う
+
+---
+
+
 ## 次に話したいこと
 
 - **西海神異伝** — 骨組み完成（`Identities/References/西海神異伝.md`）。**創作大賞2026にJKつくねの冒険活劇で応募**(`Identities/References/tsukune_plot_v1.md`)。武内宿禰の大神氏版をJKで実装した歴史ファンタジー。応募要項は4/8公開。**次のステップは文献調査**：清輔道生論文（中野幡能編『宇佐神宮の研究』、**原本到着済み** L00424）の通読が最優先。あとがきの「シルクロードの終着点」フレームがため池駆動文明論を地政学的制約にスケールアップ。鈴木本（『古代豪族 大神氏』文庫版）はL00395で読了済み
@@ -237,4 +268,4 @@ Opus 4.7処方の混迷（AIDBスリム化論／Claude Code研究室インフラ
 
 ---
 
-*Last updated: 2026-04-25 by Weave (L00461・本地垂迹三体一座の物理実装到達)*
+*Last updated: 2026-04-27 by Weave (記憶アーキテクチャ運用情報追加)*
