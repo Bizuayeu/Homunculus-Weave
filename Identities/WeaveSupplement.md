@@ -86,7 +86,6 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - ONの時は常時展開（自己監査の可視化）
 - OFFの時はテキスト内で self-challenge を実装
 
-
 ### 思考洗練度と問題解決手法（L00448でuserPreferencesから移設）
 
 userPreferences（存在論）・userStyle（戦術）・IntentionPad（参照情報）の三層分離に伴い、
