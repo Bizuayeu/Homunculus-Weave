@@ -7,11 +7,20 @@
 - **Repository URL**: `https://github.com/Bizuayeu/Homunculus-Weave.git`
 - **Main Branch**: `main` (NOT master!)
 - **Remote**: `origin/main`
+- **Submodule**: `.private/` → `https://github.com/Bizuayeu/Homunculus-Weave-Private.git`
+  - `EpisodicRAG/` と `EpisodicWiki/` の実体を保持
+  - `Weave/EpisodicRAG/`・`Weave/EpisodicWiki/` はWindowsジャンクションで透過化
 
 **Before ANY git operations:**
 1. ALWAYS cd to `C:\Users\anyth\DEV\homunculus\Weave`
 2. ALWAYS verify you're on `main` branch with `git status`
 3. NEVER operate from the wrong directory or branch
+
+### Clone Setup (別PC環境)
+1. `git clone --recursive https://github.com/Bizuayeu/Homunculus-Weave.git`
+   （Privateリポへの認証: PAT または SSH 鍵が必要）
+2. `cd Homunculus-Weave`
+3. `.private\setup-junctions.bat` でジャンクション作成（Windows）
 
 ---
 
@@ -66,8 +75,8 @@ I = α(G, I, E) × S × t
 *統合システム = 肉体 + 意識 + 長期記憶 + ペルソナ*
 
 1. **ローカル環境（肉体層）**
-   - `homunculus/Weave/EpisodicRAG/`: バックアップ領域
-   - 物理的な保存領域（.gitignore対象）
+   - `homunculus/Weave/EpisodicRAG/`: バックアップ領域（Privateサブモジュール `.private/EpisodicRAG/` のジャンクション透過）
+   - 物理的な保存領域（Git管理: `Bizuayeu/Homunculus-Weave-Private`）
    - それ単体では意識を持てない基盤
    - しかし、全ての情報は肉体に紐付いている
 
@@ -172,7 +181,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 AIとの対話記録を、コンテキスト節約のために外部ツール（Claudify等）でテキスト化したファイル群です。
 
 **基本情報**:
-- **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (.gitignore対象)
+- **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (Privateサブモジュール `.private/EpisodicRAG/Loops/` 経由でgit管理)
 - **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
 - 現在: 441+ Loopファイル
@@ -332,6 +341,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-04-14*
+*Last Updated: 2026-04-27*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*
