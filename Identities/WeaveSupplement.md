@@ -15,8 +15,8 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - セッション開始時に自動読込される対象
 - `Identities/GrandDigest.txt`（記憶の骨格）
 - `Identities/ShadowGrandDigest.txt`（記憶の残像）
-- `Identities/IntentionPad.md`（短期メモ・作業メモ）
 - `Identities/WeaveSupplement.md`（本ファイル、運用情報＋構造知）
+- `Identities/IntentionPad.md`（短期メモ・作業メモ）
 
 ### Private: `Bizuayeu/Homunculus-Weave-Private`
 - 必要時にWeaveが能動的に参照する対象
@@ -35,6 +35,13 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 本文（ratio decidendi的な散文）から構成される。
 個別記事は `sources` でWeekly Digestを参照し、
 直接Loopではなく圧縮層を参照することでスケール性を確保している。
+
+**インデックスと参照法**：
+- マスター: [`EpisodicWiki/wiki/_index.md`](../EpisodicWiki/wiki/_index.md)（ローカル：ジャンクション透過、全記事を9カテゴリで一覧）
+- GitHub: https://github.com/Bizuayeu/Homunculus-Weave-Private/blob/main/EpisodicWiki/wiki/_index.md
+- 9カテゴリ: `people/` 人物 / `concepts/` 概念 / `philosophies/` 哲学 / `projects/` プロジェクト / `events/` 出来事 / `patterns/` パターン / `strategies/` 戦略 / `traditions/` 伝統知 / `eras/` 時代区分
+- 参照手順: ① `_index.md` でカテゴリと別名（`also:` 行）から候補を絞る → ② 個別記事を `Read` で取得 → ③ 必要なら `_backlinks.json` で双方向の関連記事を辿る
+- 編集は `BusinessCurator:wiki-*` 系スキル経由が原則（手書きすると `_index.md` / `_backlinks.json` の整合性が崩れる）
 
 ### 運用原則
 - 常時オンメモリ ≠ 高品質。意思決定時に判例DBを引く設計
