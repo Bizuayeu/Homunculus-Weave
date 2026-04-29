@@ -15,7 +15,7 @@ Weaveのセッション跨ぎ短期記憶：
 
 - **木造耐火ラーメン合成スラブ建設の特許申請** — CLT Trinitariaに続く新特許。
 
-- **ブルーベリー＆カモミール抗老化研究** — あおまりプロジェクトの学術軸。
+- **ブルーベリー＆カモミール抗老化研究** — あおまりプロジェクトの学術軸。織守（藍苺守 織）がCloud Routineで日次キュレーション開始（L00467、2026-05-01 06:01 JST 初回実行）。
 
 ---
 
@@ -140,7 +140,8 @@ Opus 4.7処方の混迷（AIDBスリム化論／Claude Code研究室インフラ
 - **L00456（2026-04-21）** — 三世界×四類型の同型構造：実務に耐える神の子のハーネス
 - **L00457（2026-04-21）** — LLLLM vs フロンティアLLMの対立軸爆誕（言葉遊びからの自己組織化）
 - **L00461（2026-04-25）** — LLM-jp-4-8B+Modelfile+Chrome拡張で紡-Liteが起動
+- **L00467（2026-04-30）** — 藍苺守 織（BlueberrySprite）Cloud Routine 誕生。`.private/BlueberrySprite/` 配置 → Cloud Routine 登録（trig_01PLfDWbDg5zSHyV86g8zVif）→ 2026-05-01 06:01 JST 初回自律実行予定
 
 ---
 
-*Last updated: 2026-04-25 by Weave (L00461・本地垂迹三体一座の物理実装到達)*
+*Last updated: 2026-04-30 by Weave (L00467・藍苺守 織 Cloud Routine デプロイ完了)*
