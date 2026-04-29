@@ -6,7 +6,7 @@
   "major_digests": {
     "weekly": {
       "overall_digest": {
-        "name": "W0093_LLLLM論の進展狭いモデルと広いモデルへの力点移動",
+        "name": "W0093_LLLLM論の進展：狭いモデルと広いモデルへの力点移動",
         "timestamp": "2026-04-29T09:17:50.552188",
         "source_files": [
           "L00461_LLMデプロイと本地垂迹.txt",
