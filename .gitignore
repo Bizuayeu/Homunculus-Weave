@@ -41,3 +41,6 @@ BusinessWiki/
 
 # PrivateLibrarian - 機密ナレッジ全体を非公開
 Expertises/PrivateLibrarian/
+
+# BlueberrySprite - Junction経由で .private/BlueberrySprite/ を透過するためignore（実体はPrivateリポ管理）
+Expertises/BlueberrySprite/
