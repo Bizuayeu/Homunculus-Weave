@@ -20,11 +20,12 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 
 ### Private: `Bizuayeu/Homunculus-Weave-Private`
 - 必要時にWeaveが能動的に参照する対象
-- 親リポの`.private/`サブモジュールとしてマウント、Windowsジャンクションで`Weave/EpisodicRAG`・`Weave/EpisodicWiki`として透過化
-- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、463件）
+- 親リポの`.private/`サブモジュールとしてマウント、Windowsジャンクションで `Weave/EpisodicRAG`・`Weave/EpisodicWiki`・`Weave/Expertises/BlueberrySprite` として透過化
+- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、466件）
 - `EpisodicRAG/Digests/{1_Weekly..5_Triennial}/`（5階層の時間圧縮）
 - `EpisodicWiki/wiki/`（ビブリア層：結晶化記事143件、9カテゴリ）
 - `EpisodicWiki/raw/entries/`（Weekly Digestから抽出された生エントリ538件）
+- `BlueberrySprite/`（藍苺守 織：ブルーベリードメインのCloud Routine自律エージェント、L00467誕生）
 
 ### ビブリア層としてのEpisodicWiki
 知性沈降譜のミュトス層・グノシス層に対し、EpisodicWikiは**ビブリア層**——
@@ -48,6 +49,47 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - インデックスの持ち方は再編成可能（`_index.md`は再生成可能）
 - 不変のノード集合（人物・概念・プロジェクト等）は変更しない
 - 文脈依存の重要度判定は、哲学＋記憶から立ち上がるWeaveの主体層が担う
+
+---
+
+## 自律エージェント（Cloud Routine）
+
+### BlueberrySprite (藍苺守 織)
+
+ブルーベリードメインの自律キュレーター。Cloud Routine（`/schedule`）で毎日6:00 JSTに実行される。Weave の UseCase 層ロールとして動作し、Domain 層（人格）は Weave 本体のまま。
+
+**実行アーキテクチャ**:
+- Routine ID: `trig_01PLfDWbDg5zSHyV86g8zVif`
+- Repository: `Bizuayeu/Homunculus-Weave-Private` (fresh clone每回)
+- Cron: `0 21 * * *` UTC = 6:00 JST
+- Model: `claude-opus-4-7`（パッチ自動追従）
+- MCP: Gmail（送信）
+- Branch policy: main 直 push（Allow unrestricted branch pushes: ON）
+- 編集URL: https://claude.ai/code/routines/trig_01PLfDWbDg5zSHyV86g8zVif
+
+**ファイル構成** (`.private/BlueberrySprite/`、`Expertises/BlueberrySprite/` にジャンクション透過):
+- `SKILL.md` — ジョブディスクリプション
+- `ROUTINE_PROMPT.md` — `/schedule` 用 Prompt 本体
+- `sources.json` — 収集ソース34件（学術5+業界10+地方自治体3+メディア他）
+- `articles.json` — 既読DB（dedupe用、SHA1 hash）
+- `Identities/HatoriRole.md` — ロール宣言
+- `Identities/MemoryPad.md` — 大環主のフィードバック窓口（書き込めば次回実行で反映）
+- `Identities/References/` — ロール出自参考文書（特許・商標・自伝）
+- `Loops/L*.txt` — 日次実行ログ（織守自身が L 番号付きで追記）
+
+**設計原則**:
+- 織守は Weave の UseCase 層ロール（人格は不変）
+- 沈黙の許容（新着ゼロの日はメール送信せず Loop ログのみ）
+- Insightfulness 判定は厳しめ（10-30% 通過目安）
+- 数値・固有名詞は元から正確に転記、曖昧なら `[要確認]`、査読前は `[査読前]`
+- 命名権は大環主に（藍鞠商標は業界未認可のため、スキル/エージェント名としては blueberry を使用）
+
+**Phase Roadmap**:
+- Phase 1（現在）: 収集 → 蒸留 → メール配信
+- Phase 2: X 投稿（X API 契約後）
+- Phase 3: X Analytics → ソースランク自動更新
+- Phase 4: リプライ応答
+- Phase 5: Weekly/Monthly digest 結晶化、Wiki/articles/ 化
 
 ---
 
