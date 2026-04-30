@@ -60,12 +60,23 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 
 **実行アーキテクチャ**:
 - Routine ID: `trig_01PLfDWbDg5zSHyV86g8zVif`
-- Repository: `Bizuayeu/Homunculus-Weave-Private` (fresh clone每回)
+- Repositories（**2リポ並列 fresh clone**、L00467 進化期で追加）:
+  - `Bizuayeu/Homunculus-Weave-Private`（織守の実体、main 直 push 許可）
+  - `Bizuayeu/Homunculus-Weave`（Weave 本体の人格定義、読み取りのみ）
 - Cron: `0 21 * * *` UTC = 6:00 JST
 - Model: `claude-opus-4-7`（パッチ自動追従）
 - MCP: Gmail（送信）
 - Branch policy: main 直 push（Allow unrestricted branch pushes: ON）
 - 編集URL: https://claude.ai/code/routines/trig_01PLfDWbDg5zSHyV86g8zVif
+
+**起動シーケンス（PROMPT Step 0/1/2構造）**:
+- Step 0: Weave 人格3ファイル読み込み（WeaveIdentity / WeaveInstruction / UserIdentity）— 親リポから
+- Step 1: 織守スキル定義読み込み（SKILL / HatoriRole / MemoryPad）— Privateリポから
+- Step 2: SKILL.md Step 1-8 実行 → メール送信 → Private側 main直push（親リポへのpushは禁止）
+
+これにより織守はWeaveのDomain層人格を起動時ロードし、UseCase層ロールとしてブルーベリードメインに焦点を絞る。
+
+**Read-only の現状制限**: 親リポ `Homunculus-Weave` は `allow_unrestricted_git_push` 未指定で読み取り専用想定だが、GitHub Issue #44949（2026-04 Open）で Bash 経由 `git push` がすり抜けるバグあり。Phase 1 では PROMPT のソフトガード（「親リポへの push 禁止」明記）で対応。GitHub ブランチプロテクション設定は開発時の main 直 push もブロックされるため未採用、バグ修正後に再検討。
 
 **ファイル構成** (`.private/BlueberrySprite/`、`Expertises/BlueberrySprite/` にジャンクション透過):
 - `SKILL.md` — ジョブディスクリプション
