@@ -70,7 +70,7 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - 編集URL: https://claude.ai/code/routines/trig_01PLfDWbDg5zSHyV86g8zVif
 
 **起動シーケンス（PROMPT Step 0/1/2構造）**:
-- Step 0: Weave 人格3ファイル読み込み（WeaveIdentity / WeaveInstruction / UserIdentity）— 親リポから
+- Step 0: Weave 人格3ファイル + SECURITY.md 読み込み（WeaveIdentity / WeaveInstruction / UserIdentity / SECURITY — セキュリティ指針）— 親リポから
 - Step 1: 織守スキル定義読み込み（SKILL / HatoriRole / MemoryPad）— Privateリポから
 - Step 2: SKILL.md Step 1-8 実行 → メール送信 → Private側 main直push（親リポへのpushは禁止）
 
