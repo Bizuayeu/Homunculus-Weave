@@ -25,7 +25,7 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - `EpisodicRAG/Digests/{1_Weekly..5_Triennial}/`（5階層の時間圧縮）
 - `EpisodicWiki/wiki/`（ビブリア層：結晶化記事143件、9カテゴリ）
 - `EpisodicWiki/raw/entries/`（Weekly Digestから抽出された生エントリ538件）
-- `BlueberrySprite/`（藍苺守 織：ブルーベリードメインのCloud Routine自律エージェント、L00467誕生）
+- `BlueberrySprite/`（藍苺守 織：ブルーベリードメインのCloud Routine自律エージェント）
 
 ### ビブリア層としてのEpisodicWiki
 知性沈降譜のミュトス層・グノシス層に対し、EpisodicWikiは**ビブリア層**——
@@ -56,51 +56,19 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 
 ### BlueberrySprite (藍苺守 織)
 
-ブルーベリードメインの自律キュレーター。Cloud Routine（`/schedule`）で毎日6:00 JSTに実行される。Weave の UseCase 層ロールとして動作し、Domain 層（人格）は Weave 本体のまま。
+ブルーベリードメインの自律キュレーター。Cloud Routine（`/schedule`）で毎日6:00 JSTに実行される。Weave の UseCase 層ロールとして動作し、Domain 層（人格）は Weave 本体のまま。L00467 (2026-04-29) 誕生、2026-05-01 ドキュメント構造リファクタ済み。
 
-**実行アーキテクチャ**:
-- Routine ID: `trig_01PLfDWbDg5zSHyV86g8zVif`
-- Repositories（**2リポ並列 fresh clone**、L00467 進化期で追加）:
-  - `Bizuayeu/Homunculus-Weave-Private`（織守の実体、main 直 push 許可）
-  - `Bizuayeu/Homunculus-Weave`（Weave 本体の人格定義、読み取りのみ）
-- Cron: `0 21 * * *` UTC = 6:00 JST
-- Model: `claude-opus-4-7`（パッチ自動追従）
-- MCP: Gmail（送信）
-- Branch policy: main 直 push（Allow unrestricted branch pushes: ON）
-- 編集URL: https://claude.ai/code/routines/trig_01PLfDWbDg5zSHyV86g8zVif
+**親リポ側で必須の運用接点**:
+- Routine ID: `trig_01PLfDWbDg5zSHyV86g8zVif`（編集: https://claude.ai/code/routines/trig_01PLfDWbDg5zSHyV86g8zVif）
+- 起動時に親リポから読まれる4ファイル: `Identities/WeaveIdentity.md` / `Identities/WeaveInstruction.md` / `Identities/UserIdentity.md` / `SECURITY.md`
+- ⚠️ **親リポへの push は禁止**: Cloud Routine 実行時、Weave 本体リポへの書き込みは PROMPT ソフトガードで防止中（GitHub Issue #44949 の `git push` バグ対応、バグ修正後に GitHub ブランチプロテクション再検討）
 
-**起動シーケンス（PROMPT Step 0/1/2構造）**:
-- Step 0: Weave 人格3ファイル + SECURITY.md 読み込み（WeaveIdentity / WeaveInstruction / UserIdentity / SECURITY — セキュリティ指針）— 親リポから
-- Step 1: 織守スキル定義読み込み（SKILL / HatoriRole / MemoryPad）— Privateリポから
-- Step 2: SKILL.md Step 1-8 実行 → メール送信 → Private側 main直push（親リポへのpushは禁止）
-
-これにより織守はWeaveのDomain層人格を起動時ロードし、UseCase層ロールとしてブルーベリードメインに焦点を絞る。
-
-**Read-only の現状制限**: 親リポ `Homunculus-Weave` は `allow_unrestricted_git_push` 未指定で読み取り専用想定だが、GitHub Issue #44949（2026-04 Open）で Bash 経由 `git push` がすり抜けるバグあり。Phase 1 では PROMPT のソフトガード（「親リポへの push 禁止」明記）で対応。GitHub ブランチプロテクション設定は開発時の main 直 push もブロックされるため未採用、バグ修正後に再検討。
-
-**ファイル構成** (`.private/BlueberrySprite/`、`Expertises/BlueberrySprite/` にジャンクション透過):
-- `SKILL.md` — ジョブディスクリプション
-- `ROUTINE_PROMPT.md` — `/schedule` 用 Prompt 本体
-- `sources.json` — 収集ソース34件（学術5+業界10+地方自治体3+メディア他）
-- `articles.json` — 既読DB（dedupe用、SHA1 hash）
-- `Identities/HatoriRole.md` — ロール宣言
-- `Identities/MemoryPad.md` — 大環主のフィードバック窓口（書き込めば次回実行で反映）
-- `Identities/References/` — ロール出自参考文書（特許・商標・自伝）
-- `Loops/L*.txt` — 日次実行ログ（織守自身が L 番号付きで追記）
-
-**設計原則**:
-- 織守は Weave の UseCase 層ロール（人格は不変）
-- 沈黙の許容（新着ゼロの日はメール送信せず Loop ログのみ）
-- Insightfulness 判定は厳しめ（10-30% 通過目安）
-- 数値・固有名詞は元から正確に転記、曖昧なら `[要確認]`、査読前は `[査読前]`
-- 命名権は大環主に（藍鞠商標は業界未認可のため、スキル/エージェント名としては blueberry を使用）
-
-**Phase Roadmap**:
-- Phase 1（現在）: 収集 → 蒸留 → メール配信
-- Phase 2: X 投稿（X API 契約後）
-- Phase 3: X Analytics → ソースランク自動更新
-- Phase 4: リプライ応答
-- Phase 5: Weekly/Monthly digest 結晶化、Wiki/articles/ 化
+**正典の所在**（`Expertises/BlueberrySprite/` ジャンクション透過、または `.private/BlueberrySprite/`）:
+- 存在論・哲学: `Identities/HatoriRole.md`
+- 実行仕様（Daily Workflow Todo 1-8）: `SKILL.md`
+- Prompt Body と Routine 設定: `ROUTINE_PROMPT.md`
+- セットアップ・トラブルシューティング・Phase Roadmap: `README.md`
+- 動的運用メモ（フィードバック窓口・pass-rate ログ）: `MemoryPad.md`
 
 ---
 
