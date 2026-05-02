@@ -15,7 +15,7 @@ Weaveのセッション跨ぎ短期記憶：
 
 - **木造耐火ラーメン合成スラブ建設の特許申請** — CLT Trinitariaに続く新特許。
 
-- **ブルーベリー＆カモミール抗老化研究** — あおまりプロジェクトの学術軸。織守（藍苺守 織）がCloud Routineで日次キュレーション開始（L00467、2026-05-01 06:01 JST 初回実行）。
+- **ブルーベリー＆カモミール抗老化研究** — あおまりプロジェクトの学術軸。織守（藍苺守 織）がCloud Routineで日次キュレーション開始（L00467、2026-05-01 06:01 JST 初回実行）。**Phase 2 (blueberry-sprite-x-post) 着地（2026-05-02）** — `@BBS_Hatori` から SVG→PNG 投稿、OAuth 2.0 with PKCE + tweepy v4 + cairosvg、Pay-Per-Use $5/month cap 設定済、208 tests pass、CLI `python scripts/main.py post-tweet`。
 - **織守の記憶統合判断（Phase 5）** — 織守はWeaveが被るロールなので、本来は織守の業務記憶（Wiki結晶化）をWeave本体の記憶層と接続したい。が、Phase 1のうちは独立リポでも実害なし（あおまり領域は独立性が高い）。Phase 5でWiki結晶化が始まる時点で「織守の知見をWeaveが参照したい」場面が出てきて、そこで分離 vs 統合を本格判断する時系列で良さそう。
 
 ---
@@ -142,7 +142,8 @@ Opus 4.7処方の混迷（AIDBスリム化論／Claude Code研究室インフラ
 - **L00457（2026-04-21）** — LLLLM vs フロンティアLLMの対立軸爆誕（言葉遊びからの自己組織化）
 - **L00461（2026-04-25）** — LLM-jp-4-8B+Modelfile+Chrome拡張で紡-Liteが起動
 - **L00467（2026-04-30）** — 藍苺守 織（BlueberrySprite）Cloud Routine 誕生。`.private/BlueberrySprite/` 配置 → Cloud Routine 登録（trig_01PLfDWbDg5zSHyV86g8zVif）→ 2026-05-01 06:01 JST 初回自律実行予定
+- **L00xxx（2026-05-02）** — 織守 Phase 2 (blueberry-sprite-x-post) 着地。`@BBS_Hatori` X アカウント取得 + OAuth 2.0 PKCE クレデンシャル発行 + Spending cap $5/month 設定 → Stage 0 疎通テスト成功 (id=2050154446307610624) → Stage 1-6 全 TDD 完走 (208 tests pass) → CLI `post-tweet` サブコマンド + tweepy v4 + cairosvg ベースの SVG→PNG 投稿パイプライン構築。実投稿テストはユーザー承認待ち、Cloud Routine の Network allowlist (`api.x.com` 追加) と Prompt 同期は後続作業
 
 ---
 
-*Last updated: 2026-04-30 by Weave (L00467・藍苺守 織 Cloud Routine デプロイ完了)*
+*Last updated: 2026-05-02 by Weave (織守 Phase 2 — blueberry-sprite-x-post 実装完了)*
