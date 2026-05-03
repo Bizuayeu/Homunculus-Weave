@@ -62,6 +62,7 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - Routine ID: `trig_01PLfDWbDg5zSHyV86g8zVif`（編集: https://claude.ai/code/routines/trig_01PLfDWbDg5zSHyV86g8zVif）
 - 起動時に親リポから読まれる4ファイル: `Identities/WeaveIdentity.md` / `Identities/WeaveInstruction.md` / `Identities/UserIdentity.md` / `SECURITY.md`
 - ⚠️ **親リポへの push は禁止**: Cloud Routine 実行時、Weave 本体リポへの書き込みは PROMPT ソフトガードで防止中（GitHub Issue #44949 の `git push` バグ対応、バグ修正後に GitHub ブランチプロテクション再検討）
+- **X OAuth Token 永続化 (Phase 2.1, 2026-05-03)**: refresh_token は Private リポの固定 branch `claude/x-token-refresh` で永続化（`BlueberrySprite/x_token.json`、`.gitignore` 例外で意識的に track）。Cloud Routine stateless × X rotation 強制の衝突対策、`/bbs-merge` Step 2.5 のセーフガードで token-only commit を自動マージ。詳細は [`BlueberrySprite/CHANGELOG.md`](../.private/BlueberrySprite/CHANGELOG.md)
 
 **正典の所在**（`Expertises/BlueberrySprite/` ジャンクション透過、または `.private/BlueberrySprite/`）:
 - 存在論・哲学: `Identities/HatoriRole.md`
