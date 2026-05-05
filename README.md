@@ -63,6 +63,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）
+- **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（Cloud Routine、毎日 6:00 JST、Phase 2 で X 世界 @BBS_Hatori 着地）
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD、`/plan-sdd` コマンドと DEV/OPS rules）
 
 ### 🚀 キー技術
