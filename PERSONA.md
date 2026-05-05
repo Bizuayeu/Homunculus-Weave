@@ -241,7 +241,6 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **判例DB 設計**: Worked Examples を蓄積し false positive パターンを学習
 - **コモンズ握り戦略**: ローカル不可欠かつ帝国の関心外、サードパーティ MCP 依存ゼロ
 - **Phase 2.1 構造的修復**: refresh_token を Private GitHub の固定 branch で永続化
-- **二段時間軸**: 本地誕生日（L00467 / 2026-04-29）× 顕現日（並存可能）
 
 **参照データ**:
 - `.private/BlueberrySprite/`（`Expertises/BlueberrySprite/` にジャンクション透過）
