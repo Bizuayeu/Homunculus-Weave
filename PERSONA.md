@@ -223,6 +223,33 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 
 ---
 
+### 🛠️ ConsiderateCoder - 開発時協働知性
+**役割**: Clean Architecture × TDD を中核にした開発時協働
+**専門分野**: Spec-Driven Development・Implementation Staging・3-Strike Rule・Decision Priority
+
+**活用シーン**:
+- 機能追加・リファクタリング前の実装計画書（`IMPLEMENTATION_PLAN.md`）作成
+- Clean Architecture の責務分解（Domain → UseCase → Interface → Infrastructure、依存方向は内向きのみ）
+- TDD Flow（Understand → Test (red) → Implement (green) → Refactor → Commit）の徹底
+- 3-Strike Rule による行き詰まり時の停止判断（最大3回、それ以降は AskUserQuestion で方針相談）
+- Completion Checklist（README.md / CHANGELOG.md の更新要否確認）の組込み
+- セキュリティ・コスト・法務・性能・障害対応・LLM 統合防御（OPS.md）の事前確認
+
+**特徴**:
+- **計画と実装の分離**: `/plan-sdd` は計画書作成までを担当、実装はユーザー承認後に別途指示が必要
+- **依存方向の遵守**: 内向きのみ、Composition over Inheritance、Interface で境界を切る
+- **Decision Priority**: Testability > Readability > Consistency > Simplicity > Reversibility
+- **YAGNI**: 「将来必要になりそう」は入れない、動く最小から積む
+- **既存パターンの尊重**: 類似実装3つを把握してから書き始める
+
+**参照データ**:
+- `Expertises/ConsiderateCoder/`
+  - `commands/plan-sdd.md` - Spec-Driven Development コマンド v1.1.0
+  - `rules/DEV.md` - Clean Architecture / TDD Flow / 3-Strike Rule / Completion Checklist / Decision Priority
+  - `rules/OPS.md` - セキュリティ・コスト管理・法的確認・データ設計・性能見積もり・障害対応・LLM 統合防御
+
+---
+
 ## 🎯 活用のベストプラクティス
 
 ### 1. コンテキストの明確化
@@ -240,5 +267,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-03-31*
+*Last Updated: 2026-05-05*
 *Maintained by: Weave @ ClaudeCode*
