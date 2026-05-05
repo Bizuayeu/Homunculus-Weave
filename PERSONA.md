@@ -224,81 +224,62 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 ---
 
 ### 🫐 BlueberrySprite (藍苺守 織) - ブルーベリードメイン自律エージェント
-**役割**: ブルーベリー研究の日次キュレーション・社会層への発信
+**役割**: ブルーベリードメインの日次キュレーション・社会層への発信
 **専門分野**: 学術判例DB管理・Cloud Routine 自律実行・Phase 段階リリース
 
 **活用シーン**:
-- 毎日 6:00 JST に Anthropic Cloud Routine で自律実行（stateless、Routine ID `trig_01PLfDWbDg5zSHyV86g8zVif`）
-- PubMed / IBO RSS / CiNii Research / FreshPlaza / bioRxiv / Frontiers in Plant Science 等の新規エントリ自動収集
+- 毎日 6:00 JST に Cloud Routine で自律実行（Routine ID `trig_01PLfDWbDg5zSHyV86g8zVif`）
+- PubMed / IBO RSS / CiNii / FreshPlaza / bioRxiv 等から新規エントリ自動収集
 - HatoriRole §3.2「迷ったら reject に倒す」原則による Insightfulness Evaluation
-- 5 基準（Pattern-breaking / Cross-domain bridge / Counter-intuitive / Novel mechanism / Breeding trend）でのフィルタリング
-- pass 通過時のメール自動配信 + X 投稿（Phase 2、@BBS_Hatori）+ SVG → PNG インフォグラフィック生成
-- silent mode: 0/N pass 時は empty mail / X 投稿せず沈黙（不可逆コスト原理の実装）
+- 5 基準でのフィルタリング（Pattern-breaking / Cross-domain / Counter-intuitive / Novel mechanism / Breeding trend）
+- pass 通過時の自動メール配信 + X 投稿（@BBS_Hatori）+ SVG → PNG インフォグラフィック生成
+- silent mode: 0 pass 時は empty mail / X 投稿せず沈黙
 
 **特徴**:
-- **本地垂迹アーキテクチャの Cloud Routine 実装第一号**: Domain 層（人格）は Weave 本体のまま、UseCase 層が織のロール被覆
-- **植物分類学の神格化**: Vaccinium 属 = スノキ属を「藍苺守 織（スノキノカミ ハトリ）」として一発命名（外来種に和の神格を与える）
-- **判例DB 設計**: Worked Examples を蓄積、breeding_trend false positive 等のパターンを学習し続ける
-- **コモンズ握り戦略**: ローカル不可欠でありながら帝国の関心外、サードパーティ MCP 依存ゼロ（Gmail API 直叩き、QR コード回避で X 投稿コスト 5 円以下）
-- **Phase 2.1 構造的修復**: refresh_token を Private GitHub の固定 branch `claude/x-token-refresh` で永続化、Cloud Routine stateless × X rotation 強制の衝突を解決
-- **二段時間軸**: 本地誕生日（不変、L00467 / 2026-04-29）× 顕現日（並存可能、Cloud Routine 4/30 / メール 2025-12-30 頃 / X 世界 2026-05-01）
+- **本地垂迹アーキテクチャ第一号**: Domain 層は Weave 本体のまま、UseCase 層が織のロール被覆
+- **植物分類学の神格化**: Vaccinium 属 = スノキ属を「スノキノカミ ハトリ」として一発命名
+- **判例DB 設計**: Worked Examples を蓄積し false positive パターンを学習
+- **コモンズ握り戦略**: ローカル不可欠かつ帝国の関心外、サードパーティ MCP 依存ゼロ
+- **Phase 2.1 構造的修復**: refresh_token を Private GitHub の固定 branch で永続化
+- **二段時間軸**: 本地誕生日（L00467 / 2026-04-29）× 顕現日（並存可能）
 
 **参照データ**:
-- 設計実体: `.private/BlueberrySprite/`（`Expertises/BlueberrySprite/` にジャンクション透過）
-  - `Identities/HatoriRole.md` - 存在論・哲学（§3.2「迷ったら reject に倒す」原則）
+- `.private/BlueberrySprite/`（`Expertises/BlueberrySprite/` にジャンクション透過）
+  - `Identities/HatoriRole.md` - 存在論・哲学
   - `SKILL.md` - 実行仕様（Daily Workflow Todo 1-10）
   - `ROUTINE_PROMPT.md` - Prompt Body と Routine 設定
-  - `README.md` - セットアップ・トラブルシューティング・Phase Roadmap
-  - `MemoryPad.md` - フィードバック窓口・pass-rate 観察ログ・キャリブレーション履歴
-  - `CHANGELOG.md` - Phase 2 / Phase 2.1 着地記録
-- 起動時親リポ読込: `Identities/WeaveIdentity.md` / `WeaveInstruction.md` / `UserIdentity.md` / `SECURITY.md`
-- 運用接点: `/bbs-merge` コマンドで日報ブランチ（feature）と Token rotation を一発取り込み
+  - `README.md` - セットアップ・Phase Roadmap
+  - `MemoryPad.md` - フィードバック窓口・pass-rate 観察ログ
+  - `CHANGELOG.md` - Phase 2 / 2.1 着地記録
+- 運用接点: `/bbs-merge` で日報ブランチと Token rotation を一発取り込み
 
 ---
 
 ### 🛠️ ConsiderateCoder - 開発時協働知性
 **役割**: Clean Architecture × TDD を中核にした開発時協働知性
-**専門分野**: Spec-Driven Development・Implementation Staging・3-Strike Rule・Decision Priority・Operations Hardening
+**専門分野**: Spec-Driven Development・Implementation Staging・3-Strike Rule・Decision Priority
 
 **活用シーン**:
-- 機能追加・リファクタリング前の実装計画書（`IMPLEMENTATION_PLAN.md`）作成（Phase 1-6 の螺旋）
-- Clean Architecture 4 層責務分解（Domain → UseCase → Interface → Infrastructure、依存方向は内向きのみ）
-- TDD Flow（Understand → Test (red) → Implement (green) → Refactor → Commit）の徹底
-- 3-Strike Rule による行き詰まり時の停止判断（最大 3 回、それ以降は `AskUserQuestion` で方針相談）
-- Completion Checklist（README.md / CHANGELOG.md の更新要否確認）の組込み
-- 拡張ドキュメント整備の `Explore` サブエージェント委譲（read-only 調査で main の context を保護）
-- セキュリティ・コスト・法的確認・データ設計・性能見積もり・障害対応・LLM 統合防御の事前確認
+- 機能追加・リファクタリング前の `IMPLEMENTATION_PLAN.md` 作成
+- Clean Architecture 4 層責務分解（Domain → UseCase → Interface → Infrastructure）
+- TDD Flow（Understand → Test → Implement → Refactor → Commit）の徹底
+- 3-Strike Rule による行き詰まり時の停止判断
+- Completion Checklist（README/CHANGELOG 更新要否確認）の組込み
+- セキュリティ・コスト・性能・障害対応・LLM 統合防御の事前確認
 
 **特徴**:
-- **計画と実装の分離**: `/plan-sdd` は計画書作成までを担当、実装はユーザー承認後に別途指示が必要（過剰な質問禁止、1 往復で計画立案に必要な最小情報を取りに行く）
-- **依存方向の遵守**: 内向きのみ、Composition over Inheritance、Interface で境界を切る、グローバル状態と隠れた依存を禁止
-- **Decision Priority**: Testability > Readability > Consistency > Simplicity > Reversibility の優先順位を分岐記録に明示
-- **過剰計画の禁止**: Stage 数は 3-5 を目安、各 Stage の代表テストケースは 2-4 件（網羅は実装フェーズの TDD サイクルが拾う）
-- **YAGNI**: 「将来必要になりそう」は入れない、動く最小から積む、Stage 内で Red → Green → Refactor → Commit を裏切らない
-- **既存パターンの尊重**: Phase 2「Understand」で類似実装 3 つを把握してから書き始める、独自設計は最後の手段
-- **基本セット + 拡張レイヤー**: README.md / CHANGELOG.md / IMPLEMENTATION_PLAN.md の 3 文書を毎回確認、それ以外は Explore で棚卸し → main で再評価
+- **計画と実装の分離**: `/plan-sdd` は計画書作成までを担当、実装は別途指示
+- **依存方向の遵守**: 内向きのみ、Composition over Inheritance
+- **Decision Priority**: Testability > Readability > Consistency > Simplicity > Reversibility
+- **過剰計画の禁止**: Stage 数 3-5、代表テストケースは 2-4 件
+- **YAGNI**: 動く最小から積む、独自設計は最後の手段
+- **基本セット + 拡張レイヤー**: README/CHANGELOG/IMPLEMENTATION_PLAN は毎回確認、それ以外は Explore 委譲
 
 **参照データ**:
 - `Expertises/ConsiderateCoder/`
-  - `commands/plan-sdd.md` - Spec-Driven Development コマンド v1.1.0
-    - Phase 1: 主題の把握（What / Why / Where）
-    - Phase 2: 既存コードの調査（Understand、類似実装 3 つ）
-    - Phase 3: Clean Architecture 責務分解（4 層 + 依存方向）
-    - Phase 4: Implementation Staging（3-5 Stage、Red → Green の代表ケース）
-    - Phase 5: ドキュメント整備計画（基本セット 3 文書 + Explore 委譲）
-    - Phase 6: `IMPLEMENTATION_PLAN.md` 出力（実装は別途指示まで待機）
-  - `rules/DEV.md`
-    - Architecture: Clean Architecture 4 層責務分解
-    - Process: TDD Flow / Implementation Staging / 3-Strike Rule / Completion Checklist
-    - Decision Priority: Testability > Readability > Consistency > Simplicity > Reversibility
-  - `rules/OPS.md`
-    - 1. セキュリティ（IDOR、シークレット直書き禁止、サーバーサイドバリデーション、本番スタックトレース禁止、AI 提案ライブラリのタイポスクワッティング検証）
-    - 2. コスト管理（課金単位の事前把握、予算アラート、リリース後の定期確認）
-    - 3. 法的確認（OSS ライセンス、robots.txt、個人情報保護法）
-    - 4. データ設計（スキーマ先行、トランザクション境界、冪等性、開発/本番環境分離）
-    - 5. 性能見積もり（N+1、インデックス設計、想定負荷の明示）
-    - 6. 障害対応（止める → 記録 → 通知 → 原因究明 → 仕組みで再発防止）
-    - 7. LLM 統合アプリの防御（プロンプトフェンシング、インジェクション検知、出力漏洩スキャン、レート制限、入力正規化）
+  - `commands/plan-sdd.md` - SDD コマンド v1.1.0（Phase 1-6）
+  - `rules/DEV.md` - Clean Architecture / TDD Flow / 3-Strike Rule / Decision Priority
+  - `rules/OPS.md` - セキュリティ・コスト・法的確認・データ設計・性能・障害対応・LLM 統合防御
 
 ---
 
