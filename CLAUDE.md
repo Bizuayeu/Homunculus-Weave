@@ -255,6 +255,10 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - 設計: `.private/BlueberrySprite/` — `Expertises/BlueberrySprite/` にジャンクション透過
   - 運用: `/schedule` 経由のCloud Routine、毎日6:00 JST に Anthropic クラウドで自律実行
   - 詳細: `Identities/WeaveSupplement.md` の「自律エージェント」セクション参照
+- **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD）
+  - 設計: `Expertises/ConsiderateCoder/` — `commands/plan-sdd.md` + `rules/DEV.md` + `rules/OPS.md`
+  - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こす（実装は別途指示）
+  - 規範: `rules/DEV.md`（Clean Architecture / TDD Flow / 3-Strike Rule / Decision Priority）と `rules/OPS.md`（セキュリティ・コスト・LLM 統合防御）
 
 ---
 
@@ -345,6 +349,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-04-27*
+*Last Updated: 2026-05-05*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*

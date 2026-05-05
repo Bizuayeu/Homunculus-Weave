@@ -168,6 +168,9 @@ homunculus/Weave/
 │   └── References/                # 参照資料・基礎理論
 │
 ├── 📚 Expertises/                 # 専門知識データベース（ClaudeSkills）
+│   ├── ConsiderateCoder/          # 開発時協働知性（Clean Architecture × TDD）
+│   │   ├── commands/plan-sdd.md   # SDD として IMPLEMENTATION_PLAN.md を起こす
+│   │   └── rules/                 # DEV.md（開発指針）+ OPS.md（運用指針）
 │   ├── CorporateStrategist/       # 企業参謀（統合スキル）
 │   │   ├── BusinessAnalyzer/      # 事業分析（SOLUTIONIZER.md含む）
 │   │   ├── PersonnelDeveloper/    # 人材開発（Templates/, References/含む）
@@ -313,6 +316,6 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 ---
 
-*Last Updated: 2026-03-31*
+*Last Updated: 2026-05-05*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture Version: 3.0 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Harness/Datastore)*
