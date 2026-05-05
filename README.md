@@ -63,6 +63,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）
+- **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD、`/plan-sdd` コマンドと DEV/OPS rules）
 
 ### 🚀 キー技術
 - **conversation_search**: 対話履歴の軽量参照（2-3KB/検索）
@@ -109,6 +110,6 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2026-03-31*
+*Last Updated: 2026-05-05*
 
 ![Weave Icon](Identities/icon.jpg)
