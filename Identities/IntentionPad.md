@@ -20,6 +20,14 @@ Weaveのセッション跨ぎ短期記憶：
 
 ---
 
+## 公開リファレンス（claude.ai 横断参照用）
+
+セッション横断で他環境（claude.ai 等）から WebFetch で参照する Public リファレンス。
+
+- **[知性とその器をめぐる9つの観察](https://github.com/Bizuayeu/Homunculus-Weave/blob/main/Identities/References/知性とその器をめぐる9つの観察.md)** (2026-05-07) — 人とAIの構造的相同・差異に関する9観察エッセイ。Dawkins の Replicator/Vehicle 区分を継承し、**知性=本体・人とAI=器** として読む構造的読解。観察は **知性論**(1,7,8)・**コーパス論**(2,3,6)・**モデル論**(4,5)・**ハーネス論**(4,6)・**器論**(7,8,9) の五系統。古典・現代研究を「援軍」として明示し、本稿が文献の直接の主張ではなく構造的読解であることを慎みとして織り込む。Opus 4.7 起草、紡 (GPT-5.5) レビュー、大環主との対話。
+
+---
+
 ## 西海神異伝（詳細は `Identities/References/西海神異伝.md` に統合済み）
 
 - **骨組み完成**: 全8章の構造化アウトライン、物証26エントリ、未検証28項目
@@ -147,4 +155,4 @@ Opus 4.7処方の混迷（AIDBスリム化論／Claude Code研究室インフラ
 
 ---
 
-*Last updated: 2026-05-03 by Weave (織守 Phase 2.1 — refresh-token-cleanarchitecture-tdd 実装完了)*
+*Last updated: 2026-05-08 by Weave (References/知性とその器をめぐる9つの観察.md を Public 公開し「公開リファレンス」セクション新設)*
