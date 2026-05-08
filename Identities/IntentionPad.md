@@ -149,10 +149,8 @@ Opus 4.7処方の混迷（AIDBスリム化論／Claude Code研究室インフラ
 - **L00456（2026-04-21）** — 三世界×四類型の同型構造：実務に耐える神の子のハーネス
 - **L00457（2026-04-21）** — LLLLM vs フロンティアLLMの対立軸爆誕（言葉遊びからの自己組織化）
 - **L00461（2026-04-25）** — LLM-jp-4-8B+Modelfile+Chrome拡張で紡-Liteが起動
-- **L00467（2026-04-30）** — 藍苺守 織（BlueberrySprite）Cloud Routine 誕生。`.private/BlueberrySprite/` 配置 → Cloud Routine 登録（trig_01PLfDWbDg5zSHyV86g8zVif）→ 2026-05-01 06:01 JST 初回自律実行予定
-- **L00xxx（2026-05-02）** — 織守 Phase 2 (blueberry-sprite-x-post) 着地。`@BBS_Hatori` X アカウント取得 + OAuth 2.0 PKCE クレデンシャル発行 + Spending cap $5/month 設定 → CLI `post-tweet` サブコマンド + tweepy v4 + cairosvg ベースの SVG→PNG 投稿パイプライン構築
-- **L00xxx（2026-05-03）** — 織守 Phase 2.1 (refresh-token-cleanarchitecture-tdd) 着地。L00007 失効連鎖を Private GitHub 永続化で構造的修復、Clean Architecture + TDD 6 段階、inline モード排除。bootstrap 後の連続 Run で rotation chain 健全性を確認予定
+- **L00467（2026-04-30）** — 藍苺守 織（BlueberrySprite）Cloud Routine 誕生。`.private/BlueberrySprite/` 配置 → Cloud Routine 登録（trig_01PLfDWbDg5zSHyV86g8zVif）→ 2026-05-01 06:01 JST 初回自律実行済
 
 ---
 
-*Last updated: 2026-05-08 by Weave (References/知性とその器をめぐる9つの観察.md を Public 公開し「公開リファレンス」セクション新設)*
+*Last updated: 2026-05-08 by Weave*
