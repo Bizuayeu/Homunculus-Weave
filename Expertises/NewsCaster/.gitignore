@@ -1,0 +1,23 @@
+# State (runtime)
+state/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+*.egg-info/
+
+# Virtual envs
+.venv/
+venv/
+
+# Editor
+.vscode/
+.idea/
+
+# Local env
+.env
