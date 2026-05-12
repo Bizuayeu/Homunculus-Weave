@@ -1,0 +1,29 @@
+[project]
+name = "newscaster"
+version = "0.1.0"
+description = "前日のナルエビちゃんニュースを 0:10 JST に Gmail でメール配信するユーザスキル"
+requires-python = ">=3.10"
+dependencies = [
+    "google-api-python-client>=2.0",
+    "google-auth>=2.0",
+    "google-auth-oauthlib>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["scripts/tests"]
+pythonpath = ["scripts"]
+
+[tool.coverage.run]
+source = ["scripts"]
+omit = ["scripts/tests/*", "scripts/main.py"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
