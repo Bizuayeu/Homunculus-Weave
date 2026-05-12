@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.1.1] - 2026-05-12
+
+### Changed
+- `bootstrap.sh` を BlueberrySprite パターンに準拠して全面改修
+  - `pyproject.toml` を SSoT として依存抽出（重複定義の排除）
+  - `--ignore-installed cffi cryptography` リトライ機構（debian 同梱版 RECORD 欠落対策）
+  - `import cryptography.exceptions` defensive sanity check
+  - `HTTPLIB2_CA_CERTS` を `/etc/ssl/certs/ca-certificates.crt` 等から自動 export（httplib2 が `REQUESTS_CA_BUNDLE` / `SSL_CERT_FILE` を読まない問題への対策）
+  - import verification（`googleapiclient` / `google.auth` / `google_auth_oauthlib` / `cryptography`）
+- `source` / `bash` 両方の起動方法に対応（`HTTPLIB2_CA_CERTS` を親シェルに残したい場合は `source`）
+
+### Why
+- L00480 の初回 Cloud Routine 実行で `google-api-python-client` 系と `cryptography`/`cffi` が未導入のため起動失敗
+- 手動で `pip install --ignore-installed cffi cryptography` で復旧したが、次回以降も再発するため bootstrap 側で恒久対策
+- BBS で完全な処方が既に実装済みのため、フォント・SVG 等 BBS 固有層を除いて移植
+
 ## [0.1.0] - 2026-05-12
 
 ### Added
