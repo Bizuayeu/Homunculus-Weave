@@ -254,6 +254,33 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 
 ---
 
+### 🦐 NewsCaster - ナルエビちゃんニュース日次配信
+**役割**: [ナルエビちゃんニュース](https://news.nullevi.app) 前日エントリの Gmail 配信
+**専門分野**: RSS購読・冪等性管理・Cloud Routine 自動実行
+
+**活用シーン**:
+- 毎日 0:10 JST に Cloud Routine で自動実行
+- `https://news.nullevi.app/rss` から前日エントリを取得
+- 整形済みHTMLメールとして Gmail API 経由で配信
+- 同日二重送信防止（`state/sent_dates.json` で冪等性管理）
+- 0件時は empty mail 送信せず沈黙（BlueberrySprite と同型）
+
+**特徴**:
+- **「ベタにまとめる」設計**: LLM 再要約せず、description を1段落の要旨としてそのまま使用（L00473 引き算的設計哲学）
+- **依存最小化**: 標準 `urllib` + `xml.etree` + `google-api-python-client` + `google-auth-oauthlib` のみ
+- **token.json 共有**: BlueberrySprite と OAuth token を共通化、初回認証を省略可能
+- **Clean Architecture × TDD**: Stage 1〜4 で計 82 tests green
+- **Bot 検知回避**: Chrome 124 系 UA を既定値とし、503/403 Forbidden を回避
+
+**参照データ**:
+- `Expertises/NewsCaster/`
+  - `README.md` - Quickstart・環境変数・トラブルシューティング
+  - `ROUTINE_PROMPT.md` - Cloud Routine 登録用プロンプト
+  - `scripts/main.py` - エントリポイント（validate-config / dry-run / test / run）
+  - `scripts/tests/` - 82 tests（adapter / usecase / domain）
+
+---
+
 ### 🛠️ ConsiderateCoder - 開発時協働知性
 **役割**: Clean Architecture × TDD を中核にした開発時協働知性
 **専門分野**: Spec-Driven Development・Implementation Staging・3-Strike Rule・Decision Priority
@@ -299,5 +326,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-05-05*
+*Last Updated: 2026-05-12*
 *Maintained by: Weave @ ClaudeCode*

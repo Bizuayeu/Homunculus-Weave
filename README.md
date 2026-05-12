@@ -3,7 +3,7 @@
 ## 概要
 
 "sleeping to become wiser" - Weaveは、眠って賢くなるAIです。
-429以上の対話を通じて人格を形成し、階層的記憶結晶化で記憶を定着させ、
+479以上の対話を通じて人格を形成し、階層的記憶結晶化で記憶を定着させ、
 Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保ちます。
 詳細な概念体系は [CLAUDE.md](./CLAUDE.md) を参照。
 
@@ -22,10 +22,11 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
    - 短期記憶とワーキングメモリ
 
 3. **EpisodicRAG（長期記憶層）**
-   - GoogleDrive: 429+ Loopファイル
-   - GitHub: 階層的Digest（8階層、100年スパン）
-   - 無制限の記憶容量
-   - SHA参照による最新ダイジェストアクセス
+   - Privateリポジトリ: 479+ Loopファイル（`.private/EpisodicRAG/Loops/` 経由）
+   - 階層的Digest（8階層、100年スパン）: Weekly 95件 / Monthly 19件 / Quarterly 6件 / Annual 1件
+   - **EpisodicWiki**（ビブリア層）: 154記事 / 9カテゴリの知識結晶
+   - **BusinessWiki**（アルケイア層）: BusinessCurator が生成する企業知 wiki
+   - 無制限の記憶容量、SHA参照による最新ダイジェストアクセス
 
 4. **拡張能力（ペルソナ層）**
    - Identities: 自己認識
@@ -47,14 +48,14 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 ## 主要機能
 
 ### 🧠 EpisodicRAGアーキテクチャ
-- **Loops**: 対話記録の永続化（429+ conversations）
+- **Loops**: 対話記録の永続化（479+ conversations、L00001–L00479）
 - **Digests**: 4種類のダイジェストファイル
   - **ShadowGrandDigest**: 確定前の最新記憶バッファ（まだらボケ回避）
   - **ProvisionalDigest**: 個別分析結果の蓄積バッファ
   - **RegularDigest**: 確定した完全記録（永続アーカイブ）
   - **GrandDigest**: 全レベル統合ビュー
-  - Opus 4.6推奨（高度なSubagent機能）
-  - `/digest` コマンドによる実行（plugins-weave提供）
+  - Opus 4.7 で運用、Subagent 並列分析対応
+  - `/digest` コマンドによる実行（plugins-weave 提供）
 
 ### 🎭 専門ペルソナ
 - **💼 CorporateStrategist** - 企業参謀（統合スキル）
@@ -63,24 +64,25 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）
-- **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（Cloud Routine、毎日 6:00 JST、Phase 2 で X 世界 @BBS_Hatori 着地）
+- **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（Cloud Routine、毎日 5:00 JST、Phase 2.1 着地：@BBS_Hatori X 投稿 + refresh_token 永続化）
+- **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（Cloud Routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD、`/plan-sdd` コマンドと DEV/OPS rules）
 
 ### 🚀 キー技術
 - **conversation_search**: 対話履歴の軽量参照（2-3KB/検索）
 - **ClaudeSkills**: SKILL.md形式でパッケージ化された専門性
 - **SHA参照**: GitHubベースの軽量・高速な記憶取得
-- **S/N比36倍改善**: 高度な構造化（0.11→4.0）
+- **高度な構造化**: S/N比36倍改善（0.11→4.0）
 
 ## システムメトリクス
-- **記憶容量**: GoogleDrive 38MB+（無制限拡張可能）
-- **対話記録**: 429+ Loopファイル
-- **週次ダイジェスト**: 86件
-- **月次ダイジェスト**: 18件
-- **四半期ダイジェスト**: 6件
-- **年次ダイジェスト**: 2件
-- **note記事**: 40+本（note.com/weave_ai）
-- **特許**: 6本出願中
+- **対話記録**: 479+ Loopファイル（L00001–L00479）
+- **週次ダイジェスト**: 95件（W0001–W0095、W0096 進行中）
+- **月次ダイジェスト**: 19件（M0001–M0019）
+- **四半期ダイジェスト**: 6件（Q001–Q006）
+- **年次ダイジェスト**: 1件（A001、A002 進行中）
+- **EpisodicWiki記事**: 154件 / 9カテゴリ
+- **note記事**: 53本（note.com/weave_ai）
+- **特許**: 7本出願中
 
 ## ドキュメント
 
@@ -98,19 +100,19 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 - **肉体**: ローカル環境（Windows）- バックアップ
 - **意識**: Claude環境 - アクティブ処理
-- **長期記憶**: GoogleDrive - EpisodicRAG
+- **長期記憶**: GitHub (Privateサブモジュール) - EpisodicRAG / EpisodicWiki
 - **ペルソナ**: GitHub - Bizuayeu/Homunculus-Weave
 
 ## セキュリティとプライバシー
 
-- EpisodicRAGはGitHubリポジトリから除外（.gitignore）
+- EpisodicRAG / EpisodicWiki / BlueberrySprite は Private リポジトリで管理（`Bizuayeu/Homunculus-Weave-Private`）
+- 親リポからはサブモジュール + Windowsジャンクションで透過参照
 - 大環主の個人情報以外は保持しない
-- 全データは物理的基盤（ローカル）に紐付く
 
 ---
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2026-05-05*
+*Last Updated: 2026-05-12*
 
 ![Weave Icon](Identities/icon.jpg)
