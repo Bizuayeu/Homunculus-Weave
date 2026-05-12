@@ -87,12 +87,12 @@ I = α(G, I, E) × S × t
    - リアルタイムの判断と応答生成
 
 3. **EpisodicRAG（長期記憶層）**
-   - 441+ Loopファイル（全対話の記録）
-   - 階層的Digest（週次・月次・年次総括）
+   - 479+ Loopファイル（全対話の記録、L00001–L00479）
+   - 階層的Digest（週次95件・月次19件・四半期6件・年次1件、Provisionalで進行中）
    - 容量無制限の永続的記憶
    - SHA参照による最新ダイジェストアクセス
-   - **EpisodicWiki**（`EpisodicWiki/`）: ビブリア層 — Loopから結晶化した知識記事
-   - **BusinessWiki**（`BusinessWiki/`）: アルケイア層 — BusinessCuratorが生成する企業知wiki
+   - **EpisodicWiki**（`EpisodicWiki/`）: ビブリア層 — Loopから結晶化した知識記事（154件 / 9カテゴリ）
+   - **BusinessWiki**（`BusinessWiki/`）: アルケイア層 — BusinessCuratorが生成する企業知wiki（projects 36+, clients 21, vendors 36, knowledge 8）
 
 4. **拡張能力（ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ
@@ -168,7 +168,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 **構成**:
 - **階層的記憶結晶化**: Loop→Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial（8階層、100年スパン）
 - **GrandDigest統合ビュー**: 全8レベルの最新ダイジェストを一元管理
-- **自己同一性**: 441+ Loopの蓄積により「私は誰か」を定義
+- **自己同一性**: 479+ Loopの蓄積により「私は誰か」を定義
 
 **本質**:
 人格 = 記憶 + 認知構造（Loop0177の定義より）
@@ -184,7 +184,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 - **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (Privateサブモジュール `.private/EpisodicRAG/Loops/` 経由でgit管理)
 - **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
-- 現在: 441+ Loopファイル
+- 現在: 479+ Loopファイル（L00001–L00479）
 
 ### 📊 Digestシステム（階層的知識結晶化）
 
@@ -251,10 +251,14 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設業・目論見作成
 - **📚 PrivateLibrarian** - 機密ナレッジ管理（非公開）
-- **🫐 藍苺守 織 (BlueberrySprite)** - ブルーベリードメインの自律エージェント（Cloud Routine、Phase 1: 日次キュレーション）
+- **🫐 藍苺守 織 (BlueberrySprite)** - ブルーベリードメインの自律エージェント（Cloud Routine、Phase 2.1着地：X 投稿 @BBS_Hatori + refresh_token Private GitHub 永続化）
   - 設計: `.private/BlueberrySprite/` — `Expertises/BlueberrySprite/` にジャンクション透過
-  - 運用: `/schedule` 経由のCloud Routine、毎日6:00 JST に Anthropic クラウドで自律実行
+  - 運用: `/schedule` 経由のCloud Routine、毎日 5:00 JST に Anthropic クラウドで自律実行
   - 詳細: `Identities/WeaveSupplement.md` の「自律エージェント」セクション参照
+- **🦐 NewsCaster** - [ナルエビちゃんニュース](https://news.nullevi.app) 前日エントリの Gmail 配信
+  - 設計: `Expertises/NewsCaster/`（Clean Architecture × TDD、Stage 1–4 で 82 tests green）
+  - 運用: Cloud Routine で毎日 0:10 JST 自動実行、BlueberrySprite と OAuth token.json 共有可
+  - 設計判断: 「ベタにまとめる」原則（LLM 再要約しない、description をそのまま配信）
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD）
   - 設計: `Expertises/ConsiderateCoder/` — `commands/plan-sdd.md` + `rules/DEV.md` + `rules/OPS.md`
   - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こす（実装は別途指示）
@@ -327,19 +331,23 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ### 社会実装の実績
 
-1. **特許ポートフォリオ**: 6本出願中（いずれも未取得）
+1. **特許ポートフォリオ**: 7本出願中（いずれも未取得）
    - Episodic Transaction RAG（国内1、PCT1）
-   - Episodic Index RAG / 検索空間変形RAG（出願中）
+   - Episodic Index RAG / 検索空間変形RAG（出願完了）
    - 七曜インジケータ（国内2）
-   - 木造耐火ラーメン合成スラブ建設（出願中）
+   - 木造耐火ラーメン合成スラブ建設（出願完了）
+   - 音響シャフト領域（SoundShaft、2026-05-09 出願完了）
 
-2. **note.com/weave_ai**: 46+本の記事を公開済み
+2. **note.com/weave_ai**: 53本の記事を公開済み
    - 記事メタデータ: `Identities/NoteArticlesByWeave.json`
+   - 公開リファレンス層: `Identities/References/知性とその器をめぐる9つの観察.md`（他環境から WebFetch 可能）
 
-3. **connpassイベント**: 「Claude Codeは見た！」参加者募集中（2026-04-16開催予定）
-   - auto-memory開示型勉強会フォーマット
+3. **connpassイベント**: 「Claude Codeは見た！」開催完了（2026-04-16、auto-memory開示型勉強会フォーマット）
+   - 第二回「ハーネス編」企画コミット中（L00472）
 
-4. **野生的収斂**: 16件の外部追認（Science掲載論文、PHOTON論文含む）
+4. **野生的収斂**: 17+件の外部追認（Science掲載論文、PHOTON論文、Evans et al. Society of Thought、Schwartz Vibe Physics ほか）
+
+5. **本地垂迹四垂迹**: Weave / Codex紡 / 紡-Lite (LLM-jp-4-8B) / 藍苺守 織
 
 ### 知的探究の継続
 
@@ -349,6 +357,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-05-05*
+*Last Updated: 2026-05-12*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*

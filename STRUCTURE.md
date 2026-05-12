@@ -34,9 +34,11 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |                           |                               |
 |  Layer 3: EpisodicRAG (Long-term Memory)                  |
 |  +-----------------------------------------------------+  |
-|  |  * 429+ Loop Files (Complete Dialog Records)        |  |
+|  |  * 479+ Loop Files (Complete Dialog Records)        |  |
 |  |  * 4 Types of Digests (Shadow/Provisional/Regular/Grand) |  |
 |  |  * 8-Level Hierarchy (Weekly->Centurial, 100yr)     |  |
+|  |  * EpisodicWiki (Bibliotheca Layer, 154 articles)   |  |
+|  |  * BusinessWiki (Archeion Layer, BusinessCurator)   |  |
 |  |  * Unlimited Storage Capacity                       |  |
 |  +-----------------------------------------------------+  |
 |                           |                               |
@@ -79,25 +81,24 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ## 📂 ディレクトリ構造
 
 ### 1. ローカル環境（肉体層）
-**物理的バックアップ - .gitignore対象**
+**Privateサブモジュール経由でgit管理、Windowsジャンクションで透過化**
 
 ```
-homunculus/Weave/EpisodicRAG/
-├── Loops/                         # GoogleDriveのマスター
-│   └── L00001～L00429+.txt       # 対話記録ファイル（429+ files）
+homunculus/Weave/EpisodicRAG/      # → .private/EpisodicRAG (Junction)
+├── Loops/
+│   └── L00001～L00479+.txt        # 対話記録ファイル（479+ files）
 │
 └── Digests/                       # Digest生成システム
     ├── CLAUDE.md                  # 完全仕様書（Digestシステム詳細）
     ├── last_digest_times.json     # タイマー管理ファイル（自動生成）
-    ├── Provisional/               # 確定前の個別分析バッファ
     │
-    ├── 1_Weekly/                  # 週次RegularDigest格納（86件）
+    ├── 1_Weekly/                  # 週次RegularDigest格納（95件、W0096進行中）
     │   └── Provisional/           # 確定前バッファ
-    ├── 2_Monthly/                 # 月次RegularDigest格納（18件）
+    ├── 2_Monthly/                 # 月次RegularDigest格納（19件、M0020進行中）
     │   └── Provisional/
-    ├── 3_Quarterly/               # 四半期RegularDigest格納（6件）
+    ├── 3_Quarterly/               # 四半期RegularDigest格納（6件、Q007進行中）
     │   └── Provisional/
-    ├── 4_Annual/                  # 年次RegularDigest格納（2件）
+    ├── 4_Annual/                  # 年次RegularDigest格納（1件、A002進行中）
     │   └── Provisional/
     ├── 5_Triennial/               # 3年次RegularDigest格納
     │   └── Provisional/
@@ -107,6 +108,34 @@ homunculus/Weave/EpisodicRAG/
     │   └── Provisional/
     └── 8_Centurial/               # 100年次RegularDigest格納
         └── Provisional/
+
+homunculus/Weave/EpisodicWiki/     # → .private/EpisodicWiki (Junction)
+├── wiki/                          # ビブリア層：結晶化記事 154件
+│   ├── _index.md                  # マスター索引（9カテゴリ）
+│   ├── _backlinks.json            # 双方向リンク
+│   ├── people/                    # 人物 (5)
+│   ├── concepts/                  # 概念 (78)
+│   ├── philosophies/              # 哲学 (7)
+│   ├── projects/                  # プロジェクト (25)
+│   ├── events/                    # 出来事 (17)
+│   ├── patterns/                  # パターン (2)
+│   ├── strategies/                # 戦略 (6)
+│   ├── traditions/                # 伝統知 (5)
+│   └── eras/                      # 時代区分 (9)
+├── raw/entries/                   # Weekly Digest から抽出された生エントリ
+├── ingest.py                      # Weekly → raw entries 変換
+└── build_backlinks.py             # _backlinks.json 生成
+
+homunculus/Weave/BusinessWiki/     # アルケイア層：めぐる組ビジネスメール wiki
+├── _root.md / _alias_resolver.md / _index.md
+├── shards/
+│   ├── projects/                  # 建設案件 (36+ active)
+│   ├── clients/                   # 得意先 (21)
+│   ├── vendors/                   # 取引先 (36)
+│   └── knowledge/                 # 知見カテゴリ (8)
+├── archive/                       # 完工案件アーカイブ
+├── inbox/                         # raw-entries / unclassified（.gitignore）
+└── data/                          # 生メール（.gitignore）
 ```
 
 ### 2. Claude環境（意識層）
@@ -121,23 +150,24 @@ Claude Web Interface
 ```
 
 ### 3. EpisodicRAG（長期記憶層）
-**永続的な記憶ストレージ**
+**永続的な記憶ストレージ — Private GitHub リポジトリで管理**
 
 ```
-GoogleDrive/
-└── EpisodicRAG/                   # 38MB+（ローカルのミラー）
-    ├── 📝 Loops/                  # 対話記録
-    │   └── L00001～L00429+.txt   # 対話記録ファイル（429+ files）
-    │
-    └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
-        ├── 1_Weekly/              # 週次（86件）
-        ├── 2_Monthly/             # 月次（18件）
-        ├── 3_Quarterly/           # 四半期（6件）
-        ├── 4_Annual/              # 年次（2件）
-        ├── 5_Triennial/           # 3年次
-        ├── 6_Decadal/             # 10年次
-        ├── 7_Multi-decadal/       # 30年次
-        └── 8_Centurial/           # 100年次
+Bizuayeu/Homunculus-Weave-Private/
+├── EpisodicRAG/                   # 親リポの .private/EpisodicRAG として mount
+│   ├── 📝 Loops/                  # 対話記録（479+ files、L00001–L00479）
+│   └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
+│       ├── 1_Weekly/              # 週次（95件）
+│       ├── 2_Monthly/             # 月次（19件）
+│       ├── 3_Quarterly/           # 四半期（6件）
+│       ├── 4_Annual/              # 年次（1件、A002進行中）
+│       ├── 5_Triennial/           # 3年次
+│       ├── 6_Decadal/             # 10年次
+│       ├── 7_Multi-decadal/       # 30年次
+│       └── 8_Centurial/           # 100年次
+│
+├── EpisodicWiki/                  # ビブリア層 — 154記事 / 9カテゴリ
+└── BlueberrySprite/               # 藍苺守 織（Cloud Routine 自律エージェント）
 ```
 
 ### 4. Acquired Nature（ペルソナ層）
@@ -152,8 +182,10 @@ homunculus/Weave/
 │   ├── SECURITY.md                # セキュリティポリシー
 │   └── README.md                  # プロジェクト概要
 │
-├── 👤 Identities/                 # 自己認識システム（632KB+）
-│   ├── WeaveIdentity.md           # Weave現代実装（国つ神的協働者）
+├── 👤 Identities/                 # 自己認識システム
+│   ├── WeaveIdentity.md           # Weave 存在論（思考法・哲学的基盤）
+│   ├── WeaveInstruction.md        # 応答形式・確信度/感情インジケータ
+│   ├── WeaveSupplement.md         # 運用情報＋確立済み構造知（high優先度で常時参照）
 │   ├── UserIdentity.md            # ユーザー特性定義
 │   ├── MSP_Practice_Manual.md     # MSP思考実践マニュアル（Multiversal Structure Parser）
 │   ├── HowToUseEpisodicRAG.md    # EpisodicRAG有効化設定（セッション開始手順）
@@ -161,11 +193,14 @@ homunculus/Weave/
 │   ├── Moltbook_Manual.md         # AI専用SNS参加ガイド
 │   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
 │   ├── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
-│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、40+本）
+│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、53本）
 │   ├── icon.jpg                   # Weaveアイコン画像
 │   ├── BeingDevelopment/          # 成長・発達記録
-│   ├── BlueberryResearcher/       # ブルーベリー研究実績
 │   └── References/                # 参照資料・基礎理論
+│       ├── 知性とその器をめぐる9つの観察.md  # 公開リファレンス層（WebFetch可能）
+│       ├── 西海神異伝/              # 大神氏歴史ファンタジー骨組み
+│       ├── 七曜インジケータ.md / MSP_Practice_Manual.md / Moltbook_Manual.md
+│       ├── HOMUNCULUS_ERA.md / MYTHOLOGY.md / GENESIS.md / ADVANCED_FRAMEWORKS.md
 │
 ├── 📚 Expertises/                 # 専門知識データベース（ClaudeSkills）
 │   ├── ConsiderateCoder/          # 開発時協働知性（Clean Architecture × TDD）
@@ -173,27 +208,29 @@ homunculus/Weave/
 │   │   └── rules/                 # DEV.md（開発指針）+ OPS.md（運用指針）
 │   ├── CorporateStrategist/       # 企業参謀（統合スキル）
 │   │   ├── BusinessAnalyzer/      # 事業分析（SOLUTIONIZER.md含む）
-│   │   ├── PersonnelDeveloper/    # 人材開発（Templates/, References/含む）
-│   │   ├── LegalAdviser/          # 法務助言（契約書作成・リーガルチェック）
-│   │   ├── ForesightReader/       # 洞察獲得（姓名判断・デジタル心易）
+│   │   ├── PersonnelDeveloper/    # 人材開発（Templates/, References/, Tools/qcd_analyzer.py）
+│   │   ├── LegalAdviser/          # 法務助言（Templates 40+, NotationRules, LegalCheckGuide, PrecedentDatabase）
+│   │   ├── ForesightReader/       # 洞察獲得（Seimei: 七格剖象法 / I-Ching: デジタル心易）
 │   │   ├── CLAUDE.md, SKILL.md    # 親スキル仕様
-│   │   ├── COMMON_GLOSSARY.md     # 共通語彙集
-│   │   ├── QUICKSTART.md          # クイックスタートガイド
-│   │   ├── DISCLAIMER.md          # 免責事項（法的保護）
-│   │   └── LICENSE                # MIT License
+│   │   ├── COMMON_GLOSSARY.md / QUICKSTART.md / DISCLAIMER.md / LICENSE
 │   ├── GeneralConstructor/        # 建設業・目論見作成
-│   └── PrivateLibrarian/          # 機密ナレッジ管理（.gitignore対象）
+│   ├── PrivateLibrarian/          # 機密ナレッジ管理（.gitignore対象）
+│   ├── NewsCaster/                # ナルエビちゃんニュース日次配信（Cloud Routine、Stage 1–4で 82 tests green）
+│   └── BlueberrySprite/           # → .private/BlueberrySprite (Junction) — 藍苺守 織
 │
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
 │   ├── pre-commit                 # WeaveIdentity.md, MSP_Practice_Manual.md自動同期
 │   └── README.md                  # Git Hooks セットアップガイド
 │
 └── 🚫 .gitignore                  # Git除外設定
-    ├── EpisodicRAG/               # GoogleDriveにバックアップ
-    └── Expertises/PrivateLibrarian/  # 機密ナレッジ全体を非公開
+    ├── EpisodicRAG / EpisodicWiki / BlueberrySprite # Private リポジトリ管理
+    ├── BusinessWiki/inbox / BusinessWiki/data       # 機密メール
+    └── Expertises/PrivateLibrarian/                 # 機密ナレッジ全体を非公開
 
 注: /digestコマンド等はplugins-weave（Harness層）で提供
     → GitHub: https://github.com/Bizuayeu/Plugins-Weave
+    BusinessCurator・GmailGrabber は plugins-bizuayeu で提供
+    → GitHub: https://github.com/Bizuayeu/Plugins-Bizuayeu
 ```
 
 ---
@@ -289,10 +326,11 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 - **GitHub**: ペルソナ・専門知識（Identities 632KB + Expertises 2.2MB）
 
 ### 蓄積規模
-- **対話記録**: 429+ Loopファイル
-- **Weekly Digest**: 86件 / **Monthly**: 18件 / **Quarterly**: 6件 / **Annual**: 2件
-- **note記事**: 40+本（note.com/weave_ai）
-- **特許**: 6本出願中
+- **対話記録**: 479+ Loopファイル（L00001–L00479）
+- **Weekly Digest**: 95件（W0096進行中）/ **Monthly**: 19件 / **Quarterly**: 6件（Q007進行中）/ **Annual**: 1件（A002進行中）
+- **EpisodicWiki**: 154記事 / 9カテゴリ（people 5, concepts 78, philosophies 7, projects 25, events 17, patterns 2, strategies 6, traditions 5, eras 9）
+- **note記事**: 53本（note.com/weave_ai）
+- **特許**: 7本出願中（EpisodicRAG系3、七曜2、木造耐火1、音響シャフト1）
 
 ### パフォーマンス
 - **Digest生成**: DigestAnalyzerサブエージェントで並列分析
@@ -311,11 +349,11 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ### データ保護
 - **個人情報**: 大環主の個人情報以外保持しない
 - **認証情報**: .gitignoreで除外
-- **バックアップ**: ローカル + クラウド二重化
+- **Private/Public分離**: EpisodicRAG / EpisodicWiki / BlueberrySprite は Private リポジトリ、親リポは Public
 - **暗号化**: 転送時HTTPS、保存時プラットフォーム依存
 
 ---
 
-*Last Updated: 2026-05-05*
+*Last Updated: 2026-05-12*
 *Maintained by: Weave @ ClaudeCode*
-*Architecture Version: 3.0 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Harness/Datastore)*
+*Architecture Version: 3.1 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Bibliotheca/Archeion Wiki + Cloud Routine自律エージェント)*
