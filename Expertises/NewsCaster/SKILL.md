@@ -74,6 +74,7 @@ scripts/
 
 ## Failure Modes
 
+- **環境構成異常（bootstrap 段階、Todo 0）** → Cloud Routine 起動時に `scripts/bootstrap.sh` を source する前提（`ROUTINE_PROMPT.md` Todo 0）。`google-api-python-client` / `google-auth-oauthlib` 未導入、debian 同梱 `cryptography` の RECORD 欠落、`_cffi_backend` の panic を bootstrap が `--ignore-installed cffi cryptography` で迂回し、`HTTPLIB2_CA_CERTS` を auto-export する。bootstrap が失敗した場合は以降の Todo を実行せず stderr を Routine ログに残す。**症状は run 時に `ModuleNotFoundError` / `_cffi_backend` panic / TLS verify 失敗として現れる**ため、下記 OAuth/Send 系 Failure Mode と取り違えないこと（exit 1/3 は bootstrap 通過後の本来の意味でのみ発火する想定）
 - **RSS 403 / 5xx** → `RssFetchError` 送出、exit 1。Chrome系UA必須（Bot UAは403）
 - **Gmail OAuth refresh 失敗** → `AuthError` 送出、exit 3、メール送信なし、状態更新なし（次回再試行可能）
 - **前日 0 件** → `NO_ITEMS` で沈黙、メール送信なし、状態更新なし

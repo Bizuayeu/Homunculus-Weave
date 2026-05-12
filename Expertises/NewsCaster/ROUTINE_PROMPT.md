@@ -9,10 +9,21 @@
 
 ## 手順
 
+### Todo 0 — 環境構築
+
+```bash
+source Expertises/NewsCaster/scripts/bootstrap.sh
+```
+
+`pyproject.toml` の deps を pip install し、debian 同梱版 `cryptography` の RECORD 欠落を `--ignore-installed cffi cryptography` で迂回、`HTTPLIB2_CA_CERTS` を auto-export、必須 import を検証する（BBS 同型）。
+
+- 成功（`[newscaster-bootstrap] ready`）→ Todo 1 へ
+- 失敗 → 依存解決不能。stderr を記録し終了。後続 Todo は実行しない
+
 ### Todo 1 — 環境確認
 
 ```bash
-cd homunculus/Weave/Expertises/NewsCaster && python scripts/main.py validate-config
+cd Expertises/NewsCaster && python scripts/main.py validate-config
 ```
 
 - exit 0 → 続行
