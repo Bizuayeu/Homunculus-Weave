@@ -1,5 +1,5 @@
 ---
-name: newscaster-daily
+name: newscaster-daily-digest
 description: 前日(JST 00:00-23:59)公開のナルエビちゃんニュース(news.nullevi.app)を Gmail で 0:10 JST に大環主へダイジェスト配信する Cloud Routine 用スキル。description 整形のみで LLM 再要約はしない（「ベタにまとめる」設計、L00473）。
 ---
 
