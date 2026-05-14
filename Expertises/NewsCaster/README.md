@@ -37,7 +37,7 @@ pip install -e ".[dev]"
 python -m pytest scripts/tests/ -v
 ```
 
-Stage 1〜4 で計 **82 tests** が green。
+Stage 1〜4 + cache-buster fix で計 **91 tests** が green。
 
 ## 環境変数
 
@@ -73,6 +73,9 @@ env: 上記環境変数を Cloud Routine の Environment に設定
 
 ### RSS が 403 Forbidden
 → `NEWSCASTER_USER_AGENT` が Bot 系UA になっていないか確認。Chrome 系UA で取れることは検証済（[`scripts/tests/adapters/fixtures/sample_rss.xml`](scripts/tests/adapters/fixtures/sample_rss.xml) は実フィードの先頭3件相当）。
+
+### RSS が古い／前日エントリ 0 件でメール空振り
+→ CDN エッジキャッシュ起因の可能性。`RssXmlGateway` は cache-buster クエリ `?_=<epoch>` と `Cache-Control: no-cache, no-store, max-age=0` + `Pragma: no-cache` を毎回付与しており、Vercel/Cloudflare 系エッジを貫通する想定（[CHANGELOG `[0.1.2]`](CHANGELOG.md) 参照）。それでも 0 件なら **実際に前日公開が無かった** 可能性が高い。
 
 ### Gmail API `403 PERMISSION_DENIED`
 → token.json の scope に `https://www.googleapis.com/auth/gmail.send` が含まれているか確認。BBS と共有しているなら自動的に含まれる。
