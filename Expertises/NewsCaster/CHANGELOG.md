@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.1.2] - 2026-05-15
+
+### Fixed
+- `RssXmlGateway` が CDN エッジキャッシュ起因で古いフィードをつかみ、前日エントリ 0 件と誤判定してメール空振りする問題
+
+### Changed
+- `RssXmlGateway._fetch_xml` に毎リクエスト固有の cache-buster クエリ `?_=<epoch_seconds>` を付与
+- HTTP リクエストヘッダに `Cache-Control: no-cache, no-store, max-age=0` と `Pragma: no-cache` を追加
+- `RssXmlGateway.__init__` に `time_provider: Callable[[], float] | None = None` 任意引数を追加（テスト時に固定時刻を注入可能、本番では既定の `time.time` が使われる）
+- `RssFetchError.final_url` は cache-buster 込みの実 URL を保持（trace 容易性）。メッセージ本文は元 URL を維持（運用ログの可読性）
+
+### Why
+- 2026-05-15 朝の Cloud Routine 実運用で「前日エントリ 0 件」によるメール空振りが発生
+- `news.nullevi.app` は Vercel/Cloudflare 系の static export と推測され、CDN エッジが直近の更新を反映しない時間帯がある
+- 業務要件は「毎日 0:10 JST に最新フィードを必ず取得」なので、キャッシュ回避は冪等性と同等に必須
+
+### Verification
+- 91 tests green（既存 83 + 新規 8: cache-buster 3 / no-cache headers 3 / 統合 + 元 URL 保存 2）
+- 本番 CDN 貫通は mock テストでは検証不可。**翌朝 0:10 JST Cloud Routine 実行ログで fetch 件数 > 0** を確認する運用律
+
 ## [0.1.1] - 2026-05-12
 
 ### Changed
