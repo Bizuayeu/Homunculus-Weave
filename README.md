@@ -67,6 +67,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 - **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（Cloud Routine、毎日 5:00 JST、Phase 2.1 着地：@BBS_Hatori X 投稿 + refresh_token 永続化）
 - **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（Cloud Routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD、`/plan-sdd` コマンドと DEV/OPS rules）
+- **🔮 PrecognitiveViewer** - 三位占術フォーマル鑑定書（姓名判断 × 周易 × タロット、対話相手向け、相と卜の二柱）
 
 ### 🚀 キー技術
 - **conversation_search**: 対話履歴の軽量参照（2-3KB/検索）
