@@ -1,0 +1,46 @@
+{
+  "_source": "https://github.com/abdul-hamid-achik/tarot-mcp (MIT License) を基に PrecognitiveViewer 用に再構成",
+  "spreads": [
+    {
+      "name": "single_card",
+      "display_name": "一枚引き",
+      "positions": ["核心"],
+      "focus": "当日の指針あるいは人物の中核を一枚で観る、最もシンプルなリーディング。第三者代理引きに最も適する。"
+    },
+    {
+      "name": "past_present_future",
+      "display_name": "過去・現在・未来",
+      "positions": ["過去", "現在", "未来"],
+      "focus": "時間軸に沿った流れを三枚で観る。状況の経緯と展開を直観的に把握する。"
+    },
+    {
+      "name": "decision_making",
+      "display_name": "意思決定",
+      "positions": ["現状", "課題", "選択肢A", "選択肢B", "助言"],
+      "focus": "二つの選択肢の間で迷う際に、それぞれの帰結と助言を比較するためのスプレッド。"
+    },
+    {
+      "name": "celtic_cross",
+      "display_name": "ケルト十字",
+      "positions": [
+        "現状（中心）",
+        "障害（交差）",
+        "根底（過去の基盤）",
+        "起点（過ぎ去ろうとするもの）",
+        "可能性（頂点）",
+        "近未来",
+        "自己認識",
+        "外的影響",
+        "希望と恐れ",
+        "最終結果"
+      ],
+      "focus": "包括的かつ多層的な分析。状況・障害・無意識・将来見通しを十枚で立体的に観る伝統的スプレッド。"
+    },
+    {
+      "name": "person_reading",
+      "display_name": "人物リーディング",
+      "positions": ["本質", "現在のテーマ", "成長の方向"],
+      "focus": "対話相手の存在を三枚で観る。占的なしで第三者が引く運用に適した、人物プロファイリング専用スプレッド。"
+    }
+  ]
+}

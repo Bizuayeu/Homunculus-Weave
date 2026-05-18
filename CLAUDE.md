@@ -263,6 +263,10 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - 設計: `Expertises/ConsiderateCoder/` — `commands/plan-sdd.md` + `rules/DEV.md` + `rules/OPS.md`
   - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こす（実装は別途指示）
   - 規範: `rules/DEV.md`（Clean Architecture / TDD Flow / 3-Strike Rule / Decision Priority）と `rules/OPS.md`（セキュリティ・コスト・LLM 統合防御）
+- **🔮 PrecognitiveViewer** - 三位占術によるフォーマル鑑定書生成（姓名判断 + 周易 + タロット）
+  - 設計: `Expertises/PrecognitiveViewer/` — 命相卜のうち「相と卜の二柱」、タロット第三者代理性により対話相手の鑑定を可能化
+  - 運用: 三占術を統合した鑑定書を `ReadingReport_yyyymmdd_hhmmss.md` 形式で出力、相手への贈り物として渡せるフォーマル品質
+  - 関係: CorporateStrategist/ForesightReader（経営判断支援）とは利用文脈が異なり**並列進化**、技術コアの共通化は意図的に行わない
 
 ---
 
