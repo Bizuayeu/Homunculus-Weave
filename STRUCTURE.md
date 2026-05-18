@@ -216,6 +216,12 @@ homunculus/Weave/
 │   ├── GeneralConstructor/        # 建設業・目論見作成
 │   ├── PrivateLibrarian/          # 機密ナレッジ管理（.gitignore対象）
 │   ├── NewsCaster/                # ナルエビちゃんニュース日次配信（Cloud Routine、Stage 1–4で 82 tests green）
+│   ├── PrecognitiveViewer/        # 三位占術フォーマル鑑定書（姓名判断 × 周易 × タロット、対話相手向け、64 tests green）
+│   │   ├── Report/                # Domain + UseCase + Presenter（Clean Architecture コア）
+│   │   ├── Seimei/                # 七格剖象法（ForesightReader からコピー、独立進化）
+│   │   ├── I-Ching/               # デジタル心易（ForesightReader からコピー、独立進化）
+│   │   ├── Tarot/                 # 78 枚カードデータ + 5 スプレッド（tarot-mcp MIT 出典）
+│   │   └── References/            # 数霊術基礎理論
 │   └── BlueberrySprite/           # → .private/BlueberrySprite (Junction) — 藍苺守 織
 │
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
