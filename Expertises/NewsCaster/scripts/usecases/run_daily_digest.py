@@ -3,9 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from typing import Sequence
 
 from domain.date_range import DateRangeJST
 from domain.digest import DailyDigest
+from domain.feed_source import FeedSource
 from usecases.fetch_and_filter import FetchAndFilterUseCase
 from usecases.format_digest import FormatDigestUseCase
 from usecases.ports import MailGatewayPort, RssGatewayPort, StateStorePort
@@ -30,13 +32,14 @@ class RunDailyDigestUseCase:
     def __init__(
         self,
         *,
-        rss_gateway: RssGatewayPort,
+        gateways: Sequence[tuple[FeedSource, RssGatewayPort]],
         mail_gateway: MailGatewayPort,
         state_store: StateStorePort,
         sender: str,
         recipient: str,
     ) -> None:
-        self._fetch_filter = FetchAndFilterUseCase(rss_gateway=rss_gateway)
+        self._feed_sources: tuple[FeedSource, ...] = tuple(fs for fs, _ in gateways)
+        self._fetch_filter = FetchAndFilterUseCase(gateways=gateways)
         self._format = FormatDigestUseCase()
         self._send = SendDigestEmailUseCase(
             mail_gateway=mail_gateway,
@@ -59,7 +62,11 @@ class RunDailyDigestUseCase:
         if not items:
             return RunOutcome(RunResult.NO_ITEMS, target_date)
 
-        digest = self._format.execute(target_date=target_date, items=items)
+        digest = self._format.execute(
+            target_date=target_date,
+            items=items,
+            feed_sources=self._feed_sources,
+        )
 
         if dry_run:
             return RunOutcome(RunResult.DRY_RUN, target_date, digest=digest)

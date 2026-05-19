@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import ClassVar
 
+from domain.exceptions import ValidationError
+from domain.feed_policy import FeedPolicy
+from domain.feed_source import FeedSource
+
 DEFAULT_RSS_URL = "https://news.nullevi.app/rss"
+DEFAULT_FEED_NAME = "ナルエビちゃんニュース"
 DEFAULT_USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -25,6 +31,8 @@ class DigestConfig:
     user_agent: str
     state_dir: Path
     retry_count: int
+    feeds: tuple[FeedSource, ...]
+    feeds_parse_error: str | None
 
     _instance: ClassVar["DigestConfig | None"] = None
 
@@ -51,6 +59,11 @@ class DigestConfig:
         ).strip()
         state_dir_raw = os.environ.get("NEWSCASTER_STATE_DIR", "").strip()
 
+        rss_url = (
+            os.environ.get("NEWSCASTER_RSS_URL", "").strip() or DEFAULT_RSS_URL
+        )
+        feeds, feeds_parse_error = cls._resolve_feeds(rss_url=rss_url)
+
         cls._instance = cls(
             sender=os.environ.get("NEWSCASTER_SENDER_EMAIL", ""),
             recipient=os.environ.get("NEWSCASTER_RECIPIENT_EMAIL", ""),
@@ -59,13 +72,67 @@ class DigestConfig:
             oauth_client_secret_path=Path(client_secret_raw)
             if client_secret_raw
             else None,
-            rss_url=os.environ.get("NEWSCASTER_RSS_URL", "").strip() or DEFAULT_RSS_URL,
+            rss_url=rss_url,
             user_agent=os.environ.get("NEWSCASTER_USER_AGENT", "").strip()
             or DEFAULT_USER_AGENT,
             state_dir=Path(state_dir_raw) if state_dir_raw else DEFAULT_STATE_DIR,
             retry_count=retry_count,
+            feeds=feeds,
+            feeds_parse_error=feeds_parse_error,
         )
         return cls._instance
+
+    @classmethod
+    def _resolve_feeds(
+        cls, *, rss_url: str
+    ) -> tuple[tuple[FeedSource, ...], str | None]:
+        feeds_raw = os.environ.get("NEWSCASTER_FEEDS", "").strip()
+
+        if feeds_raw:
+            try:
+                data = json.loads(feeds_raw)
+            except json.JSONDecodeError as e:
+                return ((), f"NEWSCASTER_FEEDS is not valid JSON: {e}")
+
+            if not isinstance(data, list):
+                return (
+                    (),
+                    f"NEWSCASTER_FEEDS must be a JSON array, got {type(data).__name__}",
+                )
+
+            parsed: list[FeedSource] = []
+            for i, entry in enumerate(data):
+                if not isinstance(entry, dict):
+                    return ((), f"NEWSCASTER_FEEDS[{i}] must be an object")
+                name = entry.get("name")
+                url = entry.get("url")
+                policy_raw = entry.get("policy", "passthrough")
+                if not isinstance(name, str) or not isinstance(url, str):
+                    return (
+                        (),
+                        f"NEWSCASTER_FEEDS[{i}] requires string 'name' and 'url'",
+                    )
+                try:
+                    policy = FeedPolicy.from_string(policy_raw)
+                except ValueError as e:
+                    return ((), f"NEWSCASTER_FEEDS[{i}] invalid policy: {e}")
+                try:
+                    parsed.append(
+                        FeedSource(name=name, url=url, policy=policy)
+                    )
+                except ValidationError as e:
+                    return ((), f"NEWSCASTER_FEEDS[{i}] {e}")
+            if not parsed:
+                return ((), "NEWSCASTER_FEEDS is an empty array")
+            return tuple(parsed), None
+
+        # Backward-compat: single NEWSCASTER_RSS_URL → default-named PASSTHROUGH feed
+        fallback = FeedSource(
+            name=DEFAULT_FEED_NAME,
+            url=rss_url,
+            policy=FeedPolicy.PASSTHROUGH,
+        )
+        return (fallback,), None
 
     @staticmethod
     def _load_env_file(path: Path) -> None:
@@ -88,6 +155,10 @@ class DigestConfig:
             errors.append(
                 "NEWSCASTER_OAUTH_TOKEN_PATH or NEWSCASTER_OAUTH_TOKEN_JSON is required"
             )
+        if self.feeds_parse_error:
+            errors.append(self.feeds_parse_error)
+        elif not self.feeds:
+            errors.append("NEWSCASTER_FEEDS resolution produced empty list")
         return errors
 
     @classmethod
