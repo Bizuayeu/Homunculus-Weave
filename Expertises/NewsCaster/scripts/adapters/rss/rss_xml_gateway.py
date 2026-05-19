@@ -18,11 +18,13 @@ class RssXmlGateway:
         *,
         rss_url: str,
         user_agent: str,
+        source_name: str,
         timeout: int = DEFAULT_TIMEOUT_SEC,
         time_provider: Callable[[], float] | None = None,
     ) -> None:
         self._rss_url = rss_url
         self._user_agent = user_agent
+        self._source_name = source_name
         self._timeout = timeout
         self._time_provider = time_provider or time.time
 
@@ -80,10 +82,14 @@ class RssXmlGateway:
                 "guid": _text(item_el, "guid"),
                 "pubDate": _text(item_el, "pubDate"),
                 "description": _text(item_el, "description"),
-                "category": _text(item_el, "category"),
+                "category": ",".join(
+                    el.text for el in item_el.findall("category") if el.text
+                ),
             }
             try:
-                items.append(NewsItem.from_rss_dict(d))
+                items.append(
+                    NewsItem.from_rss_dict(d, source_name=self._source_name)
+                )
             except ValidationError:
                 # 個別 item の不正は黙ってスキップ（フィード全体は維持）
                 continue

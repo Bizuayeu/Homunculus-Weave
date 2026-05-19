@@ -1,7 +1,7 @@
 [project]
 name = "newscaster"
-version = "0.1.0"
-description = "前日のナルエビちゃんニュースを 0:10 JST に Gmail でメール配信するユーザスキル"
+version = "0.2.0"
+description = "複数 RSS フィードの前日エントリを 0:10 JST に Gmail でメール配信するユーザスキル（フィード別ポリシーで装飾エッセイは Weave がベタ化）"
 requires-python = ">=3.10"
 dependencies = [
     "google-api-python-client>=2.0",
