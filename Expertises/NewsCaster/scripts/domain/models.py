@@ -19,6 +19,7 @@ class NewsItem:
     pub_date_jst: datetime
     description: str
     categories: tuple[str, ...]
+    source_name: str
 
     def __post_init__(self) -> None:
         if not self.title or not self.title.strip():
@@ -34,9 +35,11 @@ class NewsItem:
         offset = self.pub_date_jst.utcoffset()
         if offset is None or offset.total_seconds() != 9 * 3600:
             raise ValidationError("pub_date_jst must be in JST (+09:00)")
+        if not self.source_name or not self.source_name.strip():
+            raise ValidationError("source_name is required")
 
     @classmethod
-    def from_rss_dict(cls, d: dict[str, Any]) -> "NewsItem":
+    def from_rss_dict(cls, d: dict[str, Any], *, source_name: str) -> "NewsItem":
         title = (d.get("title") or "").strip()
         link = (d.get("link") or "").strip()
         guid = (d.get("guid") or link).strip()
@@ -68,4 +71,5 @@ class NewsItem:
             pub_date_jst=pub_jst,
             description=description,
             categories=categories,
+            source_name=source_name,
         )

@@ -1,6 +1,8 @@
 # NewsCaster
 
-🦐 [ナルエビちゃんニュース](https://news.nullevi.app) の前日エントリを Gmail で配信するユーザスキル。Cloud Routine で毎日 0:10 JST に自動実行。
+複数 RSS フィードの前日エントリを Gmail で配信するユーザスキル。Cloud Routine で毎日 0:10 JST に自動実行。フィード別ポリシーで装飾強めエッセイ系メディアは Cloud Routine 内の親プロセス Weave がベタ化する（L00473）。
+
+デフォルトフィード: 🦐 [ナルエビちゃんニュース](https://news.nullevi.app)
 
 ## Quickstart（ローカル動作確認）
 
@@ -37,7 +39,7 @@ pip install -e ".[dev]"
 python -m pytest scripts/tests/ -v
 ```
 
-Stage 1〜4 + cache-buster fix で計 **91 tests** が green。
+Stage 1〜6 で計 **137 tests** が green。
 
 ## 環境変数
 
@@ -47,12 +49,37 @@ Stage 1〜4 + cache-buster fix で計 **91 tests** が green。
 | `NEWSCASTER_RECIPIENT_EMAIL` | ✓ | 配信先 Gmail アドレス |
 | `NEWSCASTER_OAUTH_TOKEN_PATH` | ✓* | OAuth token.json パス（BBS と共有可） |
 | `NEWSCASTER_OAUTH_TOKEN_JSON` | ✓* | inline JSON（Cloud Routine env用） |
-| `NEWSCASTER_RSS_URL` | — | 既定: `https://news.nullevi.app/rss` |
+| `NEWSCASTER_FEEDS` | — | JSON 配列でマルチフィード設定（後述） |
+| `NEWSCASTER_RSS_URL` | — | 単一フィード URL（後方互換）。既定: `https://news.nullevi.app/rss` |
 | `NEWSCASTER_USER_AGENT` | — | 既定: Chrome 124 系（Bot検知対策） |
 | `NEWSCASTER_STATE_DIR` | — | 既定: `<skill_dir>/state` |
 | `NEWSCASTER_MAIL_RETRY_COUNT` | — | 既定: `3` |
 
 \* PATH or JSON のいずれか必須。
+
+### `NEWSCASTER_FEEDS` 設定例
+
+```json
+[
+  {"name":"ナルエビちゃんニュース","url":"https://news.nullevi.app/rss","policy":"passthrough"},
+  {"name":"Wireless Wire News","url":"https://wirelesswire.jp/feed/","policy":"weave_compact"}
+]
+```
+
+- `policy: passthrough` — description をそのまま使う（要約済みフィード向け）
+- `policy: weave_compact` — Cloud Routine 内の親プロセス Weave が装飾を剥いで1〜2文に圧縮する（装飾エッセイ系フィード向け）
+- 優先順位: `NEWSCASTER_FEEDS` ＞ `NEWSCASTER_RSS_URL` 単数 ＞ デフォルトフィード
+- 単一 PASSTHROUGH 構成なら `run` 一発で動く（Stage 4 互換）
+
+### ベタ化挙動（WEAVE_COMPACT）
+
+`WEAVE_COMPACT` ポリシーのフィードがある場合、`run` の代わりに以下の三段フローが必要：
+
+1. `dry-run` で `{{WEAVE_COMPACT:<guid>}}` プレースホルダを含む subject/body を出力
+2. 親プロセス Weave が dry-run 出力を読んでプレースホルダを 1〜2 文のベタ化テキストに置き換え
+3. `send-rendered --subject "..." --body-file <path>` で書き換え済み body を直接送信
+
+これにより Domain/UseCase 層は LLM 依存ゼロを維持（Testability 最優先）。詳細フローは [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md) を参照。
 
 ## Cloud Routine 登録
 

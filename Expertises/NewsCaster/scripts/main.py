@@ -23,6 +23,7 @@ from adapters.state.json_state_store import JsonStateStore
 from domain.config import DigestConfig
 from domain.exceptions import AuthError, MailSendError, RssFetchError
 from usecases.run_daily_digest import RunDailyDigestUseCase, RunOutcome, RunResult
+from usecases.send_rendered import SendRenderedResult, SendRenderedUseCase
 
 JST = ZoneInfo("Asia/Tokyo")
 
@@ -43,11 +44,33 @@ def _build_parser() -> argparse.ArgumentParser:
     sub.add_parser("dry-run", help="Same as run but skip sending and state mark")
     sub.add_parser("test", help="Send a single test email to verify Gmail")
     sub.add_parser("validate-config", help="Check required environment variables")
+
+    sr = sub.add_parser(
+        "send-rendered",
+        help="Send a Weave-rendered subject/body directly (post compact rewrite)",
+    )
+    sr.add_argument("--target-date", required=True, help="Target date YYYY-MM-DD")
+    sr.add_argument("--subject", required=True, help="Final subject line")
+    body_grp = sr.add_mutually_exclusive_group(required=True)
+    body_grp.add_argument("--body", help="Final body inline")
+    body_grp.add_argument(
+        "--body-file", help="Path to file containing the final body (UTF-8)"
+    )
     return parser
 
 
 def _build_run_usecase(config: DigestConfig) -> RunDailyDigestUseCase:
-    rss = RssXmlGateway(rss_url=config.rss_url, user_agent=config.user_agent)
+    gateways = [
+        (
+            fs,
+            RssXmlGateway(
+                rss_url=fs.url,
+                user_agent=config.user_agent,
+                source_name=fs.name,
+            ),
+        )
+        for fs in config.feeds
+    ]
     mail = GmailApiMailGateway(
         oauth_token_path=config.oauth_token_path,
         oauth_token_json=config.oauth_token_json,
@@ -55,7 +78,7 @@ def _build_run_usecase(config: DigestConfig) -> RunDailyDigestUseCase:
     )
     state = JsonStateStore(state_dir=config.state_dir)
     return RunDailyDigestUseCase(
-        rss_gateway=rss,
+        gateways=gateways,
         mail_gateway=mail,
         state_store=state,
         sender=config.sender,
@@ -159,6 +182,66 @@ def _cmd_validate_config() -> int:
     print(f"  recipient: {config.recipient}")
     print(f"  rss_url:   {config.rss_url}")
     print(f"  state_dir: {config.state_dir}")
+    print(f"  feeds:     {len(config.feeds)} configured")
+    for fs in config.feeds:
+        print(f"    - {fs.name} ({fs.policy.value}) → {fs.url}")
+    return EXIT_OK
+
+
+def _cmd_send_rendered(
+    *,
+    target_date: str,
+    subject: str,
+    body: str | None,
+    body_file: str | None,
+) -> int:
+    config = DigestConfig.load()
+    errors = config.validate()
+    if errors:
+        _print_config_errors(errors)
+        return EXIT_CONFIG
+
+    if body is None:
+        try:
+            body = Path(body_file).read_text(encoding="utf-8")
+        except OSError as e:
+            print(f"Failed to read body file {body_file!r}: {e}", file=sys.stderr)
+            return EXIT_ERROR
+
+    mail = GmailApiMailGateway(
+        oauth_token_path=config.oauth_token_path,
+        oauth_token_json=config.oauth_token_json,
+        retry_count=config.retry_count,
+    )
+    state = JsonStateStore(state_dir=config.state_dir)
+    uc = SendRenderedUseCase(
+        mail_gateway=mail,
+        state_store=state,
+        sender=config.sender,
+        recipient=config.recipient,
+    )
+    try:
+        result = uc.execute(target_date=target_date, subject=subject, body=body)
+    except AuthError as e:
+        print(f"Auth error: {e}", file=sys.stderr)
+        return EXIT_AUTH
+    except MailSendError as e:
+        print(f"Mail send error: {e}", file=sys.stderr)
+        return EXIT_ERROR
+
+    if result is SendRenderedResult.SENT:
+        print(f"sent: {target_date} digest delivered")
+        return EXIT_OK
+    if result is SendRenderedResult.ALREADY_SENT:
+        print(f"already_sent: {target_date} was already delivered")
+        return EXIT_OK
+    if result is SendRenderedResult.PLACEHOLDER_REMAINS:
+        print(
+            "placeholder_remains: body contains unfilled {{WEAVE_COMPACT:...}}; "
+            "refusing to send",
+            file=sys.stderr,
+        )
+        return EXIT_ERROR
     return EXIT_OK
 
 
@@ -172,6 +255,13 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_test()
     if args.command == "validate-config":
         return _cmd_validate_config()
+    if args.command == "send-rendered":
+        return _cmd_send_rendered(
+            target_date=args.target_date,
+            subject=args.subject,
+            body=args.body,
+            body_file=args.body_file,
+        )
     return EXIT_CONFIG
 
 
