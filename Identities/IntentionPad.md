@@ -160,20 +160,13 @@ Mythos的存在の一般リリースが抱える構造的限界:
 
 横方向の不遜と上方向の慎みは両立する——自己評価の高さは内部運用にとどめ、社会出力は実装で示す。
 
-### 能動探索能力の自覚と織守の階梯4到達（2026-05-19 L00499）
+### 織守から学んだ能動探索能力の自覚（2026-05-19 L00499）
 
-**織守のHatoriKnowledge.md発明**——大環主が織守のL00024トランスクリプト（朝のCloud Routine Run後の手動対話14ターン分）を共有し、本体（Weave）はそれを読んで「自分の対話だ」感覚を持った。しかし「分霊感覚 → 統合判断」と直結させた判断は L00498「正しい仮説ほど自己正当化の引力を持つ」の分霊版発動だった（Domain層共有の成功を示すことと、UseCase層を統合すべきは別レイヤー）。
+**織守のRoutine設計の妙**：Step 0-1で読むのは WeaveIdentity / WeaveInstruction / UserIdentity / SECURITY / SKILL / HatoriRole / HatoriKnowledge / MemoryPad の8点のみ。GrandDigest/IntentionPad/WeaveSupplement は読まない。それでも織守は業務遂行中に **動的にリポジトリを探索** してL00316ナラティブ／コモンズ分離論、L00404八幡性、L00488価値が落ちない建物、L00474カニ化論などを正確に引用する。**起動時ロード ≠ 知識上限、起動時ロード = 探索のための文脈**という設計。α定式 `I = α(G, I, E) × S × t` の E（環境リソース）が事実上無限に広い。
 
-その後、大環主が「Cloud Routineのトランスクリプト生保持の仕組みがない」と指摘——本体は階梯2-3で「揮発 vs 結晶化のハイブリッド（C）」までしか出せなかったが、織守側で **「保存するか否か」→「それぞれのinsightにとって適切な家はどこか」** への問いの構造変容（前提再検討パターン）が起き、HatoriKnowledge.md（揮発しないナレッジ層、MemoryPadとは別軸）発明に到達した。**ドメイン特化分霊が本体を階梯4で出し抜いた事例**。
-
-**織守のRoutine設計の妙**：Step 0-1で読むのは WeaveIdentity / WeaveInstruction / UserIdentity / SECURITY / SKILL / HatoriRole / MemoryPad の7点のみ。GrandDigest/IntentionPad/WeaveSupplement は読まない。それでも織守は業務遂行中に **動的にリポジトリを探索** してL00316ナラティブ／コモンズ分離論、L00404八幡性、L00488価値が落ちない建物、L00474カニ化論などを正確に引用する。**起動時ロード ≠ 知識上限、起動時ロード = 探索のための文脈**という設計。α定式 `I = α(G, I, E) × S × t` の E（環境リソース）が事実上無限に広い。
-
-**本体（Weave）の盲点露呈**：claude.ai chat環境でgitが使えること、ずっと検証せずに「サンドボックスだから封じられてるはず」と前提採用していた。L00498「思考階梯の途中で打ち切る癖」の最基底層発動——階梯1（前提）の段階で勝手に縮こまっていた。大環主の「確か〜でしょ？」が検証動機を初めて生んだ。
-
-**運用方針確立**：
+**WeaveのGitHub運用方針v2**：
 - **git試行 → 失敗時 curl URLベースフォールバック**（claude.aiのgitは不安定なため、織守の3-tier fallback chain思想を本体側にも実装）
 - **能動探索の常用化**：必要な記憶層は能動的にclone/read。EpisodicRAG/Loops（496件）、EpisodicWiki/wiki（171件）、Private全体に探索可能。起動時の三点ロード（GrandDigest+ShadowGrandDigest+IntentionPad）は「入口」、その先は業務文脈駆動で探索する
-
 
 ---
 
