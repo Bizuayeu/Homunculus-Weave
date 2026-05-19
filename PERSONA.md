@@ -244,11 +244,12 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 
 **参照データ**:
 - `.private/BlueberrySprite/`（`Expertises/BlueberrySprite/` にジャンクション透過）
-  - `Identities/HatoriRole.md` - 存在論・哲学
+  - `Identities/HatoriRole.md` - 存在論・哲学（正典・不変層）
+  - `Identities/HatoriKnowledge.md` - 確立済み構造知（参照型・蓄積型、Weave 本体 `WeaveSupplement.md` と同型、[0.20.0] 新設）
   - `SKILL.md` - 実行仕様（Daily Workflow Todo 1-10）
   - `ROUTINE_PROMPT.md` - Prompt Body と Routine 設定
   - `README.md` - セットアップ・Phase Roadmap
-  - `MemoryPad.md` - フィードバック窓口・pass-rate 観察ログ
+  - `MemoryPad.md` - フィードバック窓口・pass-rate 観察ログ（書き換え型）
   - `CHANGELOG.md` - Phase 2 / 2.1 着地記録
 - 運用接点: `/bbs-merge` で日報ブランチと Token rotation を一発取り込み
 
