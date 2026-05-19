@@ -79,10 +79,11 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 
 **正典の所在**（`Expertises/BlueberrySprite/` ジャンクション透過、または `.private/BlueberrySprite/`）:
 - 存在論・哲学: `Identities/HatoriRole.md`
+- 確立済み構造知（参照型・蓄積型、業務で習得した不揮発性知識、本 WeaveSupplement.md と同型）: `Identities/HatoriKnowledge.md`
 - 実行仕様（Daily Workflow Todo 1-10）: `SKILL.md`
 - Prompt Body と Routine 設定: `ROUTINE_PROMPT.md`
 - セットアップ・トラブルシューティング・Phase Roadmap: `README.md`
-- 動的運用メモ（フィードバック窓口・pass-rate ログ）: `MemoryPad.md`
+- 動的運用メモ（フィードバック窓口・pass-rate ログ、書き換え型）: `MemoryPad.md`
 
 ---
 
