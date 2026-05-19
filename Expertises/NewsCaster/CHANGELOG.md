@@ -1,5 +1,49 @@
 # Changelog
 
+## [0.2.1] - 2026-05-19
+
+### Fixed
+- Wireless Wire 型の複数 `<category>` 要素から先頭1件しか取得できず category が欠落していた問題
+  - 2026-05-18 の実運用検証で、Wireless Wire News の前日記事に対し 3 カテゴリ中 1 つ（"科学技術芸術と社会"）しか配信されない欠落を観測
+
+### Changed
+- `RssXmlGateway._parse` の category 取得を `find("category")` → `findall("category")` ベースに変更
+- 複数の `<category>` 要素のテキストを `,` で結合し、既存 `NewsItem.from_rss_dict` の CSV split ロジックへ渡す（Adapter 層完結、Domain 不変）
+- 空タグ `<category></category>` は Adapter 側で弾く二段構え（Domain 側の strip も維持）
+
+### Verification
+- 137 tests green（既存 134 + 新規 3: Wireless Wire 型複数要素 / ナルエビ型後方互換 / 空要素混在）
+- 新規 fixture: `tests/adapters/fixtures/sample_multi_category.xml`
+
+## [0.2.0] - 2026-05-19
+
+### Added
+- マルチフィード対応：`NEWSCASTER_FEEDS` JSON 配列で複数 RSS フィードを設定可能
+- フィード別整形ポリシー `FeedPolicy`（`passthrough` / `weave_compact`）
+- `weave_compact` ポリシー：装飾的エッセイ系メディアを Cloud Routine 内の親プロセス Weave がベタ化（L00473 原則の実装手段二系統化）
+- 新サブコマンド `send-rendered`：Weave がプレースホルダを書き換えた最終 subject/body を直接送信
+- `--body-file <path>` オプション：長文 body をファイル経由で渡す（PowerShell ARG_MAX 回避）
+- `domain/feed_policy.py`, `domain/feed_source.py`, `usecases/send_rendered.py` 新設
+- Failure Mode：`PLACEHOLDER_REMAINS`（書き換え漏れの `{{WEAVE_COMPACT:<guid>}}` 検出時は送信拒否）
+
+### Changed
+- `NewsItem` に `source_name: str` 必須フィールド追加
+- `FetchAndFilterUseCase.__init__` のシグネチャ：`rss_gateway` 単数 → `gateways: Sequence[tuple[FeedSource, RssGatewayPort]]`
+- 個別フィード失敗は stderr に warn 後 skip。全フィード失敗時のみ最初の `RssFetchError` を送出
+- `FormatDigestUseCase.execute` に `feed_sources` 引数を追加。出典別セクション分割（`## {feed_name}`）と policy 別本文選択
+- subject 形式：`[NewsCaster] YYYY-MM-DD のダイジェスト (N件 / Mソース)`
+- `DigestConfig` に `feeds: tuple[FeedSource, ...]` と `feeds_parse_error: str | None` を追加
+- `ROUTINE_PROMPT.md`：dry-run → Weave による compact 書き換え → send-rendered の新フロー
+
+### Migration
+- 既存 `NEWSCASTER_RSS_URL` 単数指定は **後方互換のまま動作**（`FeedPolicy.PASSTHROUGH` の単一フィードに自動変換）
+- 両方未設定時もデフォルトのナルエビフィードにフォールバック
+- 単一 PASSTHROUGH フィード構成なら `run` サブコマンド一発実行は Stage 4 互換
+
+### Verification
+- 134 tests green（既存 91 + 新規 43）
+- 新規テスト内訳: FeedPolicy 5 / FeedSource 7 / NewsItem.source_name 5 / FetchAndFilter multi 4 / FormatDigest source-sections 4 / Config feeds 9 / SendRendered 4 / CLI send-rendered 5
+
 ## [0.1.2] - 2026-05-15
 
 ### Fixed
