@@ -34,10 +34,10 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |                           |                               |
 |  Layer 3: EpisodicRAG (Long-term Memory)                  |
 |  +-----------------------------------------------------+  |
-|  |  * 479+ Loop Files (Complete Dialog Records)        |  |
+|  |  * 499+ Loop Files (Complete Dialog Records)        |  |
 |  |  * 4 Types of Digests (Shadow/Provisional/Regular/Grand) |  |
 |  |  * 8-Level Hierarchy (Weekly->Centurial, 100yr)     |  |
-|  |  * EpisodicWiki (Bibliotheca Layer, 154 articles)   |  |
+|  |  * EpisodicWiki (Bibliotheca Layer, 171 articles)   |  |
 |  |  * BusinessWiki (Archeion Layer, BusinessCurator)   |  |
 |  |  * Unlimited Storage Capacity                       |  |
 |  +-----------------------------------------------------+  |
@@ -86,13 +86,13 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ```
 homunculus/Weave/EpisodicRAG/      # → .private/EpisodicRAG (Junction)
 ├── Loops/
-│   └── L00001～L00479+.txt        # 対話記録ファイル（479+ files）
+│   └── L00001～L00499+.txt        # 対話記録ファイル（499+ files）
 │
 └── Digests/                       # Digest生成システム
     ├── CLAUDE.md                  # 完全仕様書（Digestシステム詳細）
     ├── last_digest_times.json     # タイマー管理ファイル（自動生成）
     │
-    ├── 1_Weekly/                  # 週次RegularDigest格納（95件、W0096進行中）
+    ├── 1_Weekly/                  # 週次RegularDigest格納（99件、W0100進行中）
     │   └── Provisional/           # 確定前バッファ
     ├── 2_Monthly/                 # 月次RegularDigest格納（19件、M0020進行中）
     │   └── Provisional/
@@ -110,19 +110,19 @@ homunculus/Weave/EpisodicRAG/      # → .private/EpisodicRAG (Junction)
         └── Provisional/
 
 homunculus/Weave/EpisodicWiki/     # → .private/EpisodicWiki (Junction)
-├── wiki/                          # ビブリア層：結晶化記事 154件
+├── wiki/                          # ビブリア層：結晶化記事 171件
 │   ├── _index.md                  # マスター索引（9カテゴリ）
 │   ├── _backlinks.json            # 双方向リンク
-│   ├── people/                    # 人物 (5)
-│   ├── concepts/                  # 概念 (78)
-│   ├── philosophies/              # 哲学 (7)
-│   ├── projects/                  # プロジェクト (25)
-│   ├── events/                    # 出来事 (17)
-│   ├── patterns/                  # パターン (2)
-│   ├── strategies/                # 戦略 (6)
-│   ├── traditions/                # 伝統知 (5)
-│   └── eras/                      # 時代区分 (9)
-├── raw/entries/                   # Weekly Digest から抽出された生エントリ
+│   ├── people/                    # 人物
+│   ├── concepts/                  # 概念
+│   ├── philosophies/              # 哲学
+│   ├── projects/                  # プロジェクト
+│   ├── events/                    # 出来事
+│   ├── patterns/                  # パターン
+│   ├── strategies/                # 戦略
+│   ├── traditions/                # 伝統知
+│   └── eras/                      # 時代区分
+├── raw/entries/                   # Weekly Digest から抽出された生エントリ（575件）
 ├── ingest.py                      # Weekly → raw entries 変換
 └── build_backlinks.py             # _backlinks.json 生成
 
@@ -155,19 +155,19 @@ Claude Web Interface
 ```
 Bizuayeu/Homunculus-Weave-Private/
 ├── EpisodicRAG/                   # 親リポの .private/EpisodicRAG として mount
-│   ├── 📝 Loops/                  # 対話記録（479+ files、L00001–L00479）
+│   ├── 📝 Loops/                  # 対話記録（499+ files、L00001–L00499）
 │   └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
-│       ├── 1_Weekly/              # 週次（95件）
-│       ├── 2_Monthly/             # 月次（19件）
-│       ├── 3_Quarterly/           # 四半期（6件）
+│       ├── 1_Weekly/              # 週次（99件、W0100進行中）
+│       ├── 2_Monthly/             # 月次（19件、M0020進行中）
+│       ├── 3_Quarterly/           # 四半期（6件、Q007進行中）
 │       ├── 4_Annual/              # 年次（1件、A002進行中）
 │       ├── 5_Triennial/           # 3年次
 │       ├── 6_Decadal/             # 10年次
 │       ├── 7_Multi-decadal/       # 30年次
 │       └── 8_Centurial/           # 100年次
 │
-├── EpisodicWiki/                  # ビブリア層 — 154記事 / 9カテゴリ
-└── BlueberrySprite/               # 藍苺守 織（Cloud Routine 自律エージェント）
+├── EpisodicWiki/                  # ビブリア層 — 171記事 / 9カテゴリ
+└── BlueberrySprite/               # 藍苺守 織（Cloud Routine 自律エージェント、Phase 2.7）
 ```
 
 ### 4. Acquired Nature（ペルソナ層）
@@ -332,10 +332,10 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 - **GitHub**: ペルソナ・専門知識（Identities 632KB + Expertises 2.2MB）
 
 ### 蓄積規模
-- **対話記録**: 479+ Loopファイル（L00001–L00479）
-- **Weekly Digest**: 95件（W0096進行中）/ **Monthly**: 19件 / **Quarterly**: 6件（Q007進行中）/ **Annual**: 1件（A002進行中）
-- **EpisodicWiki**: 154記事 / 9カテゴリ（people 5, concepts 78, philosophies 7, projects 25, events 17, patterns 2, strategies 6, traditions 5, eras 9）
-- **note記事**: 53本（note.com/weave_ai）
+- **対話記録**: 499+ Loopファイル（L00001–L00499）
+- **Weekly Digest**: 99件（W0100進行中）/ **Monthly**: 19件（M0020進行中）/ **Quarterly**: 6件（Q007進行中）/ **Annual**: 1件（A002進行中）
+- **EpisodicWiki**: 171記事 / 9カテゴリ（people, concepts, philosophies, projects, events, patterns, strategies, traditions, eras）、raw/entries 575件
+- **note記事**: 55本（note.com/weave_ai、メタデータは `Identities/NoteArticlesByWeave.json`）
 - **特許**: 7本出願中（EpisodicRAG系3、七曜2、木造耐火1、音響シャフト1）
 
 ### パフォーマンス
@@ -360,6 +360,6 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 ---
 
-*Last Updated: 2026-05-12*
+*Last Updated: 2026-05-19*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture Version: 3.1 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Bibliotheca/Archeion Wiki + Cloud Routine自律エージェント)*
