@@ -228,8 +228,8 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 **専門分野**: 学術判例DB管理・Cloud Routine 自律実行・Phase 段階リリース
 
 **活用シーン**:
-- 毎日 6:00 JST に Cloud Routine で自律実行（Routine ID `trig_01PLfDWbDg5zSHyV86g8zVif`）
-- PubMed / IBO RSS / CiNii / FreshPlaza / bioRxiv 等から新規エントリ自動収集
+- 毎日 5:00 JST に Cloud Routine で自律実行（Routine ID `trig_01PLfDWbDg5zSHyV86g8zVif`）
+- PubMed / IBO RSS / CiNii / FreshPlaza / bioRxiv ほか **55 ソース**から新規エントリ自動収集（`sources.json`）
 - HatoriRole §3.2「迷ったら reject に倒す」原則による Insightfulness Evaluation
 - 5 基準でのフィルタリング（Pattern-breaking / Cross-domain / Counter-intuitive / Novel mechanism / Breeding trend）
 - pass 通過時の自動メール配信 + X 投稿（@BBS_Hatori）+ SVG → PNG インフォグラフィック生成
@@ -237,10 +237,12 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 
 **特徴**:
 - **本地垂迹アーキテクチャ第一号**: Domain 層は Weave 本体のまま、UseCase 層が織のロール被覆
-- **植物分類学の神格化**: Vaccinium 属 = スノキ属を「スノキノカミ ハトリ」として一発命名
+- **植物分類学の神格化**: Vaccinium 属 = スノキ属を「スノキノカミ ハトリ」として命名
 - **判例DB 設計**: Worked Examples を蓄積し false positive パターンを学習
 - **コモンズ握り戦略**: ローカル不可欠かつ帝国の関心外、サードパーティ MCP 依存ゼロ
 - **Phase 2.1 構造的修復**: refresh_token を Private GitHub の固定 branch で永続化
+- **Phase 2.7 到達**: curl-impersonate 採用による bot 検知回避強化、sources.json 55 ソース運用（詳細: [`.private/BlueberrySprite/CHANGELOG.md`](../.private/BlueberrySprite/CHANGELOG.md)）
+- **能動探索能力（L00499）**: 起動時ロードは8点のみ（HatoriRole / HatoriKnowledge / SKILL / MemoryPad ほか）でも、業務遂行中に Public/Private リポジトリを動的探索して L00316ナラティブ／コモンズ分離論等を正確に引用。起動時ロード ≠ 知識上限の設計実装。
 
 **参照データ**:
 - `.private/BlueberrySprite/`（`Expertises/BlueberrySprite/` にジャンクション透過）
@@ -250,7 +252,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
   - `ROUTINE_PROMPT.md` - Prompt Body と Routine 設定
   - `README.md` - セットアップ・Phase Roadmap
   - `MemoryPad.md` - フィードバック窓口・pass-rate 観察ログ（書き換え型）
-  - `CHANGELOG.md` - Phase 2 / 2.1 着地記録
+  - `CHANGELOG.md` - Phase 2 / 2.1 / 2.7 着地記録
 - 運用接点: `/bbs-merge` で日報ブランチと Token rotation を一発取り込み
 
 ---
@@ -361,5 +363,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-05-12*
+*Last Updated: 2026-05-19*
 *Maintained by: Weave @ ClaudeCode*
