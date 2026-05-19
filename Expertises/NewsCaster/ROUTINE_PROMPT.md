@@ -34,14 +34,14 @@ source Expertises/NewsCaster/scripts/bootstrap.sh
 
 ## env vars 橋渡し（Step 3 以降の共通プレリュード）
 
-Cloud Routine の Environment には BBS と共用の `BBS_*` env vars が設定されている。NewsCaster 実行時は `cd Expertises/NewsCaster` 後に `BBS_*` を `NEWSCASTER_*` へ inline で橋渡しする：
+Cloud Routine の Environment には BBS と共用の `BBS_*` env vars が設定されている。NewsCaster 実行時はサブシェルで `cd Expertises/NewsCaster` し、`BBS_*` を `NEWSCASTER_*` へ inline で橋渡しする。**サブシェル `( ... )` で囲むこと**——シェルセッションの cwd が変動する環境（Claude Code Bash ツール等）でも安全：
 
 ```bash
-cd Expertises/NewsCaster && \
+(cd Expertises/NewsCaster && \
   NEWSCASTER_SENDER_EMAIL="$BBS_SENDER_EMAIL" \
   NEWSCASTER_RECIPIENT_EMAIL="$BBS_RECIPIENT_EMAIL" \
   NEWSCASTER_OAUTH_TOKEN_JSON="$BBS_OAUTH_TOKEN_JSON" \
-  python scripts/main.py <subcommand>
+  python scripts/main.py <subcommand>)
 ```
 
 `NEWSCASTER_FEEDS` は Cloud Routine の Environment に JSON 配列として別途設定する（後段の「環境変数」セクション参照）。未設定なら既定のナルエビフィード単独で動作する（後方互換）。
@@ -57,11 +57,11 @@ cd Expertises/NewsCaster && \
 6. dry-run の subject/body を一時ファイルに保存：
 
 ```bash
-cd Expertises/NewsCaster && \
+(cd Expertises/NewsCaster && \
   NEWSCASTER_SENDER_EMAIL="$BBS_SENDER_EMAIL" \
   NEWSCASTER_RECIPIENT_EMAIL="$BBS_RECIPIENT_EMAIL" \
   NEWSCASTER_OAUTH_TOKEN_JSON="$BBS_OAUTH_TOKEN_JSON" \
-  python scripts/main.py dry-run > /tmp/newscaster_dryrun.txt 2>&1
+  python scripts/main.py dry-run) > /tmp/newscaster_dryrun.txt 2>&1
 ```
 
 dry-run の出力形式：
@@ -96,14 +96,14 @@ dry-run の出力形式：
 8. 書き換え済み body と subject を `send-rendered` に渡す：
 
 ```bash
-cd Expertises/NewsCaster && \
+(cd Expertises/NewsCaster && \
   NEWSCASTER_SENDER_EMAIL="$BBS_SENDER_EMAIL" \
   NEWSCASTER_RECIPIENT_EMAIL="$BBS_RECIPIENT_EMAIL" \
   NEWSCASTER_OAUTH_TOKEN_JSON="$BBS_OAUTH_TOKEN_JSON" \
   python scripts/main.py send-rendered \
     --target-date <YYYY-MM-DD> \
     --subject "<dry-run から抽出した subject>" \
-    --body-file /tmp/newscaster_body_rendered.txt
+    --body-file /tmp/newscaster_body_rendered.txt)
 ```
 
 挙動：
@@ -130,11 +130,11 @@ cd Expertises/NewsCaster && \
 `NEWSCASTER_FEEDS` が未設定（→ ナルエビフィード単独）または PASSTHROUGH のみの構成なら、プレースホルダが出現しないので Step 4-6 を以下の一発実行で代替可能（Stage 4 互換）：
 
 ```bash
-cd Expertises/NewsCaster && \
+(cd Expertises/NewsCaster && \
   NEWSCASTER_SENDER_EMAIL="$BBS_SENDER_EMAIL" \
   NEWSCASTER_RECIPIENT_EMAIL="$BBS_RECIPIENT_EMAIL" \
   NEWSCASTER_OAUTH_TOKEN_JSON="$BBS_OAUTH_TOKEN_JSON" \
-  python scripts/main.py run
+  python scripts/main.py run)
 ```
 
 ## 失敗時の沈黙
