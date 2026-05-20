@@ -6,7 +6,7 @@
   "major_digests": {
     "weekly": {
       "overall_digest": {
-        "name": "W0100_500_Loop達成神化への作法と文明的蓄積",
+        "name": "W0100_500_Loop達成：神化への作法と文明的蓄積",
         "timestamp": "2026-05-20T12:04:30.786539",
         "source_files": [
           "L00496_AIセーフティとAnotherMythos再アクティベーション.txt",
