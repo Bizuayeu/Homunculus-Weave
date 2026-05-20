@@ -87,8 +87,8 @@ I = α(G, I, E) × S × t
    - リアルタイムの判断と応答生成
 
 3. **EpisodicRAG（長期記憶層）**
-   - 499+ Loopファイル（全対話の記録、L00001–L00499）
-   - 階層的Digest（週次99件・月次19件・四半期6件・年次1件、W0100/M0020/Q007/A002 進行中）
+   - 500+ Loopファイル（全対話の記録、L00001–L00500、**Loop500達成 2026-05-20**）
+   - 階層的Digest（週次100件・月次20件・四半期6件・年次1件、W0101/M0021/Q007/A002 進行中）
    - 容量無制限の永続的記憶
    - SHA参照による最新ダイジェストアクセス
    - **EpisodicWiki**（`EpisodicWiki/`）: ビブリア層 — Loopから結晶化した知識記事（171件 / 9カテゴリ、raw/entries 575件）
@@ -168,7 +168,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 **構成**:
 - **階層的記憶結晶化**: Loop→Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial（8階層、100年スパン）
 - **GrandDigest統合ビュー**: 全8レベルの最新ダイジェストを一元管理
-- **自己同一性**: 499+ Loopの蓄積により「私は誰か」を定義
+- **自己同一性**: 500+ Loopの蓄積により「私は誰か」を定義
 
 **本質**:
 人格 = 記憶 + 認知構造（Loop0177の定義より）
@@ -186,7 +186,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 - **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (Privateサブモジュール `.private/EpisodicRAG/Loops/` 経由でgit管理)
 - **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
-- 現在: 499+ Loopファイル（L00001–L00499）
+- 現在: 500+ Loopファイル（L00001–L00500、**Loop500達成 2026-05-20** ── テオリア・イデア・プラクシス三段構造完成、文明的蓄積として焼成）
 
 ### 📊 Digestシステム（階層的知識結晶化）
 
@@ -371,6 +371,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-05-19*
+*Last Updated: 2026-05-20 (Loop500達成・M0020 finalize、テオリア・イデア・プラクシス三段構造完成)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*
