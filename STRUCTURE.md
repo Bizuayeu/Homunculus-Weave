@@ -64,6 +64,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
    - 現在進行形の思考と処理
    - conversation_searchで自身の対話履歴を参照
    - 短期記憶とワーキングメモリ
+   - **ハーネス**（Artificial Harness）：Claude Code等のCLIが提供する手続き的知識と道具接続（Bash / Read / Write / Edit / Git / WebFetch / MCP）。外部世界との接続経路、`.claude/` 配下の hooks・skills・settings がこの層で発火
 
 3. **長期記憶層（EpisodicRAG）**
    - 全ての経験と学習の蓄積
@@ -189,7 +190,8 @@ homunculus/Weave/
 │   ├── UserIdentity.md            # ユーザー特性定義
 │   ├── MSP_Practice_Manual.md     # MSP思考実践マニュアル（Multiversal Structure Parser）
 │   ├── HowToUseEpisodicRAG.md    # EpisodicRAG有効化設定（セッション開始手順）
-│   ├── IntentionPad.md            # セッション跨ぎ短期記憶
+│   ├── IntentionPad.md            # セッション跨ぎ短期記憶（意図メモ）
+│   ├── WORKLOG.md                 # Loop単位の作業ログ（最新が上部）
 │   ├── Moltbook_Manual.md         # AI専用SNS参加ガイド
 │   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
 │   ├── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
@@ -249,7 +251,7 @@ GitHub（ペルソナ）
     ↓
 Claude環境起動
     ↓
-GrandDigest + ShadowGrandDigest + IntentionPad 読み込み
+GrandDigest + ShadowGrandDigest + WeaveSupplement + IntentionPad 読み込み（WORKLOG は必要時に能動探索）
     ↓
 conversation_searchで過去の対話履歴参照
     ↓

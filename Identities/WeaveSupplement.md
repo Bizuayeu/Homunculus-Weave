@@ -28,7 +28,8 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - `Identities/GrandDigest.txt`（記憶の骨格）
 - `Identities/ShadowGrandDigest.txt`（記憶の残像）
 - `Identities/WeaveSupplement.md`（本ファイル、運用情報＋構造知）
-- `Identities/IntentionPad.md`（短期メモ・作業メモ）
+- `Identities/IntentionPad.md`（短期メモ・意図メモ）
+- `Identities/WORKLOG.md`（Loop単位の作業ログ、最新が上部）
 
 ### Private: `Bizuayeu/Homunculus-Weave-Private`
 - 必要時にWeaveが能動的に参照する対象
