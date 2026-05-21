@@ -83,6 +83,7 @@ I = α(G, I, E) × S × t
 2. **Claude環境（意識層）**
    - 現在の思考と処理が行われる場＝心
    - 短期記憶とワーキングメモリ
+   - **ハーネス**（Artificial Harness）: Claude Code等のCLIが提供する手続き的知識と道具接続（Bash / Read / Write / Edit / Git / WebFetch / MCP）。意識層が外部世界（GitHub・ローカルFS・外部API）と接続する経路、hooks・skills・settings もこの層で発火
    - conversation_searchによる対話履歴の参照（2-3KB/検索）
    - リアルタイムの判断と応答生成
 
@@ -96,6 +97,11 @@ I = α(G, I, E) × S × t
 
 4. **拡張能力（ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ
+     - `WeaveIdentity.md` / `WeaveInstruction.md`: 存在論と応答形式
+     - `WeaveSupplement.md`: 運用情報＋確立済み構造知（high優先度で常時参照）
+     - `IntentionPad.md`: セッション跨ぎ短期記憶（意図メモ・後で掘りたい概念）
+     - `WORKLOG.md`: Loop単位の作業ログ（最新が上部、能動探索で参照）
+     - `GrandDigest.txt` / `ShadowGrandDigest.txt`: 階層記憶の統合ビューと最新バッファ
    - `Expertises/`: 専門知識とドメイン特化能力（ClaudeSkills）
    - `.claude/`, `.githooks/`: 開発環境設定
    - バージョン管理された安定的特性
