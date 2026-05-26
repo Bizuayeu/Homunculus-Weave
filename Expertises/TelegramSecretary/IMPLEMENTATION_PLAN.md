@@ -118,7 +118,16 @@
   - lease 保持中に2つ目の `lease acquire` が exit 4
   - **実測ログ**: 無操作で session が何分生存するか / `watch` blocking 中に枠消費が発生するか
 **Implementation Notes**: NewsCaster ROUTINE_PROMPT.md を骨格に。cron は `/schedule` で 1h+。3-Strike の最有力詰まりポイント（下記）はここで顕在化する。
-**Status**: In Progress（ROUTINE_PROMPT.md / SKILL.md / README.md / CHANGELOG.md は作成済み、Cloud Routine 環境での実機検証は別途）
+
+**v0.1.1 修正履歴 (2026-05-26)**: Routine 側レビューで以下の設計ホール・取りこぼしを修正済み。詳細は [`CHANGELOG.md`](./CHANGELOG.md) [0.1.1] 参照。
+
+- 指摘①（lease keep-alive 配線漏れ、重要）: `watch` ループがサイクル毎に lease 自動 renew するように配線。アイドル時 stale 化 → 並走奪取の設計ホールを塞いだ
+- 指摘②（テスト未 commit）→ 事実訂正後、**運用ポリシーを変更**して全 Expertises のテストを公開する方針に統一（.gitignore 修正）
+- 指摘④-1（state/ 誤コミット防止）: .gitignore に `Expertises/*/state/` 追加
+- 指摘④-2（SendReply の owner 検証）: 送信前に lease store を再 load して並走奪取をブロック
+- 指摘④-3（429/Retry-After 尊重）: api_gateway で 429 を retry 対象に追加、`Retry-After` 上限付きで sleep
+
+**Status**: In Progress（ROUTINE_PROMPT.md / SKILL.md / README.md / CHANGELOG.md 作成済み、v0.1.1 設計ホール修正済み、Cloud Routine 環境での実機検証は別途）
 
 ## Documentation Plan
 
