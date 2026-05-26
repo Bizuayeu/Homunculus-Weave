@@ -1,5 +1,65 @@
 # Changelog
 
+## [0.2.0] - 2026-05-27 — Stage 6 Multimodal Inbox (Doc Complete / E2E Pending)
+
+### Added — photo / document / caption 受信対応
+
+**Domain**:
+- `MediaAttachment` 値オブジェクト（`kind: photo|document` / `file_id` / `mime_type` / `size`、frozen dataclass、`@classmethod from_photo_api` / `from_document_api`）
+- `merge_caption_into_text(text, caption)` 純関数（caption + "\n" + text を結合、欠落は falsy 統一）
+- `MediaSizeLimitExceeded` exception（`flag_injection` 同型の「フラグ化して emit、ブロックしない」原則）
+- `TelegramUpdate` に `media: List[MediaAttachment]` / `caption: Optional[str]` field 追加（default_factory で後方互換）、`from_api` が photo（最大解像度）/ document / caption を抽出
+
+**UseCase**:
+- `MediaDownloader` Port（`download(file_id, target_dir) -> Path`）
+- `DownloadAuthorizedMedia` UseCase（認可済み update の media を size 制限内で download、size 超過は内部 raise → catch → skip_reason="media_size_exceeded" に変換）
+- `MediaDownloadResult` dataclass（`update_id` / `media` / `local_path` / `skip_reason`）
+- `FetchAuthorizedUpdates` を caption 統合へ拡張（normalized_text に caption を merge してから injection 判定）
+
+**Interface (Adapter)**:
+- `TelegramApiGateway.get_file(file_id) -> str`（既存 `_request_with_retry` 流用、5xx retry / 401 AuthFailureError）
+- `TelegramMediaDownloader` 新規（別 httpx.Client で `/file/bot<TOKEN>/<file_path>` 取得、target ファイル名は `<file_id 先頭16>_<basename>` で衝突回避、`raise ... from None` で chain 切り token 漏洩防止）
+- `StdoutEventEmitter` を v2 化（`v: 2` + `media: []` 追加、`emit(update, download_results=None)` で download 結果を統合、Medium モードは local_path null）
+
+**Infrastructure**:
+- `Config` に 3 env 追加: `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES`（default 20MB）/ `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS`（default 24）/ `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD`（default true）
+- `_parse_positive_int` / `_parse_bool` ヘルパで env 解析統一、不正値は `EnvironmentError`（exit 2）
+- `media_cleanup.cleanup_media_dir(target_dir, retention_seconds, now=None)` ユーティリティ（fake clock 注入可能、OSError は best-effort で吸収、サブディレクトリ無視）
+- `cmd_poll` / `cmd_watch` に Heavy / Medium モード切替を統合（`media_enable_download` で分岐、Heavy 時は downloader を内側で確保、watch は loop 外で 1 回作って使い回し）
+
+### Changed
+
+- emit JSON Lines は `v: 2` を含む（v1 は `v` キー欠落として後方互換扱い）
+- `ROUTINE_PROMPT.md` Step 5 を v2 schema に差し替え、`local_path` の三状態（非null=Read で開く / null+skip_reason=サイズ超過の旨応答 / null+null=Medium モード）処理分岐を明記
+- Failure modes に `media_size_exceeded` / media download 失敗を追加
+
+### Tests
+
+- **Total: 165 tests passing**（v0.1.2 の 99 → +66）
+- Domain: +13（MediaAttachment + merge_caption / TelegramUpdate.from_api 拡張 5 / 既存 media は空 list backward compat）
+- UseCase: +13（DownloadAuthorizedMedia 5 / FetchAuthorizedUpdates caption 3 / TelegramUpdate media 5）
+- Adapters: +14（get_file 4 / media_downloader 5 / emitter v2 5）
+- Infrastructure: +23（config 17 parametrize 込 / media_cleanup 6）
+- CLI: +3（Medium モード切替）
+
+### Design Notes
+
+- **Medium + Heavy ハイブリッド採用**（Reversibility）: env で切替、default Heavy で 24-7 即応性を取り、運用負荷顕在化時に Medium へ倒せる
+- **token redact 多層防御**: `safe_id = file_id[:8]` + status code のみ例外メッセージに含める、`raise ... from None` で chain 切り、テストで `"TEST_TOKEN" not in str(excinfo.value)` を明示検証
+- **既存 emit テスト破壊なし**（3-Strike 予想 #4 杞憂）: 既存テストは個別 field を読むだけで `v` キーに触れていなかったため、v2 追加で regression ゼロ
+- **`.gitignore` 確認のみ**: 既存の `Expertises/*/state/` で state/media/ も既に除外済み、追加変更なし
+
+### Live E2E Pending (Fresh Session 必須)
+
+実機 E2E（photo / document / caption → Weave Vision 解釈 → 返信）は新コンテナでの実機検証が残る:
+
+- E2E: photo + caption "見える？" → emit に media[0].local_path → 親プロセス Weave が Read で開いて Vision 解釈 → Telegram に返信到達
+- E2E: 大画像（>20MB）送信 → `skip_reason="media_size_exceeded"` → サイズ超過応答
+- E2E: PDF document 送信 → mime_type=application/pdf で Read 経由取得
+- retention 実測: 24h 経過後 `media_cleanup.cleanup_media_dir` で該当ファイル削除
+
+Stage 5 と同様、Custom Environment の Network policy 反映には新コンテナが必要。env は Stage 5 で設定済みのものをそのまま継承可能（追加 env 3 件は default 値で動くので未設定でも E2E 可能）。
+
 ## Stage 5 進捗ノート - 2026-05-26
 
 ### Live Functional Verification (Routine 側ローカル検証)

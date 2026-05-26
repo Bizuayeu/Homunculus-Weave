@@ -309,3 +309,94 @@ def test_watch_uses_env_owner(env_ready, monkeypatch):
     assert main(["lease", "acquire"]) == EXIT_OK
     rc = main(["watch", "--timeout", "1", "--max-iterations", "1"])
     assert rc == EXIT_OK
+
+
+# --- Stage 6.4: Medium モード（download 無効）切替 ---
+
+
+def test_poll_medium_mode_emits_media_without_local_path(
+    env_ready, monkeypatch, capsys
+):
+    """media_enable_download=false: photo 付き update が来ても download せず、
+    emit に local_path=None の media[] が乗る。getFile も呼ばれない。"""
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        # Medium モードでは getFile は絶対呼ばれない
+        assert "getFile" not in str(request.url)
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200, "username": "weave"},
+                            "photo": [{"file_id": "AgACphoto", "file_size": 4096}],
+                            "caption": "見て",
+                        },
+                    },
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    rc = main(["poll", "--timeout", "1"])
+    assert rc == EXIT_OK
+    out = capsys.readouterr().out.strip()
+    payload = json.loads(out)
+    # caption は text に統合
+    assert payload["text"] == "見て"
+    # media は出るが local_path は None（Medium モード）
+    assert len(payload["media"]) == 1
+    assert payload["media"][0]["kind"] == "photo"
+    assert payload["media"][0]["file_id"] == "AgACphoto"
+    assert payload["media"][0]["local_path"] is None
+    assert payload["media"][0]["skip_reason"] is None
+
+
+def test_poll_medium_mode_text_only_unchanged(env_ready, monkeypatch, capsys):
+    """media なし text-only update でも Medium モードで Stage 5 と同等に動く。"""
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200, "username": "weave"},
+                            "text": "hi",
+                        },
+                    },
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    rc = main(["poll", "--timeout", "1"])
+    assert rc == EXIT_OK
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["text"] == "hi"
+    assert payload["media"] == []
+
+
+def test_watch_medium_mode_does_not_call_getfile(env_ready, monkeypatch):
+    """watch の Medium モードでも getFile を呼ばない（fetch のみ）。"""
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+    monkeypatch.setenv("TELEGRAM_SECRETARY_SESSION_ID", "S-medium-watch")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert "getFile" not in str(request.url)
+        return httpx.Response(200, json={"ok": True, "result": []})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire"]) == EXIT_OK
+    rc = main(["watch", "--timeout", "1", "--max-iterations", "1"])
+    assert rc == EXIT_OK
