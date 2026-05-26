@@ -48,18 +48,20 @@ python -m pytest scripts/tests/ -v
 | `TELEGRAM_BOT_TOKEN` | ✅ | BotFather から取得 |
 | `TELEGRAM_SECRETARY_AUTHORIZED_CHATS` | ✅ | JSON array of int (chat_id allowlist) |
 | `TELEGRAM_SECRETARY_STATE_DIR` | optional | 既定 `./state` |
-| `TELEGRAM_SECRETARY_SESSION_ID` | optional | リース owner ID（省略時は uuid 自動生成） |
+| `TELEGRAM_SECRETARY_SESSION_ID` | optional | リース owner ID（省略時は uuid 自動生成）。**運用律 B 案**: `source bootstrap.sh` で自動 export され、`lease`/`watch`/`send-reply` 全コマンドで共有される |
 
 ## Subcommands
 
 | Command | 機能 | Exit code |
 |---|---|---|
 | `validate-config` | env vars と設定の検証 | 0=OK, 2=設定欠損 |
-| `lease acquire\|renew\|release` | リースロック操作 | 0=成功, 4=conflict, 2=設定 |
+| `lease acquire\|renew\|release [--owner]` | リースロック操作 | 0=成功, 4=conflict, 2=設定 |
 | `poll` | getUpdates 1サイクル | 0=OK, 1=fetch失敗, 3=auth失敗 |
-| `watch` | 長期 long-poll ループ | 長時間常駐 |
-| `send-reply --chat-id --update-id --text-file` | 返信送信 | 0=OK, 1=送信失敗, 3=auth, 4=lease |
+| `watch [--owner]` | 長期 long-poll ループ（サイクル毎に lease renew） | 長時間常駐 |
+| `send-reply --chat-id --update-id --text-file [--owner]` | 返信送信 | 0=OK, 1=送信失敗, 3=auth, 4=lease |
 | `test --chat-id` | 疎通テスト ping | 0=OK, 1/3 |
+
+`--owner` は省略可（運用律 B 案：`source bootstrap.sh` で env 経由自動同期）。緊急時の上書きにのみ使用。
 
 ## 関連ドキュメント
 

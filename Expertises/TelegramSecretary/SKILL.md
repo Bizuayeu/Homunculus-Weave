@@ -16,7 +16,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 ## Daily Workflow（Cloud Routine 起動時）
 
 ```
-1. bootstrap.sh で依存導入 + validate-config
+1. `source bootstrap.sh` で依存導入 + validate-config + `TELEGRAM_SECRETARY_SESSION_ID` 自動 export（運用律 B 案）
 2. egress 疎通確認 (curl api.telegram.org/.../getMe を invalid token で叩いて 401/404 が返ることを確認)
 3. lease acquire（他セッション保持中なら exit 4 で即終了＝自己治癒）
 4. watch を run_in_background で起動
@@ -32,11 +32,13 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | Command | 機能 | Exit code |
 |---|---|---|
 | `validate-config` | env vars + 設定の検証 | 0=OK, 2=設定欠損 |
-| `lease acquire\|renew\|release` | リースロック操作 | 0=成功, 4=conflict, 2=設定欠損 |
+| `lease acquire\|renew\|release [--owner]` | リースロック操作 | 0=成功, 4=conflict, 2=設定欠損 |
 | `poll` | getUpdates 1サイクル、認可・正規化済み update を JSON Lines で stdout に emit | 0=OK, 1=fetch失敗, 3=auth失敗 |
-| `watch` | 長期 long-poll ループ。実 message 1件=1行 emit | 長時間常駐 |
-| `send-reply --chat-id --update-id --text-file` | Weave 起草の返信送信 → offset advance + lease renew | 0=OK, 1=送信失敗, 3=auth, 4=lease |
+| `watch [--owner]` | 長期 long-poll ループ。実 message 1件=1行 emit。サイクル毎に lease 自動 renew（v0.1.1） | 長時間常駐 |
+| `send-reply --chat-id --update-id --text-file [--owner]` | Weave 起草の返信送信 → offset advance + lease renew。CLI 層 + UseCase 層の二重 owner 検証 | 0=OK, 1=送信失敗, 3=auth, 4=lease |
 | `test --chat-id` | owner chat に ping 1通 | 0=OK, 1=送信失敗, 3=auth |
+
+`--owner` は省略可（運用律 B 案：`source bootstrap.sh` で env 経由自動同期）。優先順位は `--owner > env > uuid 自動生成`。
 
 ## Failure Modes
 
@@ -55,7 +57,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `TELEGRAM_BOT_TOKEN` | ✅ | BotFather から取得した bot token |
 | `TELEGRAM_SECRETARY_AUTHORIZED_CHATS` | ✅ | JSON array of int (chat_id allowlist) |
 | `TELEGRAM_SECRETARY_STATE_DIR` | optional | offset/lease の保存先、既定 `./state` |
-| `TELEGRAM_SECRETARY_SESSION_ID` | optional | リース owner ID、省略時は uuid 自動生成 |
+| `TELEGRAM_SECRETARY_SESSION_ID` | optional | リース owner ID、省略時は uuid 自動生成。**運用律 B 案**: `source bootstrap.sh` で自動 export され、`lease`/`watch`/`send-reply` 全コマンドが同じ owner を共有 |
 
 ## Security
 
