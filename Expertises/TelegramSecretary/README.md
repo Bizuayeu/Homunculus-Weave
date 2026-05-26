@@ -53,7 +53,7 @@ python scripts/main.py poll --timeout 5
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **165 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66、Stage 5 / 6.5 は実機検証フェーズ）。
+現在 **171 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66 + v0.2.1 follow-up で +6、Stage 5 / 6.5 は実機検証フェーズ）。
 
 ## env vars
 
@@ -77,6 +77,7 @@ python -m pytest scripts/tests/ -v
 | `watch [--owner]` | 長期 long-poll ループ（サイクル毎に lease renew） | 長時間常駐 |
 | `send-reply --chat-id --update-id --text-file [--owner]` | 返信送信 | 0=OK, 1=送信失敗, 3=auth, 4=lease |
 | `test --chat-id` | 疎通テスト ping | 0=OK, 1/3 |
+| `cleanup-media` | `state_dir/media/` 配下で retention 超過の保存ファイルを削除（手動 / 外部 cron 用）。`watch` は `--cleanup-interval`（既定 120 サイクル≒1h）で自動発火 | 0=OK, 2=設定欠損 |
 
 `--owner` は省略可（運用律 B 案：`source bootstrap.sh` で env 経由自動同期）。緊急時の上書きにのみ使用。
 
