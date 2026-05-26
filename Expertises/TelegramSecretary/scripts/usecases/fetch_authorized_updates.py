@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import List
 
 from domain.authorization import AuthorizedChats
+from domain.media import merge_caption_into_text
 from domain.models import TelegramUpdate
 from domain.normalize import flag_injection, normalize_input
 from usecases.ports import OffsetStore, UpdateSource
@@ -35,6 +36,7 @@ class FetchAuthorizedUpdates:
 
         - 未認可 chat の update は Domain で破棄、Weave に渡さない
         - offset は取得した update 群（認可不問）の最大値に応じて advance（古い update の再取得を防ぐ）
+        - Stage 6.2: caption は normalized_text に統合（merge_caption_into_text）、media は update に保持
         """
         offset = self._offset_store.load()
         updates = self._source.fetch(offset, timeout_seconds)
@@ -50,9 +52,10 @@ class FetchAuthorizedUpdates:
             if not self._allowlist.is_authorized(u.chat_id):
                 continue
             text = normalize_input(u.text)
-            flags = flag_injection(text)
+            merged = merge_caption_into_text(text, u.caption)
+            flags = flag_injection(merged)
             normalized_list.append(
-                NormalizedUpdate(update=u, normalized_text=text, injection_flags=flags)
+                NormalizedUpdate(update=u, normalized_text=merged, injection_flags=flags)
             )
 
         # 認可不問で取得した更新を全て消費したことを記録（offset advance）

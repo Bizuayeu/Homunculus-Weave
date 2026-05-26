@@ -248,3 +248,165 @@
 - **Telegram bot token の共有**: 本体のみ `getUpdates` を呼ぶ、Bridge は **send only** 制限。起動時 assertion で「Bridge は polling 禁止」を構造的に強制
 - **LINE 由来承認 callback の取り扱い**: Bridge 側で X-Line-Signature 検証済みのものを共通 bot 経由で本体に転送、本体は mux タグで識別後に Domain の `ApprovalDecision` に正規化
 - **principal 権限分離**: `secretary` `list-users` `approve-user` `block-user` `edit-identity` `link-accounts` `share` `list-shares` `unshare` `relay` 等の管理系 subcommand は principal の chat_id 起源のみ実行、それ以外は拒否
+
+---
+
+## Stage 6: Multimodal Inbox（画像/メディア受信対応）
+
+> 追加日: 2026-05-27。Stage 1-5 で確立した「Domain → UseCase → Interface → Infrastructure、LLM 推論はコード外」の原則を継承し、Telegram の photo / document / caption をハイブリッド（Medium=メタ flag + Heavy=ローカル保存）で扱う。Vision 解釈は親プロセス Weave が担当（`claude -p` 禁止 / L00473）。
+
+### Overview（Stage 6 固有）
+
+- **What**: Telegram の photo（写真）/ document（任意ファイル）/ caption（添付説明文）を受信し、emit JSON Lines に `media[]` 配列とメタデータ（file_id / mime_type / size / local_path）を加える。caption は text に統合。Heavy モードで `getFile` + ファイル download まで実行し、親プロセス Weave が `Read` で開いて Vision 解釈する状態まで運ぶ。
+- **Why**: 現状の TelegramSecretary は text-only。建設プロジェクト写真、契約書 PDF、現場メモ画像など、大環主が即座に Weave と共有したい入力の多くが非テキスト。Vision 対応 LLM の能力を Cloud Routine の常駐チャネルに接続することで、24-7 即応の射程をマルチモーダルへ拡張する。
+- **Where**: 既存 `Expertises/TelegramSecretary/` 配下に追記。新規ファイル: `domain/media.py`, `adapters/telegram/media_downloader.py`, テスト一式。state_dir 直下に `media/` サブディレクトリを作成（`.gitignore` で除外）。
+- **Reference Patterns**:
+  1. `scripts/domain/models.py` — `TelegramUpdate.from_api()` の minimal field 抽出パターン → `media` 抽出も同型で追加
+  2. `scripts/adapters/telegram/api_gateway.py` — `_request_with_retry` の 5xx/429/401 ハンドリング → `getFile` + ファイル download にも同パターン適用
+  3. `scripts/adapters/state/emitter.py` — JSON Lines 出力の `ensure_ascii=False` パターン → `media[]` を payload に追加、version フィールドで後方互換性を切る
+
+### Stage 6 全体の Architecture 拡張
+
+| Layer | Stage 6 で追加する責務 | 主要な型/関数 | 依存先 |
+|---|---|---|---|
+| **Domain** | メディアの値オブジェクトと caption 統合ロジック | `MediaAttachment`（kind: photo\|document、file_id、mime_type、size）/ `MediaSizeLimitExceeded`（exception）/ `merge_caption_into_text()`（純関数） | なし |
+| **UseCase** | media 抽出 + ダウンロード判定 + ローカル保存呼び出し | Port: `MediaDownloader`（`fetch_file_path(file_id) -> str`、`download(file_path, target) -> Path`）。UseCase 拡張: `FetchAuthorizedUpdates` が media[] を抽出、`DownloadAuthorizedMedia` を新設（認可済み update の media をサイズ制限内で download） | Domain のみ |
+| **Interface (Adapter)** | Bot API `getFile` + ファイル本体 download / emit 拡張 | `TelegramMediaDownloader`（`api_gateway` 経由で `getFile` 呼び出し、`https://api.telegram.org/file/bot<token>/<file_path>` を別 client で取得し state_dir/media/ に保存）/ `StdoutEventEmitter` に `media[]` + payload version 追加 | UseCase, Domain |
+| **Infrastructure** | env 拡張 / 自動削除 cron / .gitignore | `Config` に `media_max_size_bytes`・`media_retention_hours`・`media_enable_download` 追加 / `scripts/media_cleanup.py`（保持期限超過ファイル削除）/ `.gitignore` の `state/` 配下に media/ 含む確認 | 全層 |
+
+### Dependency Direction
+
+Stage 1-5 と同じく `Infrastructure → Interface → UseCase → Domain`（内向き）を厳守。`MediaDownloader` Port は Domain の `MediaAttachment` 型のみを返す。HTTP / ファイル I/O は UseCase の外（Port の向こう）。Domain の `MediaAttachment` は file_id 等の identifier のみ保持し、bytes は持たない（純粋性維持）。
+
+### emit スキーマ拡張と version 戦略
+
+Stage 5 までの payload（`update_id` / `chat_id` / `user_id` / `username` / `text` / `injection_flags`）は **後方互換のフィールド追加**で延長する：
+
+```json
+{
+  "v": 2,
+  "update_id": 12345,
+  "chat_id": 100,
+  "user_id": 200,
+  "username": "weave_user",
+  "text": "<caption + text 統合済み正規化本文>",
+  "injection_flags": [],
+  "media": [
+    {
+      "kind": "photo",
+      "file_id": "AgACAg...",
+      "mime_type": "image/jpeg",
+      "size": 102400,
+      "local_path": "state/media/12345_AgACAg.jpg"
+    }
+  ]
+}
+```
+
+- `v: 2` を**新規追加**（v1 は明示せず欠落 = v1 として扱う運用）。破壊的変更を将来入れる際の楔
+- `media` フィールドは photo/document なしの update では空配列 `[]`（欠落ではなく明示）
+- `local_path` は Heavy モード（`media_enable_download=true`）でのみ非 null、Medium モード（download 無効）では null
+- ROUTINE_PROMPT.md Step 5 は「`media[].local_path` が non-null なら `Read` で開いてから起草」に拡張
+
+### Stages
+
+## Stage 6.1: Domain — MediaAttachment 値オブジェクト + caption 統合
+**Goal**: photo / document / caption を Domain 層の純粋型として表現し、caption を text に統合する純関数を提供する。
+**Layer**: Domain
+**Success Criteria**: `domain/media.py` の全テストが green、外部依存ゼロ（標準ライブラリのみ）。`TelegramUpdate.from_api()` が photo / document / caption を含む payload からも minimal field を取り出せる。
+**Tests** (Red → Green):
+  - `MediaAttachment.from_photo_api()` が Telegram の `photo` 配列（最大解像度）から file_id / size を抽出、mime_type は固定 `"image/jpeg"`（Telegram の photo は常に jpeg）
+  - `MediaAttachment.from_document_api()` が `document` から file_id / mime_type / file_size を抽出、mime_type 欠落時は `"application/octet-stream"` フォールバック
+  - `merge_caption_into_text(text, caption)` が `caption + "\n" + text` を返す（caption 欠落時は text のみ、両方欠落時は空文字、片方欠落時は片方のみ）
+**Implementation Notes**: `frozen dataclass`、`@classmethod from_*_api()` パターン。photo は配列で複数解像度が来るため最大 size を選択（Telegram API 仕様: 配列末尾が最大）。`TelegramUpdate.from_api` への媒介は Stage 6.2 で実装する（Domain の純粋性維持のため、Stage 6.1 では `MediaAttachment` 単体のみ）。
+**Status**: Complete
+
+## Stage 6.2: UseCase — Media Port + 認可済み media 抽出
+**Goal**: `MediaDownloader` Port を定義し、`FetchAuthorizedUpdates` を拡張して media[] を抽出、`DownloadAuthorizedMedia` UseCase を新設して認可済み update の media をサイズ制限内でダウンロードする。
+**Layer**: UseCase
+**Success Criteria**: fake `MediaDownloader` で全分岐検証、実 I/O ゼロ。`TelegramUpdate` が `media: list[MediaAttachment]` フィールドを保持し、`from_api` が photo/document/caption を抽出する。
+**Tests** (Red → Green):
+  - `FetchAuthorizedUpdates`: photo 付き update を取得 → media[] に `MediaAttachment(kind="photo")` が入る、caption が text に統合される
+  - `DownloadAuthorizedMedia`: 認可済み update の media を size 上限内なら fake downloader で download を呼ぶ / size 超過なら `MediaSizeLimitExceeded` を上げて該当 media を skip（他 media は続行、update 自体は emit される）
+  - 認可外 chat の update は media も含めて Domain で破棄（Stage 1 の chat allowlist と整合）
+**Implementation Notes**: `TelegramUpdate` 拡張は **frozen dataclass の field 追加**。既存テストの from_api ケースが `media=[]` で通る後方互換性を維持。`DownloadAuthorizedMedia` は Heavy モード時のみ呼ぶ（CLI 層で分岐、UseCase は副作用 download を Port 経由で持つだけ）。`MediaSizeLimitExceeded` は Domain exception（`domain/exceptions.py` に追加、`flag_injection` と同型の「フラグ化して emit、ブロックはしない」スタンスを基本にしつつ、download だけは skip）。
+**Status**: Complete
+
+## Stage 6.3: Interface — Telegram getFile + ダウンローダ実装 / emit v2
+**Goal**: 実 Telegram API の `getFile` 呼び出し → ファイル本体取得 → `state_dir/media/` への保存と、emit JSON の `v:2` + `media[]` 出力。
+**Layer**: Interface (Adapter)
+**Success Criteria**: HTTP モックでテスト green。`StdoutEventEmitter` が photo/document 含む update を `v:2` + `media[]` で出力、photo/document 無し update でも `media: []` を含む。`token` 込み URL がログ・例外メッセージに混入しないこと（送信前の redact 確認テスト含む）。
+**Tests** (Red → Green):
+  - `TelegramApiGateway.get_file(file_id)`: `/getFile?file_id=...` の正常応答から `file_path` を返す、5xx → retry、401 → AuthFailureError
+  - `TelegramMediaDownloader.download(file_path, target_dir)`: `/file/bot<TOKEN>/<file_path>` の bytes を target_dir 配下にユニークなファイル名で保存、URL は例外メッセージに含めない（regex で token redact 確認）
+  - `StdoutEventEmitter.emit()` が `v:2` 付きで出力、media[] が photo を1件含む / 空配列を含む両ケース、`local_path` 有/無
+**Implementation Notes**: `TelegramApiGateway` への `get_file` 追加は既存 `_request_with_retry` をそのまま流用。ファイル本体取得は **別 client**（base_url が `api.telegram.org/file/bot<TOKEN>/` で異なる、token 込み URL なのでログ秘匿が必須）。target ファイル名は `<file_id 先頭16>_<basename>` 形式（Port シグネチャ `download(file_id, target_dir)` に update_id が無いため、file_id プレフィックスで衝突回避と追跡性両立）。`v:2` の payload version は **新規追加のみで既存 emit テストは破壊されない**（既存テストは個別 field を読むだけで `v` キーに触れていないことを Stage 6.3 着手時に実測確認、3-Strike 予想 #4 は杞憂）。
+**Status**: Complete
+
+## Stage 6.4: Infrastructure — config / cleanup / .gitignore / ROUTINE_PROMPT 拡張
+**Goal**: env vars 追加、保持期限超過 media の自動削除、`.gitignore` への media/ 確認、ROUTINE_PROMPT.md Step 5 拡張。CLI は `poll` / `watch` に Heavy/Medium モード切替を統合。
+**Layer**: Infrastructure
+**Success Criteria**: `validate-config` が新 env を含めて exit 0、`media_cleanup.py` が保持期限超過ファイルのみ削除、ROUTINE_PROMPT.md に「`media[].local_path` 非 null なら `Read` で開く」が記載される。
+**Tests** (Red → Green):
+  - `Config.from_env`: `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES`（default 20MB）/ `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS`（default 24）/ `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD`（default true）の parse、欠損は default、不正値は exit 2
+  - `media_cleanup.py`: mtime が retention_hours 超過のファイルを削除、それ未満は保持（fake clock 注入）
+  - `cmd_poll` / `cmd_watch` が `media_enable_download=false` のとき `DownloadAuthorizedMedia` を呼ばず Medium モードに留まる（fake gateway/downloader 注入）
+**Implementation Notes**: env 名は `TELEGRAM_SECRETARY_MEDIA_*` プレフィックスで統一。`media_cleanup.py` は単独実行可能 + `watch` ループの cleanup hook（N サイクルに 1 回）両対応 — Stage 6.4 では cleanup 関数本体のみ実装、watch への定期呼び出し配線は Stage 6.5 で実機検証時に判断（毎サイクル / N サイクル毎 / Cloud Routine cron で別途）。`.gitignore` は既存の `Expertises/*/state/` で media/ 配下も既に除外済み（state/ サブツリー全体）→ 確認のみ、追加変更なし。ROUTINE_PROMPT.md は Step 5 の JSON 例を v2 形式に差し替え、`media[].local_path` 三状態（非null / null+skip_reason / null+null=Medium モード）の処理分岐を明記、Failure modes に `media_size_exceeded` 等を追加。
+**Status**: Complete
+
+## Stage 6.5: 統合テスト + ドキュメント + 実機 E2E
+**Goal**: photo / document / caption の E2E（自分の bot に画像を送る → `watch` → `media[]` 付き emit → Weave が `Read` で開く → 内容を踏まえた返信）を Cloud Routine 上で 1 往復成立させる。CHANGELOG / README / SKILL.md / ROUTINE_PROMPT.md を v0.2.0 で更新。
+**Layer**: Infrastructure（運用統合）
+**Success Criteria**: fresh session で `watch` 起動 → 自分の bot に photo 1 枚 + caption "これ何？" を送る → emit に `media[0].local_path` と統合 text が乗る → 親プロセス Weave が `Read` で画像を開き、Vision 解釈を含めた返信 → Telegram に到達。size 上限超過時の skip、document（PDF）の同等動作、retention_hours 経過後の自動削除も実測。
+**Tests / 検証**:
+  - E2E: photo + caption "見える？" → emit → Weave が画像内容に言及した返信を送信、Telegram で受信確認
+  - E2E: 大きな画像（>20MB）送信 → `injection_flags` 風に `media_size_exceeded` フラグが emit に乗る or 該当 media のみ skip、update 自体は他 media と text で emit
+  - E2E: PDF document 送信 → mime_type=application/pdf で emit、`Read` で開けるか確認（PDF 直接読み取りは Read tool が対応、必要に応じて pages 指定）
+  - retention 実測: 24h 経過後 `media_cleanup.py` 起動 → 該当ファイル削除、新規ファイルは保持
+**Implementation Notes**: Stage 5 同様、新 fresh session 起動が前提（既存セッションには Custom policy 反映されないため）。CHANGELOG は [0.2.0] エントリで「Multimodal Inbox: photo/document/caption 受信対応、emit v2 化」を記載。README の env vars 表に 3 件追加、Subcommands 表は変化なし（既存の poll/watch がモード切替で兼ねる）。SKILL.md と ROUTINE_PROMPT.md は v2 payload を反映。
+**Status**: In Progress（**Doc Complete** — CHANGELOG [0.2.0] / README env vars + Quickstart photo 試験 / SKILL.md Daily Workflow + env vars + Security 三層 / ROUTINE_PROMPT.md Step 5 v2 schema + media 三状態処理分岐 + Failure modes 拡張、すべて 2026-05-27 着地。**Live E2E Pending** — 新 fresh session での photo/document/caption の実機 E2E、retention 実測は Stage 5 と同じ要件で別セッション待ち）
+
+### Documentation Plan（Stage 6 追加分）
+
+| ドキュメント | パス | 新規/更新/不要 | 計画内容 |
+|---|---|---|---|
+| `CHANGELOG.md` | `Expertises/TelegramSecretary/CHANGELOG.md` | 更新 | [0.2.0] - 2026-MM-DD に「Multimodal Inbox: photo / document / caption 受信対応、emit JSON Lines v2 化、`MediaAttachment` Domain 追加、`TelegramMediaDownloader` Adapter 追加、`media_cleanup.py` 追加、3 つの env vars 追加」を記載 |
+| `README.md` | `Expertises/TelegramSecretary/README.md` | 更新 | env vars 表に 3 件（`TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES` / `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS` / `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD`）追加。Quickstart に「photo を送って試す」一節を追記 |
+| `SKILL.md` | `Expertises/TelegramSecretary/SKILL.md` | 更新 | Daily Workflow に「emit に media[] があれば Read で開いて Vision 解釈」を追加、env vars 表に 3 件追加、Security に「media size 上限・retention・token 込み URL ログ秘匿」を追加 |
+| `ROUTINE_PROMPT.md` | `Expertises/TelegramSecretary/ROUTINE_PROMPT.md` | 更新 | Step 5 の JSON 例を v2 形式（`v: 2` + `media[]`）に差し替え、「`media[].local_path` 非 null なら `Read` で開いてから起草」を明記。Failure modes に `media_size_exceeded` / `media_download_failed` を追加 |
+| `IMPLEMENTATION_PLAN.md` | （本ファイル） | 更新 | 本 Stage 6 セクション追加済み。Stage 6 全 5 段階完了後に Stage 5 と合わせて削除検討（現運用：イベント駆動開発の経緯として保持中） |
+| `.gitignore` | `homunculus/Weave/.gitignore` | 確認のみ | `Expertises/*/state/` で state/media/ も既に除外済み。Stage 6.4 で実測確認 |
+| `pyproject.toml` | `Expertises/TelegramSecretary/pyproject.toml` | 要確認 | `httpx` は既存依存、photo download 用に追加ライブラリ不要。Stage 6.3 着手時に再確認 |
+
+> 拡張レイヤーの最終棚卸しは Stage 6.5 着手時に `Explore` サブエージェントで再確認（SSoT 違反チェック含む）。
+
+### Decision Priority Notes（Stage 6 固有、Testability > Readability > Consistency > Simplicity > Reversibility）
+
+- **Medium + Heavy ハイブリッド採用**（最大の分岐）: Medium-only（メタ flag のみ）は Weave 側で `getFile` を別途呼ぶ必要があり、コード外で HTTP 知識が必要になる（Consistency 違反）。Heavy-only（常に download）はサイズ制限の運用負荷が高い。**両モードを env で切り替え**、デフォルト Heavy で 24-7 即応性を取り、運用負荷が顕在化したら Medium に倒せるよう Reversibility を確保。
+- **emit version bump（v:2）の導入**: 既存 consumer（ROUTINE_PROMPT.md と Weave）の更新が必要だが、フィールド欠落で v1 とみなす運用律で後方互換も両立可能。Testability（既存テストは v=2 期待に**一括更新**してパターン統一）を優先。`media: []` を明示出力する設計は「欠落 = 未対応」の混乱を避ける Readability の判断。
+- **Domain の `MediaAttachment` は bytes を持たない**: 純粋性維持と Testability（bytes 比較を避ける）の両立。bytes は Infrastructure 層の保存先（local_path）に閉じ込め、Domain は identifier のみ。
+- **size 制限超過は skip + flag、ブロックではない**: Stage 1 の `flag_injection` と同型の「フラグ化して emit、判断は Weave に委ねる」原則。Consistency と Reversibility（後で「skip→reject」へ厳格化は容易、逆は壊れる）の両立。
+- **保持期限は env で可変、デフォルト 24h**: 機密書類が長期残存しないよう短めにデフォルト、必要なら延長可能（Reversibility）。`watch` ループ N サイクルごとの cleanup hook は Simplicity 優先（外部 cron 別途設定不要）。
+
+### 3-Strike Rule（Stage 6 固有）
+
+- **詰まりやすい予想ポイント**:
+  1. **`getFile` レスポンスの `file_path` 形式**: Telegram の仕様変更や bot token 込み URL のドメイン差異（`api.telegram.org/file/bot<TOKEN>/...`）で download URL 組み立てが想定とずれる
+  2. **大きな photo / document の long-poll タイムアウト干渉**: download 中に `getUpdates` の long-poll が止まる、または OS の `httpx` クライアントが timeout 緩和を要する
+  3. **state_dir/media/ の容量爆発**: cleanup hook の周期と retention_hours の組み合わせで disk 圧迫、Cloud Routine の disk quota（未文書化）を踏み抜く
+  4. **emit v2 への一括更新で既存テストが大規模に壊れる**: payload 検証テスト 5-7 件が同時に red 化、Refactor 中に複数 Stage が混ざって診断困難
+- **代替アプローチ候補**:
+  - `getFile` 形式問題 → Telegram Bot API ドキュメント参照、無効 token で 401 を踏んで応答形式を実測、必要なら `MediaDownloader` を `httpx` 直叩きに切り替え
+  - long-poll 干渉 → download を **別スレッド** or 別プロセスに切り出し、`watch` のメインループは getUpdates に専念。最終手段として Medium モードに倒し、Weave 側で download を skill 化
+  - 容量爆発 → retention_hours のデフォルトを 6h に短縮、cleanup hook 頻度を 1 サイクル毎に上げる、または disk quota 実測後に上限 byte 数（合計）を新 env で追加
+  - emit v2 一括更新 → Stage 6.3 を着手する**前に**全 emit テストを `v` キー無視に変えるリファクタを 1 commit で切る（red 状態を最小化）
+- **ユーザーへ相談する判断ライン**: 上記いずれかで「Heavy モード成立せず・Medium fallback も Weave 側負荷が許容外」となった時点で、`AskUserQuestion` で（Medium-only に倒す / 別 Stage 化して延期 / Telegram 以外の add-on で Vision 接続）の三択を提示。
+
+### Security 追加項目（Stage 6 固有）
+
+- **認可済み chat のみ download**: `FetchAuthorizedUpdates` の chat allowlist フィルタが先、`DownloadAuthorizedMedia` は認可済み update の media しか受け取らない（Domain で構造的に保証）
+- **size 上限（DoS 防御）**: `media_max_size_bytes`（default 20MB）超過は download せず skip + flag emit、超大ファイルでの disk 圧迫を防ぐ
+- **保持期限の自動削除**: `media_retention_hours`（default 24h）経過した media を `media_cleanup.py` で削除、機密書類の長期残存を防ぐ
+- **token 込み URL の秘匿**: `https://api.telegram.org/file/bot<TOKEN>/<file_path>` の TOKEN は例外メッセージ・ログ・stderr に絶対残さない（regex redact をテストで検証）
+- **`.gitignore` で media/ 除外**: 既存の `Expertises/*/state/` で state/media/ も含めて除外済み、Stage 6.4 で実測確認
+- **mime_type は Telegram の自己申告**: 信頼せず、親プロセス Weave が `Read` で開いた結果を真とする（rename 攻撃対策、ただし Vision 解釈は Weave 側責務）
