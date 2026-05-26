@@ -1,5 +1,44 @@
 # Changelog
 
+## Stage 5 進捗ノート - 2026-05-26
+
+### Live Functional Verification (Routine 側ローカル検証)
+
+実コード（`origin/main` の `cbaeecc` 時点）を /tmp に展開して、実プロセス・実ソケットで以下を検証（Telegram egress 不要な部分のみ）:
+
+| Success Criterion | 結果 |
+|---|---|
+| lease 並走防止（2セッション競合） | ✅ sessB の acquire/renew が exit 4 |
+| crash 自己治癒（stale 奪取） | ✅ ttl=1 失効後に別 owner が takeover |
+| `validate-config` env 欠損/充足 | ✅ exit 2 / exit 0 |
+| `watch` アイドル時の沈黙 | ✅ 空 getUpdates → emit 0 行（idle-zero の土台） |
+| 認可フィルタ | ✅ 未認可 chat 999 を破棄、認可 12345 のみ emit |
+| injection フラグ | ✅ `role_override` + `credentials_request` 検出 |
+| offset 単調前進 | ✅ 未認可分も消費して 43=max(42)+1（無限再取得なし） |
+| sendMessage 経路 | ✅ ローカル mock Telegram サーバー経由で実ソケット疎通 |
+
+**機能パイプラインは実質グリーン**。Routine 側がローカル mock サーバーを 127.0.0.1 に立てて実コードを駆動した結果、Domain → UseCase → Adapter → Infrastructure の各層がプロダクションコードとして整合して動作することを確認。
+
+### Live E2E Pending (Fresh Session 必須)
+
+以下は本物の Telegram egress と bot token が必要で、新コンテナでの実機検証が残る（現セッションは egress 403 = `host_not_allowed` + token 未設定。allowlist 変更はコンテナ生成時のみ反映ゆえ既存セッションには波及しない）:
+
+- egress 疎通: `curl https://api.telegram.org/botINVALID/getMe` で 401/404 確認
+- `test --chat-id` で自分の bot への ping 到達
+- `watch` + Monitor の実メッセージ 1 往復（E2E）
+- **未文書化2点の実測**: セッション寿命（inactivity reclaim / hard cap）/ `watch` blocking 中のアイドル枠消費量
+- `/schedule` 登録と cron 起動
+
+### 次セッションの前準備（ユーザー）
+
+1. **BotFather** で bot 作成 → `TELEGRAM_BOT_TOKEN` 取得
+2. **chat_id 発見**: 作った bot に 1 通送信 → fresh session で `getUpdates` を 1 回叩いて chat_id を読む（鶏卵問題ゆえ最初だけ手動）
+3. Environment に 2 つ設定: `TELEGRAM_BOT_TOKEN` / `TELEGRAM_SECRETARY_AUTHORIZED_CHATS=[<chat_id>]`、任意で `TELEGRAM_SECRETARY_STATE_DIR` を private リポ配下にして state をセッション跨ぎ永続化
+4. `api.telegram.org` は allowlist 追加済み（確認のみ）
+5. **新コンテナのセッションを起動**（env と egress は新コンテナから有効になる）
+
+新セッションで「Stage 5 続き」と告げれば E2E + 寿命/枠実測を一気通貫で回す。
+
 ## [0.1.2] - 2026-05-26
 
 ### Added — 運用律 B 案: session_id の env 統一
