@@ -33,13 +33,27 @@ python scripts/main.py test --chat-id <your-chat-id>
 python scripts/main.py poll --timeout 5
 ```
 
+### photo / document を試す（Stage 6 Multimodal Inbox）
+
+```powershell
+# bot に画像 + caption "見える？" を送ってから（Telegram アプリで）：
+python scripts/main.py poll --timeout 5
+# → emit JSON Lines に v:2 + media[0] (kind=photo, local_path=<state_dir>/media/...) が乗る
+# → caption が text に統合されて "見える？" として出力
+
+# Heavy/Medium モード切替
+$env:TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD = "false"  # Medium: メタのみ、download せず
+python scripts/main.py poll --timeout 5
+# → media[].local_path is null
+```
+
 ## テスト
 
 ```powershell
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **99 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3、Stage 5 は実機検証フェーズ）。
+現在 **165 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66、Stage 5 / 6.5 は実機検証フェーズ）。
 
 ## env vars
 
@@ -49,6 +63,9 @@ python -m pytest scripts/tests/ -v
 | `TELEGRAM_SECRETARY_AUTHORIZED_CHATS` | ✅ | JSON array of int (chat_id allowlist) |
 | `TELEGRAM_SECRETARY_STATE_DIR` | optional | 既定 `./state` |
 | `TELEGRAM_SECRETARY_SESSION_ID` | optional | リース owner ID（省略時は uuid 自動生成）。**運用律 B 案**: `source bootstrap.sh` で自動 export され、`lease`/`watch`/`send-reply` 全コマンドで共有される |
+| `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES` | optional | media download のサイズ上限（既定 20MB = 20971520）。超過は `skip_reason="media_size_exceeded"` で emit、download skip |
+| `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS` | optional | 保存 media の保持期限（既定 24）。`media_cleanup.cleanup_media_dir` が超過ファイルを削除 |
+| `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替。Heavy は `state_dir/media/` に保存、Medium はメタのみで `local_path=null` |
 
 ## Subcommands
 

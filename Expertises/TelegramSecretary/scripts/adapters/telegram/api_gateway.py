@@ -74,6 +74,26 @@ class TelegramApiGateway:
         if not data.get("ok"):
             raise TelegramSecretaryError(f"sendMessage failed: {data}")
 
+    def get_file(self, file_id: str) -> str:
+        """Telegram /getFile で file_id から file_path を取得（Stage 6.3）。
+
+        Bot API の File オブジェクトは `file_path` を含む（例: `photos/file_42.jpg`）。
+        この相対パスを `/file/bot<TOKEN>/<file_path>` の組み立てに使う。
+        """
+        url = f"{self._base_url}/bot{self._bot_token}/getFile"
+        params = {"file_id": file_id}
+        response = self._request_with_retry("GET", url, params=params)
+        data = response.json()
+        if not data.get("ok"):
+            raise TelegramSecretaryError(f"getFile failed: {data}")
+        result = data.get("result") or {}
+        file_path = result.get("file_path")
+        if not file_path:
+            raise TelegramSecretaryError(
+                f"getFile response missing file_path: {data}"
+            )
+        return str(file_path)
+
     def _request_with_retry(self, method: str, url: str, **kwargs: Any) -> httpx.Response:
         last_exc: Optional[Exception] = None
         for attempt in range(self._retry_count + 1):

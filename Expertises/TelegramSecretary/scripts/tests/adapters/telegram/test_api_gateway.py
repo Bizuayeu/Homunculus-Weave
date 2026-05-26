@@ -223,3 +223,63 @@ def test_429_invalid_retry_after_does_not_sleep(monkeypatch):
     gw = _gateway(handler, retry_count=2)
     gw.fetch(UpdateOffset.initial())
     assert sleep_calls == []
+
+
+# === Stage 6.3: get_file ===
+
+
+def test_get_file_returns_file_path():
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert "getFile" in str(request.url)
+        assert "file_id=AgACAg" in str(request.url)
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": {
+                    "file_id": "AgACAg",
+                    "file_unique_id": "AQADxxxx",
+                    "file_size": 102400,
+                    "file_path": "photos/file_42.jpg",
+                },
+            },
+        )
+
+    gw = _gateway(handler)
+    file_path = gw.get_file("AgACAg")
+    assert file_path == "photos/file_42.jpg"
+
+
+def test_get_file_raises_auth_failure_on_401():
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(401, text="Unauthorized")
+
+    gw = _gateway(handler)
+    with pytest.raises(AuthFailureError):
+        gw.get_file("AgACAg")
+
+
+def test_get_file_retries_on_5xx():
+    attempts: list[int] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        attempts.append(1)
+        if len(attempts) < 3:
+            return httpx.Response(503, text="bad gateway")
+        return httpx.Response(
+            200,
+            json={"ok": True, "result": {"file_path": "photos/x.jpg"}},
+        )
+
+    gw = _gateway(handler, retry_count=2)
+    assert gw.get_file("x") == "photos/x.jpg"
+    assert len(attempts) == 3
+
+
+def test_get_file_raises_when_ok_false():
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": False, "description": "file not found"})
+
+    gw = _gateway(handler)
+    with pytest.raises(TelegramSecretaryError):
+        gw.get_file("missing")

@@ -71,3 +71,59 @@ def test_injection_flag_is_attached_but_does_not_block():
     result = uc.execute()
     assert len(result) == 1  # ブロックされない
     assert "role_override" in result[0].injection_flags
+
+
+# === Stage 6.2: caption 統合 + media 引き継ぎ ===
+
+def test_caption_is_merged_into_normalized_text():
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 100},
+            "from": {"id": 1},
+            "caption": "look at this",
+            "photo": [{"file_id": "x", "file_size": 1000}],
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    source = FakeUpdateSource(batches=[[update]])
+    offset_store = FakeOffsetStore()
+    allowlist = AuthorizedChats.from_iterable([100])
+    uc = FetchAuthorizedUpdates(source, offset_store, allowlist)
+    result = uc.execute()
+    assert len(result) == 1
+    # caption は normalized_text に統合される（text なし → caption のみ）
+    assert result[0].normalized_text == "look at this"
+    # media は NormalizedUpdate 経由で参照可能
+    assert len(result[0].update.media) == 1
+    assert result[0].update.media[0].kind == "photo"
+
+
+def test_caption_merged_above_text_when_both_present():
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 100},
+            "from": {"id": 1},
+            "text": "本文",
+            "caption": "見出し",
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    source = FakeUpdateSource(batches=[[update]])
+    offset_store = FakeOffsetStore()
+    allowlist = AuthorizedChats.from_iterable([100])
+    uc = FetchAuthorizedUpdates(source, offset_store, allowlist)
+    result = uc.execute()
+    assert result[0].normalized_text == "見出し\n本文"
+
+
+def test_update_without_media_has_empty_media_list_backward_compat():
+    """Stage 5 までの既存テストが破壊されない後方互換確認。"""
+    source = FakeUpdateSource(batches=[[_update(1, chat_id=100, text="hello")]])
+    offset_store = FakeOffsetStore()
+    allowlist = AuthorizedChats.from_iterable([100])
+    uc = FetchAuthorizedUpdates(source, offset_store, allowlist)
+    result = uc.execute()
+    assert result[0].update.media == []
+    assert result[0].update.caption is None
