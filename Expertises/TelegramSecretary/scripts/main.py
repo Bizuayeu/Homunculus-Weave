@@ -11,11 +11,13 @@ from typing import Sequence
 from adapters.state.emitter import StdoutEventEmitter
 from adapters.state.json_state_store import JsonLeaseStore, JsonOffsetStore
 from adapters.telegram.api_gateway import TelegramApiGateway
+from adapters.telegram.media_downloader import TelegramMediaDownloader
 from domain.exceptions import AuthFailureError, LeaseConflictError, TelegramSecretaryError
 from domain.lease import utc_now
 from domain.models import OutboundMessage
 from infrastructure.config import Config
 from usecases.acquire_lease import AcquireLease
+from usecases.download_authorized_media import DownloadAuthorizedMedia
 from usecases.fetch_authorized_updates import FetchAuthorizedUpdates
 from usecases.release_lease import ReleaseLease
 from usecases.renew_lease import RenewLease
@@ -87,6 +89,7 @@ def cmd_poll(args: argparse.Namespace) -> int:
 
     offset_store = JsonOffsetStore(config.state_dir)
     emitter = StdoutEventEmitter()
+    download_results: list = []
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
         uc = FetchAuthorizedUpdates(gateway, offset_store, config.authorized_chats)
         try:
@@ -98,8 +101,19 @@ def cmd_poll(args: argparse.Namespace) -> int:
             print(f"fetch failed: {exc}", file=sys.stderr)
             return EXIT_FETCH_FAILED
 
+        # Heavy モード: media を持つ update があれば download
+        if config.media_enable_download and any(u.update.media for u in updates):
+            with TelegramMediaDownloader(
+                bot_token=config.bot_token, gateway=gateway
+            ) as downloader:
+                download_results = DownloadAuthorizedMedia(downloader).execute(
+                    updates,
+                    config.state_dir / "media",
+                    config.media_max_size_bytes,
+                )
+
     for u in updates:
-        emitter.emit(u)
+        emitter.emit(u, download_results=download_results)
     return EXIT_OK
 
 
@@ -113,32 +127,53 @@ def cmd_watch(args: argparse.Namespace) -> int:
     emitter = StdoutEventEmitter()
     owner = _session_owner(args.owner)
     iterations = 0
+    media_target_dir = config.state_dir / "media"
+
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
         uc = FetchAuthorizedUpdates(gateway, offset_store, config.authorized_chats)
         renew = RenewLease(lease_store)
-        while True:
-            try:
-                updates = uc.execute(timeout_seconds=args.timeout)
-            except AuthFailureError as exc:
-                print(f"auth failure: {exc}", file=sys.stderr)
-                return EXIT_AUTH_FAILED
-            except TelegramSecretaryError as exc:
-                # 一時的エラーはログして次サイクルへ進む
-                print(f"transient fetch error: {exc}", file=sys.stderr)
-            else:
-                for u in updates:
-                    emitter.emit(u)
+        # Heavy モードのみ downloader を loop 外で 1 回作って使い回す（接続コスト削減）
+        downloader: TelegramMediaDownloader | None = None
+        download_uc: DownloadAuthorizedMedia | None = None
+        if config.media_enable_download:
+            downloader = TelegramMediaDownloader(
+                bot_token=config.bot_token, gateway=gateway
+            )
+            download_uc = DownloadAuthorizedMedia(downloader)
+        try:
+            while True:
+                try:
+                    updates = uc.execute(timeout_seconds=args.timeout)
+                except AuthFailureError as exc:
+                    print(f"auth failure: {exc}", file=sys.stderr)
+                    return EXIT_AUTH_FAILED
+                except TelegramSecretaryError as exc:
+                    # 一時的エラーはログして次サイクルへ進む
+                    print(f"transient fetch error: {exc}", file=sys.stderr)
+                else:
+                    download_results: list = []
+                    if download_uc is not None and any(u.update.media for u in updates):
+                        download_results = download_uc.execute(
+                            updates,
+                            media_target_dir,
+                            config.media_max_size_bytes,
+                        )
+                    for u in updates:
+                        emitter.emit(u, download_results=download_results)
 
-            # アイドル時も heartbeat を維持。lease を失っていたら自己治癒で即終了
-            try:
-                renew.execute(owner=owner, now=utc_now())
-            except LeaseConflictError as exc:
-                print(f"lease lost during watch: {exc}", file=sys.stderr)
-                return EXIT_LEASE_CONFLICT
+                # アイドル時も heartbeat を維持。lease を失っていたら自己治癒で即終了
+                try:
+                    renew.execute(owner=owner, now=utc_now())
+                except LeaseConflictError as exc:
+                    print(f"lease lost during watch: {exc}", file=sys.stderr)
+                    return EXIT_LEASE_CONFLICT
 
-            iterations += 1
-            if args.max_iterations and iterations >= args.max_iterations:
-                break
+                iterations += 1
+                if args.max_iterations and iterations >= args.max_iterations:
+                    break
+        finally:
+            if downloader is not None:
+                downloader.close()
     return EXIT_OK
 
 

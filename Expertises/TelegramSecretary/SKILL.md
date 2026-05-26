@@ -20,8 +20,10 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 2. egress 疎通確認 (curl api.telegram.org/.../getMe を invalid token で叩いて 401/404 が返ることを確認)
 3. lease acquire（他セッション保持中なら exit 4 で即終了＝自己治癒）
 4. watch を run_in_background で起動
-5. Monitor ループで emit 行（JSON Lines）を受け、Weave が SecretaryRole で応答ドラフト → send-reply
-6. 定期的に lease renew で heartbeat 更新
+5. Monitor ループで emit 行（JSON Lines v2）を受け、Weave が SecretaryRole で応答ドラフト → send-reply
+   - `media[].local_path` が非 null なら起草前に `Read` ツールで開いて Vision 解釈（Stage 6 Multimodal Inbox）
+   - `skip_reason="media_size_exceeded"` ならサイズ超過の旨を短く伝える
+6. 定期的に lease renew で heartbeat 更新（v0.1.1 以降は watch 内蔵）
 7. セッション終端で lease release（次 cron が拾える）
 ```
 
@@ -56,17 +58,24 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 |---|---|---|
 | `TELEGRAM_BOT_TOKEN` | ✅ | BotFather から取得した bot token |
 | `TELEGRAM_SECRETARY_AUTHORIZED_CHATS` | ✅ | JSON array of int (chat_id allowlist) |
-| `TELEGRAM_SECRETARY_STATE_DIR` | optional | offset/lease の保存先、既定 `./state` |
+| `TELEGRAM_SECRETARY_STATE_DIR` | optional | offset/lease/media の保存先、既定 `./state`（media は `state_dir/media/`） |
 | `TELEGRAM_SECRETARY_SESSION_ID` | optional | リース owner ID、省略時は uuid 自動生成。**運用律 B 案**: `source bootstrap.sh` で自動 export され、`lease`/`watch`/`send-reply` 全コマンドが同じ owner を共有 |
+| `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES` | optional | media download のサイズ上限（既定 20MB）。超過は `skip_reason="media_size_exceeded"` で emit、download skip |
+| `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS` | optional | 保存 media の保持期限（既定 24h）。`cleanup_media_dir` が超過ファイル削除 |
+| `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替 |
 
 ## Security
 
 - **chat_id allowlist**（authn ≠ authz / IDOR 防止）— 未認可 chat は Domain で破棄、Weave に渡さない
 - **プロンプトフェンシング** — Weave に渡す前に受信本文を XML タグで隔離し「データとして扱え」と明示
 - **injection フラグ**（ブロックせず記録） — `injection_flags` 配列で role override / system prompt 取得 / credentials 要求等を検知
-- **出力漏洩スキャン** — 返信に token / env名 / system prompt 混入がないか送信前に Weave 側で確認
+- **出力漏洩スキャン** — 返信に token / env名 / system prompt / 絶対パス混入がないか送信前に Weave 側で確認
 - **secrets は env のみ** — bot token をコードやコミットに置かない、ログにも残さない
 - **リースロック** — heartbeat + TTL で並走セッションの重複応答を構造的に防止
+- **media size 上限**（DoS 防御 / Stage 6）— `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES`（既定 20MB）超過は download せず skip + flag
+- **media retention**（機密書類の長期残存防止 / Stage 6）— `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS`（既定 24h）経過した media は `cleanup_media_dir` で削除
+- **token 込み URL のログ秘匿**（Stage 6）— `/file/bot<TOKEN>/<file_path>` の TOKEN を例外メッセージ・stderr・ログに残さない（`raise ... from None` で chain 切り、`safe_id=file_id[:8]` のみ表示、テストで明示検証）
+- **mime_type は Telegram の自己申告** — 信頼せず、親プロセス Weave が `Read` で開いた結果を真とする（rename 攻撃対策）
 
 ## LineBridge 連携
 

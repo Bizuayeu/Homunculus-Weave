@@ -1,7 +1,8 @@
 """UseCase テスト用の fake adapter 群。"""
 from __future__ import annotations
 
-from typing import List, Optional
+from pathlib import Path
+from typing import List, Optional, Tuple
 
 from domain.lease import SessionLease
 from domain.models import OutboundMessage, TelegramUpdate
@@ -68,3 +69,20 @@ class FakeLeaseStore:
     def clear(self) -> None:
         self.lease = None
         self.clear_calls += 1
+
+
+class FakeMediaDownloader:
+    """Stage 6.2: download 呼び出しを記録、`fail` フラグで例外を投げる fake。
+
+    成功時は target_dir / f"{file_id}.bin" を返す（実 I/O はなし）。
+    """
+
+    def __init__(self, fail: bool = False) -> None:
+        self.download_calls: List[Tuple[str, Path]] = []
+        self.fail = fail
+
+    def download(self, file_id: str, target_dir: Path) -> Path:
+        self.download_calls.append((file_id, target_dir))
+        if self.fail:
+            raise RuntimeError("simulated download failure")
+        return target_dir / f"{file_id}.bin"
