@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Wireless Wire News (test fixture)</title>
+    <link>https://wirelesswire.jp/</link>
+    <description>テスト用 — Wireless Wire 型（複数 category 要素）</description>
+    <language>ja</language>
+
+    <item>
+      <title>科学技術芸術と社会の交差点</title>
+      <link>https://wirelesswire.jp/example/multi-category-1</link>
+      <guid>https://wirelesswire.jp/example/multi-category-1</guid>
+      <pubDate>Sun, 18 May 2026 10:00:00 +0900</pubDate>
+      <description>本文サンプル（Wireless Wire 型）</description>
+      <category>科学技術芸術と社会</category>
+      <category>働き方と人材</category>
+      <category>考えるメディア</category>
+    </item>
+
+    <item>
+      <title>空 category 要素を含むエントリ</title>
+      <link>https://wirelesswire.jp/example/mixed-empty</link>
+      <guid>https://wirelesswire.jp/example/mixed-empty</guid>
+      <pubDate>Sun, 18 May 2026 11:00:00 +0900</pubDate>
+      <description>空タグと有効タグが混在するケース</description>
+      <category></category>
+      <category>有効カテゴリ</category>
+    </item>
+  </channel>
+</rss>
