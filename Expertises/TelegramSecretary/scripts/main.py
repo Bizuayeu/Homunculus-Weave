@@ -16,6 +16,7 @@ from domain.exceptions import AuthFailureError, LeaseConflictError, TelegramSecr
 from domain.lease import utc_now
 from domain.models import OutboundMessage
 from infrastructure.config import Config
+from infrastructure.media_cleanup import cleanup_media_dir
 from usecases.acquire_lease import AcquireLease
 from usecases.download_authorized_media import DownloadAuthorizedMedia
 from usecases.fetch_authorized_updates import FetchAuthorizedUpdates
@@ -169,11 +170,36 @@ def cmd_watch(args: argparse.Namespace) -> int:
                     return EXIT_LEASE_CONFLICT
 
                 iterations += 1
+                # Stage 6.5 follow-up: N サイクル毎に cleanup hook（0=無効、default 120 ≒ 1h with timeout=30s）
+                if (
+                    args.cleanup_interval > 0
+                    and iterations % args.cleanup_interval == 0
+                ):
+                    cleanup_media_dir(
+                        media_target_dir,
+                        config.media_retention_hours * 3600,
+                    )
                 if args.max_iterations and iterations >= args.max_iterations:
                     break
         finally:
             if downloader is not None:
                 downloader.close()
+    return EXIT_OK
+
+
+def cmd_cleanup_media(args: argparse.Namespace) -> int:
+    """`state_dir/media/` 配下で `media_retention_hours` 超過のファイルを削除。
+
+    Stage 6.5 follow-up: 単独実行用エンドポイント。Cloud Routine 外で
+    cron 起動するか、人手で叩いて掃除する用途。
+    """
+    config = _load_config()
+    if isinstance(config, int):
+        return config
+    target_dir = config.state_dir / "media"
+    retention_seconds = config.media_retention_hours * 3600
+    removed = cleanup_media_dir(target_dir, retention_seconds)
+    print(f"cleaned {removed} files from {target_dir}")
     return EXIT_OK
 
 
@@ -258,6 +284,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=0,
         help="0=無限ループ (Cloud Routine 常駐用), >0 はテスト用",
     )
+    p_watch.add_argument(
+        "--cleanup-interval",
+        type=int,
+        default=120,
+        help="N サイクル毎に cleanup_media_dir を発火（0=無効、default 120 ≒ 1h with timeout=30s）",
+    )
 
     p_send = sub.add_parser("send-reply", help="Weave 起草の返信を送信")
     p_send.add_argument("--chat-id", type=int, required=True)
@@ -268,6 +300,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_test = sub.add_parser("test", help="疎通テスト：owner chat に ping 送信")
     p_test.add_argument("--chat-id", type=int, required=True)
     p_test.add_argument("--text", default="ping from TelegramSecretary")
+
+    sub.add_parser(
+        "cleanup-media",
+        help="保持期限超過の media ファイルを state_dir/media/ から削除",
+    )
 
     return parser
 
@@ -282,6 +319,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "watch": cmd_watch,
         "send-reply": cmd_send_reply,
         "test": cmd_test,
+        "cleanup-media": cmd_cleanup_media,
     }
     return handlers[args.command](args)
 

@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.2.1] - 2026-05-27 — Stage 6 follow-up: cleanup 配線 + caption E2E テスト
+
+### Added
+
+- `cleanup-media` subcommand を追加（`main.py cmd_cleanup_media`）— `state_dir/media/` 配下で `media_retention_hours` 超過の保存ファイルを削除する単独実行エンドポイント
+- `cmd_watch` に **cleanup hook** を配線（v0.2.0 で関数だけ実装し未配線だった漏れの修正）— `--cleanup-interval` サイクル毎に `cleanup_media_dir` を発火（default 120 ≒ 1h with timeout=30s、`0` で無効化）
+
+### Tests
+
+- **Total: 171 tests passing**（v0.2.0 の 165 → +6）
+- `test_cleanup_media_subcommand_removes_expired_files` / `_no_op_when_media_dir_missing`
+- `test_watch_runs_cleanup_hook_at_interval` / `_skips_cleanup_when_interval_zero`
+- `test_poll_emits_caption_in_text_with_photo` — Stage 6.5 follow-up として **CLI 層 + photo + caption の end-to-end** を明示テスト化（ユニットテスト `test_caption_is_merged_into_normalized_text` は既に green だったが、CLI 経由の経路が未カバーだった）
+- `test_poll_caption_above_text_for_text_message_with_caption` — caption + text 両方ある稀ケースで `見出し\n本文` 結合を CLI 経由で確認
+
+### Rationale
+
+- v0.2.0 の "doc complete" と実配線の間にあった 2 つのギャップに対応:
+  - `cleanup_media_dir` 関数は実装＋単体テスト済みだったが `main.py` に呼び出しなし → watch hook + CLI subcommand の両方を配線
+  - Live E2E で「caption "見える？" を送ったのに emit text:""」報告（実際は caption 無し送信疑い）の切り分け基盤として、CLI 層 caption 統合の E2E テストを明示化
+
 ## [0.2.0] - 2026-05-27 — Stage 6 Multimodal Inbox (Doc Complete / E2E Pending)
 
 ### Added — photo / document / caption 受信対応
