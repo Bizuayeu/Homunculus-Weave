@@ -74,7 +74,7 @@
   - `SessionLease.is_stale(now)` が heartbeat + ttl 経過で True、`held_by_other()` が別 owner かつ非 stale で True
   - `normalize_input()` が全角/半角・Unicode 異体字・サロゲートペアを正規化、`flag_injection()` が role override / system prompt 抽出 / credential 要求を検知（ブロックせずフラグ）
 **Implementation Notes**: NewsCaster `domain/`（FeedPolicy・DateRangeJST）の値オブジェクト書式に倣う。frozen dataclass。injection 検知は OPS.md §7「フラグのみ・偽陽性回避」。
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 2: UseCase + Ports（fake adapter で駆動）
 **Goal**: ロック取得・取得認可・返信送信のオーケストレーションを Port 越しに完成。
@@ -85,7 +85,7 @@
   - `SendReply`: 送信成功で offset 永続化と lease renew が呼ばれる / 送信失敗で offset を進めない（冪等・再送可能）
   - `AcquireLease`: 他セッション保持中（非 stale）で取得失敗を返す / stale なら奪取
 **Implementation Notes**: NewsCaster `usecases/`（Port + UseCase 分離、RunDaily orchestrator）に倣う。Claude 推論は Port にしない（親プロセス担当）。DI で組み立て。
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 3: Interface Adapters（Telegram Gateway / State Store）
 **Goal**: 実 Telegram API と state 永続化の実装。HTTP はモックでテスト。
@@ -95,7 +95,7 @@
   - `TelegramApiGateway.get_updates(offset, timeout)`: 正常 JSON → `TelegramUpdate` 列、5xx → リトライ後 fetch エラー、401 → auth エラー（exit 3 系）
   - `JsonStateStore`: offset+lease の round-trip、破損ファイル → 空にフォールバック後の新規書き込み成功
 **Implementation Notes**: NewsCaster `adapters/`（RssXmlGateway・JsonStateStore）に倣う。UA は Telegram 推奨/Chrome 系。state dir は env `TELEGRAM_SECRETARY_STATE_DIR`、既定は Private 配下。
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 4: Infrastructure + CLI（main.py / bootstrap / watch ループ）
 **Goal**: subcommands の配線、認証、bootstrap、バックグラウンド watch ループ。
@@ -106,7 +106,7 @@
   - `send-reply --text-file` が body を送信し offset を永続化（gateway/store はモック）
   - `watch_loop.sh` がモック getUpdates で「空応答→無出力」「メッセージ有→1行 emit」を満たす（shell レベル smoke）
 **Implementation Notes**: NewsCaster `main.py` の argparse + env 橋渡し + bootstrap.sh をテンプレ流用。env: `TELEGRAM_BOT_TOKEN`・`TELEGRAM_SECRETARY_AUTHORIZED_CHATS`(JSON配列)・`TELEGRAM_SECRETARY_STATE_DIR`。token は env のみ（コード直書き禁止 / OPS.md §1）。
-**Status**: Not Started
+**Status**: Complete
 
 ## Stage 5: Cloud Routine 統合 + 環境実測 + ドキュメント
 **Goal**: ROUTINE_PROMPT.md（Monitor 駆動ループ + lease 並走防止 + 疎通確認）、SKILL.md、egress/cron 設定手順、そして**未文書化2点の実測**。
@@ -118,7 +118,7 @@
   - lease 保持中に2つ目の `lease acquire` が exit 4
   - **実測ログ**: 無操作で session が何分生存するか / `watch` blocking 中に枠消費が発生するか
 **Implementation Notes**: NewsCaster ROUTINE_PROMPT.md を骨格に。cron は `/schedule` で 1h+。3-Strike の最有力詰まりポイント（下記）はここで顕在化する。
-**Status**: Not Started
+**Status**: In Progress（ROUTINE_PROMPT.md / SKILL.md / README.md / CHANGELOG.md は作成済み、Cloud Routine 環境での実機検証は別途）
 
 ## Documentation Plan
 
@@ -161,3 +161,66 @@
 - **injection フラグ**（ブロックせず記録）・**出力漏洩スキャン**（返信に token/env名/system prompt 混入がないか送信前チェック）
 - **レート制限** — chat_id 単位 sliding window（コスト暴走 & DoS 防御）
 - **secrets は env のみ**（bot token をコード/コミットに置かない）・**ログに secret を残さない**
+
+## LineBridge 連携（拡張）
+
+`Expertises/TelegramSecretary/LineBridge/` を併用する場合に、本計画の各 Stage に追加で必要となる実装事項。LineBridge を採用しない構成（Telegram 単独）でも本体は動作するため、本章はオプショナルな拡張章として位置付ける。詳細仕様は `LineBridge/IMPLEMENTATION_PLAN.md` を正典として参照。
+
+### 結合方式（決定済み）
+
+- **B. 共通 Telegram bot 共有**: 本体 (TelegramSecretary) と LineBridge は同じ bot token を保持。本体のみ `getUpdates` で受信、Bridge は `sendMessage` のみ呼ぶ **send only 制限**。これで polling 競合は構造的に不可能、token 共有のリスクは漏洩時の偽通知のみに収束
+- **mux 方式 A**: Bridge 由来の Telegram メッセージは `[from:line:U1234abc]` プレフィックス付き、Weave 起草の LINE 宛応答は `[to:line:U1234abc]` または `[relay-to:line:U1234abc]` 付与
+
+### Stage 1（Domain）への追加
+
+- **`User` 集約ルート**: `uuid` / `display_name` / `role` (principal|associate) / `status` (pending|active|blocked) / `line_user_id` / `telegram_chat_id` / `registered_at` / `approved_at` / `identity` を保持
+- **`Identity` 値オブジェクト**: `category` (family|friend|client|vendor|employee|peer|introducer|other) / `relationship_label` / `honorific` / `tone` (casual|polite|formal) / `context_notes` / `shared_with: list[user_uuid]` / `priority_bias` (low|normal|high) / `taboo_topics: list[str]`。frozen dataclass、`__post_init__` でバリデーション
+- **`MuxTag`**: Telegram メッセージ内の `[from:line:X]` / `[to:line:X]` / `[relay-to:line:X]` を安全にパース・ビルド。不正フォーマット時は `ValueError`（インジェクション防御）
+
+### Stage 2（UseCase + Ports）への追加
+
+- **追加 Port**: `BridgeRelayPort`（mux タグ付きメッセージを LineBridge `/internal/relay-to-line` に POST、Bearer 認証）/ `UserStore`（User 集約の読み書き）
+- **追加 UseCase**: `RegisterOrFetchUser` / `ApproveUser` / `BlockUser` / `UpdateIdentity` / `LinkAccounts` / `ShareWith` / `UnshareWith` / `ListShares` / `RelayToAssociate` / `RenderSecretaryMenu`（`/secretary` 応答のメニュー構築）
+
+### Stage 3（Interface Adapters）への追加
+
+- **`HttpBridgeRelayClient`**: `BridgeRelayPort` の実装、httpx 非同期、retry/timeout、Bearer 認証ヘッダ付与
+- LINE 由来の承認 callback は Bridge 側 `/internal/approval-callback` で受信、Bridge → 本体への伝達は **共通 Telegram bot 経由**（B 結合方式の帰結）。本体は通常メッセージとして受け、`[approval:line:U1234abc:approve|reject]` 等の特殊 mux タグで承認結果を識別
+
+### Stage 4（Infrastructure / CLI）への追加 Subcommands
+
+| Subcommand | 機能 | Exit code |
+|---|---|---|
+| `secretary` | マスタースキル、`/secretary` 受信を検出してインライン キーボードでメニュー応答を生成 | 0 |
+| `list-users` | active な関係者一覧出力 | 0 |
+| `pending-users` | 承認待ち一覧出力 | 0 |
+| `approve-user --user-uuid` | pending → active 切替 | 0 / 4 (未存在) |
+| `block-user --user-uuid` | active/pending → blocked | 0 / 4 |
+| `edit-identity --user-uuid` | identity 編集（対話的、項目選択） | 0 |
+| `link-accounts --user-uuid --other-id` | LINE/Telegram アカウント紐付け | 0 / 4 (衝突) |
+| `share --from-uuid --to-uuid` | identity.shared_with に追加 | 0 |
+| `list-shares [--user-uuid]` | 共有許可一覧 | 0 |
+| `unshare --from-uuid --to-uuid` | identity.shared_with から削除 | 0 |
+| `relay --user-uuid --text-file` | 関係者へのリレー指示送信（Bridge 経由） | 0 / 1 (送信失敗) |
+
+**追加 env vars**:
+- `LINEBRIDGE_INTERNAL_API_URL`（Bridge の `/internal/*` 呼び出し先 URL）
+- `LINEBRIDGE_BEARER_TOKEN`（内部 API 認証 token）
+
+### Stage 5（Cloud Routine 統合）への追加
+
+- **SecretaryRole プロンプト強化**:
+  - **identity 参照**: 応答時に該当 user の `tone` / `honorific` / `taboo_topics` を必ず参照して文体・呼称・避ける話題を反映
+  - **重要度判定**: 案件ごとに `low` / `normal` / `high` を判定、`high` なら大環主に即時 push（バッチ待ちしない）
+  - **エスカレ判定**: 大環主判断要否を親性倫理に基づき判定、要なら関係者には「確認中です」自動応答 + 大環主に push
+  - **共有候補判定**: 関係者間共有が筋良いと判断したら、`identity.shared_with` の未登録相手のみ大環主に承認伺いを出す
+  - **`/secretary` 受信時のメニュー応答**: インライン キーボードでマスターメニューを返す、ボタンタップで個別 subcommand or 対話モードへ展開
+- **承認 UX 双方向**: Telegram の `callback_query`（インライン キーボード）と LINE 由来承認（Bridge `/internal/approval-callback` 経由→共通 bot で本体に伝達）の両方を扱う
+- **`/list` 等のマッピング**: ユーザーが Telegram で `/list` `/secretary` 等を打った場合の意図解釈→対応 subcommand 呼び出しを Weave プロンプトに明示
+
+### Security 追加項目
+
+- **`BridgeRelayPort` 経由の通信**: Bearer token 必須、token は env、ログ出力時に redact
+- **Telegram bot token の共有**: 本体のみ `getUpdates` を呼ぶ、Bridge は **send only** 制限。起動時 assertion で「Bridge は polling 禁止」を構造的に強制
+- **LINE 由来承認 callback の取り扱い**: Bridge 側で X-Line-Signature 検証済みのものを共通 bot 経由で本体に転送、本体は mux タグで識別後に Domain の `ApprovalDecision` に正規化
+- **principal 権限分離**: `secretary` `list-users` `approve-user` `block-user` `edit-identity` `link-accounts` `share` `list-shares` `unshare` `relay` 等の管理系 subcommand は principal の chat_id 起源のみ実行、それ以外は拒否
