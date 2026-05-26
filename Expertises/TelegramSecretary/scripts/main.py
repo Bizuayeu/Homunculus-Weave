@@ -147,12 +147,20 @@ def cmd_send_reply(args: argparse.Namespace) -> int:
     if isinstance(config, int):
         return config
 
+    owner = _session_owner(args.owner)
     text = Path(args.text_file).read_text(encoding="utf-8")
     offset_store = JsonOffsetStore(config.state_dir)
     lease_store = JsonLeaseStore(config.state_dir)
     lease = lease_store.load()
     if lease is None:
         print("no active lease (acquire first)", file=sys.stderr)
+        return EXIT_LEASE_CONFLICT
+    if lease.owner != owner:
+        # 自分以外の owner の lease で送信しようとしている (運用律 B 案: env 経由で統一)
+        print(
+            f"lease owned by {lease.owner!r}, not {owner!r} — refusing send",
+            file=sys.stderr,
+        )
         return EXIT_LEASE_CONFLICT
 
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
@@ -220,6 +228,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_send.add_argument("--chat-id", type=int, required=True)
     p_send.add_argument("--update-id", type=int, required=True)
     p_send.add_argument("--text-file", required=True)
+    p_send.add_argument("--owner", help="session owner id (lease 検証用、省略時は env か uuid)")
 
     p_test = sub.add_parser("test", help="疎通テスト：owner chat に ping 送信")
     p_test.add_argument("--chat-id", type=int, required=True)

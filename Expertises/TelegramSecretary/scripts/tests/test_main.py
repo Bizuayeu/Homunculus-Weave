@@ -236,8 +236,76 @@ def test_send_reply_after_lease_acquire(env_ready, monkeypatch, tmp_path, capsys
             "1",
             "--text-file",
             str(text_file),
+            "--owner",
+            "S1",
         ]
     )
     assert rc == EXIT_OK
     assert captured["body"]["chat_id"] == 100
     assert captured["body"]["text"] == "hello"
+
+
+def test_send_reply_fails_when_owner_mismatch(env_ready, monkeypatch, tmp_path):
+    """別 owner の lease で send-reply は exit 4（CLI 層の防御）。"""
+    text_file = tmp_path / "reply.txt"
+    text_file.write_text("hello", encoding="utf-8")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(
+        [
+            "send-reply",
+            "--chat-id",
+            "100",
+            "--update-id",
+            "1",
+            "--text-file",
+            str(text_file),
+            "--owner",
+            "S2",
+        ]
+    )
+    assert rc == EXIT_LEASE_CONFLICT
+
+
+def test_send_reply_uses_env_owner(env_ready, monkeypatch, tmp_path):
+    """env で TELEGRAM_SECRETARY_SESSION_ID を export すれば --owner 省略可 (運用律 B 案)。"""
+    text_file = tmp_path / "reply.txt"
+    text_file.write_text("hello", encoding="utf-8")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    _install_mock_transport(monkeypatch, handler)
+    # bootstrap.sh が export する状況を再現
+    monkeypatch.setenv("TELEGRAM_SECRETARY_SESSION_ID", "S-env")
+    # --owner 省略、env 経由で同じ owner を共有
+    assert main(["lease", "acquire"]) == EXIT_OK
+    rc = main(
+        [
+            "send-reply",
+            "--chat-id",
+            "100",
+            "--update-id",
+            "1",
+            "--text-file",
+            str(text_file),
+        ]
+    )
+    assert rc == EXIT_OK
+
+
+def test_watch_uses_env_owner(env_ready, monkeypatch):
+    """env で session_id を export しておけば watch も同じ owner で renew する。"""
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": []})
+
+    _install_mock_transport(monkeypatch, handler)
+    monkeypatch.setenv("TELEGRAM_SECRETARY_SESSION_ID", "S-env-watch")
+    # --owner 省略、env 経由で acquire→watch が同じ owner を共有
+    assert main(["lease", "acquire"]) == EXIT_OK
+    rc = main(["watch", "--timeout", "1", "--max-iterations", "1"])
+    assert rc == EXIT_OK

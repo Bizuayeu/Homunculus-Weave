@@ -39,7 +39,7 @@ python scripts/main.py poll --timeout 5
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **96 tests green**（Stage 1-4 完了 + Routine 側レビュー指摘①④対応で +9、Stage 5 は実機検証フェーズ）。
+現在 **99 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3、Stage 5 は実機検証フェーズ）。
 
 ## env vars
 
