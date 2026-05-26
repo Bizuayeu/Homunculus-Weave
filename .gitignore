@@ -29,9 +29,11 @@ htmlcov/
 dist/
 build/
 
-# テストフォルダ（ローカル開発用）
-**/test/
-**/tests/
+# テストは信頼性証拠として全 Expertises で公開する方針
+# __pycache__ / *.pyc / .pytest_cache は上の Python 関連ブロックで除外済み
+
+# ランタイム生成 state（offset.json / lease.json 等、Expertise ごとの実行時データ）
+Expertises/*/state/
 
 # EpisodicRAGなど - プライベート管理のため非公開
 .claude/agents/digest-analyzer.md
@@ -43,13 +45,6 @@ Expertises/BlueberrySprite/
 # PrivateLibrarian - 機密ナレッジ全体を非公開
 Expertises/PrivateLibrarian/
 
-# PrecognitiveViewer - tests/ は信頼性証拠として公開（**/tests/ ルールの例外）
-!Expertises/PrecognitiveViewer/tests/
-!Expertises/PrecognitiveViewer/tests/**
-# ただし __pycache__/ や .pyc は再除外（汎用 Python ルール尊重）
-Expertises/PrecognitiveViewer/tests/__pycache__/
-Expertises/PrecognitiveViewer/**/__pycache__/
-Expertises/PrecognitiveViewer/**/*.pyc
-# 鑑定書出力は受け手プライベート、リポ非管理
+# PrecognitiveViewer - 鑑定書出力は受け手プライベート、リポ非管理
 Expertises/PrecognitiveViewer/Report/outputs/
 

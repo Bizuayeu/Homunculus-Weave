@@ -91,13 +91,12 @@ curl -sS -o /dev/null -w '%{http_code}\n' "https://api.telegram.org/botINVALID_T
   python scripts/main.py send-reply --chat-id <chat_id> --update-id <update_id> --text-file /tmp/reply.txt)
 ```
 
-## Step 6 — 定期 renew
+## Step 6 — Lease 自動 renew（watch 内蔵）
 
-12. 一定間隔（例: 60秒ごと）で lease renew：
+`watch` ループはサイクル毎に **自分で `lease renew` を実行する**（v0.1.1 で配線、Routine 側レビュー指摘①対応）。
+したがって Weave 側で定期的な手動 renew を呼ぶ必要は無い。
 
-```bash
-(cd Expertises/TelegramSecretary && python scripts/main.py lease renew)
-```
+並走奪取が発生した場合（他セッションが lease を奪った場合）、`watch` は内部で `LeaseConflictError` を検出して **exit 4 で自己終了**する。次の hourly cron が `lease acquire` で拾い直し、自己治癒は完了する。
 
 ## Step 7 — セッション終端
 
