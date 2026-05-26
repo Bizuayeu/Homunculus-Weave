@@ -109,10 +109,13 @@ def cmd_watch(args: argparse.Namespace) -> int:
         return config
 
     offset_store = JsonOffsetStore(config.state_dir)
+    lease_store = JsonLeaseStore(config.state_dir)
     emitter = StdoutEventEmitter()
+    owner = _session_owner(args.owner)
     iterations = 0
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
         uc = FetchAuthorizedUpdates(gateway, offset_store, config.authorized_chats)
+        renew = RenewLease(lease_store)
         while True:
             try:
                 updates = uc.execute(timeout_seconds=args.timeout)
@@ -125,6 +128,14 @@ def cmd_watch(args: argparse.Namespace) -> int:
             else:
                 for u in updates:
                     emitter.emit(u)
+
+            # アイドル時も heartbeat を維持。lease を失っていたら自己治癒で即終了
+            try:
+                renew.execute(owner=owner, now=utc_now())
+            except LeaseConflictError as exc:
+                print(f"lease lost during watch: {exc}", file=sys.stderr)
+                return EXIT_LEASE_CONFLICT
+
             iterations += 1
             if args.max_iterations and iterations >= args.max_iterations:
                 break
@@ -197,6 +208,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_watch = sub.add_parser("watch", help="バックグラウンド long-poll ループ")
     p_watch.add_argument("--timeout", type=int, default=30)
+    p_watch.add_argument("--owner", help="session owner id (lease renew 用、省略時は env か uuid)")
     p_watch.add_argument(
         "--max-iterations",
         type=int,
