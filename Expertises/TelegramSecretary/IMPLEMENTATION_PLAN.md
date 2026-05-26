@@ -133,7 +133,16 @@
 - `cmd_send_reply` に `--owner` 引数 + CLI 層 owner 検証（二重防御）
 - `ROUTINE_PROMPT.md` Step 2 を `source` 呼び出しに変更
 
-**Status**: In Progress（ROUTINE_PROMPT.md / SKILL.md / README.md / CHANGELOG.md 作成済み、v0.1.1 設計ホール修正・v0.1.2 運用律 B 案実装済み、Cloud Routine 環境での実機検証は別途）
+**Live Functional Verification 結果 (Routine 側ローカル検証, 2026-05-26)**: 実コードを /tmp に展開して実プロセス・実ソケットで以下を検証 (Telegram egress 不要な部分のみ):
+- ✅ lease 並走防止 / crash 自己治癒 (stale 奪取)
+- ✅ validate-config env 欠損/充足
+- ✅ watch アイドル時の沈黙 (idle-zero の土台)
+- ✅ 認可フィルタ / injection フラグ / offset 単調前進
+- ✅ sendMessage 経路 (ローカル mock サーバー経由で実ソケット疎通)
+
+機能パイプラインは実質グリーン。詳細は [`CHANGELOG.md`](./CHANGELOG.md) 冒頭の「Stage 5 進捗ノート」を参照。
+
+**Status**: In Progress（ROUTINE_PROMPT.md / SKILL.md / README.md / CHANGELOG.md 作成済み、v0.1.1 設計ホール修正・v0.1.2 運用律 B 案実装済み、Routine 側ローカル live 検証で functional パイプライン実質グリーン、本物 Telegram egress + bot token を用いた E2E と寿命/枠実測は新コンテナでの別セッション待ち）
 
 ## Documentation Plan
 
