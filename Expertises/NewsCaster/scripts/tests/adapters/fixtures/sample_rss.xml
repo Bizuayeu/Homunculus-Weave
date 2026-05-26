@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>🦐 ナルエビちゃんニュース</title>
+    <link>https://news.nullevi.app</link>
+    <description>テスト用フィクスチャ</description>
+    <language>ja</language>
+    <lastBuildDate>Tue, 12 May 2026 08:00:00 GMT</lastBuildDate>
+    <atom:link href="https://news.nullevi.app/feed.xml" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title><![CDATA[グーグル、AIを悪用した大規模ハッキング未遂を初検知]]></title>
+      <link>https://news.nullevi.app/google-ai-abuse-hacking-foiled-2026-05-12</link>
+      <guid isPermaLink="true">https://news.nullevi.app/google-ai-abuse-hacking-foiled-2026-05-12</guid>
+      <pubDate>Tue, 12 May 2026 08:00:00 GMT</pubDate>
+      <description><![CDATA[Alphabet傘下のグーグルが2026-05-11発表の報告書で、著名なサイバー犯罪グループのハッカーがAIを悪用してソフトウエアの脆弱性を突き止め、大規模なハッキングを企てたが未遂に終わった事案を初めて明らかにした。]]></description>
+      <category>Google, AI悪用, サイバーセキュリティ, 脆弱性</category>
+    </item>
+    <item>
+      <title><![CDATA[危険すぎるAI「クロード・ミュトス」対策、週内にも作業部会]]></title>
+      <link>https://news.nullevi.app/claude-mythos-financial-taskforce-2026-05-12</link>
+      <guid isPermaLink="true">https://news.nullevi.app/claude-mythos-financial-taskforce-2026-05-12</guid>
+      <pubDate>Mon, 11 May 2026 23:00:00 GMT</pubDate>
+      <description><![CDATA[金融システムへの大きな脅威になりうる新型AI「クロード・ミュトス」（Claude Mythos）に対応するため、金融機関などでつくる官民連携会議が週内にも作業部会を立ち上げる。]]></description>
+      <category>AI規制, 金融庁, アンソロピック</category>
+    </item>
+    <item>
+      <title>カテゴリ無しエントリ</title>
+      <link>https://news.nullevi.app/no-category</link>
+      <guid isPermaLink="true">https://news.nullevi.app/no-category</guid>
+      <pubDate>Mon, 11 May 2026 12:00:00 GMT</pubDate>
+      <description>カテゴリ要素が無いケース</description>
+    </item>
+  </channel>
+</rss>
