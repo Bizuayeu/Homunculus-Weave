@@ -400,3 +400,179 @@ def test_watch_medium_mode_does_not_call_getfile(env_ready, monkeypatch):
     assert main(["lease", "acquire"]) == EXIT_OK
     rc = main(["watch", "--timeout", "1", "--max-iterations", "1"])
     assert rc == EXIT_OK
+
+
+# --- Stage 6.5 follow-up: caption が CLI 層を通って emit text に乗る E2E ---
+
+
+def test_poll_emits_caption_in_text_with_photo(env_ready, monkeypatch, capsys):
+    """photo + caption の payload で emit `text` に caption が統合されることを CLI 経由で検証。
+
+    Stage 6.5 follow-up: ユニットテスト（test_caption_is_merged_into_normalized_text）は
+    通っていたが、CLI 層を通した end-to-end は欠けていた。Live E2E で "text:\"\"" だった
+    報告（caption "見える？" 送信疑い）の切り分け用ベースラインを明示。
+    """
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200, "username": "weave"},
+                            "photo": [{"file_id": "photo1", "file_size": 4096}],
+                            "caption": "見える？",
+                        },
+                    },
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    rc = main(["poll", "--timeout", "1"])
+    assert rc == EXIT_OK
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["text"] == "見える？"
+    assert len(payload["media"]) == 1
+    assert payload["media"][0]["kind"] == "photo"
+
+
+def test_poll_caption_above_text_for_text_message_with_caption(
+    env_ready, monkeypatch, capsys
+):
+    """text + caption 両方ある稀ケースでも caption が上段、text が下段で結合される。"""
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200},
+                            "text": "本文",
+                            "caption": "見出し",
+                        },
+                    },
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["poll", "--timeout", "1"]) == EXIT_OK
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["text"] == "見出し\n本文"
+
+
+# --- Stage 6.5 follow-up: cleanup-media subcommand + watch cleanup hook ---
+
+
+def test_cleanup_media_subcommand_removes_expired_files(
+    env_ready, monkeypatch, capsys, tmp_path
+):
+    """cleanup-media subcommand が retention 超過のファイルを削除し、新しいファイルは残す。"""
+    import os
+    import time
+
+    media_dir = tmp_path / "media"
+    media_dir.mkdir()
+    old = media_dir / "old.jpg"
+    fresh = media_dir / "fresh.jpg"
+    old.write_bytes(b"a")
+    fresh.write_bytes(b"b")
+    # default retention=24h、old は 2日前にする
+    two_days_ago = time.time() - 2 * 86400
+    os.utime(old, (two_days_ago, two_days_ago))
+
+    rc = main(["cleanup-media"])
+    assert rc == EXIT_OK
+    assert not old.exists()
+    assert fresh.exists()
+    assert "cleaned 1" in capsys.readouterr().out
+
+
+def test_cleanup_media_subcommand_no_op_when_media_dir_missing(
+    env_ready, monkeypatch, capsys, tmp_path
+):
+    """state_dir/media/ が存在しない時は 0 件で正常終了。"""
+    # media/ を意図的に作らない
+    rc = main(["cleanup-media"])
+    assert rc == EXIT_OK
+    assert "cleaned 0" in capsys.readouterr().out
+
+
+def test_watch_runs_cleanup_hook_at_interval(env_ready, monkeypatch, tmp_path):
+    """watch ループが cleanup_interval サイクル毎に cleanup_media_dir を呼ぶ。"""
+    import os
+    import time
+
+    media_dir = tmp_path / "media"
+    media_dir.mkdir()
+    old = media_dir / "old.jpg"
+    old.write_bytes(b"x")
+    two_days_ago = time.time() - 2 * 86400
+    os.utime(old, (two_days_ago, two_days_ago))
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": []})
+
+    _install_mock_transport(monkeypatch, handler)
+    monkeypatch.setenv("TELEGRAM_SECRETARY_SESSION_ID", "S-cleanup-hook")
+    assert main(["lease", "acquire"]) == EXIT_OK
+    # cleanup-interval=1 で 1 サイクル目に即 cleanup 発火
+    rc = main(
+        [
+            "watch",
+            "--timeout",
+            "1",
+            "--max-iterations",
+            "1",
+            "--cleanup-interval",
+            "1",
+        ]
+    )
+    assert rc == EXIT_OK
+    # 古いファイルは消えている
+    assert not old.exists()
+
+
+def test_watch_skips_cleanup_when_interval_zero(env_ready, monkeypatch, tmp_path):
+    """--cleanup-interval=0 で cleanup hook を無効化。"""
+    import os
+    import time
+
+    media_dir = tmp_path / "media"
+    media_dir.mkdir()
+    old = media_dir / "old.jpg"
+    old.write_bytes(b"x")
+    os.utime(old, (time.time() - 2 * 86400, time.time() - 2 * 86400))
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": []})
+
+    _install_mock_transport(monkeypatch, handler)
+    monkeypatch.setenv("TELEGRAM_SECRETARY_SESSION_ID", "S-no-cleanup")
+    assert main(["lease", "acquire"]) == EXIT_OK
+    rc = main(
+        [
+            "watch",
+            "--timeout",
+            "1",
+            "--max-iterations",
+            "1",
+            "--cleanup-interval",
+            "0",
+        ]
+    )
+    assert rc == EXIT_OK
+    # cleanup 無効なのでファイルは残る
+    assert old.exists()
