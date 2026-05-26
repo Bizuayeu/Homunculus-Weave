@@ -1,6 +1,7 @@
 """Telegram Bot API への HTTP クライアント。getUpdates / sendMessage を提供。"""
 from __future__ import annotations
 
+import time
 from typing import Any, List, Optional
 
 import httpx
@@ -13,7 +14,8 @@ from domain.offset import UpdateOffset
 class TelegramApiGateway:
     """Telegram Bot API の getUpdates / sendMessage を呼ぶ実装。
 
-    - 5xx は retry_count 回まで自動再試行
+    - 5xx / 429 は retry_count 回まで自動再試行
+    - 429 は `Retry-After` ヘッダを尊重して sleep（最大 `max_retry_after_seconds` 秒）
     - 401 は AuthFailureError（exit 3 系の決定打）
     - その他 4xx は TelegramSecretaryError
     - ネットワークエラーは retry 後に TelegramSecretaryError
@@ -21,6 +23,7 @@ class TelegramApiGateway:
 
     DEFAULT_BASE_URL = "https://api.telegram.org"
     DEFAULT_USER_AGENT = "TelegramSecretary/0.1 (+Weave)"
+    DEFAULT_MAX_RETRY_AFTER_SECONDS = 60
 
     def __init__(
         self,
@@ -29,11 +32,13 @@ class TelegramApiGateway:
         client: Optional[httpx.Client] = None,
         retry_count: int = 2,
         request_timeout: float = 40.0,
+        max_retry_after_seconds: int = DEFAULT_MAX_RETRY_AFTER_SECONDS,
     ) -> None:
         self._bot_token = bot_token
         self._base_url = base_url.rstrip("/")
         self._retry_count = retry_count
         self._request_timeout = request_timeout
+        self._max_retry_after_seconds = max_retry_after_seconds
         if client is None:
             client = httpx.Client(
                 timeout=request_timeout,
@@ -82,6 +87,19 @@ class TelegramApiGateway:
 
             if response.status_code == 401:
                 raise AuthFailureError(f"401 Unauthorized: {response.text[:200]}")
+            if response.status_code == 429:
+                # Telegram のレート制限。Retry-After ヘッダを尊重して sleep してから再試行
+                last_exc = httpx.HTTPStatusError(
+                    "429 Too Many Requests",
+                    request=response.request,
+                    response=response,
+                )
+                if attempt < self._retry_count:
+                    self._sleep_for_retry_after(response.headers.get("Retry-After"))
+                    continue
+                raise TelegramSecretaryError(
+                    f"rate limited after retries (429), Retry-After={response.headers.get('Retry-After')!r}"
+                )
             if response.status_code >= 500:
                 last_exc = httpx.HTTPStatusError(
                     f"{response.status_code}", request=response.request, response=response
@@ -98,3 +116,19 @@ class TelegramApiGateway:
             return response
 
         raise TelegramSecretaryError(f"unreachable, last_exc={last_exc}")
+
+    def _sleep_for_retry_after(self, header_value: Optional[str]) -> None:
+        """`Retry-After` ヘッダの秒数だけ sleep（上限 `max_retry_after_seconds`）。
+
+        - ヘッダ無しまたは parse 失敗時は sleep しない（即時 retry）
+        - 上限を超える値は上限に丸める（DoS 自損防止）
+        """
+        if not header_value:
+            return
+        try:
+            seconds = int(header_value)
+        except (ValueError, TypeError):
+            return
+        if seconds <= 0:
+            return
+        time.sleep(min(seconds, self._max_retry_after_seconds))
