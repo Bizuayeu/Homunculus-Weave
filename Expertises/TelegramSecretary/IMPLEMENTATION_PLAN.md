@@ -127,7 +127,13 @@
 - 指摘④-2（SendReply の owner 検証）: 送信前に lease store を再 load して並走奪取をブロック
 - 指摘④-3（429/Retry-After 尊重）: api_gateway で 429 を retry 対象に追加、`Retry-After` 上限付きで sleep
 
-**Status**: In Progress（ROUTINE_PROMPT.md / SKILL.md / README.md / CHANGELOG.md 作成済み、v0.1.1 設計ホール修正済み、Cloud Routine 環境での実機検証は別途）
+**v0.1.2 修正履歴 (2026-05-26)**: 運用律 B 案として session_id を env 経由で統一。詳細は [`CHANGELOG.md`](./CHANGELOG.md) [0.1.2] 参照。
+
+- `bootstrap.sh` を source/exec デュアル対応 + `TELEGRAM_SECRETARY_SESSION_ID` 冪等自動 export
+- `cmd_send_reply` に `--owner` 引数 + CLI 層 owner 検証（二重防御）
+- `ROUTINE_PROMPT.md` Step 2 を `source` 呼び出しに変更
+
+**Status**: In Progress（ROUTINE_PROMPT.md / SKILL.md / README.md / CHANGELOG.md 作成済み、v0.1.1 設計ホール修正・v0.1.2 運用律 B 案実装済み、Cloud Routine 環境での実機検証は別途）
 
 ## Documentation Plan
 

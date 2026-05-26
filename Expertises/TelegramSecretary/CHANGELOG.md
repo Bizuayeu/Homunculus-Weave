@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.1.2] - 2026-05-26
+
+### Added — 運用律 B 案: session_id の env 統一
+
+- `bootstrap.sh` を NewsCaster と同型の **source/exec デュアル対応** に書き換え
+  - source 時は env を親シェルに引き継ぎ、bash 実行時は依存導入のみ
+  - `set -u` のみ採用（source 時に呼び出し元シェルへの影響を避けるため `set -e` は不使用）
+- `bootstrap.sh` 末尾に `TELEGRAM_SECRETARY_SESSION_ID` の**冪等な自動 export** を追加
+  - 未設定時は uuid から生成（`session-xxxxxxxx`）
+  - 設定済みなら尊重（冪等性）
+- `cmd_send_reply` に `--owner` 引数と CLI 層の owner 検証を追加
+  - lease.owner と caller の owner が不一致なら exit 4（並走奪取の二重防御）
+- `ROUTINE_PROMPT.md` Step 2 を `bash` から `source` 呼び出しに変更
+  - 運用律 B 案を明記、各コマンドでの `--owner` 明示が不要に
+
+### Changed
+
+- 全 subcommand (`lease` / `watch` / `send-reply`) は `--owner > env > uuid` の優先順位で
+  owner を解決。`source bootstrap.sh` で env を固定すれば全コマンド自動同期、
+  緊急時の上書きは `--owner <id>` で可能
+
+### Tests
+
+- **Total: 99 tests passing** (96 → +3)
+- 新規: send-reply owner mismatch / send-reply env owner sharing / watch env owner sharing
+
+### Rationale
+
+- Routine 側レビュー後の残課題（Step 5 と Step 6 の owner 整合性）への対応
+- ProsCons 検討の結果 B 案（env 統一）採用：書き忘れ防止 = Routine 指摘①と同型の構造的取りこぼし対策
+- Cloud Routine ではセッション毎に env が独立ゆえ env 汚染リスク構造的にゼロ
+
 ## [0.1.1] - 2026-05-26
 
 ### Fixed — Routine 側レビュー指摘対応
