@@ -241,3 +241,75 @@ def test_file_name_is_carried_through_render_result():
     uc = RenderAuthorizedMedia(renderer)
     results = uc.execute([dr])
     assert results[0].media.file_name == "specification.docx"
+
+
+# === Stage 9.4: audio → transcribe（transcriber 注入時のみ）===
+
+def test_audio_mpeg_calls_transcriber_when_injected():
+    """audio/mpeg は transcriber 注入時 transcribe ルート（markitdown renderer は呼ばない）。"""
+    dr = _download_result(1, "audio/mpeg", file_id="aud")
+    renderer = FakeMediaRenderer()
+    transcriber = FakeMediaRenderer(rendered_text="文字起こしテキスト", render_status="ok")
+    uc = RenderAuthorizedMedia(renderer, transcriber=transcriber)
+    results = uc.execute([dr])
+
+    assert results[0].rendered.render_status == "ok"
+    assert results[0].rendered.rendered_text == "文字起こしテキスト"
+    assert len(transcriber.render_calls) == 1  # transcriber が呼ばれる
+    assert renderer.render_calls == []  # markitdown renderer は呼ばれない
+
+
+def test_voice_ogg_calls_transcriber():
+    """Telegram voice の audio/ogg も transcribe ルート。"""
+    dr = _download_result(1, "audio/ogg", file_id="voice")
+    transcriber = FakeMediaRenderer(rendered_text="ボイスメモ内容", render_status="ok")
+    uc = RenderAuthorizedMedia(FakeMediaRenderer(), transcriber=transcriber)
+    results = uc.execute([dr])
+    assert results[0].rendered.render_status == "ok"
+    assert len(transcriber.render_calls) == 1
+
+
+def test_audio_skipped_without_transcriber():
+    """transcriber 未注入なら audio は skipped（後方互換・フォールバック）。"""
+    dr = _download_result(1, "audio/mpeg")
+    renderer = FakeMediaRenderer()
+    uc = RenderAuthorizedMedia(renderer)  # transcriber なし
+    results = uc.execute([dr])
+    assert results[0].rendered.render_status == "skipped"
+    assert renderer.render_calls == []
+
+
+def test_video_calls_transcriber():
+    """Stage 9.6: video/* も transcribe ルート（音声トラックを transcript 化）。
+
+    FfmpegAudioPreprocessor が動画コンテナの音声ストリームを PyAV で decode するため、
+    audio/* と同じ transcriber 経路に乗る。key frame Vision は 9.6-ii で別途。
+    """
+    dr = _download_result(1, "video/mp4", file_id="vid")
+    transcriber = FakeMediaRenderer(rendered_text="動画の音声トラック", render_status="ok")
+    uc = RenderAuthorizedMedia(FakeMediaRenderer(), transcriber=transcriber)
+    results = uc.execute([dr])
+    assert results[0].rendered.render_status == "ok"
+    assert results[0].rendered.rendered_text == "動画の音声トラック"
+    assert len(transcriber.render_calls) == 1
+
+
+def test_video_skipped_without_transcriber():
+    """transcriber 未注入なら video も skipped（後方互換・フォールバック）。"""
+    dr = _download_result(1, "video/mp4", file_id="vid")
+    renderer = FakeMediaRenderer()
+    uc = RenderAuthorizedMedia(renderer)  # transcriber なし
+    results = uc.execute([dr])
+    assert results[0].rendered.render_status == "skipped"
+    assert renderer.render_calls == []
+
+
+def test_audio_download_skip_propagates_even_with_transcriber():
+    """size 超過で download skip された audio は transcribe も skip。"""
+    dr = _download_result(1, "audio/mpeg", skip_reason="media_size_exceeded")
+    transcriber = FakeMediaRenderer()
+    uc = RenderAuthorizedMedia(FakeMediaRenderer(), transcriber=transcriber)
+    results = uc.execute([dr])
+    assert results[0].rendered.render_status == "skipped"
+    assert results[0].skip_reason == "media_size_exceeded"
+    assert transcriber.render_calls == []

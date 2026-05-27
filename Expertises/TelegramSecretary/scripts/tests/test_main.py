@@ -647,3 +647,87 @@ def test_watch_skips_cleanup_when_interval_zero(env_ready, monkeypatch, tmp_path
     assert rc == EXIT_OK
     # cleanup 無効なのでファイルは残る
     assert old.exists()
+
+
+# --- Stage 9.3: 受信基盤 CLI 実証（voice / video が emit に kind 付きで乗る）---
+
+
+def test_poll_medium_mode_emits_voice(env_ready, monkeypatch, capsys):
+    """Medium モード: voice update が kind=voice で emit に乗る（受信基盤・公式同等）。
+
+    Heavy モードの transcribe は adapter テスト（9.5b）＋実 E2E で検証するため、
+    ここでは download/transcribe を起動しない Medium モードで受信認識のみを固める。
+    """
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert "getFile" not in str(request.url)  # Medium モードは download しない
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200, "username": "weave"},
+                            "voice": {
+                                "file_id": "AwACvoice",
+                                "duration": 5,
+                                "mime_type": "audio/ogg",
+                                "file_size": 8192,
+                            },
+                            "caption": "聞いて",
+                        },
+                    },
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    rc = main(["poll", "--timeout", "1"])
+    assert rc == EXIT_OK
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["text"] == "聞いて"  # caption が text に統合
+    assert len(payload["media"]) == 1
+    assert payload["media"][0]["kind"] == "voice"
+    assert payload["media"][0]["file_id"] == "AwACvoice"
+    assert payload["media"][0]["mime_type"] == "audio/ogg"
+    assert payload["media"][0]["local_path"] is None  # Medium
+    assert payload["media"][0]["render_status"] is None  # Medium は render/transcribe しない
+
+
+def test_poll_medium_mode_emits_video(env_ready, monkeypatch, capsys):
+    """Medium モード: video update が kind=video で emit（音声 transcript は Heavy/9.6）。"""
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200},
+                            "video": {
+                                "file_id": "BAADvideo",
+                                "duration": 30,
+                                "mime_type": "video/mp4",
+                                "file_size": 1000000,
+                            },
+                        },
+                    },
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["poll", "--timeout", "1"]) == EXIT_OK
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["media"][0]["kind"] == "video"
+    assert payload["media"][0]["mime_type"] == "video/mp4"
+    assert payload["media"][0]["local_path"] is None
