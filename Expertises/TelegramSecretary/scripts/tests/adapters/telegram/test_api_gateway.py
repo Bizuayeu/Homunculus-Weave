@@ -10,6 +10,7 @@ from adapters.telegram.api_gateway import TelegramApiGateway
 from domain.exceptions import AuthFailureError, TelegramSecretaryError
 from domain.models import OutboundMessage
 from domain.offset import UpdateOffset
+from domain.outbound import OutboundAttachment
 
 
 def _gateway(handler, retry_count: int = 2, max_retry_after: int = 60) -> TelegramApiGateway:
@@ -283,3 +284,133 @@ def test_get_file_raises_when_ok_false():
     gw = _gateway(handler)
     with pytest.raises(TelegramSecretaryError):
         gw.get_file("missing")
+
+
+# === Stage 8.3: outbound media（sendPhoto / sendDocument / sendChatAction） ===
+
+
+def test_send_no_attachment_uses_sendmessage():
+    # 後方互換: 添付なしは従来 sendMessage（json）
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["url"] = str(request.url)
+        captured["content_type"] = request.headers.get("content-type", "")
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    gw = _gateway(handler)
+    gw.send(OutboundMessage(chat_id=100, text="hi"))
+    assert "sendMessage" in captured["url"]
+    assert "application/json" in captured["content_type"]
+
+
+def test_send_photo_attachment_uses_sendphoto(tmp_path):
+    img = tmp_path / "fig.png"
+    img.write_bytes(b"\x89PNG\r\n\x1a\n")
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["url"] = str(request.url)
+        captured["content_type"] = request.headers.get("content-type", "")
+        captured["body"] = request.read()
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    gw = _gateway(handler)
+    gw.send(
+        OutboundMessage(
+            chat_id=100,
+            text="caption text",
+            attachments=[OutboundAttachment(path=img)],
+        )
+    )
+    assert "sendPhoto" in captured["url"]
+    assert "multipart/form-data" in captured["content_type"]
+    # 本文は caption として、chat_id は data field として multipart body に乗る
+    assert b"caption text" in captured["body"]
+    assert b'name="chat_id"' in captured["body"]
+
+
+def test_send_document_attachment_uses_senddocument(tmp_path):
+    doc = tmp_path / "report.pdf"
+    doc.write_bytes(b"%PDF-1.4")
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["url"] = str(request.url)
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    gw = _gateway(handler)
+    gw.send(
+        OutboundMessage(
+            chat_id=100,
+            text="",
+            attachments=[OutboundAttachment(path=doc)],
+        )
+    )
+    assert "sendDocument" in captured["url"]
+
+
+def test_long_text_with_attachment_sends_text_separately(tmp_path):
+    # caption 上限（1024）超の text は sendMessage で先送り、添付は後続
+    img = tmp_path / "fig.png"
+    img.write_bytes(b"\x89PNG\r\n")
+    calls: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(str(request.url))
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    gw = _gateway(handler)
+    gw.send(
+        OutboundMessage(
+            chat_id=100,
+            text="x" * 2000,
+            attachments=[OutboundAttachment(path=img)],
+        )
+    )
+    assert any("sendMessage" in c for c in calls)
+    assert any("sendPhoto" in c for c in calls)
+
+
+def test_send_chat_action_calls_api():
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["url"] = str(request.url)
+        captured["body"] = json.loads(request.read())
+        return httpx.Response(200, json={"ok": True, "result": True})
+
+    gw = _gateway(handler)
+    gw.send_chat_action(100, "typing")
+    assert "sendChatAction" in captured["url"]
+    assert captured["body"]["action"] == "typing"
+    assert captured["body"]["chat_id"] == 100
+
+
+def test_send_chat_action_is_best_effort_on_error():
+    # typing は best-effort: API エラーでも例外を投げず本応答を妨げない
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(500, text="err")
+
+    gw = _gateway(handler, retry_count=0)
+    gw.send_chat_action(100, "typing")  # 例外が出ないこと
+
+
+def test_send_photo_failure_does_not_leak_token(tmp_path):
+    # 送信失敗例外に bot token が混入しない（media_downloader と同型の redact）
+    img = tmp_path / "fig.png"
+    img.write_bytes(b"\x89PNG")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": False, "description": "bad request"})
+
+    gw = _gateway(handler)
+    with pytest.raises(TelegramSecretaryError) as excinfo:
+        gw.send(
+            OutboundMessage(
+                chat_id=100,
+                text="x",
+                attachments=[OutboundAttachment(path=img)],
+            )
+        )
+    assert "TEST_TOKEN" not in str(excinfo.value)

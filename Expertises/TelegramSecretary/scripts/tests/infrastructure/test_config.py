@@ -7,7 +7,7 @@ from infrastructure.config import Config
 
 @pytest.fixture(autouse=True)
 def base_env(monkeypatch, tmp_path):
-    """最低限の env を揃え、media 系は各テストで上書きする。"""
+    """最低限の env を揃え、media/outbound 系は各テストで上書きする。"""
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "TEST")
     monkeypatch.setenv("TELEGRAM_SECRETARY_AUTHORIZED_CHATS", "[100]")
     monkeypatch.setenv("TELEGRAM_SECRETARY_STATE_DIR", str(tmp_path))
@@ -15,6 +15,7 @@ def base_env(monkeypatch, tmp_path):
         "TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES",
         "TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS",
         "TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD",
+        "TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES",
     ]:
         monkeypatch.delenv(k, raising=False)
 
@@ -70,5 +71,25 @@ def test_config_enable_download_falsy_values(monkeypatch, value):
 
 def test_config_enable_download_invalid_value(monkeypatch):
     monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "maybe")
+    with pytest.raises(EnvironmentError):
+        Config.from_env()
+
+
+# === Stage 8.4: outbound media size ===
+
+
+def test_config_default_outbound_max_size():
+    cfg = Config.from_env()
+    assert cfg.outbound_max_size_bytes == 50 * 1024 * 1024
+
+
+def test_config_parses_outbound_max_size(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES", "10485760")
+    cfg = Config.from_env()
+    assert cfg.outbound_max_size_bytes == 10 * 1024 * 1024
+
+
+def test_config_rejects_non_positive_outbound_max_size(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES", "0")
     with pytest.raises(EnvironmentError):
         Config.from_env()

@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.5.0] - 2026-05-27 — Stage 8 Outbound Media: 生成物の送り返し (Doc Complete / E2E Pending)
+
+### Added — write 系（受信 Stage 6/7/9 の対）
+
+Stage 6/7/9 が受信メディアの中身理解（公式 plugin 超越）だったのに対し、本 Stage は Weave 起草の生成物（画像/レポート/docx 等）を Telegram に送り返す outbound media。`send-reply` が text-only から添付対応へ。送信ファイルの**生成**は親プロセス Weave、コードは**決定論的な送信と送信前チェックのみ**（L00473 分業）。
+
+**Domain (8.1)**:
+- `OutboundAttachment`（`path` のみ保持＝bytes を持たず純粋性維持、`is_photo()` で拡張子 routing）、`validate_attachments(attachments, max_bytes)` 純関数（存在/サイズ検証）
+- `OutboundMessage.attachments` field 追加（`default_factory=list`、text-only と後方互換）
+- `AttachmentNotFound` / `AttachmentTooLarge` 例外（受信側 `MediaSizeLimitExceeded` の送信側カウンターパート、こちらは送信中止＝ブロック）
+
+**UseCase (8.2)**:
+- `SendReply.execute` に `max_bytes` 引数（デフォルト 50MB）、`validate_attachments` を **lease 再検証の後・送信の前**に配置（不正なら送信前 raise → offset/lease 据え置きで冪等・再送可能）
+- `MessageSink` Port 契約は不変（`OutboundMessage` に attachments が乗るだけ＝fake sink 無変更）
+
+**Interface (8.3)**:
+- `TelegramApiGateway.send` を添付有無で分岐：なし→ sendMessage（従来）、あり→ sendPhoto/sendDocument（multipart、file bytes 読み切りで retry 再利用）
+- 本文は添付1件かつ caption 上限（1024）内なら caption に、それ以外は text を別 sendMessage で先送り。reply_to は最初の送信のみ（二重 reply 回避）
+- `send_chat_action`（typing、best-effort＝失敗は本送信を妨げない）
+- token redact: 送信失敗例外は method/chat_id/file 名のみで URL/token を載せない（テストで検証）
+
+**Infrastructure (8.4)**:
+- `cmd_send_reply` に `--file`（複数可）/ `--reply-to`（threading）/ 送信前 typing 配線、`Attachment*` 例外を exit 2 にマップ
+- `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` env（既定 50MB）
+
+### 対話 UX 装飾の取捨（大環主決裁 2026-05-27）
+
+「公式 plugin が持つから移植」前提を外し、「秘書の価値は read 系（Stage 6/7/9 で公式超越済み）、write は file 送信で双方向性が完成」を急所として選択的に実装：
+
+- **採用**: outbound file 送信（中核）/ reply threading（既存 Domain の `reply_to_message_id` 完成、ほぼ無コスト）/ typing インジケータ（stateless 軽量）
+- **見送り**: markdownv2（YAGNI、escape 事故リスク。後付け容易）/ react（本文 UTF-8 絵文字で代替可、さらに 1:1 DM は bot が管理者になれず inbound reaction も構造的に受信不可と確認）/ edit_message（stateless 設計に message_id 状態を持ち込むため、必要時に独立 Stage）
+
+### Changed
+
+- `OutboundMessage` が `attachments` を内包（Port 契約・fake は不変）
+- `send-reply` Subcommand に `--file` / `--reply-to` 追加（後方互換、添付なしは従来動作）
+
+### Tests
+
+- **Total: 273 tests passing**（v0.4.0 の 246 → +27）
+- Domain: +11（OutboundAttachment.is_photo / validate_attachments / OutboundMessage 後方互換）
+- UseCase: +3（SendReply 添付素通し / サイズ超過送信前 raise / lease 検証が添付検証に先行）
+- Interface: +7（sendPhoto / sendDocument / 長文 text 別送 / sendChatAction best-effort / token redact）
+- Infrastructure: +6（config outbound env 3 / CLI --file→sendPhoto・missing→exit2・--reply-to 3）
+
+### Live E2E Pending (Fresh Session 必須)
+
+- E2E: 画像生成 → `--file figure.png` → Telegram で画像 + caption 受信
+- E2E: docx/PDF → `--file report.docx` → sendDocument 受信
+- E2E: >50MB → 送信前 exit 2、Telegram に何も送られない
+- E2E: `--reply-to` で元発言への返信スレッド表示 / 送信前 typing インジケータ
+
 ## [0.4.0] - 2026-05-27 — Stage 9 Native Voice/Audio/Video Inbox: 音声 transcript (Doc Complete / E2E Pending)
 
 ### Added — voice / audio / video の中身理解（STT）

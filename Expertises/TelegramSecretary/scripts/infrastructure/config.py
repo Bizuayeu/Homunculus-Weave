@@ -11,6 +11,7 @@ from domain.authorization import AuthorizedChats
 
 DEFAULT_MEDIA_MAX_SIZE_BYTES = 20 * 1024 * 1024  # 20 MB
 DEFAULT_MEDIA_RETENTION_HOURS = 24
+DEFAULT_OUTBOUND_MAX_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB（Telegram bot API 送信上限）
 
 
 @dataclass(frozen=True)
@@ -21,6 +22,7 @@ class Config:
     media_max_size_bytes: int = DEFAULT_MEDIA_MAX_SIZE_BYTES
     media_retention_hours: int = DEFAULT_MEDIA_RETENTION_HOURS
     media_enable_download: bool = True
+    outbound_max_size_bytes: int = DEFAULT_OUTBOUND_MAX_SIZE_BYTES
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -62,6 +64,10 @@ class Config:
             "TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD",
             default=True,
         )
+        outbound_max_size = cls._parse_positive_int(
+            "TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES",
+            default=DEFAULT_OUTBOUND_MAX_SIZE_BYTES,
+        )
 
         return cls(
             bot_token=token,
@@ -70,6 +76,7 @@ class Config:
             media_max_size_bytes=max_size,
             media_retention_hours=retention,
             media_enable_download=enable_download,
+            outbound_max_size_bytes=outbound_max_size,
         )
 
     @staticmethod

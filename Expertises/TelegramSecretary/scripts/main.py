@@ -12,9 +12,16 @@ from adapters.state.emitter import StdoutEventEmitter
 from adapters.state.json_state_store import JsonLeaseStore, JsonOffsetStore
 from adapters.telegram.api_gateway import TelegramApiGateway
 from adapters.telegram.media_downloader import TelegramMediaDownloader
-from domain.exceptions import AuthFailureError, LeaseConflictError, TelegramSecretaryError
+from domain.exceptions import (
+    AttachmentNotFound,
+    AttachmentTooLarge,
+    AuthFailureError,
+    LeaseConflictError,
+    TelegramSecretaryError,
+)
 from domain.lease import utc_now
 from domain.models import OutboundMessage
+from domain.outbound import OutboundAttachment
 from infrastructure.config import Config
 from infrastructure.media_cleanup import cleanup_media_dir
 from usecases.acquire_lease import AcquireLease
@@ -238,6 +245,7 @@ def cmd_send_reply(args: argparse.Namespace) -> int:
 
     owner = _session_owner(args.owner)
     text = Path(args.text_file).read_text(encoding="utf-8")
+    attachments = [OutboundAttachment(path=Path(f)) for f in (args.file or [])]
     offset_store = JsonOffsetStore(config.state_dir)
     lease_store = JsonLeaseStore(config.state_dir)
     lease = lease_store.load()
@@ -253,13 +261,24 @@ def cmd_send_reply(args: argparse.Namespace) -> int:
         return EXIT_LEASE_CONFLICT
 
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
+        # 送信前に typing を best-effort で出す（watch→Monitor→応答の数秒ラグの UX 緩和）
+        gateway.send_chat_action(args.chat_id)
         try:
             SendReply(gateway, offset_store, lease_store).execute(
-                message=OutboundMessage(chat_id=args.chat_id, text=text),
+                message=OutboundMessage(
+                    chat_id=args.chat_id,
+                    text=text,
+                    reply_to_message_id=args.reply_to,
+                    attachments=attachments,
+                ),
                 update_id=args.update_id,
                 lease=lease,
                 now=utc_now(),
+                max_bytes=config.outbound_max_size_bytes,
             )
+        except (AttachmentNotFound, AttachmentTooLarge) as exc:
+            print(f"attachment error: {exc}", file=sys.stderr)
+            return EXIT_CONFIG_INVALID
         except AuthFailureError as exc:
             print(f"auth failure: {exc}", file=sys.stderr)
             return EXIT_AUTH_FAILED
@@ -324,6 +343,18 @@ def build_parser() -> argparse.ArgumentParser:
     p_send.add_argument("--update-id", type=int, required=True)
     p_send.add_argument("--text-file", required=True)
     p_send.add_argument("--owner", help="session owner id (lease 検証用、省略時は env か uuid)")
+    p_send.add_argument(
+        "--file",
+        action="append",
+        default=[],
+        help="送り返す添付ファイルパス（複数指定可、画像は sendPhoto・他は sendDocument）",
+    )
+    p_send.add_argument(
+        "--reply-to",
+        type=int,
+        default=None,
+        help="返信先メッセージ ID（reply threading）",
+    )
 
     p_test = sub.add_parser("test", help="疎通テスト：owner chat に ping 送信")
     p_test.add_argument("--chat-id", type=int, required=True)
