@@ -21,6 +21,7 @@ from usecases.acquire_lease import AcquireLease
 from usecases.download_authorized_media import DownloadAuthorizedMedia
 from usecases.fetch_authorized_updates import FetchAuthorizedUpdates
 from usecases.release_lease import ReleaseLease
+from usecases.render_authorized_media import RenderAuthorizedMedia
 from usecases.renew_lease import RenewLease
 from usecases.send_reply import SendReply
 
@@ -91,6 +92,7 @@ def cmd_poll(args: argparse.Namespace) -> int:
     offset_store = JsonOffsetStore(config.state_dir)
     emitter = StdoutEventEmitter()
     download_results: list = []
+    render_results: list = []
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
         uc = FetchAuthorizedUpdates(gateway, offset_store, config.authorized_chats)
         try:
@@ -102,7 +104,7 @@ def cmd_poll(args: argparse.Namespace) -> int:
             print(f"fetch failed: {exc}", file=sys.stderr)
             return EXIT_FETCH_FAILED
 
-        # Heavy モード: media を持つ update があれば download
+        # Heavy モード: media を持つ update があれば download → render
         if config.media_enable_download and any(u.update.media for u in updates):
             with TelegramMediaDownloader(
                 bot_token=config.bot_token, gateway=gateway
@@ -112,9 +114,18 @@ def cmd_poll(args: argparse.Namespace) -> int:
                     config.state_dir / "media",
                     config.media_max_size_bytes,
                 )
+            # Stage 7.4: download 済み media を render（lazy import で markitdown
+            # 依存を validate-config / Medium モードから切り離す）
+            from adapters.render.markitdown_renderer import MarkitdownRenderer
+
+            render_results = RenderAuthorizedMedia(MarkitdownRenderer()).execute(
+                download_results
+            )
 
     for u in updates:
-        emitter.emit(u, download_results=download_results)
+        emitter.emit(
+            u, download_results=download_results, render_results=render_results
+        )
     return EXIT_OK
 
 
@@ -133,14 +144,20 @@ def cmd_watch(args: argparse.Namespace) -> int:
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
         uc = FetchAuthorizedUpdates(gateway, offset_store, config.authorized_chats)
         renew = RenewLease(lease_store)
-        # Heavy モードのみ downloader を loop 外で 1 回作って使い回す（接続コスト削減）
+        # Heavy モードのみ downloader / renderer を loop 外で 1 回作って使い回す（接続コスト削減）
         downloader: TelegramMediaDownloader | None = None
         download_uc: DownloadAuthorizedMedia | None = None
+        render_uc: RenderAuthorizedMedia | None = None
         if config.media_enable_download:
             downloader = TelegramMediaDownloader(
                 bot_token=config.bot_token, gateway=gateway
             )
             download_uc = DownloadAuthorizedMedia(downloader)
+            # Stage 7.4: renderer も loop 外で 1 回作る（MarkItDown は magika model
+            # load が重いので毎サイクル作り直さない）
+            from adapters.render.markitdown_renderer import MarkitdownRenderer
+
+            render_uc = RenderAuthorizedMedia(MarkitdownRenderer())
         try:
             while True:
                 try:
@@ -153,14 +170,21 @@ def cmd_watch(args: argparse.Namespace) -> int:
                     print(f"transient fetch error: {exc}", file=sys.stderr)
                 else:
                     download_results: list = []
+                    render_results: list = []
                     if download_uc is not None and any(u.update.media for u in updates):
                         download_results = download_uc.execute(
                             updates,
                             media_target_dir,
                             config.media_max_size_bytes,
                         )
+                        if render_uc is not None:
+                            render_results = render_uc.execute(download_results)
                     for u in updates:
-                        emitter.emit(u, download_results=download_results)
+                        emitter.emit(
+                            u,
+                            download_results=download_results,
+                            render_results=render_results,
+                        )
 
                 # アイドル時も heartbeat を維持。lease を失っていたら自己治癒で即終了
                 try:
