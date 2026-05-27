@@ -175,3 +175,103 @@ def test_rendered_media_is_immutable():
     rendered = RenderedMedia(rendered_text="x", render_status="ok")
     with pytest.raises(AttributeError):
         rendered.render_status = "failed"  # type: ignore[misc]
+
+
+# === Stage 9.1: voice / audio / video / video_note ===
+
+def test_media_from_voice_api():
+    """Telegram voice（ボイスメモ）は OGG/OPUS。file_name 概念なし。"""
+    voice = {
+        "file_id": "AwACAgIAxxx",
+        "duration": 5,
+        "mime_type": "audio/ogg",
+        "file_size": 8192,
+    }
+    media = MediaAttachment.from_voice_api(voice)
+    assert media.kind == "voice"
+    assert media.file_id == "AwACAgIAxxx"
+    assert media.mime_type == "audio/ogg"
+    assert media.size == 8192
+    assert media.file_name is None
+
+
+def test_media_from_voice_api_missing_mime_falls_back_to_ogg():
+    """voice の mime 欠落時は audio/ogg（Telegram voice は常に OGG/OPUS）。"""
+    voice = {"file_id": "v", "duration": 3}
+    media = MediaAttachment.from_voice_api(voice)
+    assert media.mime_type == "audio/ogg"
+    assert media.size == 0
+
+
+def test_media_from_audio_api():
+    """audio（音楽ファイル）は file_name / mime_type を持ち得る。"""
+    audio = {
+        "file_id": "BAACAgIAyyy",
+        "duration": 180,
+        "mime_type": "audio/mpeg",
+        "file_size": 3145728,
+        "file_name": "song.mp3",
+    }
+    media = MediaAttachment.from_audio_api(audio)
+    assert media.kind == "audio"
+    assert media.file_id == "BAACAgIAyyy"
+    assert media.mime_type == "audio/mpeg"
+    assert media.size == 3145728
+    assert media.file_name == "song.mp3"
+
+
+def test_media_from_audio_api_missing_mime_falls_back():
+    """audio の mime 欠落時は audio/mpeg（mp3 が最頻、audio/* prefix で routing）。"""
+    audio = {"file_id": "a", "duration": 10}
+    media = MediaAttachment.from_audio_api(audio)
+    assert media.mime_type == "audio/mpeg"
+    assert media.file_name is None
+
+
+def test_media_from_video_api():
+    """video（mp4）は file_name / mime_type を持ち得る。"""
+    video = {
+        "file_id": "BAACAgIAzzz",
+        "width": 1280,
+        "height": 720,
+        "duration": 30,
+        "mime_type": "video/mp4",
+        "file_size": 10485760,
+        "file_name": "clip.mp4",
+    }
+    media = MediaAttachment.from_video_api(video)
+    assert media.kind == "video"
+    assert media.file_id == "BAACAgIAzzz"
+    assert media.mime_type == "video/mp4"
+    assert media.size == 10485760
+    assert media.file_name == "clip.mp4"
+
+
+def test_media_from_video_api_missing_mime_falls_back_to_mp4():
+    """video の mime 欠落時は video/mp4（Telegram video は mp4）。"""
+    video = {"file_id": "v", "duration": 5}
+    media = MediaAttachment.from_video_api(video)
+    assert media.mime_type == "video/mp4"
+
+
+def test_media_from_video_note_api():
+    """video_note（丸いビデオメッセージ）は mime_type / file_name フィールドが無く常に mp4。"""
+    video_note = {
+        "file_id": "DQACAgIAwww",
+        "length": 240,
+        "duration": 8,
+        "file_size": 524288,
+    }
+    media = MediaAttachment.from_video_note_api(video_note)
+    assert media.kind == "video_note"
+    assert media.file_id == "DQACAgIAwww"
+    assert media.mime_type == "video/mp4"
+    assert media.size == 524288
+    assert media.file_name is None
+
+
+def test_media_voice_is_immutable():
+    """新 kind も frozen。"""
+    media = MediaAttachment.from_voice_api({"file_id": "v"})
+    with pytest.raises(AttributeError):
+        media.kind = "audio"  # type: ignore[misc]

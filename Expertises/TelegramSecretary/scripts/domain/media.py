@@ -15,9 +15,9 @@ _VALID_RENDER_STATUSES = frozenset({"ok", "passthrough", "skipped", "failed"})
 
 @dataclass(frozen=True)
 class MediaAttachment:
-    """Telegram message に含まれる photo / document を Domain 表現したもの。"""
+    """Telegram message に含まれる各種メディアを Domain 表現したもの。"""
 
-    kind: str  # "photo" | "document"
+    kind: str  # "photo" | "document" | "voice" | "audio" | "video" | "video_note"
     file_id: str
     mime_type: str
     size: int
@@ -55,6 +55,62 @@ class MediaAttachment:
             mime_type=document.get("mime_type") or "application/octet-stream",
             size=int(document.get("file_size", 0)),
             file_name=document.get("file_name"),
+        )
+
+    @classmethod
+    def from_voice_api(cls, voice: Mapping[str, Any]) -> "MediaAttachment":
+        """Telegram の voice（ボイスメモ）から構築。
+
+        voice は常に OGG/OPUS。mime 欠落時は audio/ogg にフォールバック。
+        voice に file_name の概念は無い。
+        """
+        return cls(
+            kind="voice",
+            file_id=str(voice["file_id"]),
+            mime_type=voice.get("mime_type") or "audio/ogg",
+            size=int(voice.get("file_size", 0)),
+        )
+
+    @classmethod
+    def from_audio_api(cls, audio: Mapping[str, Any]) -> "MediaAttachment":
+        """Telegram の audio（音楽ファイル）から構築。
+
+        mime 欠落時は audio/mpeg（mp3 が最頻、audio/* prefix で routing 可能）。
+        audio は file_name を持ち得る。
+        """
+        return cls(
+            kind="audio",
+            file_id=str(audio["file_id"]),
+            mime_type=audio.get("mime_type") or "audio/mpeg",
+            size=int(audio.get("file_size", 0)),
+            file_name=audio.get("file_name"),
+        )
+
+    @classmethod
+    def from_video_api(cls, video: Mapping[str, Any]) -> "MediaAttachment":
+        """Telegram の video（mp4）から構築。
+
+        mime 欠落時は video/mp4。video は file_name を持ち得る。
+        """
+        return cls(
+            kind="video",
+            file_id=str(video["file_id"]),
+            mime_type=video.get("mime_type") or "video/mp4",
+            size=int(video.get("file_size", 0)),
+            file_name=video.get("file_name"),
+        )
+
+    @classmethod
+    def from_video_note_api(cls, video_note: Mapping[str, Any]) -> "MediaAttachment":
+        """Telegram の video_note（丸いビデオメッセージ）から構築。
+
+        video_note は mime_type / file_name フィールドを持たず常に mp4。
+        """
+        return cls(
+            kind="video_note",
+            file_id=str(video_note["file_id"]),
+            mime_type="video/mp4",
+            size=int(video_note.get("file_size", 0)),
         )
 
 

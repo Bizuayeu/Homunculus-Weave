@@ -127,3 +127,44 @@ def test_update_without_media_has_empty_media_list_backward_compat():
     result = uc.execute()
     assert result[0].update.media == []
     assert result[0].update.caption is None
+
+
+# === Stage 9.2: voice / audio / video が fetch を通る ===
+
+def test_voice_update_passes_through_fetch():
+    """voice 付き update が認可フィルタを通り media に乗る。"""
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 100},
+            "from": {"id": 1},
+            "voice": {"file_id": "v1", "duration": 5, "mime_type": "audio/ogg", "file_size": 8192},
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    source = FakeUpdateSource(batches=[[update]])
+    offset_store = FakeOffsetStore()
+    allowlist = AuthorizedChats.from_iterable([100])
+    uc = FetchAuthorizedUpdates(source, offset_store, allowlist)
+    result = uc.execute()
+    assert len(result) == 1
+    assert result[0].update.media[0].kind == "voice"
+
+
+def test_unauthorized_voice_update_is_dropped():
+    """未認可 chat の voice は破棄（kind 非依存の認可フィルタ）。"""
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 999},
+            "from": {"id": 1},
+            "voice": {"file_id": "v1", "duration": 5},
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    source = FakeUpdateSource(batches=[[update]])
+    offset_store = FakeOffsetStore()
+    allowlist = AuthorizedChats.from_iterable([100])
+    uc = FetchAuthorizedUpdates(source, offset_store, allowlist)
+    result = uc.execute()
+    assert result == []

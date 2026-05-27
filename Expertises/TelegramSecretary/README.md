@@ -58,8 +58,22 @@ python scripts/main.py poll --timeout 5
 #    - rendered_text="# 仕様書\n..."（markitdown が md 化）
 #    - render_status="ok"
 # image/pdf は render_status="passthrough"（Read tool が直接対応、render 不要）
-# 音声/動画 (audio/*, video/*) や zip 等は render_status="skipped"
+# zip 等は render_status="skipped"
 # 壊れたファイル等で markitdown が失敗すると render_status="failed"
+```
+
+### voice / audio / video を試す（Stage 9 Native Voice/Audio/Video Inbox）
+
+```powershell
+# bot に voice メモ（ボイスメッセージ）を送ってから：
+python scripts/main.py poll --timeout 5
+# → emit JSON Lines の media[0] に:
+#    - kind="voice"
+#    - rendered_text="（Moonshine が文字起こしした日本語 transcript）"
+#    - render_status="ok"
+# audio(mp3) / video(mp4) も音声トラックが transcript 化される（key frame Vision は後続フェーズ）
+# Moonshine 日本語モデル base-ja は初回 transcribe 時に自動DL（約134MB、ローカルキャッシュ）
+# transcriber 未注入（or Medium モード）では音声は render_status="skipped"
 ```
 
 ## テスト
@@ -68,7 +82,7 @@ python scripts/main.py poll --timeout 5
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **214 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66 + v0.2.1 follow-up で +6 + v0.3.0 Stage 7 MediaRenderer で +43、Stage 5 / 6.5 / 7.5 は実機検証フェーズ）。
+現在 **246 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66 + v0.2.1 follow-up で +6 + v0.3.0 Stage 7 MediaRenderer で +43 + v0.4.0 Stage 9 Native Voice/Audio/Video Inbox で +32、Stage 5 / 6.5 / 7.5 / 9 E2E は実機検証フェーズ）。
 
 ### 依存ツリー注記
 
@@ -81,6 +95,12 @@ python -m pytest scripts/tests/ -v
 - `sympy` / `coloredlogs` / `humanfriendly` 等の小さな utility
 
 Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip install` で 30秒程度、以降はキャッシュで高速）。markitdown 自体は MIT、再帰依存も全て MIT/BSD/Apache 系で利用可。
+
+**Stage 9 追加依存**（voice/audio/video transcript）:
+
+- `moonshine-voice>=0.0.59`（~56.5MB wheel、**torch-free**・onnxruntime）— 日本語 STT。日本語モデル `base-ja`（~134MB）は初回 transcribe 時にランタイムDL（`%LOCALAPPDATA%/moonshine_voice` 等にキャッシュ）。⚠️ **Community License は年商 $1M 未満のみ商用無料**。めぐる組の本番利用は Enterprise License（有償）か、`kotoba-whisper-v2.0`（Apache-2.0）への切替が必要
+- `av>=17.0`（PyAV、~29MB wheel）— **ffmpeg を wheel 内包**し OGG/OPUS/mp4 を 16kHz mono float へ decode（システム ffmpeg 不要）
+- win_amd64 wheel で動作検証済み。Cloud Routine（Linux）wheel の存在は本番デプロイ時に確認（無ければ kotoba-whisper へ fallback）
 
 ## env vars
 

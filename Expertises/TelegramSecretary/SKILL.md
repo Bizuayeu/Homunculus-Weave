@@ -21,11 +21,11 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 3. lease acquire（他セッション保持中なら exit 4 で即終了＝自己治癒）
 4. watch を run_in_background で起動
 5. Monitor ループで emit 行（JSON Lines v2）を受け、Weave が SecretaryRole で応答ドラフト → send-reply
-   - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキスト（markdown）を直接活用（docx/pptx/xlsx の中身が Weave 到達、Stage 7 MediaRenderer）
+   - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキストを直接活用。docx/pptx/xlsx は markdown（Stage 7）、**voice/audio/video は音声の文字起こし transcript（Stage 9、`kind` で md か transcript か判別）**
    - **`local_path` 非 null + `render_status="passthrough"`** → `Read` ツールで開いて Vision/PDF/text 解釈（image/pdf/text 系、Stage 6 Multimodal Inbox）
-   - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答
+   - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答（markitdown md 化 or Moonshine 音声 transcribe の失敗）
    - **`render_status="skipped"` + `skip_reason="media_size_exceeded"`** → サイズ超過応答
-   - **`render_status="skipped"` + `skip_reason=null`** → 未対応 mime（音声/動画等）、`mime_type` を見て応答
+   - **`render_status="skipped"` + `skip_reason=null`** → zip 等の未対応 mime、または音声で transcriber 未注入/Medium モード、`mime_type` を見て応答
 6. 定期的に lease renew で heartbeat 更新（v0.1.1 以降は watch 内蔵）
 7. セッション終端で lease release（次 cron が拾える）
 ```
@@ -82,6 +82,9 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 - **mime_type は Telegram の自己申告** — 信頼せず、親プロセス Weave が `Read` で開いた結果を真とする（rename 攻撃対策）
 - **markitdown render 失敗時の絶対パス秘匿**（Stage 7）— Adapter 内部 catch 時の stderr warning は `file_id[:8]` のみで `local_path` の絶対パスを出さない（テストで明示検証）
 - **markitdown 寛容性の認識**（Stage 7）— garbage バイト列でも render_status="ok" で何か返してくる。**rendered_text が意味のあるテキストかは Weave 側で判断**する責務（L00473 分業）。rename 攻撃で意図しない mime を render させようとする入力にも、Weave が「内容として妥当か」を判断する層が最終防御
+- **音声のローカル完結**（Stage 9）— Moonshine は**ローカル推論で音声が外部に一切出ない**（機密 voice メモに安全）。Whisper API 等の外部送信 STT を採らなかった設計上の利点。本番で Moonshine Enterprise or kotoba-whisper へ切替時もローカル完結を維持
+- **transcript の出力漏洩スキャン**（Stage 9）— 音声内の機密（パスワード読み上げ等）が transcript 経由で emit に乗る可能性、send-reply 前の漏洩スキャン対象に `rendered_text`(transcript) も含める
+- **音声前処理のログ秘匿**（Stage 9）— `MoonshineTranscriber` の例外 catch 時の stderr は `file_id[:8]` のみ、絶対パスを出さない（markitdown と同型）
 
 ## LineBridge 連携
 

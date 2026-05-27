@@ -138,3 +138,64 @@ def test_multiple_updates_each_with_media():
     update_ids = {r.update_id for r in results}
     assert update_ids == {10, 11}
     assert len(downloader.download_calls) == 2
+
+
+# === Stage 9.2: voice / audio / video が kind 非依存で download される ===
+
+def test_downloads_voice_media_kind_agnostic():
+    """voice も kind 非依存で download される（コード変更なしの実証）。"""
+    voice = MediaAttachment(
+        kind="voice", file_id="voice1", mime_type="audio/ogg", size=8192
+    )
+    nu = _nu(update_id=20, media=[voice])
+    downloader = FakeMediaDownloader()
+    uc = DownloadAuthorizedMedia(downloader)
+
+    results = uc.execute(
+        normalized_updates=[nu],
+        target_dir=Path("/tmp/media"),
+        max_size_bytes=20 * 1024 * 1024,
+    )
+
+    assert len(results) == 1
+    assert results[0].media.kind == "voice"
+    assert results[0].local_path == Path("/tmp/media/voice1.bin")
+    assert results[0].skip_reason is None
+    assert downloader.download_calls == [("voice1", Path("/tmp/media"))]
+
+
+def test_downloads_audio_and_video_kinds():
+    """audio / video も同様に download（file_id ベース、kind を見ない）。"""
+    audio = MediaAttachment(kind="audio", file_id="aud", mime_type="audio/mpeg", size=3000)
+    video = MediaAttachment(kind="video", file_id="vid", mime_type="video/mp4", size=1000000)
+    nu = _nu(update_id=21, media=[audio, video])
+    downloader = FakeMediaDownloader()
+    uc = DownloadAuthorizedMedia(downloader)
+
+    results = uc.execute(
+        normalized_updates=[nu],
+        target_dir=Path("/tmp/media"),
+        max_size_bytes=20 * 1024 * 1024,
+    )
+
+    assert {r.media.kind for r in results} == {"audio", "video"}
+    assert len(downloader.download_calls) == 2
+
+
+def test_skips_oversized_voice():
+    """大きすぎる voice/video も既存 size 上限ロジックで skip（kind 非依存）。"""
+    big_video = MediaAttachment(
+        kind="video", file_id="bigvid", mime_type="video/mp4", size=30_000_000
+    )
+    nu = _nu(update_id=22, media=[big_video])
+    downloader = FakeMediaDownloader()
+    uc = DownloadAuthorizedMedia(downloader)
+
+    results = uc.execute(
+        normalized_updates=[nu],
+        target_dir=Path("/tmp/media"),
+        max_size_bytes=20_000_000,
+    )
+
+    assert results[0].skip_reason == "media_size_exceeded"
+    assert downloader.download_calls == []
