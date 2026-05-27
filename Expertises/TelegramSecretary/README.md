@@ -76,13 +76,24 @@ python scripts/main.py poll --timeout 5
 # transcriber 未注入（or Medium モード）では音声は render_status="skipped"
 ```
 
+### 生成物を送り返す（Stage 8 Outbound Media）
+
+```powershell
+# Weave 生成物（画像/レポート）を Telegram に送り返す（lease 取得済み前提）
+python scripts/main.py send-reply --chat-id <id> --update-id <uid> --text-file reply.txt --file figure.png
+# → --file は複数指定可。画像(.jpg/.png/.webp/.gif)→sendPhoto、他→sendDocument に自動振り分け
+# → 本文は添付1件かつ1024字以内なら caption に載る、それ以外は別 sendMessage で先送り
+# → --reply-to <message_id> で reply threading、送信前に typing インジケータを表示
+# → 50MB 超 or 存在しないパスは送信前に弾く（exit 2）
+```
+
 ## テスト
 
 ```powershell
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **246 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66 + v0.2.1 follow-up で +6 + v0.3.0 Stage 7 MediaRenderer で +43 + v0.4.0 Stage 9 Native Voice/Audio/Video Inbox で +32、Stage 5 / 6.5 / 7.5 / 9 E2E は実機検証フェーズ）。
+現在 **273 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66 + v0.2.1 follow-up で +6 + v0.3.0 Stage 7 MediaRenderer で +43 + v0.4.0 Stage 9 Native Voice/Audio/Video Inbox で +32 + v0.5.0 Stage 8 Outbound Media で +27、Stage 5 / 6.5 / 7.5 / 8.5 / 9 E2E は実機検証フェーズ）。
 
 ### 依存ツリー注記
 
@@ -113,6 +124,7 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 | `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES` | optional | media download のサイズ上限（既定 20MB = 20971520）。超過は `skip_reason="media_size_exceeded"` で emit、download skip |
 | `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS` | optional | 保存 media の保持期限（既定 24）。`media_cleanup.cleanup_media_dir` が超過ファイルを削除 |
 | `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替。Heavy は `state_dir/media/` に保存、Medium はメタのみで `local_path=null` |
+| `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB = 52428800、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
 
 ## Subcommands
 
@@ -122,7 +134,7 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 | `lease acquire\|renew\|release [--owner]` | リースロック操作 | 0=成功, 4=conflict, 2=設定 |
 | `poll` | getUpdates 1サイクル | 0=OK, 1=fetch失敗, 3=auth失敗 |
 | `watch [--owner]` | 長期 long-poll ループ（サイクル毎に lease renew） | 長時間常駐 |
-| `send-reply --chat-id --update-id --text-file [--owner]` | 返信送信 | 0=OK, 1=送信失敗, 3=auth, 4=lease |
+| `send-reply --chat-id --update-id --text-file [--owner] [--file ...] [--reply-to]` | 返信送信。`--file`（複数可）で画像→sendPhoto・他→sendDocument を添付、`--reply-to` で reply threading（Stage 8） | 0=OK, 1=送信失敗, 2=添付不正, 3=auth, 4=lease |
 | `test --chat-id` | 疎通テスト ping | 0=OK, 1/3 |
 | `cleanup-media` | `state_dir/media/` 配下で retention 超過の保存ファイルを削除（手動 / 外部 cron 用）。`watch` は `--cleanup-interval`（既定 120 サイクル≒1h）で自動発火 | 0=OK, 2=設定欠損 |
 

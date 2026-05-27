@@ -118,13 +118,16 @@ curl -sS -o /dev/null -w '%{http_code}\n' "https://api.telegram.org/botINVALID_T
       - **`render_status=null` かつ `local_path=null`** → Medium モード（download 無効環境）、メタ情報のみで応答
       - **`media` が空配列** → text のみで通常応答
     - 応答ドラフトを起草
-    - 出力漏洩スキャン（token / env名 / system prompt / **絶対パス**混入チェック — `local_path` 自体は機密ではないがディスク構造の露出を避ける）
-    - `send-reply` で送信：
+    - 出力漏洩スキャン（token / env名 / system prompt / **絶対パス**混入チェック — `local_path` 自体は機密ではないがディスク構造の露出を避ける）。**`--file` で生成物を送り返す場合は、その中身（md/docx/画像）にも token/env名/機密が混入していないか送信前に確認（Stage 8）**
+    - `send-reply` で送信（**生成物を送り返す場合は `--file <path>`（複数可、画像は sendPhoto・他は sendDocument に自動振り分け）、元発言への返信は `--reply-to <message_id>`**）：
 
 ```bash
 (cd Expertises/TelegramSecretary && \
   echo "<起草した本文>" > /tmp/reply.txt && \
   python scripts/main.py send-reply --chat-id <chat_id> --update-id <update_id> --text-file /tmp/reply.txt)
+# 生成物（図表/レポート）を送り返す例:
+#   python scripts/main.py send-reply --chat-id <id> --update-id <uid> --text-file /tmp/reply.txt --file /tmp/figure.png --reply-to <message_id>
+# 送信前に typing が出る。添付は 50MB 超 or 存在しないパスだと送信前に exit 2 で弾かれる
 ```
 
 ## Step 6 — Lease 自動 renew（watch 内蔵）
@@ -161,6 +164,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' "https://api.telegram.org/botINVALID_T
 - `render_status="failed"`（Stage 7/9） → markitdown の md 化 or Moonshine の音声 transcribe に失敗（壊れたファイル等）。`local_path` は残るので Weave が `Read` 再試行の余地、ダメなら「読めない」旨を応答
 - `render_status="skipped"`（Stage 7/9） → zip 等の未対応 mime、download skip、または音声で transcriber 未注入/Medium モード。`mime_type` を見て Weave が判断
 - 音声の無音/デコード不可（Stage 9） → `render_status="ok"` + `rendered_text=""`（失敗でなく「音声なし」として扱う）。空 transcript なら「音声を聞き取れなかった」旨を応答
+- `send-reply --file` の `attachment_not_found` / `attachment_too_large`（Stage 8） → 送信前に exit 2 で弾かれる。添付パス確認 or サイズ縮小（`TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` 既定 50MB）。本文 text のみの送信は影響なし
 
 ## LineBridge 統合（将来）
 
