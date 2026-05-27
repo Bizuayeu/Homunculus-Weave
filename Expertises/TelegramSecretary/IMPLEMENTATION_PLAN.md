@@ -410,3 +410,203 @@ Stage 5 までの payload（`update_id` / `chat_id` / `user_id` / `username` / `
 - **token 込み URL の秘匿**: `https://api.telegram.org/file/bot<TOKEN>/<file_path>` の TOKEN は例外メッセージ・ログ・stderr に絶対残さない（regex redact をテストで検証）
 - **`.gitignore` で media/ 除外**: 既存の `Expertises/*/state/` で state/media/ も含めて除外済み、Stage 6.4 で実測確認
 - **mime_type は Telegram の自己申告**: 信頼せず、親プロセス Weave が `Read` で開いた結果を真とする（rename 攻撃対策、ただし Vision 解釈は Weave 側責務）
+
+---
+
+## Stage 7: MediaRenderer（ドキュメント系 mime の Weave 判断委任完成形）
+
+> 追加日: 2026-05-27。Stage 6 で photo / document / caption の受信・download・emit v2 化までは完了したが、Step 5 の Weave 側処理は image/pdf 以外のドキュメント系（docx / pptx / xlsx）で `Read` 一択のため中身が到達しない。L00473 の分業（スキル=決定論的 fetch/render、Weave=判断と推論）を MediaRenderer 抽象で完成形に寄せ、「render → Weave が読む → Weave が動く」に一般化する。read 側のみ Stage 7、write 系（md/docx 生成して送り返し）は別 Stage（Stage 8）で扱う。音声/動画系は外部 API 判断が必要なため別 Stage（Stage 9 等）で扱う。
+
+### Overview（Stage 7 固有）
+
+- **What**: docx / pptx / xlsx などのドキュメント系 mime を [markitdown](https://github.com/microsoft/markitdown)（Microsoft 製 MIT、Python ライブラリ）でローカル変換して markdown 化し、emit JSON Lines の `media[]` item に `rendered_text` と `render_status` を追加して Weave に渡す。image/pdf は既存どおりパススルー（Vision ネイティブ / Read tool が PDF 対応のため render 不要）。未対応 mime は `render_status="skipped"` または `"failed"` でメタ情報のみ emit。
+- **Why**: 現状 Step 5 は「`local_path` を `Read` で開く」一択だが、`Read` tool は image / PDF / text 系には対応するものの docx / pptx / xlsx のバイナリは開けない。これらは Cloud Routine の常駐セッションで最も到達頻度の高いファイル形式の一群であり、Vision 対応 LLM の射程外。markitdown で md 化することで、テキスト系判断は全て Weave に委ねられる完成形になる。
+- **Where**: 既存 `Expertises/TelegramSecretary/` 配下に追記。新規ファイル: `usecases/render_media.py`, `adapters/render/markitdown_renderer.py`, テスト一式。`MediaAttachment` に `file_name` 追加、`pyproject.toml` に `markitdown` 追加。
+- **Reference Patterns**:
+  1. `scripts/usecases/download_authorized_media.py` — `MediaDownloadResult` の `skip_reason` パターン → `RenderedMedia` の `render_status` を同型で設計（"ok" | "passthrough" | "skipped" | "failed"）
+  2. `scripts/usecases/ports.py` — `MediaDownloader` Port の `download(file_id, target_dir) -> Path` シグネチャ → `MediaRenderer` Port も pure-function 寄りの `render(media, local_path) -> RenderedMedia` で同型
+  3. `scripts/adapters/telegram/media_downloader.py` — 例外を Domain Error に変換しつつ chain を切る（`raise ... from None`）パターン → `markitdown_renderer.py` でも内部ライブラリ例外を catch → flag 化（Stage 6 と同型の「ブロックしない」スタンス）
+
+### Stage 7 全体の Architecture 拡張
+
+| Layer | Stage 7 で追加する責務 | 主要な型/関数 | 依存先 |
+|---|---|---|---|
+| **Domain** | `MediaAttachment` への `file_name` 追加（document の元ファイル名取り込み、Weave の判断材料） | `MediaAttachment(file_name: Optional[str])` field 追加、`from_document_api` で `document.file_name` を抽出 | なし |
+| **UseCase** | mime に応じた render 判定 + render 実行のオーケストレーション | Port: `MediaRenderer`（`render(media, local_path) -> RenderedMedia`）。UseCase: `RenderAuthorizedMedia`（download 済み media を mime-routing し、image/pdf は passthrough、docx/pptx/xlsx 等は Port 経由で render、未対応 mime は skipped）。dataclass: `RenderedMedia`（`rendered_text: Optional[str]` / `render_status: str`） | Domain のみ |
+| **Interface (Adapter)** | markitdown 実装 + emit 拡張 | `MarkitdownRenderer`（`MediaRenderer` 実装、`markitdown.MarkItDown` を呼ぶ、例外は内部 catch して `RenderedMedia(rendered_text=None, render_status="failed")` を返す）。`StdoutEventEmitter` に `rendered_text` / `render_status` フィールド追加（既存 v2 schema に**追加のみ**、version bump なし） | UseCase, Domain |
+| **Infrastructure** | pyproject 依存追加 + CLI 配線 | `pyproject.toml` に `markitdown` 追加（再帰依存 python-docx / python-pptx / openpyxl が入ることを許容）。`cmd_poll` / `cmd_watch` に renderer instantiation 追加、`media_enable_download` 同型の `media_enable_render` env は**不要**（Heavy モードで download した時点で render も実行するのが Simplicity、disable は将来 YAGNI 解除時に検討） | 全層 |
+
+### Dependency Direction
+
+Stage 1-6 と同じく `Infrastructure → Interface → UseCase → Domain`（内向き）を厳守。`MediaRenderer` Port は Domain の `MediaAttachment` と新規 `RenderedMedia` のみを扱う。markitdown ライブラリ呼び出しは UseCase の外（Port の向こう）に閉じ込め、UseCase は mime-routing と Port 呼び出しのみを担う。
+
+### emit スキーマ拡張（v2 維持、フィールド追加のみ）
+
+Stage 6 で確立した payload v2 を**バージョン bump せず、フィールド追加のみ**で延長する。既存 consumer（ROUTINE_PROMPT.md / Weave）は `rendered_text` / `render_status` の欠落（=null）を「Stage 6 までの emit」として扱える後方互換性を確保：
+
+```json
+{
+  "v": 2,
+  "update_id": 12345,
+  "chat_id": 100,
+  "user_id": 200,
+  "username": "weave_user",
+  "text": "<caption + text 統合済み正規化本文>",
+  "injection_flags": [],
+  "media": [
+    {
+      "kind": "document",
+      "file_id": "BAAD...",
+      "file_name": "specification.docx",
+      "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "size": 51200,
+      "local_path": "<state_dir>/media/BAAD..._specification.docx",
+      "skip_reason": null,
+      "rendered_text": "# 仕様書\n\n## 概要\n...",
+      "render_status": "ok"
+    },
+    {
+      "kind": "photo",
+      "file_id": "AgACAg...",
+      "file_name": null,
+      "mime_type": "image/jpeg",
+      "size": 102400,
+      "local_path": "<state_dir>/media/AgACAg..._file.jpg",
+      "skip_reason": null,
+      "rendered_text": null,
+      "render_status": "passthrough"
+    }
+  ]
+}
+```
+
+- `file_name` を全 media item に明示出力（photo は null、document は元ファイル名）— Weave が「何のファイルか」を判断する材料
+- `rendered_text` は `render_status="ok"` の時のみ非 null、それ以外は null
+- `render_status` 四状態:
+  - `"ok"`: markitdown で md 化成功、`rendered_text` 非 null
+  - `"passthrough"`: image/pdf 等 Weave の Read tool で直接読める形式、render 不要
+  - `"skipped"`: 未対応 mime（音声/動画など Stage 7 射程外）、メタのみ
+  - `"failed"`: render を試みたが内部例外発生、メタのみ + Weave に「読めない」と正直に伝える
+- ROUTINE_PROMPT.md Step 5 を「`rendered_text` があればそれを使う / なければ `local_path` を `Read` / なければメタのみ」に一般化
+
+### 対応 mime の routing 表（Stage 7 射程）
+
+| mime | 処理 | render_status |
+|---|---|---|
+| `image/*`（jpeg / png / webp / gif） | passthrough（Read tool で直接 Vision 解釈） | `"passthrough"` |
+| `application/pdf` | passthrough（Read tool が PDF 対応） | `"passthrough"` |
+| `application/vnd.openxmlformats-officedocument.wordprocessingml.document`（docx） | markitdown で md 化 | `"ok"` / `"failed"` |
+| `application/vnd.openxmlformats-officedocument.presentationml.presentation`（pptx） | markitdown で md 化 | `"ok"` / `"failed"` |
+| `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`（xlsx） | markitdown で md 化 | `"ok"` / `"failed"` |
+| `text/plain` / `text/csv` / `text/markdown` / `application/json` | passthrough（Read tool が text 系に対応、markitdown 通すと冗長） | `"passthrough"` |
+| `text/html` | markitdown で md 化（html→md の整形価値あり） | `"ok"` / `"failed"` |
+| `audio/*` / `video/*` | skipped（Whisper 等外部 API 判断、Stage 9 等別計画） | `"skipped"` |
+| `application/zip` 等のアーカイブ系 | skipped（中身展開は別判断、Stage 7 射程外） | `"skipped"` |
+| その他未知 mime | skipped（保守的、メタのみで Weave に正直に） | `"skipped"` |
+
+### Stages
+
+## Stage 7.1: Domain — MediaAttachment.file_name 追加 + RenderedMedia 値オブジェクト
+**Goal**: `MediaAttachment` に `file_name` field を追加し、`from_document_api` が document の元ファイル名を抽出する。`RenderedMedia` を新規追加。
+**Layer**: Domain
+**Success Criteria**: 既存 Domain テスト 36 件が file_name=None backward compat で green、新規テスト green、外部依存ゼロ。
+**Tests** (Red → Green):
+  - `MediaAttachment.from_document_api()` が `document.file_name` を抽出（Telegram API 仕様の document field）、欠落時は None
+  - `MediaAttachment.from_photo_api()` は photo に file_name が無いので常に None（既存テストが file_name=None で通る）
+  - `RenderedMedia` dataclass の field（`rendered_text: Optional[str]` / `render_status: str`）と frozen 性
+**Implementation Notes**: `MediaAttachment` への field 追加は `default=None` で既存テスト破壊を回避。`RenderedMedia` は `domain/media.py` に同居（純粋値オブジェクトゆえ）、frozen dataclass。`render_status` は文字列 enum 風（Domain では `frozenset({"ok", "passthrough", "skipped", "failed"})` を `__post_init__` で検証、Domain は型しか持たず文字列値そのものの意味は UseCase / Adapter 側で定義）。
+**Status**: Complete
+
+## Stage 7.2: UseCase — MediaRenderer Port + mime-routing
+**Goal**: `MediaRenderer` Port を定義し、`RenderAuthorizedMedia` UseCase が download 済み media を mime に応じて routing する。
+**Layer**: UseCase
+**Success Criteria**: fake `MediaRenderer` で全分岐検証、実 I/O ゼロ。`MediaDownloadResult` の延長として `RenderedMedia` を返す。
+**Tests** (Red → Green):
+  - `RenderAuthorizedMedia`: image/* → render を呼ばず `render_status="passthrough"` を返す、PDF も同様
+  - `RenderAuthorizedMedia`: docx/pptx/xlsx → fake renderer が呼ばれ `render_status="ok"` + `rendered_text` 非 null
+  - `RenderAuthorizedMedia`: 未対応 mime（audio/mp3 等） → renderer 呼ばず `render_status="skipped"`、`rendered_text=None`
+  - `RenderAuthorizedMedia`: `skip_reason` が立っている media（size 超過で download skip）は render も skip（`render_status="skipped"` の上位概念として skip_reason を継承）
+**Implementation Notes**: mime-routing を Port の中に閉じ込めるか、UseCase 側に持つかで分岐 → **UseCase 側に持つ**（設計分岐 #1 の判断）。理由: Port はあくまで「与えられた mime を md 化する」決定論的責務に純化、何を render するかの policy は UseCase 層。`RenderAuthorizedMedia.execute(download_results) -> List[RenderResult]` で `MediaDownloadResult` を入力に取り、download skip された media は素通り（render_status="skipped"）。`fakes.py` に `FakeMediaRenderer` 追加（呼び出し回数記録 / 例外注入 / 戻り値カスタマイズ）。`_route_mime` は純関数として UseCase モジュール冒頭に置き、`_PASSTHROUGH_MIME_PREFIXES` / `_PASSTHROUGH_MIME_EXACT` / `_RENDER_MIME_EXACT` の三集合で mime を 3 状態に分類（その他は保守的に skipped）。
+**Status**: Complete
+
+## Stage 7.3: Interface — MarkitdownRenderer + emit 拡張
+**Goal**: 実 markitdown ライブラリで docx / pptx / xlsx / html を md 化する Adapter と、emit JSON の `rendered_text` / `render_status` / `file_name` 出力。
+**Layer**: Interface (Adapter)
+**Success Criteria**: 実 markitdown を使った integration test と、HTTP モック相当の fake content での unit test 両方が green。`StdoutEventEmitter` が rendered_text / render_status / file_name を含めて出力、欠落フィールドは null で明示。
+**Tests** (Red → Green):
+  - `MarkitdownRenderer.render(media, local_path)`: 実 docx fixture（数行のテキスト含む）を渡し `RenderedMedia(rendered_text="...", render_status="ok")` を返す
+  - `MarkitdownRenderer.render(media, local_path)`: 壊れた docx（zip 構造破損）を渡し、内部例外を catch して `RenderedMedia(rendered_text=None, render_status="failed")` を返す（クラッシュさせない）
+  - `StdoutEventEmitter.emit()` が `rendered_text` / `render_status` / `file_name` を含めて出力、render_results が未指定なら全 media が `render_status=None` / `rendered_text=None` で出力（後方互換、Stage 6 までのテストを破壊しない）
+**Implementation Notes**: `markitdown` 0.1.6 の API は `from markitdown import MarkItDown; md = MarkItDown(); result = md.convert(str(local_path)); rendered = result.text_content`。例外は広め（`Exception`）に catch して `render_status="failed"` 化、stderr に短い warning（file_id 先頭8桁のみ表示、絶対パスは出さない）。fixture は test 内で python-docx / openpyxl / python-pptx で動的生成（markitdown 依存として既に入る）。**実 markitdown 挙動の発見（Stage 7.3 着手時）**: garbage バイト列 (.docx 拡張子) でも markitdown は内部の magika ML model で plain text と判定し rendered_text にバイト列を返す（render_status="ok"）。本物の `failed` パスに入るのは空 .docx（BadZipFile）/ 存在しないファイル（FileNotFoundError）等の構造的失敗時のみ。この寛容性は L00473 分業の「Weave が意味のあるテキストか判断する」責務に整合的なため受容。
+**Status**: Complete
+
+## Stage 7.4: Infrastructure — pyproject + CLI 配線 + ドキュメント
+**Goal**: `markitdown` 依存追加、`cmd_poll` / `cmd_watch` に renderer instantiation 配線、ROUTINE_PROMPT.md Step 5 一般化、README / SKILL.md / CHANGELOG 更新。
+**Layer**: Infrastructure
+**Success Criteria**: `validate-config` は変化なし（新 env なし）、`poll` / `watch` が download → render → emit を 1 サイクルで完了、ROUTINE_PROMPT.md に「`rendered_text` があればそれを使う / なければ `local_path` を `Read`」が記載される。
+**Tests** (Red → Green):
+  - `cmd_poll` が download → render → emit の順で実行、fake gateway / downloader / renderer 経由で全分岐確認
+  - `cmd_watch` の loop 内でも renderer が download_uc と同様に loop 外で 1 回作って使い回し（接続コスト削減）
+  - markitdown 未インストール環境では `import markitdown` が失敗するため、CLI 起動時に明確なエラー（"markitdown not installed, install via pip install markitdown"）で exit 2、もしくは `cmd_poll` 開始時に lazy import で検出
+**Implementation Notes**: `pyproject.toml` の `dependencies` に `markitdown[docx,pptx,xlsx]>=0.1.6` 追加（extras で必要な mime に絞り、不要な依存を入れない）。**markitdown は内部で `python-docx` / `python-pptx` / `openpyxl` / `mammoth` / `magika`（ML model）/ `onnxruntime` 等を依存として持つ**（pip install --dry-run で実測、Stage 7.3 着手時に確認済み）。`media_enable_render` env は導入しない（YAGNI、Heavy モードと render は不可分とみなす）。ROUTINE_PROMPT.md Step 5 の JSON 例を更新、Failure modes に `render_failed` / `render_skipped` を追加。**Lazy import 実装**: `from adapters.render.markitdown_renderer import MarkitdownRenderer` を `cmd_poll` / `cmd_watch` の Heavy モード分岐内で行うことで、`validate-config` / Medium モードでは markitdown 不要のまま。Stage 7.4 ではテスト戦略として Heavy モード E2E はスキップ（実 markitdown + file CDN mock の二重 transport 構築が過剰）、Medium モードで `render_status`/`rendered_text`/`file_name` が null で出る後方互換テストのみ追加。Heavy モード E2E は Stage 7.5 の実機検証に集約。
+
+**3-Strike 予想ポイント**（後述の Stage 7 固有 3-Strike Rule 参照）
+
+**Status**: Complete
+
+## Stage 7.5: 統合テスト + ドキュメント Doc Complete + 実機 E2E
+**Goal**: docx / pptx / xlsx の E2E（自分の bot にドキュメントを送る → `watch` → download → render → emit に `rendered_text` → Weave がそれを使って返信）を Cloud Routine 上で 1 往復成立させる。CHANGELOG / README / SKILL.md / ROUTINE_PROMPT.md を v0.3.0 で更新。
+**Layer**: Infrastructure（運用統合）
+**Success Criteria**: fresh session で `watch` 起動 → 自分の bot に docx 1 通 + caption "要約して" を送る → emit に `rendered_text` で md 化された内容が乗る → 親プロセス Weave が `rendered_text` を読んで要約返信 → Telegram に到達。pptx / xlsx も同等動作、render failure（壊れたファイル送信）の skip 動作も実測。
+**Tests / 検証**:
+  - E2E: docx + caption "要約して" → emit に `rendered_text` 非 null → Weave が md を読んで要約返信、Telegram で受信確認
+  - E2E: pptx → mime_type=...presentationml.presentation で render → Weave 応答到達
+  - E2E: xlsx（表データ）→ md 化（パイプ区切り表）→ Weave がデータ列を読んで応答
+  - E2E: 壊れた docx 送信 → `render_status="failed"` で emit → Weave が「ファイルが壊れて読めない」旨を応答
+  - E2E: mp3 / mp4 送信 → `render_status="skipped"` で emit → Weave が「音声/動画は現在未対応」旨を応答
+**Implementation Notes**: Stage 5 / 6.5 同様、新 fresh session 起動が前提（Custom policy 反映と pyproject 更新の両方が新コンテナで反映）。CHANGELOG は [0.3.0] エントリで「MediaRenderer 抽象導入、markitdown でドキュメント系 mime の md 化、emit に rendered_text / render_status / file_name 追加」を記載。README の Quickstart に「docx を送って試す」一節を追記、env vars 表は変化なし。SKILL.md と ROUTINE_PROMPT.md は rendered_text の四状態を反映。
+**Status**: In Progress（**Doc Complete** — CHANGELOG [0.3.0] / README Quickstart docx 試験 + 依存ツリー注記 / SKILL.md Daily Workflow render_status 五状態 + Security markitdown 寛容性認識 / ROUTINE_PROMPT.md Step 5 一般化、すべて 2026-05-27 着地。**Live E2E Pending** — docx/pptx/xlsx の Weave 要約往復・render failure skip・retention 動作は新 fresh session で別途、Stage 5 / 6.5 と同じ要件）
+
+### Documentation Plan（Stage 7 追加分）
+
+| ドキュメント | パス | 新規/更新/不要 | 計画内容 |
+|---|---|---|---|
+| `CHANGELOG.md` | `Expertises/TelegramSecretary/CHANGELOG.md` | 更新 | [0.3.0] - 2026-MM-DD に「MediaRenderer 抽象導入、markitdown でドキュメント系 mime の md 化、emit に `rendered_text` / `render_status` / `file_name` 追加、`MediaAttachment.file_name` 追加、`RenderedMedia` 値オブジェクト追加、`MarkitdownRenderer` Adapter 追加、`RenderAuthorizedMedia` UseCase 追加、pyproject に `markitdown` 依存追加」を記載 |
+| `README.md` | `Expertises/TelegramSecretary/README.md` | 更新 | Quickstart に「docx / pptx / xlsx を送って試す」一節を追記。env vars 表は変化なし（新 env なし）。**markitdown 依存ツリー膨張（python-docx / python-pptx / openpyxl / beautifulsoup4 / lxml 等が入る）を明記** |
+| `SKILL.md` | `Expertises/TelegramSecretary/SKILL.md` | 更新 | Daily Workflow Step 5 に「`rendered_text` があればそれを Weave が読む / なければ `Read` で `local_path` を開く / 両方なければメタのみ」を反映。render_status 四状態（ok / passthrough / skipped / failed）の説明追加 |
+| `ROUTINE_PROMPT.md` | `Expertises/TelegramSecretary/ROUTINE_PROMPT.md` | 更新 | Step 5 の JSON 例を新スキーマに差し替え、`rendered_text` / `render_status` / `file_name` 三状態の処理分岐を明記。Failure modes に `render_failed` / `render_skipped` を追加 |
+| `IMPLEMENTATION_PLAN.md` | （本ファイル） | 更新 | 本 Stage 7 セクション追加済み。Stage 7 全 5 段階完了後、Stage 5 / 6 と合わせて削除検討（現運用：イベント駆動開発の経緯として保持） |
+| `pyproject.toml` | `Expertises/TelegramSecretary/pyproject.toml` | 更新 | `dependencies` に `markitdown>=0.0.1` 追加。再帰依存（python-docx / python-pptx / openpyxl / beautifulsoup4 / lxml 等）が入ることを README で明記 |
+
+> 拡張レイヤーの最終棚卸しは Stage 7.5 着手時に `Explore` サブエージェントで再確認（SSoT 違反チェック含む）。
+
+### Decision Priority Notes（Stage 7 固有、Testability > Readability > Consistency > Simplicity > Reversibility）
+
+- **Port シグネチャ: `render(media, local_path) -> RenderedMedia` 単一 Port 採用**（設計分岐 #1）: mime 別に Port を分ける案（`DocxRenderer` / `PptxRenderer` 等）は Consistency（既存 Stage 6 の `MediaDownloader` Port が単一）と Simplicity を破る。markitdown が内部で mime 判定する以上、Adapter 側で mime-routing を内蔵せず、UseCase 層で「passthrough / render / skipped」の三分岐のみ持ち、render 対象は全て markitdown に渡す。**Testability** も単一 Port の fake で完結。
+- **rendering 失敗ハンドリング: Adapter 内部 catch + flag 化採用**（設計分岐 #2）: 例外を UseCase 呼び出し側に伝播させる案は、UseCase の `RenderAuthorizedMedia.execute` が個別 media の失敗で全体中断するリスク（Reversibility 違反）。Stage 6 の `MediaSizeLimitExceeded` 同型の「フラグ化して emit、ブロックしない」スタンス（Consistency）を踏襲、Adapter 内部で広く `Exception` catch → `RenderedMedia(render_status="failed")` を返す。例外詳細は stderr に短い warning（file_id 先頭8桁のみ）、ログには絶対パス・token を残さない（Security）。
+- **emit schema v2 維持、フィールド追加のみ**（設計分岐 #3）: v3 化案は既存 consumer（ROUTINE_PROMPT.md / Weave）と既存テストへの影響が大きい。v2 のまま `rendered_text` / `render_status` / `file_name` を追加し、欠落（=null）を Stage 6 までの emit として後方互換扱い。**Testability**（既存 emit テストが追加フィールド null 付きで通る）と **Reversibility**（後で v3 化は容易、逆は壊れる）の両立。
+- **markitdown 単体採用、複数ライブラリの組み合わせは見送り**: docx は python-docx、pptx は python-pptx、xlsx は openpyxl で個別実装する案は、Adapter コードが mime ごとに分岐して膨らみ、Readability と Simplicity が破られる。markitdown は Microsoft 製・MIT・依存も全て MIT/BSD で許容可能、再帰依存膨張は事前ヒアリング確定済み。**唯一の懸念は markitdown のメンテナンス停止リスク**（Reversibility）だが、Port 抽象化により後で個別ライブラリ実装に差し替え可能。
+- **`media_enable_render` env を導入しない**: Heavy / Medium の二分は download 単位、render は download した時点で常に試みる（Simplicity）。disable したい場合は `media_enable_download=false` で Medium モードに倒す（Reversibility）。将来 render が運用負荷化したら個別 disable env を YAGNI 解除して追加。
+- **`file_name` の追加は document 限定だが全 media で出力**: photo は常に null だが、フィールド自体は全 media item に出す（Readability、「欠落≠未対応」の混乱回避、Stage 6 の `media: []` 明示出力と同型方針）。
+
+### 3-Strike Rule（Stage 7 固有）
+
+- **詰まりやすい予想ポイント**:
+  1. **markitdown の API 変更 / バージョン非互換**: PyPI の `markitdown` は 2024 後半リリースの比較的新しいライブラリで、API（`MarkItDown().convert()` / `result.text_content`）が version で変動する可能性。再現性確保のため `pyproject.toml` で version 範囲指定が必要になるかも
+  2. **markitdown の再帰依存膨張**: python-docx / python-pptx / openpyxl / beautifulsoup4 / lxml が連れてこられる。Cloud Routine の bootstrap が遅くなる、または依存衝突（既存 httpx との conflict 等）が発生する可能性
+  3. **markitdown が内部で OS コマンドを呼ぶ挙動**: 特定 mime（古い .doc / .ppt 等）で外部 binary（libreoffice 等）に depend する場合、Cloud Routine 環境で動かない。事前確認が必須
+  4. **大きな docx / xlsx の render 中に long-poll タイムアウト干渉**: Stage 6.3 と同型の懸念だが、render は download より CPU 重い可能性（特に 表データの xlsx）。`watch` のメインループ blocking で getUpdates が止まる可能性
+- **代替アプローチ候補**:
+  - markitdown API 変更 → Stage 7.4 着手前に PyPI で最新版確認 + 簡単な smoke test、version 固定 (`markitdown==0.x.y`) で安定化
+  - 再帰依存膨張 → `pip install --dry-run` で依存ツリー確認、衝突あれば固定 version で回避、ブートストラップ時間は README に明記して許容
+  - OS コマンド依存 → markitdown ドキュメントで「pure python」を確認、外部 binary に依存する形式（古い .doc 等）は最初から非対応として `render_status="skipped"` 扱い、対応 mime を docx / pptx / xlsx / html に限定
+  - render 中の long-poll 干渉 → render を**別スレッド**に切り出し、`watch` のメインループは getUpdates に専念（Stage 6 の 3-Strike #2 と同型の対応）。最終手段として `media_enable_render` env を YAGNI 解除して追加、Medium モードに倒せるよう Reversibility 確保
+- **ユーザーへ相談する判断ライン**: 上記いずれかで「markitdown 単体採用が成立せず・個別ライブラリへの fallback も Adapter 肥大化が許容外」となった時点で、`AskUserQuestion` で（markitdown 固定 version で続行 / 個別ライブラリ実装に分割 / docx 単体に絞って pptx/xlsx は別 Stage 化）の三択を提示。
+
+### Security 追加項目（Stage 7 固有）
+
+- **markitdown の OS コマンド実行リスク**: 事前確認で「pure python」を確認できれば許容、外部 binary に依存する形式は最初から非対応とし `render_status="skipped"`。コード調査は Stage 7.3 着手時に実施
+- **render 失敗時の例外メッセージ秘匿**: 内部例外 catch 時に stderr に出すログは `file_id[:8]` のみ表示、`local_path` の絶対パスは出さない（Stage 6 の token redact と同型）
+- **rendered_text の出力漏洩**: docx / xlsx 内に embed された秘密情報（パスワード / token 等）が `rendered_text` 経由で emit に乗る可能性 → Weave 側の出力漏洩スキャンを send-reply 前に強化（既存の token / env名 / system prompt 検査に加え、rendered_text 内の機密パターンも検査対象、ROUTINE_PROMPT.md Step 5 に明記）
+- **mime_type は Telegram の自己申告**: Stage 6 の方針継承。markitdown も `convert()` 時に file 拡張子で mime を再判定するため、Telegram 申告との不一致時は markitdown 側の判定が優先される。**ただし render 結果の真偽は Weave が判断**（rename 攻撃で xlsx を docx として送られても、markitdown が xlsx として開いて md 化、Weave がその内容を読んで判断）
+- **render 結果のディスク残存**: markitdown の中間ファイル（temp dir 等）が残らないことを確認。残る場合は `cleanup_media_dir` の対象に追加するか、別途 cleanup ロジックを Stage 7.4 で配線

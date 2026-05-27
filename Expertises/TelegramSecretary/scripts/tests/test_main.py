@@ -545,6 +545,77 @@ def test_watch_runs_cleanup_hook_at_interval(env_ready, monkeypatch, tmp_path):
     assert not old.exists()
 
 
+# --- Stage 7.4: Medium モードで render フィールドが null で出る後方互換 ---
+
+
+def test_poll_medium_mode_renders_null_for_photo(env_ready, monkeypatch, capsys):
+    """Medium モード + photo: render_status / rendered_text が null（render は呼ばれない）。"""
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        # Medium モードでは render 配線も skip されるため、markitdown 関連 API は呼ばれない
+        assert "getFile" not in str(request.url)
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200},
+                            "photo": [{"file_id": "P", "file_size": 4096}],
+                        },
+                    },
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    rc = main(["poll", "--timeout", "1"])
+    assert rc == EXIT_OK
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["media"][0]["render_status"] is None
+    assert payload["media"][0]["rendered_text"] is None
+    # file_name は MediaAttachment から、photo は None（Stage 7.1）
+    assert payload["media"][0]["file_name"] is None
+
+
+def test_poll_medium_mode_file_name_for_document(env_ready, monkeypatch, capsys):
+    """Medium モード + document: file_name が乗る、render は null。"""
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "false")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200},
+                            "document": {
+                                "file_id": "D",
+                                "mime_type": "application/pdf",
+                                "file_size": 4096,
+                                "file_name": "report.pdf",
+                            },
+                        },
+                    },
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["poll", "--timeout", "1"]) == EXIT_OK
+    payload = json.loads(capsys.readouterr().out.strip())
+    assert payload["media"][0]["file_name"] == "report.pdf"
+    assert payload["media"][0]["render_status"] is None  # Medium モード
+
+
 def test_watch_skips_cleanup_when_interval_zero(env_ready, monkeypatch, tmp_path):
     """--cleanup-interval=0 で cleanup hook を無効化。"""
     import os

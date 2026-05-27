@@ -1,5 +1,65 @@
 # Changelog
 
+## [0.3.0] - 2026-05-27 — Stage 7 Multimodal Inbox: MediaRenderer (Doc Complete / E2E Pending)
+
+### Added — ドキュメント系 mime の Weave 判断委任完成形
+
+L00473 分業（スキル=決定論的 fetch/render、Weave=判断と推論）を MediaRenderer 抽象で完成形に寄せる。Step 5 が「`local_path` → `Read` 一択」から「render → Weave が読む → Weave が動く」に一般化。
+
+**Domain**:
+- `MediaAttachment.file_name: Optional[str]` field 追加（document の元ファイル名取り込み、Weave の判断材料）
+- `RenderedMedia` 値オブジェクト新設（`rendered_text: Optional[str]` / `render_status: str` の frozen dataclass）
+- `_VALID_RENDER_STATUSES = frozenset({"ok", "passthrough", "skipped", "failed"})` で Domain 構造的保証（不正値は ValueError）
+
+**UseCase**:
+- `MediaRenderer` Port（`render(media, local_path) -> RenderedMedia`、Adapter 内部 catch + flag 化契約）
+- `RenderAuthorizedMedia` UseCase（mime-routing 三分岐: passthrough / render / skipped、download skip 継承）
+- `RenderResult` dataclass（`MediaDownloadResult` 延長として `rendered: RenderedMedia` を持つ）
+- `_route_mime()` 純関数（image/* + application/pdf + text plain/csv/markdown + json → passthrough、docx/pptx/xlsx + text/html → render、その他 → skipped）
+
+**Interface (Adapter)**:
+- `MarkitdownRenderer` Adapter（`markitdown.MarkItDown` を呼んで md 化、内部 Exception catch → `RenderedMedia(render_status="failed")` 化、stderr warning は `file_id[:8]` のみで絶対パス・file_id 全文を秘匿）
+- `StdoutEventEmitter` を v2 schema 拡張（`v: 2` 維持、`rendered_text` / `render_status` / `file_name` を**追加のみ**で v3 化なし、欠落=null で後方互換）
+
+**Infrastructure**:
+- `pyproject.toml` に `markitdown[docx,pptx,xlsx]>=0.1.6` 追加（extras で必要 mime に絞る、再帰依存膨張: mammoth/magika/onnxruntime/python-docx/python-pptx/openpyxl 等は受容）
+- `cmd_poll` / `cmd_watch` に renderer instantiation 配線（**lazy import** で validate-config / Medium モードから markitdown 依存を切り離す）
+- `cmd_watch` の renderer は loop 外で 1 回作って使い回し（MarkItDown の magika ML model load コスト削減、downloader と同じパターン）
+
+### Changed
+
+- emit JSON Lines の `media[]` 各 item に新フィールド: `file_name` / `rendered_text` / `render_status`（Stage 6 までの emit は欠落=null で後方互換）
+- `ROUTINE_PROMPT.md` Step 5 を v2 schema 一般化:
+  - **`render_status` 四状態の処理分岐**を明示（ok=rendered_text を直接活用 / passthrough=Read で開く / failed=読めなかった応答 / skipped=未対応 mime 応答）
+  - Failure modes に `render_failed` / `render_skipped` を追加
+
+### Tests
+
+- **Total: 214 tests passing**（v0.2.1 の 171 → +43）
+- Domain: +10（MediaAttachment.file_name 4 / RenderedMedia 6）
+- UseCase: +18（RenderAuthorizedMedia passthrough 6 / render 4 / skipped 4 / 継承 1 / 複数+空 2 / file_name 1）
+- Adapters: +13（MarkitdownRenderer 7 実 markitdown integration / emitter render フィールド 6）
+- CLI: +2（Medium モード render フィールド null 後方互換）
+
+### Design Notes / 発見
+
+- **markitdown の寛容性**（Stage 7.3 着手時に判明）: garbage バイト列 (.docx 拡張子) でも magika ML model が plain text と判定し rendered_text にバイト列を返す（`render_status="ok"`）。本物の `failed` パスに入るのは空 .docx（BadZipFile）/ 存在しないファイル（FileNotFoundError）等の構造的失敗時のみ。この寛容性は L00473 分業の「Weave が意味のあるテキストか判断する」責務に整合的なため受容
+- **emit schema v2 維持**（設計分岐 #3）: フィールド追加のみで v3 化せず、既存 consumer（ROUTINE_PROMPT.md / Weave）と既存テストへの影響を最小化
+- **Port シグネチャ単一**（設計分岐 #1）: `render(media, local_path) -> RenderedMedia` 単一 Port + mime-routing は UseCase 側、markitdown が内部で mime 判定する以上 Adapter 内蔵 routing は冗長
+- **Adapter 内部 catch**（設計分岐 #2）: Stage 6 `MediaSizeLimitExceeded` 同型の「フラグ化して emit、ブロックしない」、UseCase の `RenderAuthorizedMedia.execute` が個別 media 失敗で全体中断しない Reversibility
+
+### Live E2E Pending (Fresh Session 必須)
+
+実機 E2E（docx/pptx/xlsx の Weave 要約往復、render failure の skip、retention 動作）は新コンテナでの実機検証が残る:
+
+- E2E: docx + caption "要約して" → emit に `rendered_text` 非 null → Weave が md を読んで要約返信
+- E2E: pptx → mime_type=...presentationml で render → Weave 応答到達
+- E2E: xlsx → 表データを md 化（パイプ区切り）→ Weave がデータ列を読んで応答
+- E2E: 壊れた docx → `render_status="failed"` で emit → Weave が file_name 込みで「読めない」応答
+- E2E: mp3 / mp4 → `render_status="skipped"` で emit → Weave が「音声/動画は現在未対応」応答
+
+Stage 5 / 6.5 と同じく、Custom Environment の Network policy 反映と pyproject 更新の両方が新コンテナで反映されるため fresh session 起動が前提。env は Stage 5/6 のものを継承可能。
+
 ## [0.2.1] - 2026-05-27 — Stage 6 follow-up: cleanup 配線 + caption E2E テスト
 
 ### Added
