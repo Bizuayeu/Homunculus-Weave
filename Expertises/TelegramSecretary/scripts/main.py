@@ -117,10 +117,11 @@ def cmd_poll(args: argparse.Namespace) -> int:
             # Stage 7.4: download 済み media を render（lazy import で markitdown
             # 依存を validate-config / Medium モードから切り離す）
             from adapters.render.markitdown_renderer import MarkitdownRenderer
+            from adapters.transcribe.moonshine_transcriber import MoonshineTranscriber
 
-            render_results = RenderAuthorizedMedia(MarkitdownRenderer()).execute(
-                download_results
-            )
+            render_results = RenderAuthorizedMedia(
+                MarkitdownRenderer(), transcriber=MoonshineTranscriber()
+            ).execute(download_results)
 
     for u in updates:
         emitter.emit(
@@ -156,8 +157,11 @@ def cmd_watch(args: argparse.Namespace) -> int:
             # Stage 7.4: renderer も loop 外で 1 回作る（MarkItDown は magika model
             # load が重いので毎サイクル作り直さない）
             from adapters.render.markitdown_renderer import MarkitdownRenderer
+            from adapters.transcribe.moonshine_transcriber import MoonshineTranscriber
 
-            render_uc = RenderAuthorizedMedia(MarkitdownRenderer())
+            render_uc = RenderAuthorizedMedia(
+                MarkitdownRenderer(), transcriber=MoonshineTranscriber()
+            )
         try:
             while True:
                 try:

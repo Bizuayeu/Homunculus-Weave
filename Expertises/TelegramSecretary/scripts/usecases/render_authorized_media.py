@@ -4,7 +4,8 @@ mime-routing は UseCase 側に閉じる:
 - image/* → passthrough（Vision native）
 - application/pdf, text/plain, text/csv, text/markdown, application/json → passthrough
 - docx, pptx, xlsx, text/html → render（markitdown 経由）
-- audio/*, video/*, archive 等その他 → skipped
+- audio/*, video/* → transcribe（transcriber 注入時のみ、Stage 9.4/9.6 音声 STT。動画は音声トラックを抽出。未注入なら skipped）
+- archive 等その他 → skipped（key frame Vision は Stage 9.6-ii で別途）
 
 download 段階で skip された media（size 超過等）は render も skip。
 """
@@ -37,6 +38,7 @@ _RENDER_MIME_EXACT = frozenset(
         "text/html",
     }
 )
+_TRANSCRIBE_MIME_PREFIXES = ("audio/", "video/")  # Stage 9.4/9.6: 音声・動画音声トラックを STT で transcript 化
 
 
 @dataclass(frozen=True)
@@ -54,19 +56,24 @@ class RenderResult:
 
 
 def _route_mime(mime: str) -> str:
-    """mime を `"passthrough" | "render" | "skipped"` に分類する純関数。"""
+    """mime を `"passthrough" | "render" | "transcribe" | "skipped"` に分類する純関数。"""
     if any(mime.startswith(prefix) for prefix in _PASSTHROUGH_MIME_PREFIXES):
         return "passthrough"
     if mime in _PASSTHROUGH_MIME_EXACT:
         return "passthrough"
     if mime in _RENDER_MIME_EXACT:
         return "render"
+    if any(mime.startswith(prefix) for prefix in _TRANSCRIBE_MIME_PREFIXES):
+        return "transcribe"
     return "skipped"
 
 
 class RenderAuthorizedMedia:
-    def __init__(self, renderer: MediaRenderer) -> None:
+    def __init__(
+        self, renderer: MediaRenderer, transcriber: Optional[MediaRenderer] = None
+    ) -> None:
         self._renderer = renderer
+        self._transcriber = transcriber
 
     def execute(
         self,
@@ -97,5 +104,10 @@ class RenderAuthorizedMedia:
             return RenderedMedia(rendered_text=None, render_status="passthrough")
         if routing == "skipped":
             return RenderedMedia(rendered_text=None, render_status="skipped")
+        if routing == "transcribe":
+            # 音声: transcriber 注入時のみ transcribe、未注入なら skipped にフォールバック
+            if self._transcriber is None:
+                return RenderedMedia(rendered_text=None, render_status="skipped")
+            return self._transcriber.render(dr.media, dr.local_path)
         # routing == "render"
         return self._renderer.render(dr.media, dr.local_path)

@@ -25,7 +25,8 @@ class TelegramUpdate:
         """Telegram Bot API の update JSON から構築。最小限のフィールドのみ抽出。
 
         Stage 6.2 拡張: photo / document / caption を抽出する。
-        media 配列は photo（最大解像度）→ document の順。
+        Stage 9.2 拡張: voice / audio / video / video_note を抽出する。
+        media 配列は photo（最大解像度）→ document → voice → audio → video → video_note の順。
         """
         message = payload.get("message") or payload.get("edited_message") or {}
         chat = message.get("chat") or {}
@@ -40,6 +41,18 @@ class TelegramUpdate:
         document = message.get("document")
         if document:
             media.append(MediaAttachment.from_document_api(document))
+        voice = message.get("voice")
+        if voice:
+            media.append(MediaAttachment.from_voice_api(voice))
+        audio = message.get("audio")
+        if audio:
+            media.append(MediaAttachment.from_audio_api(audio))
+        video = message.get("video")
+        if video:
+            media.append(MediaAttachment.from_video_api(video))
+        video_note = message.get("video_note")
+        if video_note:
+            media.append(MediaAttachment.from_video_note_api(video_note))
 
         return cls(
             update_id=int(payload["update_id"]),
