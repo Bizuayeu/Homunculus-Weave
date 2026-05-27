@@ -6,8 +6,10 @@ requires-python = ">=3.10"
 dependencies = [
     "httpx>=0.27",
     # Stage 7: ドキュメント系 mime (docx/pptx/xlsx) を markdown 化して Weave に渡す。
-    # markitdown が内部で python-docx / python-pptx / openpyxl / mammoth /
+    # markitdown が内部で mammoth (docx 読込) / python-pptx / openpyxl /
     # magika (ML model) / onnxruntime 等の再帰依存を連れてくる点に留意。
+    # ※ docx 読込は mammoth であり python-docx は引かれない（python-docx は書込用）。
+    #   テストは fixture 生成に python-docx を使うため dev extras 側で別途宣言する。
     "markitdown[docx,pptx,xlsx]>=0.1.6",
 ]
 
@@ -16,6 +18,13 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=6.0",
     "pytest-asyncio>=0.23",
+    # テスト fixture を動的生成するための書込ライブラリ群（git に巨大バイナリを置かない方針）。
+    # python-docx は markitdown[docx] では引かれない（読込は mammoth）ため必須。
+    # python-pptx / openpyxl は markitdown[pptx,xlsx] でも入るが、テスト依存を
+    # markitdown の内部依存に暗黙依存させず明示する（fresh clone / CI の再現性）。
+    "python-docx>=1.1",
+    "python-pptx>=1.0",
+    "openpyxl>=3.1",
 ]
 
 [tool.pytest.ini_options]
