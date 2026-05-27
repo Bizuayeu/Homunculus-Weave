@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import List, Optional, Protocol
 
 from domain.lease import SessionLease
+from domain.media import MediaAttachment, RenderedMedia
 from domain.models import OutboundMessage, TelegramUpdate
 from domain.offset import UpdateOffset
 
@@ -58,4 +59,17 @@ class MediaDownloader(Protocol):
     """
 
     def download(self, file_id: str, target_dir: Path) -> Path:
+        ...
+
+
+class MediaRenderer(Protocol):
+    """Download 済み media を Weave が読める形式に変換する Port（Stage 7.2）。
+
+    実装は adapters/render/markitdown_renderer.py（Stage 7.3）。
+    mime-routing は呼び出し側（UseCase）が担い、ここに来た時点で render 対象は確定。
+    Adapter は内部例外を catch して RenderedMedia(render_status="failed") を返す契約
+    （Stage 6 の skip_reason 同型の「フラグ化、ブロックしない」スタンス）。
+    """
+
+    def render(self, media: MediaAttachment, local_path: Path) -> RenderedMedia:
         ...

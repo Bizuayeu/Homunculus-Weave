@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from domain.lease import SessionLease
+from domain.media import MediaAttachment, RenderedMedia
 from domain.models import OutboundMessage, TelegramUpdate
 from domain.offset import UpdateOffset
 
@@ -86,3 +87,31 @@ class FakeMediaDownloader:
         if self.fail:
             raise RuntimeError("simulated download failure")
         return target_dir / f"{file_id}.bin"
+
+
+class FakeMediaRenderer:
+    """Stage 7.2: render 呼び出しを記録、固定値を返す fake。
+
+    Adapter 側で内部 catch + flag 化のため、UseCase は raise を期待しない契約。
+    fail フラグで raise すれば契約違反を観察できる（テスト用、通常未使用）。
+    """
+
+    def __init__(
+        self,
+        rendered_text: str = "# rendered\n",
+        render_status: str = "ok",
+        fail: bool = False,
+    ) -> None:
+        self.render_calls: List[Tuple[MediaAttachment, Path]] = []
+        self._rendered_text = rendered_text
+        self._render_status = render_status
+        self._fail = fail
+
+    def render(self, media: MediaAttachment, local_path: Path) -> RenderedMedia:
+        self.render_calls.append((media, local_path))
+        if self._fail:
+            raise RuntimeError("simulated renderer failure")
+        return RenderedMedia(
+            rendered_text=self._rendered_text,
+            render_status=self._render_status,
+        )

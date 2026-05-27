@@ -21,8 +21,11 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 3. lease acquire（他セッション保持中なら exit 4 で即終了＝自己治癒）
 4. watch を run_in_background で起動
 5. Monitor ループで emit 行（JSON Lines v2）を受け、Weave が SecretaryRole で応答ドラフト → send-reply
-   - `media[].local_path` が非 null なら起草前に `Read` ツールで開いて Vision 解釈（Stage 6 Multimodal Inbox）
-   - `skip_reason="media_size_exceeded"` ならサイズ超過の旨を短く伝える
+   - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキスト（markdown）を直接活用（docx/pptx/xlsx の中身が Weave 到達、Stage 7 MediaRenderer）
+   - **`local_path` 非 null + `render_status="passthrough"`** → `Read` ツールで開いて Vision/PDF/text 解釈（image/pdf/text 系、Stage 6 Multimodal Inbox）
+   - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答
+   - **`render_status="skipped"` + `skip_reason="media_size_exceeded"`** → サイズ超過応答
+   - **`render_status="skipped"` + `skip_reason=null`** → 未対応 mime（音声/動画等）、`mime_type` を見て応答
 6. 定期的に lease renew で heartbeat 更新（v0.1.1 以降は watch 内蔵）
 7. セッション終端で lease release（次 cron が拾える）
 ```
@@ -77,6 +80,8 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 - **media retention**（機密書類の長期残存防止 / Stage 6）— `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS`（既定 24h）経過した media は `cleanup_media_dir` で削除
 - **token 込み URL のログ秘匿**（Stage 6）— `/file/bot<TOKEN>/<file_path>` の TOKEN を例外メッセージ・stderr・ログに残さない（`raise ... from None` で chain 切り、`safe_id=file_id[:8]` のみ表示、テストで明示検証）
 - **mime_type は Telegram の自己申告** — 信頼せず、親プロセス Weave が `Read` で開いた結果を真とする（rename 攻撃対策）
+- **markitdown render 失敗時の絶対パス秘匿**（Stage 7）— Adapter 内部 catch 時の stderr warning は `file_id[:8]` のみで `local_path` の絶対パスを出さない（テストで明示検証）
+- **markitdown 寛容性の認識**（Stage 7）— garbage バイト列でも render_status="ok" で何か返してくる。**rendered_text が意味のあるテキストかは Weave 側で判断**する責務（L00473 分業）。rename 攻撃で意図しない mime を render させようとする入力にも、Weave が「内容として妥当か」を判断する層が最終防御
 
 ## LineBridge 連携
 

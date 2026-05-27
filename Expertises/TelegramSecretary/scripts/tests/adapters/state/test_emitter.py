@@ -166,3 +166,110 @@ def test_emit_includes_skip_reason_for_size_exceeded():
     payload = json.loads(stream.getvalue().strip())
     assert payload["media"][0]["local_path"] is None
     assert payload["media"][0]["skip_reason"] == "media_size_exceeded"
+
+
+# === Stage 7.3: rendered_text / render_status / file_name 出力 ===
+
+from domain.media import RenderedMedia
+from usecases.render_authorized_media import RenderResult
+
+
+def _docx_media_attachment(file_name: str = "spec.docx") -> MediaAttachment:
+    return MediaAttachment(
+        kind="document",
+        file_id="DOC123",
+        mime_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        size=4096,
+        file_name=file_name,
+    )
+
+
+def test_emit_includes_file_name_for_document():
+    media = _docx_media_attachment("specification.docx")
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]))
+    payload = json.loads(stream.getvalue().strip())
+    assert payload["media"][0]["file_name"] == "specification.docx"
+
+
+def test_emit_file_name_is_null_for_photo():
+    """photo には file_name 概念なし、出力は null（欠落≠未対応 の混乱回避）。"""
+    media = MediaAttachment(
+        kind="photo", file_id="P", mime_type="image/jpeg", size=4096
+    )
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]))
+    payload = json.loads(stream.getvalue().strip())
+    assert payload["media"][0]["file_name"] is None
+
+
+def test_emit_serializes_rendered_text_and_status_from_render_results():
+    """Heavy + render: render_results を渡すと rendered_text / render_status が乗る。"""
+    media = _docx_media_attachment()
+    rr = RenderResult(
+        update_id=1,
+        media=media,
+        local_path=Path("/tmp/media/DOC123_spec.docx"),
+        skip_reason=None,
+        rendered=RenderedMedia(rendered_text="# 仕様書\n概要", render_status="ok"),
+    )
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]), render_results=[rr])
+    payload = json.loads(stream.getvalue().strip())
+    assert payload["media"][0]["render_status"] == "ok"
+    assert payload["media"][0]["rendered_text"] == "# 仕様書\n概要"
+    assert payload["media"][0]["local_path"] is not None
+    assert "spec.docx" in payload["media"][0]["local_path"]
+
+
+def test_emit_passthrough_render_status_for_photo_with_render_results():
+    """image/pdf 等 passthrough: rendered_text=null + render_status='passthrough'。"""
+    media = MediaAttachment(
+        kind="photo", file_id="P", mime_type="image/jpeg", size=4096
+    )
+    rr = RenderResult(
+        update_id=1,
+        media=media,
+        local_path=Path("/tmp/media/P.jpg"),
+        skip_reason=None,
+        rendered=RenderedMedia(rendered_text=None, render_status="passthrough"),
+    )
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]), render_results=[rr])
+    payload = json.loads(stream.getvalue().strip())
+    assert payload["media"][0]["render_status"] == "passthrough"
+    assert payload["media"][0]["rendered_text"] is None
+
+
+def test_emit_failed_render_status_keeps_local_path():
+    """render 失敗: local_path は残るが rendered_text=null + render_status='failed'。"""
+    media = _docx_media_attachment("broken.docx")
+    rr = RenderResult(
+        update_id=1,
+        media=media,
+        local_path=Path("/tmp/media/DOC123_broken.docx"),
+        skip_reason=None,
+        rendered=RenderedMedia(rendered_text=None, render_status="failed"),
+    )
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]), render_results=[rr])
+    payload = json.loads(stream.getvalue().strip())
+    assert payload["media"][0]["render_status"] == "failed"
+    assert payload["media"][0]["rendered_text"] is None
+    assert payload["media"][0]["local_path"] is not None
+
+
+def test_emit_without_render_results_outputs_null_render_fields():
+    """後方互換: render_results 未指定なら rendered_text / render_status は null。"""
+    media = _docx_media_attachment()
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]))
+    payload = json.loads(stream.getvalue().strip())
+    assert payload["media"][0]["rendered_text"] is None
+    assert payload["media"][0]["render_status"] is None

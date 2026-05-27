@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Optional, Sequence, TextIO
 
 from usecases.download_authorized_media import MediaDownloadResult
 from usecases.fetch_authorized_updates import NormalizedUpdate
+from usecases.render_authorized_media import RenderResult
 
 PAYLOAD_VERSION = 2
 
@@ -15,7 +16,9 @@ class StdoutEventEmitter:
     """`watch` モード時、認可・正規化済み update を JSON Lines で emit する。
 
     Stage 6.3: `v: 2` + `media[]` 拡張。download_results を渡せば local_path / skip_reason が乗る。
-    Monitor ツールがこの行を消費し、Weave が応答ドラフトを起草する。
+    Stage 7.3: `rendered_text` / `render_status` / `file_name` 追加（v2 維持、フィールド追加のみ）。
+    render_results 優先（あれば local_path / skip_reason もそこから拾う）、なければ download_results、
+    どちらもなければメタのみ。
     """
 
     def __init__(self, stream: Optional[TextIO] = None) -> None:
@@ -25,8 +28,11 @@ class StdoutEventEmitter:
         self,
         update: NormalizedUpdate,
         download_results: Optional[Sequence[MediaDownloadResult]] = None,
+        render_results: Optional[Sequence[RenderResult]] = None,
     ) -> None:
-        media_payload = self._build_media_payload(update, download_results or [])
+        media_payload = self._build_media_payload(
+            update, download_results or [], render_results or []
+        )
         payload: Dict[str, Any] = {
             "v": PAYLOAD_VERSION,
             "update_id": update.update.update_id,
@@ -44,31 +50,53 @@ class StdoutEventEmitter:
         self,
         update: NormalizedUpdate,
         download_results: Sequence[MediaDownloadResult],
+        render_results: Sequence[RenderResult],
     ) -> List[Dict[str, Any]]:
-        """update.update.media を JSON 化、対応する download_result があれば
-        local_path / skip_reason を埋める。"""
-        own_results = {
+        """update.update.media を JSON 化。
+        render_results 優先（あれば local_path / skip_reason もそこから）、
+        なければ download_results、どちらもなければメタのみ。"""
+        download_by_file_id = {
             r.media.file_id: r
             for r in download_results
             if r.update_id == update.update.update_id
         }
+        render_by_file_id = {
+            r.media.file_id: r
+            for r in render_results
+            if r.update_id == update.update.update_id
+        }
         out: List[Dict[str, Any]] = []
         for media in update.update.media:
-            result = own_results.get(media.file_id)
-            local_path = (
-                str(result.local_path)
-                if result is not None and result.local_path is not None
-                else None
-            )
-            skip_reason = result.skip_reason if result is not None else None
+            rd = render_by_file_id.get(media.file_id)
+            dl = download_by_file_id.get(media.file_id)
+
+            if rd is not None:
+                local_path = str(rd.local_path) if rd.local_path is not None else None
+                skip_reason = rd.skip_reason
+                rendered_text = rd.rendered.rendered_text
+                render_status = rd.rendered.render_status
+            elif dl is not None:
+                local_path = str(dl.local_path) if dl.local_path is not None else None
+                skip_reason = dl.skip_reason
+                rendered_text = None
+                render_status = None
+            else:
+                local_path = None
+                skip_reason = None
+                rendered_text = None
+                render_status = None
+
             out.append(
                 {
                     "kind": media.kind,
                     "file_id": media.file_id,
+                    "file_name": media.file_name,
                     "mime_type": media.mime_type,
                     "size": media.size,
                     "local_path": local_path,
                     "skip_reason": skip_reason,
+                    "rendered_text": rendered_text,
+                    "render_status": render_status,
                 }
             )
         return out
