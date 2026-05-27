@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, List, Mapping, Optional
 
 from domain.media import MediaAttachment
+from domain.outbound import OutboundAttachment
 
 
 @dataclass(frozen=True)
@@ -73,3 +74,4 @@ class OutboundMessage:
     chat_id: int
     text: str
     reply_to_message_id: Optional[int] = None
+    attachments: List[OutboundAttachment] = field(default_factory=list)

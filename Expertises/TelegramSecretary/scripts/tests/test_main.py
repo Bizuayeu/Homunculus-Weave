@@ -298,6 +298,100 @@ def test_send_reply_uses_env_owner(env_ready, monkeypatch, tmp_path):
     assert rc == EXIT_OK
 
 
+# --- Stage 8.4: send-reply --file / --reply-to ---
+
+
+def test_send_reply_with_file_uses_sendphoto(env_ready, monkeypatch, tmp_path):
+    text_file = tmp_path / "reply.txt"
+    text_file.write_text("caption", encoding="utf-8")
+    img = tmp_path / "fig.png"
+    img.write_bytes(b"\x89PNG\r\n")
+    calls: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(str(request.url))
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(
+        [
+            "send-reply",
+            "--chat-id",
+            "100",
+            "--update-id",
+            "1",
+            "--text-file",
+            str(text_file),
+            "--owner",
+            "S1",
+            "--file",
+            str(img),
+        ]
+    )
+    assert rc == EXIT_OK
+    assert any("sendPhoto" in c for c in calls)
+
+
+def test_send_reply_missing_file_exits_config_invalid(env_ready, monkeypatch, tmp_path):
+    text_file = tmp_path / "reply.txt"
+    text_file.write_text("x", encoding="utf-8")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(
+        [
+            "send-reply",
+            "--chat-id",
+            "100",
+            "--update-id",
+            "1",
+            "--text-file",
+            str(text_file),
+            "--owner",
+            "S1",
+            "--file",
+            str(tmp_path / "nonexistent.png"),
+        ]
+    )
+    # 存在しない添付は送信前に弾く（入力不正 = exit 2）
+    assert rc == EXIT_CONFIG_INVALID
+
+
+def test_send_reply_with_reply_to(env_ready, monkeypatch, tmp_path):
+    text_file = tmp_path / "reply.txt"
+    text_file.write_text("threaded", encoding="utf-8")
+    captured: dict = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if "sendMessage" in str(request.url):
+            captured["body"] = json.loads(request.read())
+        return httpx.Response(200, json={"ok": True, "result": {}})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(
+        [
+            "send-reply",
+            "--chat-id",
+            "100",
+            "--update-id",
+            "1",
+            "--text-file",
+            str(text_file),
+            "--owner",
+            "S1",
+            "--reply-to",
+            "42",
+        ]
+    )
+    assert rc == EXIT_OK
+    assert captured["body"]["reply_to_message_id"] == 42
+
+
 def test_watch_uses_env_owner(env_ready, monkeypatch):
     """env で session_id を export しておけば watch も同じ owner で renew する。"""
     def handler(request: httpx.Request) -> httpx.Response:
