@@ -153,3 +153,87 @@ def test_telegram_update_from_api_with_both_photo_and_document():
     kinds = [m.kind for m in update.media]
     assert "photo" in kinds
     assert "document" in kinds
+
+
+# === Stage 9.2: voice / audio / video / video_note 抽出 ===
+
+def test_telegram_update_from_api_extracts_voice():
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 100},
+            "from": {"id": 200},
+            "voice": {"file_id": "AwAC", "duration": 5, "mime_type": "audio/ogg", "file_size": 8192},
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    assert len(update.media) == 1
+    assert update.media[0].kind == "voice"
+    assert update.media[0].file_id == "AwAC"
+    assert update.media[0].mime_type == "audio/ogg"
+
+
+def test_telegram_update_from_api_extracts_audio():
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 100},
+            "from": {"id": 200},
+            "audio": {
+                "file_id": "BAAC",
+                "duration": 180,
+                "mime_type": "audio/mpeg",
+                "file_size": 3000,
+                "file_name": "song.mp3",
+            },
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    assert len(update.media) == 1
+    assert update.media[0].kind == "audio"
+    assert update.media[0].file_name == "song.mp3"
+
+
+def test_telegram_update_from_api_extracts_video():
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 100},
+            "from": {"id": 200},
+            "video": {"file_id": "BAAD", "duration": 30, "mime_type": "video/mp4", "file_size": 1000000},
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    assert len(update.media) == 1
+    assert update.media[0].kind == "video"
+
+
+def test_telegram_update_from_api_extracts_video_note():
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 100},
+            "from": {"id": 200},
+            "video_note": {"file_id": "DQAC", "length": 240, "duration": 8, "file_size": 500000},
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    assert len(update.media) == 1
+    assert update.media[0].kind == "video_note"
+    assert update.media[0].mime_type == "video/mp4"
+
+
+def test_telegram_update_from_api_voice_with_caption():
+    """voice + caption（Telegram では voice にも caption 付与可能）。"""
+    payload = {
+        "update_id": 1,
+        "message": {
+            "chat": {"id": 100},
+            "from": {"id": 200},
+            "caption": "聞いて",
+            "voice": {"file_id": "v", "duration": 3},
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    assert update.media[0].kind == "voice"
+    assert update.caption == "聞いて"

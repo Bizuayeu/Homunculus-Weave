@@ -1,5 +1,58 @@
 # Changelog
 
+## [0.4.0] - 2026-05-27 — Stage 9 Native Voice/Audio/Video Inbox: 音声 transcript (Doc Complete / E2E Pending)
+
+### Added — voice / audio / video の中身理解（STT）
+
+公式 telegram plugin（claude-plugins-official）が voice/audio/video を file_id forward + download 止まりで**中身理解しない**のに対し、本 Stage は音声を Moonshine 日本語 STT で transcript 化。Stage 7 の MediaRenderer 抽象に「音声→transcript も render の一種」として乗せ、emit スキーマは無変更（rendered_text 再利用）。
+
+**Domain (9.1)**:
+- `MediaAttachment.kind` に `voice|audio|video|video_note` 追加、`from_voice_api` / `from_audio_api` / `from_video_api` / `from_video_note_api`（voice/video_note は file_name なし、voice 既定 mime=audio/ogg、video/video_note 既定 video/mp4）
+
+**UseCase (9.2 / 9.4 / 9.6-i)**:
+- `TelegramUpdate.from_api` が voice/audio/video/video_note を抽出（既存 `FetchAuthorizedUpdates` / `DownloadAuthorizedMedia` は file_id ベースで kind 非依存＝**コード変更ゼロ流用**）
+- `_route_mime` に `_TRANSCRIBE_MIME_PREFIXES=("audio/","video/")` → `"transcribe"` ルート追加
+- `RenderAuthorizedMedia(renderer, transcriber=None)` で mime 分岐（**transcriber 未注入時は audio/video→skipped に後方互換フォールバック**）
+
+**Interface / Infrastructure (9.5b)**:
+- `FfmpegAudioPreprocessor`（PyAV `av`、任意音声/動画→16kHz mono float、**ffmpeg を wheel 内包＝システム ffmpeg 不要**、壊れ/音声なしは空リスト）
+- `MoonshineTranscriber`（`MediaRenderer` Port 実装、`moonshine-voice` の日本語 `base-ja` モデル、**model load は lazy**＝初回の実音声 render 時、例外は `render_status="failed"` 化）
+- `cmd_poll` / `cmd_watch` に transcriber 注入配線（lazy import）
+
+### Changed
+
+- emit JSON Lines は**スキーマ無変更**（音声 transcript は `rendered_text` に乗り `render_status="ok"`、Stage 7 の枠そのまま）。Weave 側は `media.kind` で transcript か md かを判別
+- `pyproject.toml` に `moonshine-voice` + `av`（PyAV）を追加
+
+### Tests
+
+- **Total: 246 tests passing**（v0.3.1 の 214 → +32）
+- Domain: +13（from_voice/audio/video/video_note_api 8 / from_api 抽出 5）
+- UseCase: +11（download/fetch kind 非依存流用 5 / audio・video transcribe routing 6）
+- Adapters: +6（FfmpegAudioPreprocessor 3 / MoonshineTranscriber 3、実 PyAV + 実 Moonshine integration）
+- CLI: +2（Medium モードで voice/video emit）
+
+### 実機検証（ローカル、2026-05-27）
+
+- Moonshine 日本語 STT 動作確認（`DEV/verify_moonshine.py`）: RTF 0.43〜0.69（リアルタイム超）、建設業務語彙を正確認識、末尾欠落あり（Base 58M / CER 13.62%）
+- 本番 adapter 経由の日本語 transcribe（`verify_adapter.py`）: 直接 API と同結果＝配線バグなし
+- 動画(mp4)音声トラック transcribe（`verify_video.py`）: PyAV が動画コンテナの音声を decode → transcript 成功（108544 samples @16kHz）
+
+### ライセンス申し送り（重要）
+
+Moonshine Community License は「年商 $1M 未満は商用も無料」（"non-commercial" 表記だが実態は年商閾値）。**めぐる組（年商50-60億）の本番利用は Enterprise License（有償、contact@moonshine.ai）が必要**。テスト段階は Community で可（大環主決裁）。本番商用化前に Enterprise 契約 or `kotoba-whisper-v2.0`（Apache-2.0、日本語 large-v3 超）へ `MediaRenderer` Port 差し替え。
+
+### Live E2E Pending (Fresh Session 必須)
+
+- E2E: voice メモ送信 → emit `rendered_text` に transcript → Weave が内容応答
+- E2E: audio(mp3) / video(mp4) の音声 transcript
+- E2E: 壊れ音声 → `render_status="failed"` 応答
+- 残: ①Cloud Routine（Linux）の `moonshine-voice` wheel 存在確認（win_amd64 で検証済み、Linux wheel 無ければ kotoba fallback）②末尾欠落緩和
+
+### 後続フェーズ
+
+- **Stage 9.6-ii: 動画 key frame Vision**（emit 複数 media 拡張が必要、段階的に後続）
+
 ## [0.3.1] - 2026-05-27 — Stage 7 follow-up: test fixture 依存の宣言漏れ修正
 
 ### Fixed
