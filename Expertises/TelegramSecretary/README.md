@@ -47,13 +47,40 @@ python scripts/main.py poll --timeout 5
 # → media[].local_path is null
 ```
 
+### docx / pptx / xlsx を試す（Stage 7 MediaRenderer）
+
+```powershell
+# bot に .docx ファイル + caption "要約して" を送ってから：
+python scripts/main.py poll --timeout 5
+# → emit JSON Lines の media[0] に:
+#    - kind="document"
+#    - file_name="spec.docx"
+#    - rendered_text="# 仕様書\n..."（markitdown が md 化）
+#    - render_status="ok"
+# image/pdf は render_status="passthrough"（Read tool が直接対応、render 不要）
+# 音声/動画 (audio/*, video/*) や zip 等は render_status="skipped"
+# 壊れたファイル等で markitdown が失敗すると render_status="failed"
+```
+
 ## テスト
 
 ```powershell
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **171 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66 + v0.2.1 follow-up で +6、Stage 5 / 6.5 は実機検証フェーズ）。
+現在 **214 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66 + v0.2.1 follow-up で +6 + v0.3.0 Stage 7 MediaRenderer で +43、Stage 5 / 6.5 / 7.5 は実機検証フェーズ）。
+
+### 依存ツリー注記
+
+`markitdown[docx,pptx,xlsx]>=0.1.6` の install は内部で以下の再帰依存を連れてきます（Stage 7.3 着手時に `pip install --dry-run` で実測）:
+
+- `mammoth` (docx parser)
+- `python-pptx` / `openpyxl` (pptx/xlsx parser、`python-docx` も入る)
+- `magika` + `onnxruntime` (ML model でファイルタイプ自動判定、~25MB 程度)
+- `markdownify` / `beautifulsoup4` / `lxml` (html→md)
+- `sympy` / `coloredlogs` / `humanfriendly` 等の小さな utility
+
+Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip install` で 30秒程度、以降はキャッシュで高速）。markitdown 自体は MIT、再帰依存も全て MIT/BSD/Apache 系で利用可。
 
 ## env vars
 
