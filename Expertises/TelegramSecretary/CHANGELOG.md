@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.1] - 2026-05-27 — Stage 7 follow-up: test fixture 依存の宣言漏れ修正
+
+### Fixed
+
+- `pyproject.toml` の dev extras に `python-docx` / `python-pptx` / `openpyxl` を明示追加。`test_markitdown_renderer.py` の fixture が `from docx import Document` 等で**書込**ライブラリを使うが、`markitdown[docx]` は docx **読込**に mammoth を使うため **python-docx を引かない**。fresh clone / CI で declared deps だけ入れると `test_renders_docx_to_markdown` が `ModuleNotFoundError: No module named 'docx'` で 1 件落ちる環境依存を解消（python-pptx / openpyxl は markitdown extras でも入るが、テスト依存を markitdown 内部依存に暗黙依存させず明示）
+- `dependencies` のコメント修正（「markitdown が内部で python-docx を引く」→ 実態は mammoth が docx 読込担当、python-docx は引かれない）
+
+### Rationale
+
+- 新セッションの live レビューで発見（クリーン環境で **213 passed / 1 failed**）。「214 green」は開発機にたまたま python-docx があった環境依存だった
+- Testability > Readability の判断: テスト依存を markitdown の内部依存に暗黙依存させず dev extras で明示し、宣言通り 214 が再現する状態にする。織守のように無人で回す前提では CI 再現性が効く
+- コード本体の瑕疵ではなく**テスト依存の宣言漏れ**（実 render 経路は本物の docx 契約書で render_status=ok / 可読テキスト取得を live 実証済み）
+
 ## [0.3.0] - 2026-05-27 — Stage 7 Multimodal Inbox: MediaRenderer (Doc Complete / E2E Pending)
 
 ### Added — ドキュメント系 mime の Weave 判断委任完成形
