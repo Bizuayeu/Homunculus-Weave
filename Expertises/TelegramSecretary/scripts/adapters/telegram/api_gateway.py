@@ -9,6 +9,7 @@ import httpx
 from domain.exceptions import AuthFailureError, TelegramSecretaryError
 from domain.models import OutboundMessage, TelegramUpdate
 from domain.offset import UpdateOffset
+from domain.outbound import OutboundAttachment
 
 
 class TelegramApiGateway:
@@ -64,15 +65,88 @@ class TelegramApiGateway:
             raise TelegramSecretaryError(f"getUpdates failed: {data}")
         return [TelegramUpdate.from_api(u) for u in data.get("result", [])]
 
+    # Telegram の photo/document caption 上限（超過分は text を別 sendMessage で先送り）
+    CAPTION_LIMIT = 1024
+
     def send(self, message: OutboundMessage) -> None:
+        """添付の有無で分岐。添付なしは sendMessage、ありは sendPhoto/sendDocument。"""
+        if not message.attachments:
+            self._send_text(message.chat_id, message.text, message.reply_to_message_id)
+            return
+        self._send_with_attachments(message)
+
+    def _send_text(
+        self, chat_id: int, text: str, reply_to_message_id: Optional[int]
+    ) -> None:
         url = f"{self._base_url}/bot{self._bot_token}/sendMessage"
-        payload: dict[str, Any] = {"chat_id": message.chat_id, "text": message.text}
-        if message.reply_to_message_id is not None:
-            payload["reply_to_message_id"] = message.reply_to_message_id
+        payload: dict[str, Any] = {"chat_id": chat_id, "text": text}
+        if reply_to_message_id is not None:
+            payload["reply_to_message_id"] = reply_to_message_id
         response = self._request_with_retry("POST", url, json=payload)
         data = response.json()
         if not data.get("ok"):
             raise TelegramSecretaryError(f"sendMessage failed: {data}")
+
+    def _send_with_attachments(self, message: OutboundMessage) -> None:
+        """各添付を sendPhoto/sendDocument で送る。
+
+        - 添付1件かつ caption 上限内なら本文を caption に載せる
+        - それ以外（複数 or 上限超）は本文を sendMessage で先送りしてから添付を送る
+        - reply_to は最初の送信のみに付与（二重 reply 回避）
+        """
+        text = message.text or ""
+        attachments = message.attachments
+        single_caption = len(attachments) == 1 and len(text) <= self.CAPTION_LIMIT
+        reply_to = message.reply_to_message_id
+
+        if text and not single_caption:
+            self._send_text(message.chat_id, text, reply_to)
+            reply_to = None  # 先送り済み。以降の添付には付けない
+
+        for index, attachment in enumerate(attachments):
+            caption = text if (single_caption and index == 0) else None
+            self._send_one_attachment(
+                message.chat_id,
+                attachment,
+                caption=caption,
+                reply_to_message_id=reply_to if index == 0 else None,
+            )
+
+    def _send_one_attachment(
+        self,
+        chat_id: int,
+        attachment: OutboundAttachment,
+        caption: Optional[str],
+        reply_to_message_id: Optional[int],
+    ) -> None:
+        method = "sendPhoto" if attachment.is_photo() else "sendDocument"
+        field = "photo" if attachment.is_photo() else "document"
+        url = f"{self._base_url}/bot{self._bot_token}/{method}"
+        # retry で再利用できるよう bytes に読み切る（file handle 消費済み問題の回避）
+        file_bytes = attachment.path.read_bytes()
+        files = {field: (attachment.path.name, file_bytes)}
+        data: dict[str, Any] = {"chat_id": chat_id}
+        if caption is not None:
+            data["caption"] = caption
+        if reply_to_message_id is not None:
+            data["reply_to_message_id"] = reply_to_message_id
+        response = self._request_with_retry("POST", url, files=files, data=data)
+        payload = response.json()
+        if not payload.get("ok"):
+            # token 込み URL は載せず、method/chat_id/file 名のみ（redact）
+            raise TelegramSecretaryError(
+                f"{method} failed (chat_id={chat_id}, file={attachment.path.name}): {payload}"
+            )
+
+    def send_chat_action(self, chat_id: int, action: str = "typing") -> None:
+        """typing 等のチャットアクションを送る（best-effort、失敗は本応答を妨げない）。"""
+        url = f"{self._base_url}/bot{self._bot_token}/sendChatAction"
+        try:
+            self._request_with_retry(
+                "POST", url, json={"chat_id": chat_id, "action": action}
+            )
+        except TelegramSecretaryError:
+            pass  # best-effort
 
     def get_file(self, file_id: str) -> str:
         """Telegram /getFile で file_id から file_path を取得（Stage 6.3）。

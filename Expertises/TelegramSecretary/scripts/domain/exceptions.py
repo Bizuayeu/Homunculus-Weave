@@ -24,3 +24,15 @@ class MediaSizeLimitExceeded(TelegramSecretaryError):
     `MediaDownloadResult.skip_reason="media_size_exceeded"` に変換する。
     Stage 1 の `flag_injection` と同型の「フラグ化して emit、判断は Weave に委ねる」原則。
     """
+
+
+class AttachmentNotFound(TelegramSecretaryError):
+    """outbound 添付ファイルのパスが存在しない（送信前検証で弾く、Stage 8.1）。"""
+
+
+class AttachmentTooLarge(TelegramSecretaryError):
+    """outbound 添付ファイルのサイズが上限を超えた（送信前検証で弾く、Stage 8.1）。
+
+    受信側の MediaSizeLimitExceeded（download skip = フラグ化）の送信側カウンターパート。
+    こちらは送信を中止する（ブロック）: 誤送信・コスト事故防止のため明示的に弾く。
+    """

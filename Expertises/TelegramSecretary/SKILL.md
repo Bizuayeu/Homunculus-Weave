@@ -26,6 +26,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
    - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答（markitdown md 化 or Moonshine 音声 transcribe の失敗）
    - **`render_status="skipped"` + `skip_reason="media_size_exceeded"`** → サイズ超過応答
    - **`render_status="skipped"` + `skip_reason=null`** → zip 等の未対応 mime、または音声で transcriber 未注入/Medium モード、`mime_type` を見て応答
+   - **生成物を送り返す（Stage 8 outbound）** → 図表/レポート等を生成したら `send-reply --file <path>`（複数可、画像→sendPhoto・他→sendDocument 自動振り分け）。`--reply-to <message_id>` で元発言への返信スレッド、送信前に typing インジケータ
 6. 定期的に lease renew で heartbeat 更新（v0.1.1 以降は watch 内蔵）
 7. セッション終端で lease release（次 cron が拾える）
 ```
@@ -40,7 +41,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `lease acquire\|renew\|release [--owner]` | リースロック操作 | 0=成功, 4=conflict, 2=設定欠損 |
 | `poll` | getUpdates 1サイクル、認可・正規化済み update を JSON Lines で stdout に emit | 0=OK, 1=fetch失敗, 3=auth失敗 |
 | `watch [--owner]` | 長期 long-poll ループ。実 message 1件=1行 emit。サイクル毎に lease 自動 renew（v0.1.1） | 長時間常駐 |
-| `send-reply --chat-id --update-id --text-file [--owner]` | Weave 起草の返信送信 → offset advance + lease renew。CLI 層 + UseCase 層の二重 owner 検証 | 0=OK, 1=送信失敗, 3=auth, 4=lease |
+| `send-reply --chat-id --update-id --text-file [--owner] [--file ...] [--reply-to]` | Weave 起草の返信送信 → offset advance + lease renew。CLI 層 + UseCase 層の二重 owner 検証。`--file`（複数可）で画像→sendPhoto・他→sendDocument 添付、`--reply-to` で threading（Stage 8） | 0=OK, 1=送信失敗, 2=添付不正, 3=auth, 4=lease |
 | `test --chat-id` | owner chat に ping 1通 | 0=OK, 1=送信失敗, 3=auth |
 | `cleanup-media` | `state_dir/media/` 配下で `media_retention_hours` 超過の保存 media を削除（手動 / cron）。`watch` は `--cleanup-interval` で自動発火（既定 120 サイクル≒1h） | 0=OK, 2=設定欠損 |
 
@@ -67,6 +68,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES` | optional | media download のサイズ上限（既定 20MB）。超過は `skip_reason="media_size_exceeded"` で emit、download skip |
 | `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS` | optional | 保存 media の保持期限（既定 24h）。`cleanup_media_dir` が超過ファイル削除 |
 | `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替 |
+| `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
 
 ## Security
 
@@ -85,6 +87,9 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 - **音声のローカル完結**（Stage 9）— Moonshine は**ローカル推論で音声が外部に一切出ない**（機密 voice メモに安全）。Whisper API 等の外部送信 STT を採らなかった設計上の利点。本番で Moonshine Enterprise or kotoba-whisper へ切替時もローカル完結を維持
 - **transcript の出力漏洩スキャン**（Stage 9）— 音声内の機密（パスワード読み上げ等）が transcript 経由で emit に乗る可能性、send-reply 前の漏洩スキャン対象に `rendered_text`(transcript) も含める
 - **音声前処理のログ秘匿**（Stage 9）— `MoonshineTranscriber` の例外 catch 時の stderr は `file_id[:8]` のみ、絶対パスを出さない（markitdown と同型）
+- **outbound 添付の漏洩スキャン**（Stage 8）— Weave 生成物（md/docx/画像/PDF）に token/env名/system prompt/機密が混入していないか**送信前**に Weave 側で確認（text の漏洩スキャンを添付にも拡張）。コードはバイナリ中身まで検査しない＝Weave の判断責務（L00473 分業）
+- **outbound サイズ上限**（Stage 8、事故防止）— `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES`（既定 50MB）超過は送信前に `AttachmentTooLarge` で弾く（生成物肥大による誤送信防止）
+- **送信時 token 込み URL のログ秘匿**（Stage 8）— sendPhoto/sendDocument 失敗例外は method/chat_id/file 名のみで URL/token を載せない（受信側 media_downloader と同型、テストで検証）
 
 ## LineBridge 連携
 
