@@ -414,3 +414,25 @@ def test_send_photo_failure_does_not_leak_token(tmp_path):
             )
         )
     assert "TEST_TOKEN" not in str(excinfo.value)
+
+
+def test_network_error_does_not_leak_token():
+    """network error（httpx.RequestError）時、例外に bot token / URL が漏れない。
+
+    全メソッド共通の `_request_with_retry` の network error 経路を sendMessage で代表検証。
+    実ライブラリが URL をエラーメッセージに含めても、`from None` で chain を切り redact する
+    （media_downloader の network error 経路と同型）。
+    """
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        # 実ライブラリが URL（token 込み）をエラーメッセージに含めるケースを再現
+        raise httpx.ConnectError(f"connect failed: {request.url}", request=request)
+
+    gw = _gateway(handler, retry_count=0)
+    with pytest.raises(TelegramSecretaryError) as excinfo:
+        gw.send(OutboundMessage(chat_id=100, text="hi"))
+    msg = str(excinfo.value)
+    assert "TEST_TOKEN" not in msg
+    assert "api.telegram.org/bot" not in msg
+    # from None で chain を切り、traceback 経由の URL 露出も防ぐ
+    assert excinfo.value.__cause__ is None

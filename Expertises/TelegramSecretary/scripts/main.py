@@ -24,6 +24,7 @@ from domain.models import OutboundMessage
 from domain.outbound import OutboundAttachment
 from infrastructure.config import Config
 from infrastructure.media_cleanup import cleanup_media_dir
+from infrastructure.registry_cli import run_registry_command
 from usecases.acquire_lease import AcquireLease
 from usecases.download_authorized_media import DownloadAuthorizedMedia
 from usecases.fetch_authorized_updates import FetchAuthorizedUpdates
@@ -308,6 +309,14 @@ def cmd_test(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_registry(args: argparse.Namespace) -> int:
+    """個人/タスク/知識 管理表の CRUD。args.command が管理表名（individuals/tasks/knowledge）。"""
+    config = _load_config()
+    if isinstance(config, int):
+        return config
+    return run_registry_command(config, args.command, args.registry_action, args)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="telegram-secretary")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -365,6 +374,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="保持期限超過の media ファイルを state_dir/media/ から削除",
     )
 
+    # 管理表 CRUD（individuals / tasks / knowledge）。/secretary が全操作をラップする入口
+    for _name in ("individuals", "tasks", "knowledge"):
+        p_reg = sub.add_parser(_name, help=f"{_name} 管理表の CRUD")
+        p_reg.add_argument("registry_action", choices=["list", "get", "add", "remove"])
+        p_reg.add_argument("--key", help="get/remove のキー（uuid または id）")
+        p_reg.add_argument("--json", help="add するレコードの JSON 文字列")
+        p_reg.add_argument("--json-file", dest="json_file", help="add するレコードの JSON ファイル")
+
     return parser
 
 
@@ -379,6 +396,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         "send-reply": cmd_send_reply,
         "test": cmd_test,
         "cleanup-media": cmd_cleanup_media,
+        "individuals": cmd_registry,
+        "tasks": cmd_registry,
+        "knowledge": cmd_registry,
     }
     return handlers[args.command](args)
 

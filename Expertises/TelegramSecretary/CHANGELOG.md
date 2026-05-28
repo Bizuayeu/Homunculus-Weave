@@ -1,5 +1,61 @@
 # Changelog
 
+## [0.6.0] - 2026-05-28 — 管理表（INDIVIDUALS / TASKS / KNOWLEDGE）+ ドキュメント体系整備
+
+### Added — 管理表アーキテクチャ（Clean Arch 4層）
+
+秘書としての3管理表を新規構築。**SSoT = Private JSON、配布物はテンプレートのみ**（個人データを焼き込まない＝配布可能性の担保）。
+
+- **Domain** (`domain/registry.py`): `Individual` / `Identity` / `Task` / `Knowledge` 値オブジェクト（frozen、from_dict/to_dict、enum バリデーション）+ `upsert` / `find_by` 純関数
+- **UseCase** (`usecases/manage_registry.py`): `RegistryService`（list/get/add_or_update/remove、Store Port 越し）+ `RegistryStore` Port
+- **Interface** (`adapters/registry/json_registry_store.py`): `JsonRegistryStore`（`{"version","records"}` 形式、破損フォールバック、ensure_ascii=False）
+- **Infrastructure** (`infrastructure/archive_rotate.py`): `partition_for_archive`（TASKS/INDIVIDUALS 日付 Archive）+ `split_by_category`（KNOWLEDGE カテゴリ分割＝蓄積優先）
+- **CLI** (`infrastructure/registry_cli.py` + `main.py`): `individuals|tasks|knowledge {list|get|add|remove}` subcommand。値オブジェクトで入力検証（不正は exit 2）。全操作は将来 `/secretary` がラップ
+- **Config**: `individuals_path` / `tasks_path` / `knowledge_path` property（state_dir からの導出、SSoT）
+- **templates/**: `INDIVIDUALS|TASKS|KNOWLEDGE.template.json`（`_record_schema` 付き雛型）+ `Identities/SecretaryRole.template.md`（人格雛型）
+
+### Added — ドキュメント体系
+
+- `DESIGN.md` 拡張（設計正典: Architecture + Data Architecture + Scope）/ `STRUCTURE.md` 新規（構造地図 + 早見表）/ `SECURITY.md` 新規（網羅版、配布前チェックリスト、SSoT を意図的に例外化）/ `DOCUMENTATION_PLAN.md`（整備計画、勉強会資料として保持）
+
+### Data Architecture（確定事項）
+
+- **SSoT = Private JSON**（Redis は将来 LineBridge のキャッシュ、一方向 JSON→Redis）
+- **Identities レイヤー**: 人格定義（`SecretaryRole.md`）は Private、無いとエージェントが人格的に振る舞えない
+- **CRUD 操作主体 = エージェント**、決定論 I/O は CLI、入口は `/secretary`
+- **肥大化対策**: TASKS/INDIVIDUALS=日付 Archive、KNOWLEDGE=カテゴリ分割
+
+### Tests
+
+- **Total: 318 passed**（v0.5.1 の 279 → +39）
+- Domain: +16（値オブジェクト 11 / upsert・find 5）
+- Adapter: +5（JsonRegistryStore）
+- UseCase: +6（RegistryService）
+- Infrastructure: +12（archive_rotate 6 / registry_cli 6）
+- CLI 配線は実機 smoke test（list→add→list→不正 add で exit 2）で end-to-end 確認
+
+## [0.5.1] - 2026-05-27 — Stage 8 Live E2E follow-up: emit message_id + network error redact
+
+### Fixed
+
+- **emit に `message_id` 欠落（reply threading の入力源が Weave に届かない）**: `ROUTINE_PROMPT.md` Step 5 は Weave に「元発言への返信は `--reply-to <message_id>`」と指示していたが、Weave が読む emit JSON Lines に `message_id` が無く、threading に渡す値を取得できなかった。送信パイプライン（CLI `--reply-to` → `OutboundMessage.reply_to_message_id` → gateway payload）は完備していたのに**入力源だけが欠けていた設計不整合**。`TelegramUpdate.message_id` field + `from_api` 抽出 + emit payload 出力を追加（完全後方互換、欠落=null）。Stage 8 Live E2E（ケース D: reply threading、emit からではなく生 getUpdates から message_id を別途取得して通した）で顕在化
+- **network error 経路の token 込み URL 漏洩**: `TelegramApiGateway._request_with_retry` の `httpx.RequestError` 経路が `raise ... from exc` で例外メッセージに `{exc}` を載せ、exc が `/bot<TOKEN>/...` URL を含むと token が漏れた（getUpdates / sendMessage / sendPhoto / sendDocument / getFile / sendChatAction の**全共通経路**）。`from None` で chain を切り、メッセージからも exc を除去（受信側 `media_downloader` の network error 経路と同型の redact に統一）。Stage 8 Live E2E の気づき（送信失敗例外の redact 未検証）への対応で、red テストが実際に `botTEST_TOKEN/sendMessage` の混入を実証
+
+### Changed
+
+- `ROUTINE_PROMPT.md` Step 5 の emit スキーマ例に `message_id` を追加、`--reply-to` の入力源であることを明記（プロンプトとスキーマの矛盾を解消）
+
+### Tests
+
+- **Total: 279 tests passing**（v0.5.0 の 273 → +6）
+- Domain: +3（from_api の message_id 抽出 / 欠落時 None / edited_message でも取得）
+- Adapters: +3（emit の message_id 出力 / 欠落時 null / network error の token redact）
+
+### Rationale
+
+- Stage 8 Live E2E（大環主目視確認）で「emit に message_id が無く本番 Cloud Routine フローで SecretaryRole が threading できない」「送信失敗例外の redact 未発火＝未検証」の 2 点が報告された。コード突き合わせで ①=プロンプトが存在しない値の使用を命じる設計不整合（実在）/ ②=network error 経路の穴（red テストで token 混入を実証）と確定
+- **変更しなかったもの**（加算バイアス回避）: typing 不可視（best-effort 実装は正しい、`AuthFailureError` も握り潰す）/ PIL・python-docx 不在（本体の docx 解釈は markitdown 経由で成立、不足は送信テスト用の生成物作りのみ）/ caption 上限・複数 --file（実装済み・E2E 検証待ち）
+
 ## [0.5.0] - 2026-05-27 — Stage 8 Outbound Media: 生成物の送り返し (Doc Complete / E2E Pending)
 
 ### Added — write 系（受信 Stage 6/7/9 の対）
