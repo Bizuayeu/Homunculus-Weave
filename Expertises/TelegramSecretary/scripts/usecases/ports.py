@@ -73,3 +73,17 @@ class MediaRenderer(Protocol):
 
     def render(self, media: MediaAttachment, local_path: Path) -> RenderedMedia:
         ...
+
+
+class RegistryStore(Protocol):
+    """管理表（INDIVIDUALS / TASKS / KNOWLEDGE）1 ファイルの永続化 Port。
+
+    実装は adapters/registry/json_registry_store.py。records は dict のリスト
+    （値オブジェクトへの変換は呼び出し側の責務）。
+    """
+
+    def load(self) -> List[dict]:
+        ...
+
+    def save(self, records: List[dict]) -> None:
+        ...
