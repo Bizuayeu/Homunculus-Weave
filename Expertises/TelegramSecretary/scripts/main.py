@@ -20,6 +20,7 @@ from domain.exceptions import (
     TelegramSecretaryError,
 )
 from domain.lease import utc_now
+from domain.watch_window import WatchWindow
 from domain.models import OutboundMessage
 from domain.outbound import OutboundAttachment
 from infrastructure.config import Config
@@ -148,6 +149,7 @@ def cmd_watch(args: argparse.Namespace) -> int:
     emitter = StdoutEventEmitter()
     owner = _session_owner(args.owner)
     iterations = 0
+    window = WatchWindow(started_at=utc_now(), max_duration_seconds=args.max_duration)
     media_target_dir = config.state_dir / "media"
 
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
@@ -172,6 +174,7 @@ def cmd_watch(args: argparse.Namespace) -> int:
             )
         try:
             while True:
+                had_messages = False
                 try:
                     updates = uc.execute(timeout_seconds=args.timeout)
                 except AuthFailureError as exc:
@@ -197,6 +200,7 @@ def cmd_watch(args: argparse.Namespace) -> int:
                             download_results=download_results,
                             render_results=render_results,
                         )
+                    had_messages = bool(updates)
 
                 # アイドル時も heartbeat を維持。lease を失っていたら自己治癒で即終了
                 try:
@@ -216,6 +220,10 @@ def cmd_watch(args: argparse.Namespace) -> int:
                         config.media_retention_hours * 3600,
                     )
                 if args.max_iterations and iterations >= args.max_iterations:
+                    break
+                if window.is_expired(utc_now()):
+                    break
+                if args.exit_on_message and had_messages:
                     break
         finally:
             if downloader is not None:
@@ -339,6 +347,17 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=0,
         help="0=無限ループ (Cloud Routine 常駐用), >0 はテスト用",
+    )
+    p_watch.add_argument(
+        "--max-duration",
+        type=int,
+        default=0,
+        help="0=無限 (既存挙動), >0 で N 秒経過後に自然終了。Cloud Routine の窓畳み用",
+    )
+    p_watch.add_argument(
+        "--exit-on-message",
+        action="store_true",
+        help="認可済みメッセージを emit したサイクルで exit 0（D: early-exit→返信→再起動 運用）",
     )
     p_watch.add_argument(
         "--cleanup-interval",

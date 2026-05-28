@@ -1,6 +1,6 @@
 ---
 name: telegram-secretary
-description: Telegram Bot API の long-polling を Cloud Routine 上で常駐させ、認可済みチャットからのメッセージに Weave（SecretaryRole）が即応する対話チャネル。Webhook 不可な Cloud Routine 環境制約を long-polling + Monitor 駆動で回避。LineBridge 併用で LINE 関係者集約にも拡張可能。
+description: Telegram Bot API の long-polling を Cloud Routine 上で常駐させ、認可済みチャットからのメッセージに Weave（SecretaryRole）が即応する対話チャネル。Webhook 不可な Cloud Routine 環境制約を long-polling + /goal deadline 駆動ループで回避。LineBridge 併用で LINE 関係者集約にも拡張可能。
 ---
 
 # TelegramSecretary — Cloud Routine 上の Telegram 常駐秘書スキル
@@ -11,7 +11,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 - **受信方式**: Telegram getUpdates の long-polling（公開 ingress 不要のため Cloud Routine と整合）
 - **応答主体**: 親プロセス Weave 本人が担う（`claude -p` 禁止原則 / L00473）。本スキルは fetch / 認可 / 正規化 / 送信のみ
 - **state 永続化**: `offset.json` + `lease.json` を `state_dir` に保存、heartbeat + TTL リースで並走防止と crash 自己治癒
-- **アイドル枠ゼロの心臓部**: `watch` がバックグラウンドで long-poll、Monitor が emit 行を消費。Weave は実メッセージが来た瞬間のみ起動
+- **アイドル枠ゼロの心臓部**: `/goal` が deadline まで各ターンで foreground `watch --exit-on-message` を回す。メッセージ受信で即 exit→返信→再起動（即応、遅延 ≤long-poll 30秒）、無メッセージ時は long-poll でブロック（待機トークン最小＋ foreground call でセッション warm 保持）。詳細は [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md)
 
 ## Daily Workflow（Cloud Routine 起動時）
 
@@ -19,8 +19,8 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 1. `source bootstrap.sh` で依存導入 + validate-config + `TELEGRAM_SECRETARY_SESSION_ID` 自動 export（運用律 B 案）
 2. egress 疎通確認 (curl api.telegram.org/.../getMe を invalid token で叩いて 401/404 が返ることを確認)
 3. lease acquire（他セッション保持中なら exit 4 で即終了＝自己治癒）
-4. watch を run_in_background で起動
-5. Monitor ループで emit 行（JSON Lines v2）を受け、Weave が SecretaryRole で応答ドラフト → send-reply
+4. `/goal` で deadline（`$TS_SESSION_DEADLINE_EPOCH`）まで監視を駆動。各ターン = foreground `watch --exit-on-message --max-duration <残り窓> --timeout 30`（この call のみ bash `timeout: $TS_POLL_BASH_TIMEOUT_MS`、他は既定 2分）
+5. watch 返却後、stdout の JSON Lines v2 を読み、Weave が SecretaryRole で応答ドラフト → send-reply（メッセージ受信なら即応再起動、無ければ窓満了で再起動）
    - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキストを直接活用。docx/pptx/xlsx は markdown（Stage 7）、**voice/audio/video は音声の文字起こし transcript（Stage 9、`kind` で md か transcript か判別）**
    - **`local_path` 非 null + `render_status="passthrough"`** → `Read` ツールで開いて Vision/PDF/text 解釈（image/pdf/text 系、Stage 6 Multimodal Inbox）
    - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答（markitdown md 化 or Moonshine 音声 transcribe の失敗）
@@ -40,7 +40,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `validate-config` | env vars + 設定の検証 | 0=OK, 2=設定欠損 |
 | `lease acquire\|renew\|release [--owner]` | リースロック操作 | 0=成功, 4=conflict, 2=設定欠損 |
 | `poll` | getUpdates 1サイクル、認可・正規化済み update を JSON Lines で stdout に emit | 0=OK, 1=fetch失敗, 3=auth失敗 |
-| `watch [--owner]` | 長期 long-poll ループ。実 message 1件=1行 emit。サイクル毎に lease 自動 renew（v0.1.1） | 長時間常駐 |
+| `watch [--owner] [--max-iterations N] [--max-duration SEC] [--exit-on-message]` | 長期 long-poll ループ。実 message 1件=1行 emit。サイクル毎に lease 自動 renew（v0.1.1）。`--max-duration SEC`=窓満了で exit 0（0=無限）、`--exit-on-message`=メッセージ emit したサイクルで exit 0（D: 即応再起動） | 長時間常駐 / 窓畳み |
 | `send-reply --chat-id --update-id --text-file [--owner] [--file ...] [--reply-to]` | Weave 起草の返信送信 → offset advance + lease renew。CLI 層 + UseCase 層の二重 owner 検証。`--file`（複数可）で画像→sendPhoto・他→sendDocument 添付、`--reply-to` で threading（Stage 8） | 0=OK, 1=送信失敗, 2=添付不正, 3=auth, 4=lease |
 | `test --chat-id` | owner chat に ping 1通 | 0=OK, 1=送信失敗, 3=auth |
 | `cleanup-media` | `state_dir/media/` 配下で `media_retention_hours` 超過の保存 media を削除（手動 / cron）。`watch` は `--cleanup-interval` で自動発火（既定 120 サイクル≒1h） | 0=OK, 2=設定欠損 |
@@ -70,6 +70,8 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS` | optional | 保存 media の保持期限（既定 24h）。`cleanup_media_dir` が超過ファイル削除 |
 | `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替 |
 | `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
+
+> **`/goal` deadline 駆動の運用変数**（`TS_SESSION_DURATION_SEC` / `TS_SESSION_DEADLINE_EPOCH` / `TS_POLL_SET_SEC` / `TS_POLL_BASH_TIMEOUT_MS` / `TS_MAX_TURNS`）は `bootstrap.sh` が export（SSoT）。`BASH_MAX_TIMEOUT_MS=600000` は `.private/.claude/settings.json`。詳細は [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md)。
 
 ## Security
 
