@@ -36,6 +36,7 @@ class StdoutEventEmitter:
         payload: Dict[str, Any] = {
             "v": PAYLOAD_VERSION,
             "update_id": update.update.update_id,
+            "message_id": update.update.message_id,
             "chat_id": update.update.chat_id,
             "user_id": update.update.user_id,
             "username": update.update.username,

@@ -177,7 +177,11 @@ class TelegramApiGateway:
                 last_exc = exc
                 if attempt < self._retry_count:
                     continue
-                raise TelegramSecretaryError(f"network error after retries: {exc}") from exc
+                # exc には token 込み URL が混入し得る → from None で chain を切り、
+                # メッセージにも exc を載せない（media_downloader の network error と同型の redact）
+                raise TelegramSecretaryError(
+                    "network error after retries (request to Telegram API failed)"
+                ) from None
 
             if response.status_code == 401:
                 raise AuthFailureError(f"401 Unauthorized: {response.text[:200]}")

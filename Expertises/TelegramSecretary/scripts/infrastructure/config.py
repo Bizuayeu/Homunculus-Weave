@@ -24,6 +24,18 @@ class Config:
     media_enable_download: bool = True
     outbound_max_size_bytes: int = DEFAULT_OUTBOUND_MAX_SIZE_BYTES
 
+    @property
+    def individuals_path(self) -> Path:
+        return self.state_dir / "individuals" / "INDIVIDUALS.json"
+
+    @property
+    def tasks_path(self) -> Path:
+        return self.state_dir / "tasks" / "TASKS.json"
+
+    @property
+    def knowledge_path(self) -> Path:
+        return self.state_dir / "knowledge" / "KNOWLEDGE.json"
+
     @classmethod
     def from_env(cls) -> "Config":
         token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()

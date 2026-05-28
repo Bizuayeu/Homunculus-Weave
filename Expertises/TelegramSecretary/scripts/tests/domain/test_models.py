@@ -237,3 +237,46 @@ def test_telegram_update_from_api_voice_with_caption():
     update = TelegramUpdate.from_api(payload)
     assert update.media[0].kind == "voice"
     assert update.caption == "聞いて"
+
+
+# === message_id: reply threading の入力源（ROUTINE_PROMPT の --reply-to が使う） ===
+
+
+def test_telegram_update_from_api_extracts_message_id():
+    """message_id を抽出。emit に乗せて Weave が --reply-to threading に使う。"""
+    payload = {
+        "update_id": 12345,
+        "message": {
+            "message_id": 678,
+            "chat": {"id": 100},
+            "from": {"id": 200},
+            "text": "hi",
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    assert update.message_id == 678
+
+
+def test_telegram_update_from_api_message_id_absent_is_none():
+    """message_id 欠落時は None（後方互換、既存の text-only payload）。"""
+    payload = {
+        "update_id": 1,
+        "message": {"chat": {"id": 100}, "from": {"id": 200}, "text": "x"},
+    }
+    update = TelegramUpdate.from_api(payload)
+    assert update.message_id is None
+
+
+def test_telegram_update_from_api_edited_message_has_message_id():
+    """edited_message でも message_id を取得（編集メッセージへの返信も threading 可能）。"""
+    payload = {
+        "update_id": 99,
+        "edited_message": {
+            "message_id": 55,
+            "chat": {"id": 1},
+            "from": {"id": 2},
+            "text": "edited",
+        },
+    }
+    update = TelegramUpdate.from_api(payload)
+    assert update.message_id == 55
