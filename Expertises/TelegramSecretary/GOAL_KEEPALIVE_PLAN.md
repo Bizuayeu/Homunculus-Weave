@@ -158,10 +158,38 @@
 **Implementation Notes**: ROUTINE_PROMPT の watch 起動行を `--max-duration $TS_POLL_SET_SEC` 付き + bash `timeout: $TS_POLL_BASH_TIMEOUT_MS` 明示に。`/goal` 条件文に COUNT と turn 上限（COUNT+2）の二重停止。**コスト注意**: メインターンはフルモデル課金だが、待機は bash 内 long-poll ゆえターン内トークンは最小。CHANGELOG は 0.7.0 目安で「watch `--max-duration`、`WatchWindow` Domain、bootstrap 運用変数、settings `BASH_MAX_TIMEOUT_MS`、ROUTINE_PROMPT /goal 12セット手順」。
 **Status**: Complete（2026-05-29、D 改修込み。詳細は冒頭「設計転換」と CHANGELOG [0.7.0]）
 
-## /goal の要確認事項（実装後 E2E で確認、致命的でない）
+## Stage 11: E2E 実機検証（Cloud Routine、Phase 段階）
 
-- **Cloud Routine 内で `/goal` がコンテナを維持するか**（公式未記載）。維持されない場合の fallback: `/goal` 無しで watch を `--max-duration $((POLL_SET_SEC * POLL_SET_COUNT))` の単発 foreground（ただし bash 10分上限ゆえ実質1セット）+ cron 間隔短縮。最小仕様（watch wall-clock 停止）は `/goal` 非依存で Stage 10.1-10.2 完成ゆえ本体価値は不変。
-- **`/goal` × foreground 長 call の直列動作**・**SIGTERM 非発火**・**session 実寿命** は Stage 10.4 E2E で実測。
+**Goal**: D の独立4関門を最重要から切り分け検証。Phase 0（コンテナ維持）を最小コストで先に確定し、NG なら fallback（session 間 cron）へ即転換して Phase 1/2 を省く。
+**Layer**: 運用検証（実機 Cloud Routine 必須、ローカル不可）。コード（`--max-duration` / `--exit-on-message`）は green 済みゆえ本検証は「ハーネスが Cloud Routine で成立するか」の確認に限定。
+**前提**: bot token・authorized chat は準備済み。Cloud Routine（`/schedule`）への新規登録が必要。
+
+### 検証マトリクス
+
+| Phase | 狙う関門 | 短縮パラメータ | メッセージ | pass 基準 | fail 時 |
+|---|---|---|---|---|---|
+| **0** | コンテナ維持 + deadline 停止（**最重要ゲート**） | `TS_SESSION_DURATION_SEC=180` `TS_POLL_SET_SEC=60` | 送らない | 3分間 watch が複数サイクル回り deadline で正常終了。途中でコンテナが落ちない | **コンテナ維持不成立** → fallback（session 間 cron 反復）へ転換、Phase 1/2 中止 |
+| **1** | early-exit 即応ループ | 同上 | 1–2通送る | メッセージに ≤数十秒で返信し、exit→返信→再起動が継続 | early-exit / 再起動 / 返信のどこが落ちたか stderr で切り分け |
+| **2** | フル安定 + SIGTERM 非発火 + コスト | 本番 `7200` / `580` | 随時 | 2時間安定・プロセス自然終了（SIGTERM 痕跡なし）・トークン妥当 | 窓畳みバッファ（580<600）/ cron 間隔を見直し |
+
+### 短縮版の利点（Phase 0/1）
+60秒窓は **bash 既定 timeout 2分（120000ms）で収まる**ため、`TS_POLL_BASH_TIMEOUT_MS=600000` を使わずに回せる。`BASH_MAX_TIMEOUT_MS` 設定の有無に依存せず最重要ゲートを検証できる（600000 が要るのは本番 580秒窓のときだけ）。
+
+### Cloud Routine 登録手順（`/schedule`）
+1. prompt body = `ROUTINE_PROMPT.md`（Step 0–7）。Phase 0/1 は Step 2（bootstrap）の前に短縮 env を export（`export TS_SESSION_DURATION_SEC=180 TS_POLL_SET_SEC=60`）。ROUTINE_PROMPT の「E2E 短縮モード」注記を参照
+2. 起動は手動 run（cron を待たず即トリガ）で Phase 0 を回す。Phase 2 で cron 間隔（例 2h）を設定
+3. `session_context` に人格4ファイル（WeaveIdentity / WeaveInstruction / UserIdentity / SECURITY）+ SecretaryRole を注入（BlueberrySprite Routine と同型、`reference_remote_trigger_update` 準拠）
+
+### 観測方法
+- Cloud Routine 実行ログ：watch サイクル数（emit/heartbeat）、lease acquire/renew/release、`/goal` ターン遷移、stderr（auth/transient/lease lost）
+- Phase 1：Telegram 実応答（返信の到達と遅延）
+- deadline 停止：`/goal` が止まりログ末尾に lease release が出るか
+
+### 最重要ゲート Phase 0 の判定
+- **pass**: ログに watch ≥2 サイクル + 約3分後に deadline → lease release。コンテナが3分間生存 → 「foreground 長 call で warm 維持」成立 = D の根幹 OK
+- **fail（コンテナ即閉鎖）**: 1サイクル目の watch 中/直後にログ途絶 → 維持不成立。**fallback**: ROUTINE_PROMPT を session 間ループへ（短セッション = lease acquire → `watch --exit-on-message --max-iterations N` で数サイクル → メッセージ捌いて即終了 → cron 1–5分毎に反復）。コード（early-exit / max-duration）は両設計で再利用、即応性は cron 間隔へ依存
+
+**Status**: Not Started（実機 E2E、別セッション。bot/chat 準備済み → Routine 登録から）
 
 ## Documentation Plan
 
