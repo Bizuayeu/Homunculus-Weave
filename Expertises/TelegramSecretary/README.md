@@ -137,13 +137,18 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 | `send-reply --chat-id --update-id --text-file [--owner] [--file ...] [--reply-to]` | 返信送信。`--file`（複数可）で画像→sendPhoto・他→sendDocument を添付、`--reply-to` で reply threading（Stage 8） | 0=OK, 1=送信失敗, 2=添付不正, 3=auth, 4=lease |
 | `test --chat-id` | 疎通テスト ping | 0=OK, 1/3 |
 | `cleanup-media` | `state_dir/media/` 配下で retention 超過の保存ファイルを削除（手動 / 外部 cron 用）。`watch` は `--cleanup-interval`（既定 120 サイクル≒1h）で自動発火 | 0=OK, 2=設定欠損 |
+| `individuals\|tasks\|knowledge {list\|get\|add\|remove}` | 管理表 CRUD。`get`/`remove` は `--key`、`add` は `--json`/`--json-file`。値オブジェクトで入力検証（不正は exit 2）。全操作は `/secretary` がラップ予定 | 0=OK, 2=不正入力 |
 
 `--owner` は省略可（運用律 B 案：`source bootstrap.sh` で env 経由自動同期）。緊急時の上書きにのみ使用。
 
 ## 関連ドキュメント
 
 - [SKILL.md](./SKILL.md) — スキルマニフェスト
+- [DESIGN.md](./DESIGN.md) — 設計正典（Architecture + Data Architecture + 公式 plugin 採否 Scope）
+- [STRUCTURE.md](./STRUCTURE.md) — 構造地図（ディレクトリ・管理表/Identities 配置・データフロー・早見表）
+- [SECURITY.md](./SECURITY.md) — 網羅的セキュリティ正典（脅威モデル・配布前チェックリスト）
 - [ROUTINE_PROMPT.md](./ROUTINE_PROMPT.md) — Cloud Routine prompt body
 - [CHANGELOG.md](./CHANGELOG.md) — 変更履歴
 - [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) — 実装計画（本イベント駆動開発の経緯ゆえ保持・修正方針）
+- [DOCUMENTATION_PLAN.md](./DOCUMENTATION_PLAN.md) — ドキュメント体系・管理表データアーキテクチャの整備計画
 - [LineBridge/IMPLEMENTATION_PLAN.md](./LineBridge/IMPLEMENTATION_PLAN.md) — LINE 連携の薄ラッパー実装計画

@@ -1,0 +1,126 @@
+# STRUCTURE: TelegramSecretary の構造地図
+
+「どこに何を置くか」の正典。設計の why は [DESIGN.md](./DESIGN.md)、整備手順は [DOCUMENTATION_PLAN.md](./DOCUMENTATION_PLAN.md)。
+
+## 全体像（3区分）
+
+| 区分 | git | 中身 |
+|---|---|---|
+| **public（配布物）** | 公開（将来 `plugins-weave/TelegramSecretary/`） | scripts（コード）・ドキュメント・テンプレート（雛型） |
+| **Private（実体）** | 別リポ `Homunculus-Weave-Private` | 人格実体・管理表実データ・運用 state |
+| **除外（開発中）** | `.gitignore` | `LineBridge/` 一式 |
+
+**鉄則**: public には個人情報・人格を一切焼き込まない。実体はすべて Private。これが配布可能性の担保。
+
+## public ツリー（`Expertises/TelegramSecretary/`）
+
+```
+TelegramSecretary/
+├── README.md                 # 入口インデックス
+├── SKILL.md                  # スキルマニフェスト
+├── DESIGN.md                 # 設計正典（why）
+├── STRUCTURE.md              # 本ファイル（where）
+├── SECURITY.md               # 網羅的セキュリティ正典
+├── ROUTINE_PROMPT.md         # Cloud Routine prompt body
+├── CHANGELOG.md              # 変更履歴
+├── IMPLEMENTATION_PLAN.md    # コード実装の経緯（保持）
+├── DOCUMENTATION_PLAN.md     # 本整備計画（保持）
+├── bootstrap.sh / watch_loop.sh
+├── pyproject.toml
+│
+├── templates/                # ★雛型のみ（実データは Private）
+│   ├── INDIVIDUALS.template.json
+│   ├── TASKS.template.json
+│   ├── KNOWLEDGE.template.json
+│   └── Identities/
+│       └── SecretaryRole.template.md
+│
+├── scripts/                  # Clean Architecture 4層
+│   ├── main.py               # CLI entrypoint（subcommands）
+│   ├── domain/               # 純粋ロジック・値オブジェクト
+│   │   ├── models.py / media.py / outbound.py / exceptions.py
+│   │   ├── authorization.py / lease.py / normalize.py / offset.py
+│   │   ├── individual.py     # ★管理表 値オブジェクト
+│   │   ├── task.py           # ★
+│   │   └── knowledge.py      # ★
+│   ├── usecases/             # オーケストレーション + Port
+│   │   ├── ports.py          # 既存 Port + ★ IndividualStore/TaskStore/KnowledgeStore
+│   │   ├── fetch_authorized_updates.py / send_reply.py / ...
+│   │   └── manage_registry.py # ★管理表 CRUD UseCase（add/update/list/close...）
+│   ├── adapters/
+│   │   ├── telegram/         # api_gateway / media_downloader
+│   │   ├── state/            # json_state_store / emitter
+│   │   ├── render/ transcribe/ audio/
+│   │   └── registry/         # ★ json_individual_store / json_task_store / json_knowledge_store
+│   ├── infrastructure/
+│   │   ├── config.py / media_cleanup.py
+│   │   └── archive_rotate.py # ★日付Archive（TASKS/INDIVIDUALS）+ カテゴリ分割（KNOWLEDGE）
+│   └── tests/                # 全層のテスト（配布物として公開）
+│
+└── LineBridge/               # ← .gitignore（開発中、配布除外）
+```
+
+## Private ツリー（`Homunculus-Weave-Private` 配下）
+
+```
+<Private root>/
+├── Identities/                       # ★人格定義（無いと人格的に振る舞えない）
+│   └── SecretaryRole.md              # SecretaryRole の存在論・対応原則（HatoriRole 同型）
+│
+└── <TELEGRAM_SECRETARY_STATE_DIR>/   # 運用 state + 管理表実データ
+    ├── README.md                     # ★蓄積データのユーザ用インデックス（生成物）
+    ├── offset.json / lease.json      # 既存 state
+    ├── media/                        # 受信メディア（retention で自動削除）
+    ├── individuals/
+    │   ├── INDIVIDUALS.json           # 現役（SSoT）
+    │   └── archive/INDIVIDUALS_<YYYY-MM>.json
+    ├── tasks/
+    │   ├── TASKS.json
+    │   └── archive/TASKS_<YYYY-MM>.json
+    └── knowledge/
+        ├── KNOWLEDGE.json             # 小規模時は単一
+        ├── <category>.json            # ★肥大化時はカテゴリ分割（archive せず蓄積）
+        └── archive/                   # （原則空。明示的廃棄時のみ）
+```
+
+> `Identities/` と `<state_dir>/` の Private 内の正確な親パスは、大環主が Private リポ構成を確定する際に決定（D4 で作成依頼）。env `TELEGRAM_SECRETARY_STATE_DIR` で state_dir を指す。
+
+## どこに何を作るか（早見表）
+
+| 作るもの | 配置 | 区分 |
+|---|---|---|
+| 関係者データ INDIVIDUALS.json | `<state_dir>/individuals/` | Private |
+| 依頼データ TASKS.json | `<state_dir>/tasks/` | Private |
+| 対応知 KNOWLEDGE.json（→category 分割） | `<state_dir>/knowledge/` | Private |
+| 秘書人格 SecretaryRole.md | `<Private>/Identities/` | Private |
+| 各管理表の雛型 | `templates/`（+ `templates/Identities/`） | public |
+| 管理表の値オブジェクト | `scripts/domain/{individual,task,knowledge}.py` | public |
+| 管理表 CRUD ロジック | `scripts/usecases/manage_registry.py` + Port | public |
+| 管理表の JSON 永続化 | `scripts/adapters/registry/json_*_store.py` | public |
+| Archive / カテゴリ分割 | `scripts/infrastructure/archive_rotate.py` | public |
+
+## データフロー
+
+```
+[起動] bootstrap → Weave 人格ロード（WeaveIdentity/Instruction/UserIdentity）
+                 → Identities/SecretaryRole.md を重ねる（SecretaryRole 起動）
+                 → lease acquire → watch 起動
+
+[受信] Telegram → fetch → 認可 → 正規化 → media download/render → emit(JSON Lines)
+        → Monitor → Weave（SecretaryRole）が読む
+
+[判断] Weave が文脈で判断（重要度の世界）:
+        - 関係者を INDIVIDUALS に登録/更新すべきか
+        - 依頼を TASKS に起票/進捗更新すべきか
+        - 対応知を KNOWLEDGE に残すべきか
+        → 該当する CLI subcommand を呼ぶ（決定論 I/O）
+
+[応答] Weave 起草 → 出力漏洩スキャン → send-reply（必要なら --file/--reply-to）
+
+[保守] archive_rotate: TASKS/INDIVIDUALS は日付 Archive、KNOWLEDGE は category 分割
+        state README を再生成（件数・最終更新・分割状況）
+```
+
+## `/secretary` ラップ（操作の入口）
+
+管理表 CRUD の全インターフェース（`individuals|tasks|knowledge add|update|list|...`）は、マスタースキル `/secretary` の管理パネル経由でアクセスできる。Weave も人間ユーザーも、コマンド名を覚えずに `/secretary` から操作に到達する（LineBridge plan の `/secretary` 構想と統合）。

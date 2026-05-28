@@ -273,3 +273,37 @@ def test_emit_without_render_results_outputs_null_render_fields():
     payload = json.loads(stream.getvalue().strip())
     assert payload["media"][0]["rendered_text"] is None
     assert payload["media"][0]["render_status"] is None
+
+
+# === message_id: reply threading の入力源を emit に乗せる ===
+
+
+def test_emit_includes_message_id():
+    """ROUTINE_PROMPT が --reply-to に使う message_id を emit に出力する。"""
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(
+        NormalizedUpdate(
+            update=TelegramUpdate(
+                update_id=1,
+                chat_id=100,
+                user_id=200,
+                username="weave_user",
+                text="hi",
+                message_id=678,
+            ),
+            normalized_text="hi",
+            injection_flags=[],
+        )
+    )
+    payload = json.loads(stream.getvalue().strip())
+    assert payload["message_id"] == 678
+
+
+def test_emit_message_id_null_when_absent():
+    """message_id 欠落時は null を明示出力（欠落≠未対応の混乱回避）。"""
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized("hi"))
+    payload = json.loads(stream.getvalue().strip())
+    assert payload["message_id"] is None

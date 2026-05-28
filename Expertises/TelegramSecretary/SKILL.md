@@ -44,6 +44,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `send-reply --chat-id --update-id --text-file [--owner] [--file ...] [--reply-to]` | Weave 起草の返信送信 → offset advance + lease renew。CLI 層 + UseCase 層の二重 owner 検証。`--file`（複数可）で画像→sendPhoto・他→sendDocument 添付、`--reply-to` で threading（Stage 8） | 0=OK, 1=送信失敗, 2=添付不正, 3=auth, 4=lease |
 | `test --chat-id` | owner chat に ping 1通 | 0=OK, 1=送信失敗, 3=auth |
 | `cleanup-media` | `state_dir/media/` 配下で `media_retention_hours` 超過の保存 media を削除（手動 / cron）。`watch` は `--cleanup-interval` で自動発火（既定 120 サイクル≒1h） | 0=OK, 2=設定欠損 |
+| `individuals\|tasks\|knowledge {list\|get\|add\|remove}` | 管理表（INDIVIDUALS/TASKS/KNOWLEDGE）の CRUD。`get`/`remove` は `--key`（uuid/id）、`add` は `--json`/`--json-file`。値オブジェクトで検証。SSoT は Private JSON、操作主体は SecretaryRole、入口は `/secretary` | 0=OK, 2=不正入力 |
 
 `--owner` は省略可（運用律 B 案：`source bootstrap.sh` で env 経由自動同期）。優先順位は `--owner > env > uuid 自動生成`。
 

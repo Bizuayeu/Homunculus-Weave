@@ -20,6 +20,7 @@ class TelegramUpdate:
     raw: Mapping[str, Any] = field(default_factory=dict)
     media: List[MediaAttachment] = field(default_factory=list)
     caption: Optional[str] = None
+    message_id: Optional[int] = None
 
     @classmethod
     def from_api(cls, payload: Mapping[str, Any]) -> "TelegramUpdate":
@@ -64,6 +65,7 @@ class TelegramUpdate:
             raw=payload,
             media=media,
             caption=message.get("caption"),
+            message_id=message.get("message_id"),
         )
 
 
