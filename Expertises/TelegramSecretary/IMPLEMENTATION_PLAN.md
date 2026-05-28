@@ -2,6 +2,7 @@
 
 > 本計画は `Expertises/ConsiderateCoder/rules/DEV.md` および `/plan-sdd` の方針で生成。全 Stage 完了後に削除する。
 > スキル名 `TelegramSecretary` は暫定。「Weave への Telegram 経由の到達口（SecretaryRole を被った Weave 本人が応答）」を表す。要改名なら Stage 着手前に。
+> **Stage 10（keep-alive: /goal deadline 駆動ロングポーリング + watch early-exit）は独立ファイル [`GOAL_KEEPALIVE_PLAN.md`](./GOAL_KEEPALIVE_PLAN.md) に分離**（教材保持、本計画 Stage 1-9 とは別ライフサイクル）。
 
 ## Overview
 

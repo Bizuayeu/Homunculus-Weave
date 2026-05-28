@@ -2,7 +2,7 @@
 
 Telegram Bot API の long-polling を Cloud Routine 上で常駐させ、認可済みチャットからのメッセージに Weave（SecretaryRole）が即応する対話チャネル。
 
-Webhook 不可な Cloud Routine 環境制約を、long-polling + Monitor 駆動ループで回避する設計（IMPLEMENTATION_PLAN.md L20 参照）。
+Webhook 不可な Cloud Routine 環境制約を、long-polling + /goal deadline 駆動ループで回避する設計（`watch --exit-on-message` で即応再起動。詳細は [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md)、GOAL_KEEPALIVE_PLAN.md）。
 
 ## アーキテクチャ
 
@@ -31,6 +31,12 @@ python scripts/main.py test --chat-id <your-chat-id>
 
 # 1サイクル poll（getUpdates → JSON Lines で stdout に emit）
 python scripts/main.py poll --timeout 5
+
+# watch の deadline 駆動を試す（D: --exit-on-message で即応再起動、--max-duration で窓満了 exit）
+python scripts/main.py lease acquire
+python scripts/main.py watch --exit-on-message --max-duration 10 --timeout 5
+#   → メッセージが来たサイクルで即 exit 0／無ければ 10 秒の窓満了で exit 0
+python scripts/main.py lease release
 ```
 
 ### photo / document を試す（Stage 6 Multimodal Inbox）
@@ -126,6 +132,8 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 | `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替。Heavy は `state_dir/media/` に保存、Medium はメタのみで `local_path=null` |
 | `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB = 52428800、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
 
+> **`/goal` deadline 駆動の運用変数**（`TS_SESSION_DURATION_SEC`=7200 / `TS_SESSION_DEADLINE_EPOCH`=now+duration / `TS_POLL_SET_SEC`=580 / `TS_POLL_BASH_TIMEOUT_MS`=600000 / `TS_MAX_TURNS`=300）は `bootstrap.sh` が export（SSoT）。グローバル `BASH_MAX_TIMEOUT_MS=600000` は `.private/.claude/settings.json`（`BASH_DEFAULT_TIMEOUT_MS` は据え置き＝他コマンド 2分）。
+
 ## Subcommands
 
 | Command | 機能 | Exit code |
@@ -133,7 +141,7 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 | `validate-config` | env vars と設定の検証 | 0=OK, 2=設定欠損 |
 | `lease acquire\|renew\|release [--owner]` | リースロック操作 | 0=成功, 4=conflict, 2=設定 |
 | `poll` | getUpdates 1サイクル | 0=OK, 1=fetch失敗, 3=auth失敗 |
-| `watch [--owner]` | 長期 long-poll ループ（サイクル毎に lease renew） | 長時間常駐 |
+| `watch [--owner] [--max-iterations N] [--max-duration SEC] [--exit-on-message]` | 長期 long-poll ループ（サイクル毎に lease renew）。`--max-duration`=窓満了 exit 0、`--exit-on-message`=メッセージ受信サイクルで exit 0（D 即応再起動） | 長時間常駐 / 窓畳み |
 | `send-reply --chat-id --update-id --text-file [--owner] [--file ...] [--reply-to]` | 返信送信。`--file`（複数可）で画像→sendPhoto・他→sendDocument を添付、`--reply-to` で reply threading（Stage 8） | 0=OK, 1=送信失敗, 2=添付不正, 3=auth, 4=lease |
 | `test --chat-id` | 疎通テスト ping | 0=OK, 1/3 |
 | `cleanup-media` | `state_dir/media/` 配下で retention 超過の保存ファイルを削除（手動 / 外部 cron 用）。`watch` は `--cleanup-interval`（既定 120 サイクル≒1h）で自動発火 | 0=OK, 2=設定欠損 |

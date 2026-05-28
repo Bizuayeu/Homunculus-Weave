@@ -47,6 +47,17 @@ python -c "import httpx" >/dev/null || _ts_die "httpx import failed after instal
 export TELEGRAM_SECRETARY_SESSION_ID="${TELEGRAM_SECRETARY_SESSION_ID:-session-$(python -c 'import uuid; print(uuid.uuid4().hex[:8])')}"
 _ts_log "session_id=$TELEGRAM_SECRETARY_SESSION_ID"
 
+# --- D: deadline 駆動ロングポーリング運用変数 (Stage 10.3 / D 改修) ---
+# 「2時間枠 (deadline)」と「ポーリング回数 (メッセージ頻度で可変)」を分離する。
+# 停止主軸は TS_SESSION_DEADLINE_EPOCH (時刻)。回数は数えない (早期 exit→返信→再起動)。
+# テスト時は env 上書きで短縮可能（既存 session_id と同型の :- 冪等パターン）。
+export TS_SESSION_DURATION_SEC="${TS_SESSION_DURATION_SEC:-7200}"    # session 総枠 (2h)、deadline 計算の元
+export TS_SESSION_DEADLINE_EPOCH="${TS_SESSION_DEADLINE_EPOCH:-$(( $(date +%s) + TS_SESSION_DURATION_SEC ))}"  # 停止主軸: この epoch 秒を過ぎたら /goal 停止
+export TS_POLL_SET_SEC="${TS_POLL_SET_SEC:-580}"                     # メッセージ無し時の 1 窓上限 (bash timeout より短く)
+export TS_POLL_BASH_TIMEOUT_MS="${TS_POLL_BASH_TIMEOUT_MS:-600000}"  # ポーリング call の bash tool timeout (=BASH_MAX_TIMEOUT_MS)
+export TS_MAX_TURNS="${TS_MAX_TURNS:-300}"                           # /goal turn 安全弁 (deadline 異常時の暴走防止、2h/30s≈240+バッファ)
+_ts_log "deadline-driven poll: deadline=$TS_SESSION_DEADLINE_EPOCH (now+${TS_SESSION_DURATION_SEC}s), window<=${TS_POLL_SET_SEC}s, max_turns=${TS_MAX_TURNS}, bash timeout ${TS_POLL_BASH_TIMEOUT_MS}ms"
+
 # --- 設定検証 (env 欠損なら exit 2 で fail-fast) ---
 (cd "$_ts_script_dir" && python scripts/main.py validate-config) || _ts_die "validate-config failed"
 
