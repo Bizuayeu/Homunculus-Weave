@@ -35,6 +35,8 @@ Infrastructure → Interface(Adapter) → UseCase → Domain
 
 **設計線**: 「何を保存するか（スキーマ）・どう保存するか（I/O）・いつ分割するか（archive）」は決定論的世界。「誰を active にするか・何を KNOWLEDGE に残すか・どう応答するか」は重要度の世界（Weave）。この境界が管理表設計の背骨。
 
+**keep-alive の三世界対応（Stage 10 / D）**: 「watch の窓満了・メッセージ駆動 exit（`WatchWindow` / `--max-duration` / `--exit-on-message`）」と「deadline 計算」は決定論的世界（コード + bash 算術、テスト可能）。「`/goal` で deadline まで各ターン watch を回し返信を起草する」運用は従属度の世界（ROUTINE_PROMPT に委任）。停止主軸を時刻（deadline）に置きポーリング回数を LLM 判断から切り離したのは、決定論をコードに寄せる本設計線の踏襲。詳細は [`GOAL_KEEPALIVE_PLAN.md`](./GOAL_KEEPALIVE_PLAN.md)。
+
 ## 3. データアーキテクチャ（管理表 + Identities）
 
 ### 3.1 二系統のデータ
