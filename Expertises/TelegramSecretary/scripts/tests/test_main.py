@@ -189,6 +189,137 @@ def test_watch_exits_4_when_lease_stolen(env_ready, monkeypatch):
     assert rc == EXIT_LEASE_CONFLICT
 
 
+# --- watch (--max-duration で wall-clock 自然停止) ---
+
+
+def test_watch_stops_after_max_duration(env_ready, monkeypatch):
+    """--max-duration 経過で wall-clock 自然終了（exit 0）。max-iterations 未指定でも時間で止まる。
+
+    RenewLease は owner 一致のみ確認し is_stale を見ない（renew_lease.py）ため、
+    acquire を実時刻で行い watch だけ fake clock にしても renew は成功する。
+    """
+    import itertools
+    from datetime import datetime, timedelta, timezone
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": []})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    # acquire 後に patch（acquire の utc_now を汚染しない）。
+    # watch 内の utc_now: window生成(base+0) → renew(base+1000) → is_expired(base+2000)。
+    # 2000s > 窓 580s ゆえ 1 サイクル後に break。
+    base = datetime(2026, 5, 26, 12, 0, 0, tzinfo=timezone.utc)
+    counter = itertools.count()
+    monkeypatch.setattr(
+        "main.utc_now", lambda: base + timedelta(seconds=1000 * next(counter))
+    )
+    rc = main(["watch", "--timeout", "1", "--max-duration", "580", "--owner", "S1"])
+    assert rc == EXIT_OK
+
+
+def test_watch_max_duration_zero_is_infinite_backward_compat(env_ready, monkeypatch):
+    """--max-duration 0（既定）は無限窓。--max-iterations 1 で従来どおり 1 周（後方互換）。"""
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": []})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(
+        [
+            "watch",
+            "--timeout",
+            "1",
+            "--max-iterations",
+            "1",
+            "--max-duration",
+            "0",
+            "--owner",
+            "S1",
+        ]
+    )
+    assert rc == EXIT_OK
+
+
+# --- watch (--exit-on-message で early-exit→返信→再起動 運用) ---
+
+
+def test_watch_exit_on_message_breaks_after_emit(env_ready, monkeypatch):
+    """--exit-on-message: 認可済みメッセージを emit したサイクルで exit 0。
+
+    D 運用（メッセージ受信で foreground watch を畳む→返信→再起動）の核。
+    max-iterations 5 は無限ループ保険。early-exit が効けば 1 サイクル目の emit で
+    break するため getUpdates は 1 回しか呼ばれない。
+    """
+    calls = {"n": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200, "username": "weave"},
+                            "text": "hi",
+                        },
+                    }
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(
+        [
+            "watch",
+            "--timeout",
+            "1",
+            "--exit-on-message",
+            "--max-iterations",
+            "5",
+            "--owner",
+            "S1",
+        ]
+    )
+    assert rc == EXIT_OK
+    assert calls["n"] == 1  # 1 サイクル目の emit で break（max-iterations 5 に達しない）
+
+
+def test_watch_exit_on_message_continues_when_no_message(env_ready, monkeypatch):
+    """--exit-on-message でもメッセージが無いサイクルでは早期終了しない（誤発火しない）。
+
+    空 result が続く間は窓/回数まで回り続ける。max-iterations 2 まで getUpdates が呼ばれる。
+    """
+    calls = {"n": 0}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        return httpx.Response(200, json={"ok": True, "result": []})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(
+        [
+            "watch",
+            "--timeout",
+            "1",
+            "--exit-on-message",
+            "--max-iterations",
+            "2",
+            "--owner",
+            "S1",
+        ]
+    )
+    assert rc == EXIT_OK
+    assert calls["n"] == 2  # メッセージ無しでは exit-on-message 発火せず 2 サイクル回る
+
+
 # --- send-reply ---
 
 

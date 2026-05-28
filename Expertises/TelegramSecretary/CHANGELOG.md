@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.7.0] - 2026-05-29 — Stage 10: /goal deadline 駆動ロングポーリング（keep-alive + early-exit 即応）
+
+Cloud Routine のセッションを枠（既定 2h）の間 warm に保ちつつ、Telegram メッセージに即応するための keep-alive 設計。**設計 A（background watch + Monitor 維持 × /goal warm）は claude-code-guide 調査で不成立**（`/goal` はターン間機構で keep-alive にならない／monitor タスクは resume 復元されない／Cloud Routine はタスク完了型で常駐想定外）。代わりに **D（session 内 keep-alive + early-exit）** を採用。
+
+### Added — watch の wall-clock / message 駆動 exit
+
+- **Domain** (`domain/watch_window.py`): `WatchWindow(started_at, max_duration_seconds)` 値オブジェクト（frozen、`is_expired` / `remaining_seconds`、`<=0`=無限窓、`SessionLease.is_stale` と同型の境界作法）
+- **CLI** (`main.py::cmd_watch` + `build_parser`):
+  - `--max-duration SEC`（既定 0=無限）: 窓満了で自然終了（exit 0）。bash timeout 発火（SIGTERM）より先にプロセスを自然終了させる窓畳み
+  - `--exit-on-message`（D の核）: 認可済みメッセージを emit したサイクルで exit 0。「メッセージ受信→即返信→watch 再起動」の即応ループを実現（遅延 ≤ long-poll timeout）。無メッセージのサイクルでは発火しない
+
+### Added — deadline 駆動の運用統合
+
+- **bootstrap.sh**: deadline 方式の運用変数を export。**「枠（`TS_SESSION_DEADLINE_EPOCH`）」と「ポーリング回数（メッセージ頻度で可変）」を分離**。`TS_SESSION_DURATION_SEC`(7200) / `TS_SESSION_DEADLINE_EPOCH`(now+duration、停止主軸) / `TS_POLL_SET_SEC`(580、無メッセージ時の窓上限) / `TS_POLL_BASH_TIMEOUT_MS`(600000) / `TS_MAX_TURNS`(300、暴走保険)。旧 `TS_POLL_SET_COUNT`（停止条件）は廃止
+- **settings** (`.private/.claude/settings.json`): `BASH_MAX_TIMEOUT_MS=600000`（上限引き上げ）。`BASH_DEFAULT_TIMEOUT_MS` は据え置き＝ポーリング以外は 2分のまま
+- **ROUTINE_PROMPT.md**: Step 5 を `/goal` deadline 駆動に刷新（各ターン foreground `watch --exit-on-message --max-duration <残り窓>`、timeout 限定適用の運用規律、deadline→lease release→次 cron）
+
+### Design — 路線判断と要実機検証
+
+- 設計 A 不成立 → **D 採用**（即応性◎を保つため session 内 keep-alive）
+- **⚠️ 要実機 E2E（別セッション）**: 「foreground 長 call が Cloud Routine のコンテナを warm に保つか」は公式未保証。NG 時の fallback は session 間ループ（短セッションを cron で頻繁反復、既存 lease/offset 冪等性に乗せる）
+- 設計記録は `GOAL_KEEPALIVE_PLAN.md`（教材として保持）
+
+### Tests
+
+- **Total: 329 passed**（0.6.0 の 318 → `WatchWindow` Domain / `--max-duration` / `--exit-on-message` で +11）
+- `--exit-on-message`: メッセージ受信サイクルで break（getUpdates 1回で抜ける）/ 無メッセージでは誤発火せず窓・回数まで継続
+
 ## [0.6.0] - 2026-05-28 — 管理表（INDIVIDUALS / TASKS / KNOWLEDGE）+ ドキュメント体系整備
 
 ### Added — 管理表アーキテクチャ（Clean Arch 4層）

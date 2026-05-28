@@ -60,13 +60,46 @@ curl -sS -o /dev/null -w '%{http_code}\n' "https://api.telegram.org/botINVALID_T
 - exit 4: 他セッション保持中 → 即終了（自己治癒の重複防止）
 - exit 2/3: 設定 or 認証エラー、stderr 確認後終了
 
-## Step 5 — watch 起動 + Monitor ループ
+## Step 5 — /goal による deadline 駆動ロングポーリング（keep-alive + 即応）
 
-9. `watch` をバックグラウンドで起動、Monitor で emit 行（JSON Lines）を消費：
+9. `/goal` で「2時間枠（`$TS_SESSION_DEADLINE_EPOCH` 到達）まで Telegram を監視し続ける」ゴールを駆動する。**各ターン = 1 つの foreground watch call**で、`--exit-on-message` 付きゆえ **メッセージを受けた瞬間に exit→返信→次ターンで再起動**する（即応）。メッセージが来なければ `--max-duration` の窓満了まで long-poll でブロック（待機トークンは getUpdates サーバ側ブロックでほぼゼロ＝コスト最小、かつ foreground call がセッションを warm に保つ＝アイドル閉鎖の回避）。
+
+**2時間枠とポーリング回数は分離**: 停止主軸は deadline（時刻）。ポーリング回数はメッセージ頻度で可変（数えない）。`$TS_MAX_TURNS` は deadline 判定が壊れた時の暴走保険。
+
+> **要実機検証（別セッション E2E）**: 「foreground 長 call が Cloud Routine のコンテナを warm に保つか」は公式未保証。NG だった場合の fallback は session 間ループ（短セッションを cron で頻繁反復、既存 lease/offset 冪等性に乗せる）。
+
+`/goal` 起動（条件文に停止条件を自然文で記述、各ターン後に小型モデルが評価し未達なら次ターンを自律起動）：
+
+```
+/goal "Telegram を deadline まで監視する。各ターンで下記の watch を1回 foreground 実行し、
+       返ってきた JSON Lines の各メッセージに send-reply で返信する。
+       現在時刻が $TS_SESSION_DEADLINE_EPOCH (epoch秒) を過ぎたら lease release して停止。
+       or stop after $TS_MAX_TURNS turns（保険）。停止時に未返信メッセージが無いこと。"
+```
+
+各ターンの手順：
+
+1. **残り窓を計算**（残り 0 以下なら deadline 到達 → Step 7 へ）。この短い call は `timeout` を明示しない（既定 2分）：
 
 ```bash
-(cd Expertises/TelegramSecretary && python scripts/main.py watch --timeout 30) &
+remaining=$(( TS_SESSION_DEADLINE_EPOCH - $(date +%s) ))
+if [ "$remaining" -le 0 ]; then echo "DEADLINE_REACHED"; \
+  else echo "window=$(( remaining < TS_POLL_SET_SEC ? remaining : TS_POLL_SET_SEC ))"; fi
 ```
+
+2. **watch を foreground 実行**（`&` を付けない）。この call **だけ** bash tool の `timeout` に `$TS_POLL_BASH_TIMEOUT_MS`（=600000）を明示：
+
+```bash
+(cd Expertises/TelegramSecretary && \
+  python scripts/main.py watch --exit-on-message --max-duration <上記 window> --timeout 30)
+```
+
+- **timeout 限定適用の運用規律**: 長い `timeout` を渡すのは **このポーリング call だけ**。lease 操作・send-reply・残り窓計算・git・pytest 等は `timeout` を明示しない（既定 2分=`BASH_DEFAULT_TIMEOUT_MS`）。`.private/.claude/settings.json` の `BASH_MAX_TIMEOUT_MS=600000` は上限の許可であって既定値は変えない
+- `--max-duration` < bash `timeout`（窓 ≤580s < 600s）で、プロセス自然終了を timeout 発火（SIGTERM）より先に起こす
+- watch は **(a) 認可済みメッセージを受けたサイクル**（`--exit-on-message`）または **(b) 窓満了**（`--max-duration`）で exit 0 する。**(a) なら即返信→再起動で即応（遅延は long-poll の最大 30秒）、(b) なら素通りで再起動し warm 継続**
+- watch が exit 4（lease 奪取を検出）で返ったら即終了（次 cron が拾い直す、自己治癒）
+
+3. **call 返却後**、stdout に出た JSON Lines（0 行以上）を読み、各メッセージに下記手順 11 で応答する。応答し終えたら次ターンへ（/goal が deadline 未到達を確認して再起動）
 
 10. 各 JSON Lines payload は以下のスキーマ（**v2、Stage 7 で `rendered_text` / `render_status` / `file_name` 追加**）：
 
@@ -145,7 +178,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' "https://api.telegram.org/botINVALID_T
 
 ## Step 7 — セッション終端
 
-13. 終端時に lease release で次 cron が拾えるようにする：
+13. `/goal` が deadline 到達（または `$TS_MAX_TURNS` 保険）で停止したら、lease release で次 cron が拾えるようにする。deadline → lease release → 次 cron が `lease/offset` 冪等性で継続（cron 間隔の隙間メッセージは次回 getUpdates が offset 起点で回収、Telegram は ~24h 保持）：
 
 ```bash
 (cd Expertises/TelegramSecretary && python scripts/main.py lease release)
