@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.1] - 2026-05-29 — E2E Phase 0 PASS + FINDING A 修正（media stack 遅延構築）
+
+### Verified — E2E Phase 0（Cloud Routine 実機、Stage 11）
+
+- **コンテナ維持 PASS**: foreground 長 call（`watch --max-duration`）で Cloud Routine のコンテナが約3分 warm 維持され、deadline で正常終了・lease release まで走破。**D（session 内 keep-alive）の根幹が実機で成立**し、fallback（session 間 cron 反復）は不要と確定
+- routine `telegram-secretary-e2e-phase0`（BlueberrySprite 環境）で、Medium モードに隔離して keep-alive 単体を観測（watch 3 サイクル × 60/60/26s、いずれも foreground long-poll が窓満了で exit 0、コンテナ非ドロップ）
+
+### Fixed — FINDING A: Heavy モード watch の起動時クラッシュ
+
+- **症状**: fresh container で既定 Heavy モードの `watch` が `ModuleNotFoundError: No module named 'markitdown'` で exit 1。`bootstrap.sh` は httpx しか導入しないが、`cmd_watch` が起動時に renderer/transcriber を **eager 構築**して markitdown/moonshine/av を import していた（E2E Phase 0 で顕在化）
+- **修正**: media stack（downloader/renderer/transcriber）を **遅延構築** `_ensure_media_stack()` に。実際に media を受けたサイクルで初回構築しキャッシュ。media を受けない常駐は httpx だけで起動する（Medium モードも自然に同経路）。起動が常に軽く、moonshine の ~134MB model DL も media 受信まで発生しない
+
+### Tests
+
+- **Total: 330 passed**（0.7.0 の 329 → +1）。「Heavy モード + media 無しサイクルで renderer を構築しない（遅延構築）」テストを追加
+
 ## [0.7.0] - 2026-05-29 — Stage 10: /goal deadline 駆動ロングポーリング（keep-alive + early-exit 即応）
 
 Cloud Routine のセッションを枠（既定 2h）の間 warm に保ちつつ、Telegram メッセージに即応するための keep-alive 設計。**設計 A（background watch + Monitor 維持 × /goal warm）は claude-code-guide 調査で不成立**（`/goal` はターン間機構で keep-alive にならない／monitor タスクは resume 復元されない／Cloud Routine はタスク完了型で常駐想定外）。代わりに **D（session 内 keep-alive + early-exit）** を採用。

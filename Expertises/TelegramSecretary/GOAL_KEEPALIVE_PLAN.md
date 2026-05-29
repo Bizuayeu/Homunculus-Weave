@@ -189,7 +189,7 @@
 - **pass**: ログに watch ≥2 サイクル + 約3分後に deadline → lease release。コンテナが3分間生存 → 「foreground 長 call で warm 維持」成立 = D の根幹 OK
 - **fail（コンテナ即閉鎖）**: 1サイクル目の watch 中/直後にログ途絶 → 維持不成立。**fallback**: ROUTINE_PROMPT を session 間ループへ（短セッション = lease acquire → `watch --exit-on-message --max-iterations N` で数サイクル → メッセージ捌いて即終了 → cron 1–5分毎に反復）。コード（early-exit / max-duration）は両設計で再利用、即応性は cron 間隔へ依存
 
-**Status**: Not Started（実機 E2E、別セッション。bot/chat 準備済み → Routine 登録から）
+**Status**: Phase 0 **PASS**（2026-05-29、Cloud Routine 実機。foreground 長 call でコンテナ約3分 warm 維持 → deadline 正常終了、fallback 不要）。検証中に **FINDING A**（Heavy モード watch の起動時 `ModuleNotFoundError: markitdown`）を発見、media stack 遅延構築で修正済み（CHANGELOG [0.7.1]、330 tests green）。**Phase 1**（early-exit 即応・実メッセージ）/ **Phase 2**（本番 580s 窓・長時間・SIGTERM 非発火）は未実施。
 
 ## Documentation Plan
 
