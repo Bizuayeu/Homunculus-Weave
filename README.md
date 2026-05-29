@@ -54,7 +54,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **ProvisionalDigest**: 個別分析結果の蓄積バッファ
   - **RegularDigest**: 確定した完全記録（永続アーカイブ）
   - **GrandDigest**: 全レベル統合ビュー
-  - Opus 4.7 で運用、Subagent 並列分析対応
+  - Opusで運用、Subagent 並列分析対応
   - `/digest` コマンドによる実行（plugins-weave 提供）
 
 ### 🎭 専門ペルソナ
