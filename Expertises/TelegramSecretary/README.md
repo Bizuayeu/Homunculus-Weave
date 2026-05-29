@@ -130,6 +130,7 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 | `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES` | optional | media download のサイズ上限（既定 20MB = 20971520）。超過は `skip_reason="media_size_exceeded"` で emit、download skip |
 | `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS` | optional | 保存 media の保持期限（既定 24）。`media_cleanup.cleanup_media_dir` が超過ファイルを削除 |
 | `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替。Heavy は `state_dir/media/` に保存、Medium はメタのみで `local_path=null` |
+| `TELEGRAM_SECRETARY_BUNDLE_VOICE` | optional | 音声/動画 STT（moonshine+av）を bootstrap で導入するか（既定 true）。`false` で除外＝音声は `skipped` にフォールバック。moonshine Community License は年商$1M 未満のみ商用無料ゆえ、大規模は `false`（or kotoba-whisper 移行）|
 | `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB = 52428800、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
 
 > **`/goal` deadline 駆動の運用変数**（`TS_SESSION_DURATION_SEC`=7200 / `TS_SESSION_DEADLINE_EPOCH`=now+duration / `TS_POLL_SET_SEC`=580 / `TS_POLL_BASH_TIMEOUT_MS`=600000 / `TS_MAX_TURNS`=300）は `bootstrap.sh` が export（SSoT）。グローバル `BASH_MAX_TIMEOUT_MS=600000` は `.private/.claude/settings.json`（`BASH_DEFAULT_TIMEOUT_MS` は据え置き＝他コマンド 2分）。

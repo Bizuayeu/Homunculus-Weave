@@ -69,6 +69,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `TELEGRAM_SECRETARY_MEDIA_MAX_SIZE_BYTES` | optional | media download のサイズ上限（既定 20MB）。超過は `skip_reason="media_size_exceeded"` で emit、download skip |
 | `TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS` | optional | 保存 media の保持期限（既定 24h）。`cleanup_media_dir` が超過ファイル削除 |
 | `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替 |
+| `TELEGRAM_SECRETARY_BUNDLE_VOICE` | optional | 音声/動画 STT（moonshine+av）を bootstrap で導入するか（既定 true）。`false` で除外＝音声は `skipped` にフォールバック（moonshine Community License 回避・軽量化、大規模向け） |
 | `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
 
 > **`/goal` deadline 駆動の運用変数**（`TS_SESSION_DURATION_SEC` / `TS_SESSION_DEADLINE_EPOCH` / `TS_POLL_SET_SEC` / `TS_POLL_BASH_TIMEOUT_MS` / `TS_MAX_TURNS`）は `bootstrap.sh` が export（SSoT）。`BASH_MAX_TIMEOUT_MS=600000` は `.private/.claude/settings.json`。詳細は [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md)。
