@@ -191,8 +191,17 @@ def cmd_watch(args: argparse.Namespace) -> int:
         try:
             while True:
                 had_messages = False
+                # 最終サイクルが bash timeout を超えないよう long-poll を残り窓に丸める（FINDING C）。
+                # max_duration + timeout が bash_timeout/1000 を超えると、厳密 foreground では window 満了を
+                # 超えて回り SIGTERM される（Phase 2 実測で満了が 603s=580+timeout に達した）。残り窓に
+                # 丸めれば満了が max_duration をほぼ超えず、値(580/30)に依存せず不変条件を保つ。
+                poll_timeout = args.timeout
+                if window.max_duration_seconds > 0:
+                    remaining = window.remaining_seconds(utc_now())
+                    if remaining < poll_timeout:
+                        poll_timeout = max(1, int(remaining))
                 try:
-                    updates = uc.execute(timeout_seconds=args.timeout)
+                    updates = uc.execute(timeout_seconds=poll_timeout)
                 except AuthFailureError as exc:
                     print(f"auth failure: {exc}", file=sys.stderr)
                     return EXIT_AUTH_FAILED

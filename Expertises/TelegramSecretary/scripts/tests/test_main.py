@@ -399,6 +399,48 @@ def test_watch_heavy_without_moonshine_does_not_crash(env_ready, monkeypatch):
     assert rc == EXIT_OK
 
 
+# --- watch (FINDING C: 最終サイクルの long-poll を残り窓に丸める) ---
+
+
+def test_watch_caps_poll_timeout_to_remaining_window(env_ready, monkeypatch):
+    """残り窓 < --timeout の最終サイクルでは long-poll timeout を残り窓に丸める（FINDING C）。
+
+    max_duration + timeout が bash timeout(600s) を超えると、厳密 foreground では window 満了を
+    超えて回り SIGTERM(143) される（Phase 2 で実測 603s）。最終 long-poll を残り窓に丸めることで
+    満了が max_duration をほぼ超えず、値(580/30)に依存せず max_duration + timeout < bash_timeout を保つ。
+    """
+    import itertools
+    from datetime import datetime, timedelta, timezone
+
+    import usecases.fetch_authorized_updates as fau
+
+    captured: list[int] = []
+
+    def spy_execute(self, timeout_seconds):
+        captured.append(timeout_seconds)
+        return []
+
+    monkeypatch.setattr(fau.FetchAuthorizedUpdates, "execute", spy_execute)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"ok": True, "result": []})
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    # window=10s, --timeout=30s。fake clock は呼び出し毎に +5s 進む。
+    # window生成(base) → poll_timeout 計算(base+5, remaining=5) ゆえ残り窓5 < 30 で丸まる。
+    base = datetime(2026, 5, 29, 12, 0, 0, tzinfo=timezone.utc)
+    counter = itertools.count()
+    monkeypatch.setattr(
+        "main.utc_now", lambda: base + timedelta(seconds=5 * next(counter))
+    )
+    rc = main(["watch", "--timeout", "30", "--max-duration", "10", "--owner", "S1"])
+    assert rc == EXIT_OK
+    # 最初の long-poll は残り窓(≈5s)に丸められ、--timeout(30) 未満になる
+    assert captured[0] < 30
+    assert captured[0] >= 1
+
+
 # --- send-reply ---
 
 

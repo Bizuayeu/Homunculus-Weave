@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.7.4] - 2026-05-29 — E2E Phase 2 PASS + FINDING 2 格上げ修正（窓畳みオーバーラン → SIGTERM リスク）
+
+### Verified — E2E Phase 2（Cloud Routine 実機、本番 580s 窓・2h・SIGTERM 非発火）
+
+- 本番設定（`deadline=now+7200s` / `window<=580s` / `bash timeout 600000ms` / Medium）で **約2h00m22s 生存**、watch 全15窓 exit 0、**SIGTERM(143) 発火ゼロ**、deadline 正常終了、lease conflict ゼロ
+- early-exit 即応5通（挨拶/能力質問/写真メタ応答）併観測（Phase 1 を本番窓で再確認）
+- 待機は getUpdates サーバ側ブロックでターン内トークン最小（約30ターン/2h）
+
+### Fixed — FINDING 2: 最終窓オーバーランの深刻度格上げと根本修正
+
+- [0.7.3] では deadline 最終窓のオーバーラン（≈`--timeout`）を「2h 枠に無視可、ROUTINE_PROMPT 注記のみ」と判断していた
+- Phase 2 実測で **window 満了窓が 603〜604s** に達し、`max_duration(580) + timeout(30) = 610 > bash_timeout(600)`。exit 0 だったのは**ハーネスの自動 background 化**が 600s の foreground 上限を外したため＝**偽の安全**。厳密 foreground 経路なら 600s で SIGTERM(143) 発火する構成
+- **修正**: `cmd_watch` が**最終サイクルの long-poll を残り窓に丸める**（`remaining < timeout` なら `timeout=remaining`）。値(580/30)非依存で不変条件 **`max_duration + timeout < bash_timeout`** を保証
+- 切り分け: `BASH_MAX_TIMEOUT_MS` は実効（600000 確認済み）。純粋に窓畳みバッファ(600−580=20s) < オーバーラン上限(`--timeout`=30s)
+
+### Tests
+
+- **Total: 332 passed**（0.7.3 の 331 → +1: 残り窓 < `--timeout` の最終サイクルで long-poll が残り窓に丸められる spy テスト）
+
 ## [0.7.3] - 2026-05-29 — FINDING C/D: E2E Phase 1 PASS + 単一永続シェル前提の解消
 
 E2E Phase 1（early-exit 即応ループ）を実機で走破。検証中に、ROUTINE_PROMPT が依拠していた「`source` で env を親シェルに引き継ぐ／単一の永続シェル」前提が Claude Code / Cloud Routine の Bash tool では成立しない（**env は call 間で揮発、cwd のみ persist**）ことが判明。env snapshot の re-source と STATE_DIR の絶対パス固定で根治した。
