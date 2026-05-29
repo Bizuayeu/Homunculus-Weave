@@ -362,6 +362,43 @@ def test_watch_heavy_mode_no_media_does_not_build_renderer(env_ready, monkeypatc
     assert rc == EXIT_OK
 
 
+def test_watch_heavy_without_moonshine_does_not_crash(env_ready, monkeypatch):
+    """moonshine 未導入（BUNDLE_VOICE=false 相当）でも Heavy watch は落ちない（FINDING B: moonshine opt-out）。
+
+    _ensure_media_stack は transcriber(moonshine) を optional に try-import する。未導入なら
+    transcriber=None で render stack を構築し、音声だけ skipped にフォールバック（markitdown render は維持）。
+    photo は size 超過で download skip させ getFile を回避（_ensure 自体は media 受信サイクルで発火）。
+    """
+    import sys
+
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "true")
+    # moonshine を未導入として模す（from ... import で ImportError）
+    monkeypatch.setitem(sys.modules, "adapters.transcribe.moonshine_transcriber", None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200, "username": "weave"},
+                            "photo": [{"file_id": "X", "file_size": 99999999}],
+                        },
+                    }
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(["watch", "--timeout", "1", "--max-iterations", "1", "--owner", "S1"])
+    assert rc == EXIT_OK
+
+
 # --- send-reply ---
 
 

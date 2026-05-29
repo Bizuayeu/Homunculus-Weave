@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.7.2] - 2026-05-29 — FINDING B: media 依存の Tier 別 graceful（moonshine opt-out）
+
+プラグイン配布を見据え、media stack を「種別で必要な依存が違う」前提に再設計。デフォルトは全 media 対応（多くの利用者は moonshine Community License で無料）、大規模/ライセンス回避は音声バンドルを外せる。FINDING A の lazy 化を踏まえた延長修正。
+
+### Changed — moonshine(transcriber) を optional 構築
+
+- `cmd_watch::_ensure_media_stack`: moonshine を **try-import**。未導入なら `transcriber=None` で `RenderAuthorizedMedia` を構築（render usecase は transcriber Optional ＝音声/動画を `skipped` にフォールバック）。markitdown(render) は必須デフォルトのまま
+- **bootstrap: Tier 別 install**。Medium(`MEDIA_ENABLE_DOWNLOAD=false`)=httpx のみ / Heavy(既定)=+markitdown / voice(moonshine+av)=`TELEGRAM_SECRETARY_BUNDLE_VOICE=false` で除外可。Phase 0 等の keep-alive 検証は httpx だけで軽い（3分岐 source 検証済み）
+- moonshine Community License は年商$1M 未満のみ商用無料・~134MB model ゆえ、大規模（めぐる組等）は `BUNDLE_VOICE=false` で外す運用
+
+### Tests
+
+- **Total: 331 passed**（0.7.1 の 330 → +1）。「moonshine 未導入でも Heavy watch が落ちず transcriber 無しで起動」テストを追加
+
 ## [0.7.1] - 2026-05-29 — E2E Phase 0 PASS + FINDING A 修正（media stack 遅延構築）
 
 ### Verified — E2E Phase 0（Cloud Routine 実機、Stage 11）
