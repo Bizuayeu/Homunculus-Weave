@@ -168,14 +168,25 @@ def cmd_watch(args: argparse.Namespace) -> int:
             if download_uc is not None:
                 return
             from adapters.render.markitdown_renderer import MarkitdownRenderer
-            from adapters.transcribe.moonshine_transcriber import MoonshineTranscriber
 
             downloader = TelegramMediaDownloader(
                 bot_token=config.bot_token, gateway=gateway
             )
             download_uc = DownloadAuthorizedMedia(downloader)
+            # 音声 transcriber(moonshine) は optional: 未導入（bootstrap で BUNDLE_VOICE=false により
+            # 除外、ライセンス/軽量化目的）なら None で構築し、音声/動画は skipped にフォールバック
+            # （render usecase は transcriber=None を許容）。markitdown render は維持される。
+            transcriber = None
+            try:
+                from adapters.transcribe.moonshine_transcriber import (
+                    MoonshineTranscriber,
+                )
+
+                transcriber = MoonshineTranscriber()
+            except ImportError:
+                transcriber = None
             render_uc = RenderAuthorizedMedia(
-                MarkitdownRenderer(), transcriber=MoonshineTranscriber()
+                MarkitdownRenderer(), transcriber=transcriber
             )
         try:
             while True:

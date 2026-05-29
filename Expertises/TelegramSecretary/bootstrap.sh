@@ -34,10 +34,24 @@ _ts_log() { echo "[telegram-secretary-bootstrap] $*"; }
 _ts_script_path="${BASH_SOURCE[0]:-$0}"
 _ts_script_dir="$(cd "$(dirname "$_ts_script_path")" && pwd)"
 
-# --- 依存導入 ---
-if ! python -c "import httpx" 2>/dev/null; then
-    _ts_log "installing httpx..."
-    python -m pip install --quiet httpx || _ts_die "httpx install failed"
+# --- 依存導入（pyproject.toml dependencies が SSoT、Tier 別に Cloud Routine 起動コストを制御）---
+# base: httpx（必須）。Heavy モード時のみ markitdown(docx render) と voice(moonshine+av) を追加。
+# media を扱わない Medium 運用・keep-alive 検証は httpx だけで起動が軽い（FINDING A/B）。
+python -m pip install --quiet "httpx>=0.27" || _ts_die "httpx install failed"
+if [ "${TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD:-true}" != "false" ]; then
+    _ts_log "Heavy mode: installing markitdown (docx/pptx/xlsx render)..."
+    python -m pip install --quiet "markitdown[docx,pptx,xlsx]>=0.1.6" || _ts_die "markitdown install failed"
+    # voice(moonshine+av) は BUNDLE_VOICE=false で除外可（moonshine Community License は年商$1M未満のみ
+    # 商用無料・~134MB model ゆえ大規模/ライセンス回避向け）。未導入時は watch が transcriber=None で
+    # 起動し音声を skipped にフォールバック（FINDING B、render usecase は transcriber Optional）。
+    if [ "${TELEGRAM_SECRETARY_BUNDLE_VOICE:-true}" != "false" ]; then
+        _ts_log "installing voice deps (moonshine + av; BUNDLE_VOICE!=false)..."
+        python -m pip install --quiet "moonshine-voice>=0.0.59" "av>=17.0" || _ts_die "voice deps install failed"
+    else
+        _ts_log "voice deps skipped (BUNDLE_VOICE=false) -> 音声は skipped にフォールバック"
+    fi
+else
+    _ts_log "Medium mode (MEDIA_ENABLE_DOWNLOAD=false): media deps skipped, httpx only"
 fi
 python -c "import httpx" >/dev/null || _ts_die "httpx import failed after install"
 
