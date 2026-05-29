@@ -189,7 +189,19 @@
 - **pass**: ログに watch ≥2 サイクル + 約3分後に deadline → lease release。コンテナが3分間生存 → 「foreground 長 call で warm 維持」成立 = D の根幹 OK
 - **fail（コンテナ即閉鎖）**: 1サイクル目の watch 中/直後にログ途絶 → 維持不成立。**fallback**: ROUTINE_PROMPT を session 間ループへ（短セッション = lease acquire → `watch --exit-on-message --max-iterations N` で数サイクル → メッセージ捌いて即終了 → cron 1–5分毎に反復）。コード（early-exit / max-duration）は両設計で再利用、即応性は cron 間隔へ依存
 
-**Status**: Phase 0 **PASS**（2026-05-29、Cloud Routine 実機。foreground 長 call でコンテナ約3分 warm 維持 → deadline 正常終了、fallback 不要）。検証中に **FINDING A**（Heavy モード watch の起動時 `ModuleNotFoundError: markitdown`）を発見、media stack 遅延構築で修正済み（CHANGELOG [0.7.1]、330 tests green）。**Phase 1**（early-exit 即応・実メッセージ）/ **Phase 2**（本番 580s 窓・長時間・SIGTERM 非発火）は未実施。
+**Status**: Phase 0 / 1 / 2 すべて **PASS**（2026-05-29、Cloud Routine 実機）。
+- **Phase 0**: foreground 長 call でコンテナ約3分 warm 維持 → deadline 正常終了（fallback 不要）
+- **Phase 1**: early-exit 即応ループ実機走破（受信5件→返信5件、未返信ゼロ、photo は Medium メタ応答）
+- **Phase 2**: 本番 580s 窓で約2h 生存・watch 全15窓 exit 0・SIGTERM 発火ゼロ・deadline 正常終了
+
+検証で5つの FINDING を発見・修正済み:
+- **A**（Heavy watch 起動時 `ModuleNotFoundError: markitdown` → media stack 遅延構築、[0.7.1]）
+- **B**（moonshine ライセンス・サイズ → Tier 別 graceful + `BUNDLE_VOICE` opt-out、[0.7.2]）
+- **C**（env が call 間で揮発 → bootstrap が env snapshot を書き各 call で re-source、[0.7.3]）
+- **D**（相対 STATE_DIR が subshell cd で幽霊パス化 → 絶対パス固定、[0.7.3]）
+- **2**（deadline 最終窓オーバーラン。[0.7.3] では「無視可」と Note 扱いだったが、Phase 2 で実測 603s > bash timeout 600s ＝厳密 foreground なら SIGTERM の偽の安全と判明し格上げ → 最終 long-poll を残り窓に丸める不変条件保証、[0.7.4]）
+
+332 tests green。Stage 11 完了。残: なし（Phase 1/2 とも実機 PASS 済み）。
 
 ## Documentation Plan
 

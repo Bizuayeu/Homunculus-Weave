@@ -106,8 +106,8 @@ source /tmp/telegram-secretary.env.sh && cd "$TELEGRAM_SECRETARY_REPO_ROOT" && \
 ```
 
 - **timeout 限定適用の運用規律**: 長い `timeout` を渡すのは **このポーリング call だけ**。lease 操作・send-reply・残り窓計算・git・pytest 等は `timeout` を明示しない（既定 2分=`BASH_DEFAULT_TIMEOUT_MS`）。`.private/.claude/settings.json` の `BASH_MAX_TIMEOUT_MS=600000` は上限の許可であって既定値は変えない
-- `--max-duration` < bash `timeout`（窓 ≤580s < 600s）で、プロセス自然終了を timeout 発火（SIGTERM）より先に起こす
-- **`--max-duration` の粒度は ≈ `--timeout`**（FINDING 2）：実行中の long-poll サイクルを最後まで回してから畳むため、窓は最大 `--timeout`（既定 30s）分オーバーランし得る。deadline 直前の最終窓が deadline を ≤30s 超えることがあるが、2h 枠に対し無視できる（Step 7 の release は遅延後に確実に走る）。E2E 短縮モード（窓 60s／timeout 30s）では相対的に目立つので、停止時刻はこの粒度で評価する
+- **不変条件 `max_duration + timeout < bash_timeout/1000`**: watch は最終サイクルの long-poll を残り窓に丸めて窓満了を `max_duration` 付近に収め、`timeout` ぶんのオーバーランが bash timeout を超えて SIGTERM するのを防ぐ（[0.7.4]）。プロセス自然終了を timeout 発火より先に起こす
+- **`--max-duration` の粒度（FINDING 2 → [0.7.4] で根本修正）**：かつて窓満了は最後の long-poll サイクルを回しきるぶん最大 `--timeout` 分オーバーランし、Phase 2 実測で 603s=580+timeout が bash timeout 600s を超過した（当時 exit 0 だったのは自動 background 化に救われた偽の安全で、厳密 foreground なら SIGTERM）。現在は最終サイクルの long-poll を残り窓に丸めるため、窓満了・deadline 直前の最終窓ともに `max_duration` をほぼ超えない（Step 7 の release は確実に走る）
 - watch は **(a) 認可済みメッセージを受けたサイクル**（`--exit-on-message`）または **(b) 窓満了**（`--max-duration`）で exit 0 する。**(a) なら即返信→再起動で即応（遅延は long-poll の最大 30秒）、(b) なら素通りで再起動し warm 継続**
 - watch が exit 4（lease 奪取を検出）で返ったら即終了（次 cron が拾い直す、自己治癒）
 
