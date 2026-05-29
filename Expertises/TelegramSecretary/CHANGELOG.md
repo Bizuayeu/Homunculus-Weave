@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.7.3] - 2026-05-29 — FINDING C/D: E2E Phase 1 PASS + 単一永続シェル前提の解消
+
+E2E Phase 1（early-exit 即応ループ）を実機で走破。検証中に、ROUTINE_PROMPT が依拠していた「`source` で env を親シェルに引き継ぐ／単一の永続シェル」前提が Claude Code / Cloud Routine の Bash tool では成立しない（**env は call 間で揮発、cwd のみ persist**）ことが判明。env snapshot の re-source と STATE_DIR の絶対パス固定で根治した。
+
+### Verified — E2E Phase 1（early-exit 即応ループ）
+
+- 「メッセージ受信 → watch early-exit → 返信 → watch 再起動」の即応ループが実機で 3 サイクル連続成立。受信 5 件（text 4 + photo 1）に対し返信 5 件すべて成功、未返信ゼロ。窓満了 → deadline → lease release も正常
+- photo は Medium モード（download 無効）のためメタ情報応答、`injection_flags` は全件空
+
+### Fixed — FINDING C: env が call 間で揮発（運用律 B 案の前提崩れ）
+
+- **症状**: `source bootstrap.sh` で export した `TELEGRAM_SECRETARY_SESSION_ID` / `TS_SESSION_DEADLINE_EPOCH` 等が後続 Bash call に残らない。無改修だと owner 不一致 → lease exit 4、または deadline 未設定 → 即停止。Phase 1 が通ったのは即席の env-dump workaround ゆえ
+- **修正**: `bootstrap.sh` が派生 env（session_id / deadline / repo_root / 絶対 state_dir / TS_* 群）を `TELEGRAM_SECRETARY_ENV_FILE`（既定 `/tmp/telegram-secretary.env.sh`）へ snapshot。`ROUTINE_PROMPT.md` の Step 4-7 各 call は冒頭で `source <snapshot> && cd "$TELEGRAM_SECRETARY_REPO_ROOT"` を実行。`TELEGRAM_BOT_TOKEN` / `AUTHORIZED_CHATS` は Environment 注入で各 call に入る & 秘匿のため snapshot に書かない（出力漏洩スキャン規律）
+
+### Fixed — FINDING D: 相対 STATE_DIR が subshell cd で幽霊パス化
+
+- **症状**: 各 Step は `(cd Expertises/TelegramSecretary && ...)` で subshell cd するため、相対 `TELEGRAM_SECRETARY_STATE_DIR` がその cwd 基準で解決され、`Expertises/TelegramSecretary/.private/.../state/` という実体のないパスに落ちる（`.gitignore` の `Expertises/*/state/` にも当たらず untracked 化）。E2E Phase 1 の cleanup で顕在化
+- **修正**: `bootstrap.sh` が STATE_DIR を bootstrap 実行時 cwd（=リポルート）基準で `os.path.abspath` 絶対化して snapshot に固定。既定 `./state` は従来どおり `Expertises/TelegramSecretary/state/` に解決され `.gitignore` に引き続きマッチ（**既定運用は不変**）
+
+### Note — deadline 最終窓のオーバーラン（実害なし、FINDING 2）
+
+- `--max-duration` の粒度は実行中の long-poll サイクル（≈`--timeout`）まで。deadline 直前の最終窓は ≤`--timeout`（既定 30s）超過し得るが、2h 枠に対し無視可。`ROUTINE_PROMPT.md` に注記のみ追加
+
+### Tests
+
+- shell 構文（`bash -n`）と path 解決ロジック（repo_root 導出 ・ STATE_DIR 絶対化 ・ `printf %q`）を決定論的に再現検証。env file パスの bootstrap↔ROUTINE 一致（9 occurrences）と source ガード網羅（Step 4-7 全 call）を確認。Python 層は未変更ゆえ pytest は 0.7.2 の **331 passed** 据え置き
+
 ## [0.7.2] - 2026-05-29 — FINDING B: media 依存の Tier 別 graceful（moonshine opt-out）
 
 プラグイン配布を見据え、media stack を「種別で必要な依存が違う」前提に再設計。デフォルトは全 media 対応（多くの利用者は moonshine Community License で無料）、大規模/ライセンス回避は音声バンドルを外せる。FINDING A の lazy 化を踏まえた延長修正。
