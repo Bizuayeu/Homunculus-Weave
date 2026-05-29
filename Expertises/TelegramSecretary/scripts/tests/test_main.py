@@ -320,6 +320,48 @@ def test_watch_exit_on_message_continues_when_no_message(env_ready, monkeypatch)
     assert calls["n"] == 2  # メッセージ無しでは exit-on-message 発火せず 2 サイクル回る
 
 
+# --- watch (Heavy モード media stack の遅延構築 / FINDING A) ---
+
+
+def test_watch_heavy_mode_no_media_does_not_build_renderer(env_ready, monkeypatch):
+    """Heavy モードでも media を受けないサイクルでは renderer/transcriber を構築しない（遅延構築）。
+
+    fresh container では bootstrap が httpx しか入れない。watch が起動時に renderer を eager 構築すると
+    markitdown / moonshine を import して ModuleNotFoundError で落ちる（FINDING A、E2E Phase 0 で顕在化）。
+    media を実際に受けるまで構築を遅延すれば、media 無しの常駐は httpx だけで起動できる。
+    """
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "true")
+    import adapters.render.markitdown_renderer as mr_mod
+
+    def _boom(*args, **kwargs):
+        raise AssertionError("renderer must not be constructed without media (lazy)")
+
+    monkeypatch.setattr(mr_mod, "MarkitdownRenderer", _boom)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200, "username": "weave"},
+                            "text": "hi",
+                        },
+                    }
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["lease", "acquire", "--owner", "S1"]) == EXIT_OK
+    rc = main(["watch", "--timeout", "1", "--max-iterations", "1", "--owner", "S1"])
+    assert rc == EXIT_OK
+
+
 # --- send-reply ---
 
 
