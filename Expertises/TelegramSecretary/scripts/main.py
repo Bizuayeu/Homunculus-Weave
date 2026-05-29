@@ -155,20 +155,25 @@ def cmd_watch(args: argparse.Namespace) -> int:
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
         uc = FetchAuthorizedUpdates(gateway, offset_store, config.authorized_chats)
         renew = RenewLease(lease_store)
-        # Heavy モードのみ downloader / renderer を loop 外で 1 回作って使い回す（接続コスト削減）
+        # media stack は「実際に media を受けた時」だけ遅延構築する（FINDING A）。
+        # markitdown / moonshine / av は重く、media を受けない限り不要。起動時に eager 構築すると
+        # 未導入の fresh container で watch が ModuleNotFoundError で落ちる。一度作ったら使い回す
+        # （MarkItDown の magika model load が重いので毎サイクル作り直さない）。
         downloader: TelegramMediaDownloader | None = None
         download_uc: DownloadAuthorizedMedia | None = None
         render_uc: RenderAuthorizedMedia | None = None
-        if config.media_enable_download:
+
+        def _ensure_media_stack() -> None:
+            nonlocal downloader, download_uc, render_uc
+            if download_uc is not None:
+                return
+            from adapters.render.markitdown_renderer import MarkitdownRenderer
+            from adapters.transcribe.moonshine_transcriber import MoonshineTranscriber
+
             downloader = TelegramMediaDownloader(
                 bot_token=config.bot_token, gateway=gateway
             )
             download_uc = DownloadAuthorizedMedia(downloader)
-            # Stage 7.4: renderer も loop 外で 1 回作る（MarkItDown は magika model
-            # load が重いので毎サイクル作り直さない）
-            from adapters.render.markitdown_renderer import MarkitdownRenderer
-            from adapters.transcribe.moonshine_transcriber import MoonshineTranscriber
-
             render_uc = RenderAuthorizedMedia(
                 MarkitdownRenderer(), transcriber=MoonshineTranscriber()
             )
@@ -186,14 +191,16 @@ def cmd_watch(args: argparse.Namespace) -> int:
                 else:
                     download_results: list = []
                     render_results: list = []
-                    if download_uc is not None and any(u.update.media for u in updates):
+                    if config.media_enable_download and any(
+                        u.update.media for u in updates
+                    ):
+                        _ensure_media_stack()
                         download_results = download_uc.execute(
                             updates,
                             media_target_dir,
                             config.media_max_size_bytes,
                         )
-                        if render_uc is not None:
-                            render_results = render_uc.execute(download_results)
+                        render_results = render_uc.execute(download_results)
                     for u in updates:
                         emitter.emit(
                             u,
