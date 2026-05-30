@@ -2,7 +2,8 @@
 
 mime-routing は UseCase 側に閉じる:
 - image/* → passthrough（Vision native）
-- application/pdf, text/plain, text/csv, text/markdown, application/json → passthrough
+- text/plain, text/csv, text/markdown, application/json → passthrough
+- application/pdf → pdf（pdf_renderer 注入時のみ、Stage 10 でテキスト層抽出に移行。未注入なら skipped）
 - docx, pptx, xlsx, text/html → render（markitdown 経由）
 - audio/*, video/* → transcribe（transcriber 注入時のみ、Stage 9.4/9.6 音声 STT。動画は音声トラックを抽出。未注入なら skipped）
 - archive 等その他 → skipped（key frame Vision は Stage 9.6-ii で別途）
@@ -23,13 +24,14 @@ from usecases.ports import MediaRenderer
 _PASSTHROUGH_MIME_PREFIXES = ("image/",)
 _PASSTHROUGH_MIME_EXACT = frozenset(
     {
-        "application/pdf",
+        # Stage 10: application/pdf は passthrough から外し pdf ルート（テキスト層抽出）へ移行
         "text/plain",
         "text/csv",
         "text/markdown",
         "application/json",
     }
 )
+_PDF_MIME_EXACT = frozenset({"application/pdf"})  # Stage 10: pdfplumber でテキスト層抽出
 _RENDER_MIME_EXACT = frozenset(
     {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # docx
@@ -56,11 +58,13 @@ class RenderResult:
 
 
 def _route_mime(mime: str) -> str:
-    """mime を `"passthrough" | "render" | "transcribe" | "skipped"` に分類する純関数。"""
+    """mime を `"passthrough" | "pdf" | "render" | "transcribe" | "skipped"` に分類する純関数。"""
     if any(mime.startswith(prefix) for prefix in _PASSTHROUGH_MIME_PREFIXES):
         return "passthrough"
     if mime in _PASSTHROUGH_MIME_EXACT:
         return "passthrough"
+    if mime in _PDF_MIME_EXACT:
+        return "pdf"
     if mime in _RENDER_MIME_EXACT:
         return "render"
     if any(mime.startswith(prefix) for prefix in _TRANSCRIBE_MIME_PREFIXES):
@@ -70,10 +74,14 @@ def _route_mime(mime: str) -> str:
 
 class RenderAuthorizedMedia:
     def __init__(
-        self, renderer: MediaRenderer, transcriber: Optional[MediaRenderer] = None
+        self,
+        renderer: MediaRenderer,
+        transcriber: Optional[MediaRenderer] = None,
+        pdf_renderer: Optional[MediaRenderer] = None,
     ) -> None:
         self._renderer = renderer
         self._transcriber = transcriber
+        self._pdf_renderer = pdf_renderer
 
     def execute(
         self,
@@ -104,6 +112,12 @@ class RenderAuthorizedMedia:
             return RenderedMedia(rendered_text=None, render_status="passthrough")
         if routing == "skipped":
             return RenderedMedia(rendered_text=None, render_status="skipped")
+        if routing == "pdf":
+            # PDF: pdf_renderer 注入時のみテキスト層抽出、未注入なら skipped にフォールバック
+            # （Stage 10、transcriber 同型の後方互換）
+            if self._pdf_renderer is None:
+                return RenderedMedia(rendered_text=None, render_status="skipped")
+            return self._pdf_renderer.render(dr.media, dr.local_path)
         if routing == "transcribe":
             # 音声: transcriber 注入時のみ transcribe、未注入なら skipped にフォールバック
             if self._transcriber is None:
