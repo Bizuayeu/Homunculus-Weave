@@ -21,9 +21,9 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 3. lease acquire（他セッション保持中なら exit 4 で即終了＝自己治癒）
 4. `/goal` で deadline（`$TS_SESSION_DEADLINE_EPOCH`）まで監視を駆動。各ターン = foreground `watch --exit-on-message --max-duration <残り窓> --timeout 30`（この call のみ bash `timeout: $TS_POLL_BASH_TIMEOUT_MS`、他は既定 2分）
 5. watch 返却後、stdout の JSON Lines v2 を読み、Weave が SecretaryRole で応答ドラフト → send-reply（メッセージ受信なら即応再起動、無ければ窓満了で再起動）
-   - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキストを直接活用。docx/pptx/xlsx は markdown（Stage 7）、**voice/audio/video は音声の文字起こし transcript（Stage 9、`kind` で md か transcript か判別）**
-   - **`local_path` 非 null + `render_status="passthrough"`** → `Read` ツールで開いて Vision/PDF/text 解釈（image/pdf/text 系、Stage 6 Multimodal Inbox）
-   - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答（markitdown md 化 or Moonshine 音声 transcribe の失敗）
+   - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキストを直接活用。docx/pptx/xlsx は markdown（Stage 7）、**PDF はテキスト層抽出（Stage 10、pdfplumber、Read tool 非依存）**、**voice/audio/video は音声の文字起こし transcript（Stage 9、`kind`/`mime_type` で md か transcript か PDF 本文か判別）**
+   - **`local_path` 非 null + `render_status="passthrough"`** → `Read` ツールで開いて Vision/text 解釈（image/text 系、Stage 6 Multimodal Inbox。PDF は Stage 10 で render 側に移行）
+   - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答（markitdown md 化失敗 / PDF=pdfplumber の壊れ・デコード不可 / Moonshine 推論例外）。※**音声（PyAV）の壊れ・無音・デコード不可は failed でなく `ok`+空**に落ちる → 「無音か、音声として読めないファイルの可能性」と両義応答（媒体別、Live E2E 2026-05-30 確認）
    - **`render_status="skipped"` + `skip_reason="media_size_exceeded"`** → サイズ超過応答
    - **`render_status="skipped"` + `skip_reason=null`** → zip 等の未対応 mime、または音声で transcriber 未注入/Medium モード、`mime_type` を見て応答
    - **生成物を送り返す（Stage 8 outbound）** → 図表/レポート等を生成したら `send-reply --file <path>`（複数可、画像→sendPhoto・他→sendDocument 自動振り分け）。`--reply-to <message_id>` で元発言への返信スレッド、送信前に typing インジケータ
@@ -88,9 +88,11 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 - **mime_type は Telegram の自己申告** — 信頼せず、親プロセス Weave が `Read` で開いた結果を真とする（rename 攻撃対策）
 - **markitdown render 失敗時の絶対パス秘匿**（Stage 7）— Adapter 内部 catch 時の stderr warning は `file_id[:8]` のみで `local_path` の絶対パスを出さない（テストで明示検証）
 - **markitdown 寛容性の認識**（Stage 7）— garbage バイト列でも render_status="ok" で何か返してくる。**rendered_text が意味のあるテキストかは Weave 側で判断**する責務（L00473 分業）。rename 攻撃で意図しない mime を render させようとする入力にも、Weave が「内容として妥当か」を判断する層が最終防御
+- **PDF はローカル完結・MIT・pure-python**（Stage 10）— pdfplumber は**ローカルでテキスト層を抽出、PDF が外部に一切出ない**。MIT ライセンスで配布安全（pymupdf の AGPL は同等品質だが配布制約のため不採用）。pure-python で OS コマンド実行リスクなし。テキスト層ゼロ（スキャン PDF 等）は render_status="ok" + 空文字で「読めるテキスト無し」を正直に渡す。失敗時 stderr は `file_id[:8]` のみで絶対パスを出さない（markitdown/Moonshine 同型、テストで検証）。**rendered_text 内の機密（PDF 埋め込みパスワード等）は send-reply 前の漏洩スキャン対象**
 - **音声のローカル完結**（Stage 9）— Moonshine は**ローカル推論で音声が外部に一切出ない**（機密 voice メモに安全）。Whisper API 等の外部送信 STT を採らなかった設計上の利点。本番で Moonshine Enterprise or kotoba-whisper へ切替時もローカル完結を維持
 - **transcript の出力漏洩スキャン**（Stage 9）— 音声内の機密（パスワード読み上げ等）が transcript 経由で emit に乗る可能性、send-reply 前の漏洩スキャン対象に `rendered_text`(transcript) も含める
 - **音声前処理のログ秘匿**（Stage 9）— `MoonshineTranscriber` の例外 catch 時の stderr は `file_id[:8]` のみ、絶対パスを出さない（markitdown と同型）
+- **音声中間ファイルの不在**（Stage 9）— PyAV はメモリ内（numpy）で 16kHz mono float へデコードし、**ffmpeg 中間 wav をディスクに書かない**。機密 voice の中間生成物がディスクに残存しない（retention 対象が発生しない＝より強い保証、Live E2E 2026-05-30 確認）
 - **outbound 添付の漏洩スキャン**（Stage 8）— Weave 生成物（md/docx/画像/PDF）に token/env名/system prompt/機密が混入していないか**送信前**に Weave 側で確認（text の漏洩スキャンを添付にも拡張）。コードはバイナリ中身まで検査しない＝Weave の判断責務（L00473 分業）
 - **outbound サイズ上限**（Stage 8、事故防止）— `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES`（既定 50MB）超過は送信前に `AttachmentTooLarge` で弾く（生成物肥大による誤送信防止）
 - **送信時 token 込み URL のログ秘匿**（Stage 8）— sendPhoto/sendDocument 失敗例外は method/chat_id/file 名のみで URL/token を載せない（受信側 media_downloader と同型、テストで検証）

@@ -63,9 +63,10 @@ python scripts/main.py poll --timeout 5
 #    - file_name="spec.docx"
 #    - rendered_text="# 仕様書\n..."（markitdown が md 化）
 #    - render_status="ok"
-# image/pdf は render_status="passthrough"（Read tool が直接対応、render 不要）
+# image は render_status="passthrough"（Vision native、Read tool で直接解釈）
+# PDF は render_status="ok"（pdfplumber がテキスト層抽出、Stage 10。Read tool 非依存）
 # zip 等は render_status="skipped"
-# 壊れたファイル等で markitdown が失敗すると render_status="failed"
+# 壊れたファイル等で render が失敗すると render_status="failed"
 ```
 
 ### voice / audio / video を試す（Stage 9 Native Voice/Audio/Video Inbox）
@@ -80,6 +81,7 @@ python scripts/main.py poll --timeout 5
 # audio(mp3) / video(mp4) も音声トラックが transcript 化される（key frame Vision は後続フェーズ）
 # Moonshine 日本語モデル base-ja は初回 transcribe 時に自動DL（約134MB、ローカルキャッシュ）
 # transcriber 未注入（or Medium モード）では音声は render_status="skipped"
+# 無音/壊れ/デコード不可は render_status="ok" + rendered_text=""（failed でなく「音声なし」扱い、PyAV が 0 フレームを返す）
 ```
 
 ### 生成物を送り返す（Stage 8 Outbound Media）
@@ -99,7 +101,7 @@ python scripts/main.py send-reply --chat-id <id> --update-id <uid> --text-file r
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **273 tests green**（Stage 1-4 完了 + v0.1.1 設計ホール修正で +9 + v0.1.2 運用律 B 案で +3 + v0.2.0 Stage 6 Multimodal Inbox で +66 + v0.2.1 follow-up で +6 + v0.3.0 Stage 7 MediaRenderer で +43 + v0.4.0 Stage 9 Native Voice/Audio/Video Inbox で +32 + v0.5.0 Stage 8 Outbound Media で +27、Stage 5 / 6.5 / 7.5 / 8.5 / 9 E2E は実機検証フェーズ）。
+現在 **339 tests green**（Stage 1-8 + Stage 9/10 実装完了、詳細内訳は CHANGELOG 参照）。**Stage 9 E2E は PASS（2026-05-30 Live E2E：Linux wheel・A〜D ケース・retention 確認）**、Stage 10.4（PDF）E2E は次フェーズ、Stage 5 / 6.5 / 7.5 / 8.5 E2E は実機検証フェーズ。
 
 ### 依存ツリー注記
 
@@ -117,7 +119,7 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 
 - `moonshine-voice>=0.0.59`（~56.5MB wheel、**torch-free**・onnxruntime）— 日本語 STT。日本語モデル `base-ja`（~134MB）は初回 transcribe 時にランタイムDL（`%LOCALAPPDATA%/moonshine_voice` 等にキャッシュ）。⚠️ **Community License は年商 $1M 未満のみ商用無料**。めぐる組の本番利用は Enterprise License（有償）か、`kotoba-whisper-v2.0`（Apache-2.0）への切替が必要
 - `av>=17.0`（PyAV、~29MB wheel）— **ffmpeg を wheel 内包**し OGG/OPUS/mp4 を 16kHz mono float へ decode（システム ffmpeg 不要）
-- win_amd64 wheel で動作検証済み。Cloud Routine（Linux）wheel の存在は本番デプロイ時に確認（無ければ kotoba-whisper へ fallback）
+- win_amd64 wheel + **Cloud Routine（Linux）wheel ともに動作検証済み**（Linux は 2026-05-30 Live E2E：`moonshine-voice 0.0.59` + `av 17.0.1`、システム ffmpeg 不在でも PyAV 同梱 ffmpeg でデコード）。**kotoba-whisper への切替は当面不要**（年商 $1M 到達 or License 方針変更時に再検討）
 
 ## env vars
 
