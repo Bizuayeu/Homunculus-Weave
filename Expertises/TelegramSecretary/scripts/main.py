@@ -125,11 +125,15 @@ def cmd_poll(args: argparse.Namespace) -> int:
                 )
             # Stage 7.4: download 済み media を render（lazy import で markitdown
             # 依存を validate-config / Medium モードから切り離す）
+            # Stage 10: PDF は passthrough をやめ pdf_renderer（pdfplumber でテキスト層抽出）へ
             from adapters.render.markitdown_renderer import MarkitdownRenderer
+            from adapters.render.pdf_renderer import PdfRenderer
             from adapters.transcribe.moonshine_transcriber import MoonshineTranscriber
 
             render_results = RenderAuthorizedMedia(
-                MarkitdownRenderer(), transcriber=MoonshineTranscriber()
+                MarkitdownRenderer(),
+                transcriber=MoonshineTranscriber(),
+                pdf_renderer=PdfRenderer(),
             ).execute(download_results)
 
     for u in updates:
@@ -185,8 +189,19 @@ def cmd_watch(args: argparse.Namespace) -> int:
                 transcriber = MoonshineTranscriber()
             except ImportError:
                 transcriber = None
+            # Stage 10: PDF は passthrough をやめ pdf_renderer(pdfplumber) でテキスト層抽出。
+            # pdfplumber 未導入なら None で構築し PDF は skipped にフォールバック（transcriber 同型）。
+            pdf_renderer = None
+            try:
+                from adapters.render.pdf_renderer import PdfRenderer
+
+                pdf_renderer = PdfRenderer()
+            except ImportError:
+                pdf_renderer = None
             render_uc = RenderAuthorizedMedia(
-                MarkitdownRenderer(), transcriber=transcriber
+                MarkitdownRenderer(),
+                transcriber=transcriber,
+                pdf_renderer=pdf_renderer,
             )
         try:
             while True:
