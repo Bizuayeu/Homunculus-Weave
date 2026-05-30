@@ -76,16 +76,23 @@ class StdoutEventEmitter:
                 skip_reason = rd.skip_reason
                 rendered_text = rd.rendered.rendered_text
                 render_status = rd.rendered.render_status
+                # Stage 11.2: 派生ページ画像と総ページ数は rd（render 済み）からのみ非空/非 null
+                derived_image_paths = list(rd.rendered.derived_image_paths)
+                page_count = rd.rendered.page_count
             elif dl is not None:
                 local_path = str(dl.local_path) if dl.local_path is not None else None
                 skip_reason = dl.skip_reason
                 rendered_text = None
                 render_status = None
+                derived_image_paths = []
+                page_count = None
             else:
                 local_path = None
                 skip_reason = None
                 rendered_text = None
                 render_status = None
+                derived_image_paths = []
+                page_count = None
 
             out.append(
                 {
@@ -98,6 +105,8 @@ class StdoutEventEmitter:
                     "skip_reason": skip_reason,
                     "rendered_text": rendered_text,
                     "render_status": render_status,
+                    "page_count": page_count,
+                    "derived_image_paths": derived_image_paths,
                 }
             )
         return out

@@ -307,3 +307,96 @@ def test_emit_message_id_null_when_absent():
     emitter.emit(_normalized("hi"))
     payload = json.loads(stream.getvalue().strip())
     assert payload["message_id"] is None
+
+
+# === Stage 11.2: derived_image_paths / page_count 出力（v2 維持、フィールド追加のみ）===
+
+
+def _pdf_media_attachment(file_name: str = "drawings.pdf") -> MediaAttachment:
+    return MediaAttachment(
+        kind="document",
+        file_id="PDF123",
+        mime_type="application/pdf",
+        size=3145728,
+        file_name=file_name,
+    )
+
+
+def test_emit_serializes_derived_image_paths_and_page_count_for_image_pdf():
+    """画像 PDF: render_results の derived_image_paths / page_count が payload に乗る。"""
+    media = _pdf_media_attachment()
+    rr = RenderResult(
+        update_id=1,
+        media=media,
+        local_path=Path("/tmp/media/PDF123_drawings.pdf"),
+        skip_reason=None,
+        rendered=RenderedMedia(
+            rendered_text="",
+            render_status="ok",
+            derived_image_paths=[
+                "/tmp/media/PDF123_page-001.png",
+                "/tmp/media/PDF123_page-002.png",
+            ],
+            page_count=12,
+        ),
+    )
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]), render_results=[rr])
+    item = json.loads(stream.getvalue().strip())["media"][0]
+    assert item["page_count"] == 12
+    assert len(item["derived_image_paths"]) == 2
+    assert "page-001.png" in item["derived_image_paths"][0]
+    assert item["rendered_text"] == ""
+    assert item["render_status"] == "ok"
+
+
+def test_emit_text_pdf_has_empty_derived_images_but_page_count():
+    """テキスト PDF: derived_image_paths=[] だが page_count は乗る（両方明示）。"""
+    media = _pdf_media_attachment("contract.pdf")
+    rr = RenderResult(
+        update_id=1,
+        media=media,
+        local_path=Path("/tmp/media/PDF123_contract.pdf"),
+        skip_reason=None,
+        rendered=RenderedMedia(
+            rendered_text="--- page 1 ---\n本文",
+            render_status="ok",
+            derived_image_paths=[],
+            page_count=3,
+        ),
+    )
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]), render_results=[rr])
+    item = json.loads(stream.getvalue().strip())["media"][0]
+    assert item["derived_image_paths"] == []
+    assert item["page_count"] == 3
+
+
+def test_emit_without_render_results_defaults_derived_images_and_page_count():
+    """後方互換: render_results 未指定なら derived_image_paths=[] / page_count=null。"""
+    media = _pdf_media_attachment()
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]))
+    item = json.loads(stream.getvalue().strip())["media"][0]
+    assert item["derived_image_paths"] == []
+    assert item["page_count"] is None
+
+
+def test_emit_download_only_defaults_derived_images_and_page_count():
+    """download_results のみ（render なし）: derived_image_paths=[] / page_count=null。"""
+    media = _pdf_media_attachment()
+    result = MediaDownloadResult(
+        update_id=1,
+        media=media,
+        local_path=Path("/tmp/media/PDF123_drawings.pdf"),
+        skip_reason=None,
+    )
+    stream = io.StringIO()
+    emitter = StdoutEventEmitter(stream=stream)
+    emitter.emit(_normalized_with_media([media]), download_results=[result])
+    item = json.loads(stream.getvalue().strip())["media"][0]
+    assert item["derived_image_paths"] == []
+    assert item["page_count"] is None

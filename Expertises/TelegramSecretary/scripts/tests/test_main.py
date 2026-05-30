@@ -1077,3 +1077,54 @@ def test_poll_medium_mode_emits_video(env_ready, monkeypatch, capsys):
     assert payload["media"][0]["kind"] == "video"
     assert payload["media"][0]["mime_type"] == "video/mp4"
     assert payload["media"][0]["local_path"] is None
+
+
+# --- Stage 11.4: cmd_poll が PDF cap を PdfRenderer に渡す配線 ---
+
+
+def test_poll_heavy_passes_pdf_cap_to_renderer(env_ready, monkeypatch):
+    """cmd_poll の Heavy 分岐で PdfRenderer が config.pdf_image_max_pages 付きで構築される。
+
+    markitdown/moonshine の重い __init__（magika 等）は軽量 stub に置換し、PdfRenderer の
+    構築引数だけをスパイ。photo を size 超過にして download skip させ getFile/render を回避。
+    """
+    monkeypatch.setenv("TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD", "true")
+    monkeypatch.setenv("TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES", "7")
+
+    import adapters.render.markitdown_renderer as mr_mod
+    import adapters.transcribe.moonshine_transcriber as mt_mod
+    import adapters.render.pdf_renderer as pdf_mod
+
+    monkeypatch.setattr(mr_mod, "MarkitdownRenderer", lambda: object())
+    monkeypatch.setattr(mt_mod, "MoonshineTranscriber", lambda: object())
+
+    captured: dict = {}
+    real_pdf_renderer = pdf_mod.PdfRenderer
+
+    def spy(image_max_pages=20):
+        captured["cap"] = image_max_pages
+        return real_pdf_renderer(image_max_pages=image_max_pages)
+
+    monkeypatch.setattr(pdf_mod, "PdfRenderer", spy)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "ok": True,
+                "result": [
+                    {
+                        "update_id": 1,
+                        "message": {
+                            "chat": {"id": 100},
+                            "from": {"id": 200},
+                            "photo": [{"file_id": "X", "file_size": 99999999}],
+                        },
+                    }
+                ],
+            },
+        )
+
+    _install_mock_transport(monkeypatch, handler)
+    assert main(["poll", "--timeout", "1"]) == EXIT_OK
+    assert captured["cap"] == 7
