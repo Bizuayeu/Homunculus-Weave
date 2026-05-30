@@ -16,6 +16,7 @@ def base_env(monkeypatch, tmp_path):
         "TELEGRAM_SECRETARY_MEDIA_RETENTION_HOURS",
         "TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD",
         "TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES",
+        "TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES",
     ]:
         monkeypatch.delenv(k, raising=False)
 
@@ -91,5 +92,32 @@ def test_config_parses_outbound_max_size(monkeypatch):
 
 def test_config_rejects_non_positive_outbound_max_size(monkeypatch):
     monkeypatch.setenv("TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES", "0")
+    with pytest.raises(EnvironmentError):
+        Config.from_env()
+
+
+# === Stage 11.4: PDF image max pages (cap) ===
+
+
+def test_config_default_pdf_image_max_pages():
+    """欠損時は default 20（超多ページ画像化の安全弁）。"""
+    cfg = Config.from_env()
+    assert cfg.pdf_image_max_pages == 20
+
+
+def test_config_parses_pdf_image_max_pages(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES", "5")
+    cfg = Config.from_env()
+    assert cfg.pdf_image_max_pages == 5
+
+
+def test_config_rejects_non_positive_pdf_image_max_pages(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES", "0")
+    with pytest.raises(EnvironmentError):
+        Config.from_env()
+
+
+def test_config_rejects_invalid_pdf_image_max_pages(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES", "lots")
     with pytest.raises(EnvironmentError):
         Config.from_env()
