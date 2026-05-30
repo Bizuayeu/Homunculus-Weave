@@ -23,7 +23,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 5. watch 返却後、stdout の JSON Lines v2 を読み、Weave が SecretaryRole で応答ドラフト → send-reply（メッセージ受信なら即応再起動、無ければ窓満了で再起動）
    - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキストを直接活用。docx/pptx/xlsx は markdown（Stage 7）、**PDF はテキスト層抽出（Stage 10、pdfplumber、Read tool 非依存）**、**voice/audio/video は音声の文字起こし transcript（Stage 9、`kind`/`mime_type` で md か transcript か PDF 本文か判別）**
    - **`local_path` 非 null + `render_status="passthrough"`** → `Read` ツールで開いて Vision/text 解釈（image/text 系、Stage 6 Multimodal Inbox。PDF は Stage 10 で render 側に移行）
-   - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答（markitdown md 化 / PDF テキスト層抽出 / Moonshine 音声 transcribe の失敗）
+   - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答（markitdown md 化失敗 / PDF=pdfplumber の壊れ・デコード不可 / Moonshine 推論例外）。※**音声（PyAV）の壊れ・無音・デコード不可は failed でなく `ok`+空**に落ちる → 「無音か、音声として読めないファイルの可能性」と両義応答（媒体別、Live E2E 2026-05-30 確認）
    - **`render_status="skipped"` + `skip_reason="media_size_exceeded"`** → サイズ超過応答
    - **`render_status="skipped"` + `skip_reason=null`** → zip 等の未対応 mime、または音声で transcriber 未注入/Medium モード、`mime_type` を見て応答
    - **生成物を送り返す（Stage 8 outbound）** → 図表/レポート等を生成したら `send-reply --file <path>`（複数可、画像→sendPhoto・他→sendDocument 自動振り分け）。`--reply-to <message_id>` で元発言への返信スレッド、送信前に typing インジケータ
@@ -92,6 +92,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 - **音声のローカル完結**（Stage 9）— Moonshine は**ローカル推論で音声が外部に一切出ない**（機密 voice メモに安全）。Whisper API 等の外部送信 STT を採らなかった設計上の利点。本番で Moonshine Enterprise or kotoba-whisper へ切替時もローカル完結を維持
 - **transcript の出力漏洩スキャン**（Stage 9）— 音声内の機密（パスワード読み上げ等）が transcript 経由で emit に乗る可能性、send-reply 前の漏洩スキャン対象に `rendered_text`(transcript) も含める
 - **音声前処理のログ秘匿**（Stage 9）— `MoonshineTranscriber` の例外 catch 時の stderr は `file_id[:8]` のみ、絶対パスを出さない（markitdown と同型）
+- **音声中間ファイルの不在**（Stage 9）— PyAV はメモリ内（numpy）で 16kHz mono float へデコードし、**ffmpeg 中間 wav をディスクに書かない**。機密 voice の中間生成物がディスクに残存しない（retention 対象が発生しない＝より強い保証、Live E2E 2026-05-30 確認）
 - **outbound 添付の漏洩スキャン**（Stage 8）— Weave 生成物（md/docx/画像/PDF）に token/env名/system prompt/機密が混入していないか**送信前**に Weave 側で確認（text の漏洩スキャンを添付にも拡張）。コードはバイナリ中身まで検査しない＝Weave の判断責務（L00473 分業）
 - **outbound サイズ上限**（Stage 8、事故防止）— `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES`（既定 50MB）超過は送信前に `AttachmentTooLarge` で弾く（生成物肥大による誤送信防止）
 - **送信時 token 込み URL のログ秘匿**（Stage 8）— sendPhoto/sendDocument 失敗例外は method/chat_id/file 名のみで URL/token を載せない（受信側 media_downloader と同型、テストで検証）
