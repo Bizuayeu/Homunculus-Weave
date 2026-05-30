@@ -101,7 +101,7 @@ python scripts/main.py send-reply --chat-id <id> --update-id <uid> --text-file r
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **339 tests green**（Stage 1-8 + Stage 9/10 実装完了、詳細内訳は CHANGELOG 参照）。**Stage 9 E2E は PASS（2026-05-30 Live E2E：Linux wheel・A〜D ケース・retention 確認）**、Stage 10.4（PDF）E2E は次フェーズ、Stage 5 / 6.5 / 7.5 / 8.5 E2E は実機検証フェーズ。
+現在 **339 tests green**（Stage 1-8 + Stage 9/10 実装完了、詳細内訳は CHANGELOG 参照）。**Stage 9 E2E（音声）・Stage 10.4 E2E（PDF）ともに PASS（2026-05-30 Live E2E）**——Stage 9 は Linux wheel・A〜D ケース・retention、Stage 10.4 は Read tool 不使用での PDF 内容到達・文字化け PDF のクリーン抽出・スキャン PDF の空 ok・壊れ PDF の failed を確認。Stage 5 / 6.5 / 7.5 / 8.5 E2E は実機検証フェーズ。
 
 ### 依存ツリー注記
 
