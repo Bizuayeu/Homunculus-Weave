@@ -1128,3 +1128,79 @@ def test_poll_heavy_passes_pdf_cap_to_renderer(env_ready, monkeypatch):
     _install_mock_transport(monkeypatch, handler)
     assert main(["poll", "--timeout", "1"]) == EXIT_OK
     assert captured["cap"] == 7
+
+
+# --- Stage 11.5: render-pdf オンデマンドコマンド（--text 全文 / --pages 個別画像）---
+
+
+def _write_text_pdf(path: Path, lines) -> None:
+    from reportlab.pdfgen import canvas
+
+    c = canvas.Canvas(str(path))
+    c.setFont("Helvetica", 14)
+    y = 800
+    for ln in lines:
+        c.drawString(50, y, ln)
+        y -= 24
+    c.showPage()
+    c.save()
+
+
+def _write_blank_pdf(path: Path, n: int) -> None:
+    from reportlab.pdfgen import canvas
+
+    c = canvas.Canvas(str(path))
+    for _ in range(n):
+        c.showPage()
+    c.save()
+
+
+def test_render_pdf_text_mode_outputs_json(env_ready, tmp_path, capsys):
+    """render-pdf --text → JSON 1行で全文テキスト + page_count。"""
+    pdf = tmp_path / "doc.pdf"
+    _write_text_pdf(pdf, ["Hello render-pdf text"])
+    assert main(["render-pdf", "--path", str(pdf), "--text"]) == EXIT_OK
+    out = json.loads(capsys.readouterr().out.strip())
+    assert out["mode"] == "text"
+    assert out["render_status"] == "ok"
+    assert out["page_count"] == 1
+    assert "Hello render-pdf text" in out["rendered_text"]
+
+
+def test_render_pdf_pages_mode_outputs_paths(env_ready, tmp_path, capsys):
+    """render-pdf --pages 1-2 → JSON 1行で derived_image_paths（実在 png）。"""
+    pdf = tmp_path / "scan.pdf"
+    _write_blank_pdf(pdf, 3)
+    assert main(["render-pdf", "--path", str(pdf), "--pages", "1-2"]) == EXIT_OK
+    out = json.loads(capsys.readouterr().out.strip())
+    assert out["mode"] == "pages"
+    assert len(out["derived_image_paths"]) == 2
+    for p in out["derived_image_paths"]:
+        assert Path(p).exists()
+
+
+def test_render_pdf_missing_file_returns_config_invalid(env_ready, tmp_path):
+    """存在しない PDF → EXIT_CONFIG_INVALID（クラッシュさせない）。"""
+    assert (
+        main(["render-pdf", "--path", str(tmp_path / "nope.pdf"), "--text"])
+        == EXIT_CONFIG_INVALID
+    )
+
+
+def test_render_pdf_requires_text_or_pages(tmp_path):
+    """--text も --pages も無い → mutually exclusive required で SystemExit。"""
+    pdf = tmp_path / "doc.pdf"
+    _write_text_pdf(pdf, ["x"])
+    with pytest.raises(SystemExit):
+        main(["render-pdf", "--path", str(pdf)])
+
+
+def test_parse_page_range():
+    """_parse_page_range: 1-indexed inclusive → 0-indexed [start, end)。"""
+    from main import _parse_page_range
+
+    assert _parse_page_range("21-22") == (20, 22)
+    assert _parse_page_range("21") == (20, 21)
+    assert _parse_page_range("1-3") == (0, 3)
+    start, end = _parse_page_range("21-")
+    assert start == 20 and end >= 22

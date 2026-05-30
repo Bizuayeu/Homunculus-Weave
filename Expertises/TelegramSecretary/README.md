@@ -64,21 +64,26 @@ python scripts/main.py poll --timeout 5
 #    - rendered_text="# 仕様書\n..."（markitdown が md 化）
 #    - render_status="ok"
 # image は render_status="passthrough"（Vision native、Read tool で直接解釈）
-# PDF は render_status="ok"（pdfplumber がテキスト層抽出、Stage 10。Read tool 非依存）
+# PDF は render_status="ok" + derived_image_paths（常に画像化、Stage 11.5。全文は render-pdf --text）
 # zip 等は render_status="skipped"
 # 壊れたファイル等で render が失敗すると render_status="failed"
 ```
 
-### PDF を試す（Stage 10 テキスト層 + Stage 11 画像 PDF）
+### PDF を試す（Stage 11.5 常に画像化 + render-pdf オンデマンド）
 
 ```powershell
 # bot に PDF + caption "中身を読んで" を送ってから：
 python scripts/main.py poll --timeout 5
-# テキスト PDF → render_status="ok" + rendered_text に "--- page N ---" マーカー入り本文 + page_count（Stage 10/11）
-# スキャン/図面 PDF（テキスト層なし）→ render_status="ok" + rendered_text="" +
-#   derived_image_paths=[全ページ png] + page_count（Stage 11、pypdfium2 で全ページ画像化）
-#   → Weave は先頭1枚を Read で Vision → page_count で総量把握 → 段階判断（多量なら send-reply で確認）
-# cap 超（既定20ページ、TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES）→ derived は先頭20枚、page_count は実総数
+# PDF は常に画像化 → render_status="ok" + rendered_text="" +
+#   derived_image_paths=[先頭 cap 枚 png] + page_count（実総数）（Stage 11.5、pypdfium2）
+#   → Weave は先頭最大 5 枚を Read で Vision → 大枠把握 → ①②③を判断
+# ① 全文テキストが要る → オンデマンドで pdfplumber 抽出：
+python scripts/main.py render-pdf --path <local_path> --text
+#   → {"mode":"text","render_status":"ok","page_count":N,"rendered_text":"--- page 1 ---\n..."}
+# ② cap 超（21枚目以降）のページ画像が要る → オンデマンドで画像化：
+python scripts/main.py render-pdf --path <local_path> --pages 21-22
+#   → {"mode":"pages","pages":"21-22","derived_image_paths":[...]}
+# cap（既定20、TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES）超は先頭20枚、page_count は実総数
 ```
 
 ### voice / audio / video を試す（Stage 9 Native Voice/Audio/Video Inbox）
@@ -113,7 +118,7 @@ python scripts/main.py send-reply --chat-id <id> --update-id <uid> --text-file r
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **358 tests green**（Stage 1-11 実装完了、詳細内訳は CHANGELOG 参照）。**Stage 9 E2E（音声）・Stage 10.4 E2E（PDF テキスト層）ともに PASS（2026-05-30 Live E2E）**——Stage 9 は Linux wheel・A〜D ケース・retention、Stage 10.4 は Read tool 不使用での PDF 内容到達・文字化け PDF のクリーン抽出・スキャン PDF の空 ok・壊れ PDF の failed を確認。**Stage 11（画像 PDF の Vision 経路）は pypdfium2 実 API を adapter test で検証済み、Live E2E（段階 Vision 往復）は Stage 11.5 に申し送り**。Stage 5 / 6.5 / 7.5 / 8.5 / 11.5 E2E は実機検証フェーズ。
+現在 **369 tests green**（Stage 1-11.5 実装完了、詳細内訳は CHANGELOG 参照）。**Stage 9 E2E（音声）・Stage 10.4 E2E（PDF テキスト層）ともに PASS（2026-05-30 Live E2E）**——Stage 9 は Linux wheel・A〜D ケース・retention、Stage 10.4 は Read tool 不使用での PDF 内容到達・文字化け PDF のクリーン抽出・スキャン PDF の空 ok・壊れ PDF の failed を確認。**Stage 11.5（PDF は常に画像化、テキスト全文・cap 超ページは `render-pdf` でオンデマンド）は pypdfium2/pdfplumber 実 API を adapter test で検証済み、Live E2E（最大 5 枚 Vision → `render-pdf` 往復）は申し送り**。Stage 5 / 6.5 / 7.5 / 8.5 / 11.5 E2E は実機検証フェーズ。
 
 ### 依存ツリー注記
 
@@ -146,7 +151,7 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 | `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替。Heavy は `state_dir/media/` に保存、Medium はメタのみで `local_path=null` |
 | `TELEGRAM_SECRETARY_BUNDLE_VOICE` | optional | 音声/動画 STT（moonshine+av）を bootstrap で導入するか（既定 true）。`false` で除外＝音声は `skipped` にフォールバック。moonshine Community License は年商$1M 未満のみ商用無料ゆえ、大規模は `false`（or kotoba-whisper 移行）|
 | `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB = 52428800、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
-| `TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES` | optional | 画像 PDF（スキャン/図面）の全ページ画像化の上限（既定 20）。超多ページの disk/トークン暴走の安全弁。超過分は打ち切り、`page_count` は実総数を emit（Stage 11） |
+| `TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES` | optional | PDF 受信時に事前画像化する先頭ページ数の上限（既定 20）。超多ページの disk/トークン暴走の安全弁。21 枚目以降は `render-pdf --pages` でオンデマンド、`page_count` は実総数を emit（Stage 11.5） |
 
 > **`/goal` deadline 駆動の運用変数**（`TS_SESSION_DURATION_SEC`=7200 / `TS_SESSION_DEADLINE_EPOCH`=now+duration / `TS_POLL_SET_SEC`=580 / `TS_POLL_BASH_TIMEOUT_MS`=600000 / `TS_MAX_TURNS`=300）は `bootstrap.sh` が export（SSoT）。グローバル `BASH_MAX_TIMEOUT_MS=600000` は `.private/.claude/settings.json`（`BASH_DEFAULT_TIMEOUT_MS` は据え置き＝他コマンド 2分）。
 

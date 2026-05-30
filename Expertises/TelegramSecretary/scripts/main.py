@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import uuid
@@ -289,6 +290,69 @@ def cmd_cleanup_media(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _parse_page_range(spec: str) -> tuple[int, int]:
+    """'21-22'(1-indexed inclusive) → (20, 22) の 0-indexed [start, end)。
+
+    '21' 単体 → (20, 21)。'21-' → (20, 大) で末尾まで（rasterize_pages 側が
+    実ページ数でクランプするので上限ははみ出して良い）。
+    """
+    spec = spec.strip()
+    if "-" in spec:
+        lo_s, hi_s = spec.split("-", 1)
+        start = int(lo_s) - 1
+        end = int(hi_s) if hi_s.strip() else 10 ** 9
+    else:
+        start = int(spec) - 1
+        end = start + 1
+    return max(0, start), end
+
+
+def cmd_render_pdf(args: argparse.Namespace) -> int:
+    """オンデマンド PDF 抽出: --text 全文テキスト / --pages N-M 個別ページ画像化。
+
+    Weave が画像 Vision で大枠把握後（ROUTINE_PROMPT）、①全文テキスト or ②個別ページ
+    （cap 超の 21 枚目以降含む）を要求した時に叩く。結果は JSON 1 行で stdout。
+    """
+    config = _load_config()
+    if isinstance(config, int):
+        return config
+
+    path = Path(args.path)
+    if not path.exists():
+        print(f"render-pdf: file not found: {path.name}", file=sys.stderr)
+        return EXIT_CONFIG_INVALID
+
+    from adapters.render.pdf_renderer import PdfRenderer
+
+    renderer = PdfRenderer(image_max_pages=config.pdf_image_max_pages)
+    if args.text:
+        result = renderer.extract_text(path)
+        print(
+            json.dumps(
+                {
+                    "mode": "text",
+                    "render_status": result.render_status,
+                    "page_count": result.page_count,
+                    "rendered_text": result.rendered_text,
+                },
+                ensure_ascii=False,
+            )
+        )
+        return EXIT_OK
+    if args.pages:
+        start, end = _parse_page_range(args.pages)
+        paths = renderer.rasterize_pages(path, start, end)
+        print(
+            json.dumps(
+                {"mode": "pages", "pages": args.pages, "derived_image_paths": paths},
+                ensure_ascii=False,
+            )
+        )
+        return EXIT_OK
+    print("render-pdf: specify --text or --pages N-M", file=sys.stderr)
+    return EXIT_CONFIG_INVALID
+
+
 def cmd_send_reply(args: argparse.Namespace) -> int:
     config = _load_config()
     if isinstance(config, int):
@@ -435,6 +499,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="保持期限超過の media ファイルを state_dir/media/ から削除",
     )
 
+    p_render = sub.add_parser(
+        "render-pdf",
+        help="オンデマンド PDF 抽出: --text 全文テキスト / --pages N-M 個別ページ画像化",
+    )
+    p_render.add_argument("--path", required=True, help="対象 PDF の local_path")
+    g_render = p_render.add_mutually_exclusive_group(required=True)
+    g_render.add_argument(
+        "--text", action="store_true", help="全ページのテキスト層を抽出"
+    )
+    g_render.add_argument(
+        "--pages", help="画像化するページ範囲 N-M（1-indexed inclusive）"
+    )
+
     # 管理表 CRUD（individuals / tasks / knowledge）。/secretary が全操作をラップする入口
     for _name in ("individuals", "tasks", "knowledge"):
         p_reg = sub.add_parser(_name, help=f"{_name} 管理表の CRUD")
@@ -457,6 +534,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "send-reply": cmd_send_reply,
         "test": cmd_test,
         "cleanup-media": cmd_cleanup_media,
+        "render-pdf": cmd_render_pdf,
         "individuals": cmd_registry,
         "tasks": cmd_registry,
         "knowledge": cmd_registry,
