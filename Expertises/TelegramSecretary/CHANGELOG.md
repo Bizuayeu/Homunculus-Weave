@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.8.1] - 2026-05-30 — Stage 10.4 PDF Render: Live E2E PASS
+
+[0.8.0] で実装した Stage 10（PDF Render）の **Telegram 実機 Live E2E を Cloud Routine 上で走破**。最重要の「Read tool を使わず PDF 内容に到達できるか」が肯定され、本命の不確実点だった文字化け PDF も pdfplumber でクリーン抽出を確認。
+
+### Verified — Stage 10.4 Live E2E（Cloud Routine 実機、routine `telegram-secretary-stage10-e2e-pdf`、全 P1-P5 PASS）
+
+- **P1 テキスト PDF ✅【最重要】**: 資材物価スライド条項（3頁）が `render_status=ok` + 本文完全抽出（バンド表・不感帯まで構造保持）。**Read tool 不使用で全内容に到達**し要約返信＝Stage 10 の主眼を満たす
+- **P2 文字化けしやすい PDF ✅**: `フローリング.pdf`（3.0MB、Stage 9 で pypdf が文字化けした実物）が pdfplumber で **mojibake ゼロのクリーン抽出**。ライブラリ選定（pypdf→pdfplumber/pdfminer.six 系）が文字化け問題そのものを解消し、**三択申し送り（AGPL/OCR/text限定）は不発＝pdfplumber 確定**
+- **P3 スキャン PDF ✅**: テキスト層ゼロが `ok` + 空 `rendered_text` に正しく落ち、「テキスト層なし（画像 PDF の可能性）」応答。**大環主が follow-up で OCR を明示要求→スキャン PDF OCR の実需を実証**（IMPLEMENTATION_PLAN Stage 11 backlog に調査結果を記録、RapidOCR ~30MB 第一候補だが日本語は公式事前ビルド ONNX 無し＝v4 自前変換要、YAGNI で着手保留）
+- **P4 壊れ PDF ✅**: 非 PDF を .pdf リネームしたファイルが `render_status=failed`（pdfplumber 厳格、rename 攻撃耐性）。stderr は `file_id[:8]` のみで絶対パス秘匿を実機確認
+- **P5 retention ✅**: 6+ 件処理後も PDF 中間 temp ファイルゼロ（pdfplumber pure-python・in-memory）、`cleanup-media` exit 0
+- **出力漏洩スキャン ✅**: 全返信で送信前スキャン、PDF 埋め込み機密の漏れなし
+
+### Tests
+
+- Python 層は未変更（Live E2E 検証 + ドキュメント格上げのみ）ゆえ pytest は 0.8.0 の **339 passed** 据え置き
+
 ## [0.8.0] - 2026-05-30 — Stage 10 PDF Render（passthrough → render 移行、Read tool 非依存化）
 
 ### Added — PDF テキスト層抽出（pdfplumber、MediaRenderer Port 第三実装）
