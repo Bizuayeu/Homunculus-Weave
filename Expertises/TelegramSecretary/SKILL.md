@@ -21,9 +21,9 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 3. lease acquire（他セッション保持中なら exit 4 で即終了＝自己治癒）
 4. `/goal` で deadline（`$TS_SESSION_DEADLINE_EPOCH`）まで監視を駆動。各ターン = foreground `watch --exit-on-message --max-duration <残り窓> --timeout 30`（この call のみ bash `timeout: $TS_POLL_BASH_TIMEOUT_MS`、他は既定 2分）
 5. watch 返却後、stdout の JSON Lines v2 を読み、Weave が SecretaryRole で応答ドラフト → send-reply（メッセージ受信なら即応再起動、無ければ窓満了で再起動）
-   - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキストを直接活用。docx/pptx/xlsx は markdown（Stage 7）、**PDF はテキスト層抽出（Stage 10、pdfplumber、Read tool 非依存）**、**voice/audio/video は音声の文字起こし transcript（Stage 9、`kind`/`mime_type` で md か transcript か PDF 本文か判別）**
-   - **`derived_image_paths` 非空（画像 PDF、Stage 11）** → スキャン/図面 PDF を全ページ画像化済み（`rendered_text=""`）。**先頭1枚 Read → `page_count` で総量把握 → 段階 Vision**（明白なら確認なし、多量/不明なら send-reply で確認 → 残りはディスク済みを Read、追加 render コストゼロ）。画像化＝決定論／Vision 選択＝判断の分離でトークン節約
-   - **`local_path` 非 null + `render_status="passthrough"`** → `Read` ツールで開いて Vision/text 解釈（image/text 系、Stage 6 Multimodal Inbox。PDF は Stage 10 で render 側に移行）
+   - **`rendered_text` 非 null（`render_status="ok"`）** → そのテキストを直接活用。docx/pptx/xlsx は markdown（Stage 7）、**voice/audio/video は音声の文字起こし transcript（Stage 9、`kind`/`mime_type` で判別）**
+   - **`derived_image_paths` 非空（PDF、Stage 11.5）** → PDF は常に画像化される（`rendered_text=""`）。先頭最大 5 枚を Vision で大枠把握し、①全文テキスト（`render-pdf --text`）／②個別ページ精読／③十分 を判断。**詳細は上記「PDF の扱い」（仕様 SSoT）**
+   - **`local_path` 非 null + `render_status="passthrough"`** → `Read` ツールで開いて Vision/text 解釈（image/text 系、Stage 6 Multimodal Inbox。PDF は Stage 10/11.5 で render 側＝画像化に移行）
    - **`render_status="failed"`** → `file_name` 込みで「読めなかった」を短く応答（markitdown md 化失敗 / PDF=pdfplumber の壊れ・デコード不可 / Moonshine 推論例外）。※**音声（PyAV）の壊れ・無音・デコード不可は failed でなく `ok`+空**に落ちる → 「無音か、音声として読めないファイルの可能性」と両義応答（媒体別、Live E2E 2026-05-30 確認）
    - **`render_status="skipped"` + `skip_reason="media_size_exceeded"`** → サイズ超過応答
    - **`render_status="skipped"` + `skip_reason=null`** → zip 等の未対応 mime、または音声で transcriber 未注入/Medium モード、`mime_type` を見て応答
@@ -33,6 +33,23 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 ```
 
 詳細フローは [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md) を参照。
+
+## PDF の扱い（仕様 SSoT）
+
+PDF は **常に全ページ画像化**する（テキスト層の有無を判定しない）。Stage 11.5 で判定二経路（テキスト層あり→`rendered_text` ／ 無し→画像化）を撤廃。スタンプ・薄いテキスト層の誤判定（全ページ同一の文書番号印で text 経路に落ち中身が読めない等）を構造的に排除する。**画像化＝決定論（コード）／何を読むか＝判断（Weave）** の分離（L00473）。
+
+**受信時（自動）**: `poll`/`watch` が PDF を受けると `PdfRenderer.render()` が先頭 `pdf_image_max_pages`（既定 20）枚を画像化し、`rendered_text=""` ／ `page_count`（実総数）／ `derived_image_paths`（png パス配列）を emit する。テキスト抽出は **しない**（オンデマンドに分離）。
+
+**Weave の段階処理**:
+
+1. **大枠把握** — `derived_image_paths` の **先頭最大 5 枚**を `Read` で Vision し、文書の性質と `page_count`（総量）を掴む（20 枚全ては見ない＝トークン節約）
+2. **①②③ を判断**:
+   - **① 全文テキストが要る** → `render-pdf --path <local_path> --text`（pdfplumber が全ページのテキスト層を `--- page N ---` マーカー付き抽出。スキャン PDF はテキスト層ゼロで空文字を正直に返す）
+   - **② 個別ページの精読が要る** → そのページ画像を `Read`。**N ≤ 20 は emit 済み `derived_image_paths[N-1]` を開くだけ（追加コストゼロ）**、**N > 20（cap 超）は `render-pdf --path <local_path> --pages N-M` で初めて生成**してから Read
+   - **③ 5 枚で十分** → そのまま応答
+3. **多量・不明なら確認** — どこを見るべきか不明・ページ多量なら `send-reply` で「全 N ページの〇〇のようです。どこを見ますか？」と確認してから必要分のみ処理
+
+> **retention 注意**: ② の N>20 遅延生成は元 PDF が `media_retention_hours`（既定 24h）内に残っている必要がある。同一セッション/同日なら確実。後日「あの PDF の 25 ページ」は消えている可能性があり、その場合は再送を促す。
 
 ## Subcommands
 
@@ -45,6 +62,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `send-reply --chat-id --update-id --text-file [--owner] [--file ...] [--reply-to]` | Weave 起草の返信送信 → offset advance + lease renew。CLI 層 + UseCase 層の二重 owner 検証。`--file`（複数可）で画像→sendPhoto・他→sendDocument 添付、`--reply-to` で threading（Stage 8） | 0=OK, 1=送信失敗, 2=添付不正, 3=auth, 4=lease |
 | `test --chat-id` | owner chat に ping 1通 | 0=OK, 1=送信失敗, 3=auth |
 | `cleanup-media` | `state_dir/media/` 配下で `media_retention_hours` 超過の保存 media を削除（手動 / cron）。`watch` は `--cleanup-interval` で自動発火（既定 120 サイクル≒1h） | 0=OK, 2=設定欠損 |
+| `render-pdf --path <pdf> (--text \| --pages N-M)` | 受信済み PDF のオンデマンド抽出。`--text`=全ページのテキスト層（pdfplumber、`--- page N ---` マーカー）、`--pages N-M`=指定ページ画像化（1-indexed inclusive、cap 超 21 枚目以降用）。結果は JSON 1 行で stdout。`--text`/`--pages` は排他必須。詳細は「PDF の扱い」 | 0=OK, 2=ファイル不在/引数不正 |
 | `individuals\|tasks\|knowledge {list\|get\|add\|remove}` | 管理表（INDIVIDUALS/TASKS/KNOWLEDGE）の CRUD。`get`/`remove` は `--key`（uuid/id）、`add` は `--json`/`--json-file`。値オブジェクトで検証。SSoT は Private JSON、操作主体は SecretaryRole、入口は `/secretary` | 0=OK, 2=不正入力 |
 
 `--owner` は省略可（運用律 B 案：`source bootstrap.sh` で env 経由自動同期）。優先順位は `--owner > env > uuid 自動生成`。
@@ -72,7 +90,7 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 | `TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD` | optional | Heavy（true=既定）/ Medium（false）モード切替 |
 | `TELEGRAM_SECRETARY_BUNDLE_VOICE` | optional | 音声/動画 STT（moonshine+av）を bootstrap で導入するか（既定 true）。`false` で除外＝音声は `skipped` にフォールバック（moonshine Community License 回避・軽量化、大規模向け） |
 | `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
-| `TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES` | optional | 画像 PDF（スキャン/図面）の全ページ画像化の上限（既定 20）。超多ページの disk/トークン安全弁、超過は打ち切り `page_count` は実総数（Stage 11） |
+| `TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES` | optional | PDF 受信時に `render()` が事前画像化する先頭ページ数の上限（既定 20）。超多ページの disk/トークン安全弁。21 枚目以降は `render-pdf --pages` でオンデマンド生成、`page_count` は実総数（Stage 11.5） |
 
 > **`/goal` deadline 駆動の運用変数**（`TS_SESSION_DURATION_SEC` / `TS_SESSION_DEADLINE_EPOCH` / `TS_POLL_SET_SEC` / `TS_POLL_BASH_TIMEOUT_MS` / `TS_MAX_TURNS`）は `bootstrap.sh` が export（SSoT）。`BASH_MAX_TIMEOUT_MS=600000` は `.private/.claude/settings.json`。詳細は [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md)。
 
@@ -90,8 +108,8 @@ description: Telegram Bot API の long-polling を Cloud Routine 上で常駐さ
 - **mime_type は Telegram の自己申告** — 信頼せず、親プロセス Weave が `Read` で開いた結果を真とする（rename 攻撃対策）
 - **markitdown render 失敗時の絶対パス秘匿**（Stage 7）— Adapter 内部 catch 時の stderr warning は `file_id[:8]` のみで `local_path` の絶対パスを出さない（テストで明示検証）
 - **markitdown 寛容性の認識**（Stage 7）— garbage バイト列でも render_status="ok" で何か返してくる。**rendered_text が意味のあるテキストかは Weave 側で判断**する責務（L00473 分業）。rename 攻撃で意図しない mime を render させようとする入力にも、Weave が「内容として妥当か」を判断する層が最終防御
-- **PDF はローカル完結・MIT・pure-python**（Stage 10）— pdfplumber は**ローカルでテキスト層を抽出、PDF が外部に一切出ない**。MIT ライセンスで配布安全（pymupdf の AGPL は同等品質だが配布制約のため不採用）。pure-python で OS コマンド実行リスクなし。テキスト層ゼロ（スキャン PDF 等）は render_status="ok" + 空文字で「読めるテキスト無し」を正直に渡す。失敗時 stderr は `file_id[:8]` のみで絶対パスを出さない（markitdown/Moonshine 同型、テストで検証）。**rendered_text 内の機密（PDF 埋め込みパスワード等）は send-reply 前の漏洩スキャン対象**
-- **画像 PDF もローカル完結**（Stage 11）— `pypdfium2`（pdfplumber 同梱、BSD/Apache 系）で全ページをローカル画像化、PDF・派生 png が外部に出ない。派生画像は `media/` フラット直下＝既存 `cleanup_media_dir` の retention 対象（機密スキャン画像の残存防止）。`pypdfium2`/`Pillow` は pdf_renderer が直接使うため pyproject に直接宣言（再現性）。画像化失敗時 stderr は `file_id[:8]` のみ。**Vision 応答に PDF 埋め込み機密が漏れないか send-reply 前スキャン**
+- **PDF テキスト抽出はローカル完結・MIT・pure-python**（Stage 10/11.5）— `render-pdf --text` の pdfplumber は **ローカルでテキスト層を抽出、PDF が外部に一切出ない**。MIT ライセンスで配布安全（pymupdf の AGPL は同等品質だが配布制約のため不採用）。pure-python で OS コマンド実行リスクなし。テキスト層ゼロ（スキャン PDF 等）は render_status="ok" + 空文字で「読めるテキスト無し」を正直に渡す。失敗時 stderr は `file_id[:8]` のみで絶対パスを出さない（markitdown/Moonshine 同型、テストで検証）。**抽出本文内の機密（PDF 埋め込みパスワード等）は send-reply 前の漏洩スキャン対象**
+- **PDF 画像化もローカル完結**（Stage 11/11.5）— PDF は常に `pypdfium2`（pdfplumber 同梱、BSD/Apache 系）で **ローカル画像化**、PDF・派生 png が外部に出ない。受信時は先頭 cap 枚、`render-pdf --pages` で 21 枚目以降をオンデマンド（同一命名・retention）。派生画像は `media/` フラット直下＝既存 `cleanup_media_dir` の retention 対象（機密スキャン画像の残存防止）。`pypdfium2`/`Pillow` は pdf_renderer が直接使うため pyproject に直接宣言（再現性）。画像化失敗時 stderr は `file_id[:8]` のみ。**Vision 応答に PDF 埋め込み機密が漏れないか send-reply 前スキャン**
 - **音声のローカル完結**（Stage 9）— Moonshine は**ローカル推論で音声が外部に一切出ない**（機密 voice メモに安全）。Whisper API 等の外部送信 STT を採らなかった設計上の利点。本番で Moonshine Enterprise or kotoba-whisper へ切替時もローカル完結を維持
 - **transcript の出力漏洩スキャン**（Stage 9）— 音声内の機密（パスワード読み上げ等）が transcript 経由で emit に乗る可能性、send-reply 前の漏洩スキャン対象に `rendered_text`(transcript) も含める
 - **音声前処理のログ秘匿**（Stage 9）— `MoonshineTranscriber` の例外 catch 時の stderr は `file_id[:8]` のみ、絶対パスを出さない（markitdown と同型）

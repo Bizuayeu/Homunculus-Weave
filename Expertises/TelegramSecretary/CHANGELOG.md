@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.10.0] - 2026-05-31 — Stage 11.5 PDF 判定撤廃＋オンデマンド抽出（`render-pdf`）
+
+Stage 11 の二経路（テキスト層あり→`rendered_text` ／ 無し→画像化）を撤廃し、**PDF は常に画像化**へ一本化。スタンプ・薄いテキスト層の誤判定（全ページ同一の文書番号印で text 経路に落ち中身が読めない）を構造的に排除する。テキスト全文・cap 超ページは `render-pdf` サブコマンドで **オンデマンド**に分離（画像化＝決定論／抽出＝判断、L00473）。
+
+### Changed — PDF を常に画像化（判定二経路の撤廃）
+
+- `PdfRenderer.render()` を画像専用に単純化（テキスト層判定を削除）。先頭 `image_max_pages`（既定 20）枚を画像化し `rendered_text=""` ／ `page_count`（実総数）／ `derived_image_paths`。スタンプ PDF の誤判定が構造的に起きない
+- 受信時（poll/watch）の自動テキスト抽出を廃止。mime-routing は不変（`application/pdf` → `pdf` ルート → `render()`）
+
+### Added — オンデマンド抽出 API + `render-pdf` サブコマンド
+
+- `PdfRenderer.extract_text(local_path)` — 全ページのテキスト層を pdfplumber で `--- page N ---` マーカー付き抽出（スキャン PDF はテキスト層ゼロで空 ok）
+- `PdfRenderer.rasterize_pages(local_path, start, end)` — 任意ページ範囲を画像化（cap 超 21 枚目以降の個別要求用、実ページ数でクランプ、命名・保存先は `render()` と一貫）
+- `main.py` に `render-pdf --path <pdf> (--text | --pages N-M)` サブコマンド（既存 poll/watch/send-reply 群と同作法、`--text`/`--pages` は排他必須）。`_parse_page_range` で 1-indexed inclusive → 0-indexed `[start, end)`
+- 運用：受信時に先頭 20 枚を事前画像化 → Weave が最大 5 枚 Vision で大枠把握 → ①全文（`--text`）／②個別ページ（N≤20 はディスク済み Read、N>20 は `--pages`）／③十分 を判断
+
+### Docs — SSoT 純化（重複解消）
+
+- **SKILL.md に PDF 振る舞いの仕様を集約**（「PDF の扱い」セクション新設＋Subcommands 表に `render-pdf`）。ROUTINE_PROMPT は段階 Vision 記述を新仕様へ置換しコマンド例に絞る（SKILL 参照に寄せ、重複文を削除）＝役割分担（SKILL=仕様 SSoT／ROUTINE=実行手順）の純化
+- README / IMPLEMENTATION_PLAN の Stage 11.5 を「Live E2E 申し送り」から「判定撤廃＋オンデマンド実装」へ更新
+
+### Tests
+
+- **Total: 369 passed**（0.9.0 の 358 → +11：常に画像化×3 ／ `extract_text`×4 ／ `rasterize_pages`×4 ／ `render-pdf` コマンド×5、判定二経路テスト撤去分を相殺）
+- **Live E2E（実 Telegram で PDF → 最大 5 枚 Vision → `render-pdf` 往復）は fresh session に申し送り**（Stage 5/6.5/7.5/8.5/11 同様）
+
 ## [0.9.0] - 2026-05-30 — Stage 11 PDF Multipage/Image（Vision 経路、`derived_image_paths` 共通基盤）
 
 Stage 10.4 Live E2E P3 で実証されたスキャン PDF 中身読取の実需に対し、**OCR ではなく Vision 経路**を採用（決裁 2026-05-30）。画像 PDF（スキャン/図面）を `pypdfium2` で全ページ画像化し、Weave が先頭1枚から**段階 Vision** する。画像化（決定論・安い）と Vision（高い・判断）を分離（L00473）。`RenderedMedia.derived_image_paths` は **Stage 9.6-ii 動画 key frame Vision と相乗りする共通基盤**。
