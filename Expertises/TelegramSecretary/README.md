@@ -63,9 +63,10 @@ python scripts/main.py poll --timeout 5
 #    - file_name="spec.docx"
 #    - rendered_text="# 仕様書\n..."（markitdown が md 化）
 #    - render_status="ok"
-# image/pdf は render_status="passthrough"（Read tool が直接対応、render 不要）
+# image は render_status="passthrough"（Vision native、Read tool で直接解釈）
+# PDF は render_status="ok"（pdfplumber がテキスト層抽出、Stage 10。Read tool 非依存）
 # zip 等は render_status="skipped"
-# 壊れたファイル等で markitdown が失敗すると render_status="failed"
+# 壊れたファイル等で render が失敗すると render_status="failed"
 ```
 
 ### voice / audio / video を試す（Stage 9 Native Voice/Audio/Video Inbox）

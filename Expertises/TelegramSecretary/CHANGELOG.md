@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.8.0] - 2026-05-30 — Stage 10 PDF Render（passthrough → render 移行、Read tool 非依存化）
+
+### Added — PDF テキスト層抽出（pdfplumber、MediaRenderer Port 第三実装）
+
+- `PdfRenderer`（`scripts/adapters/render/pdf_renderer.py`）— `MediaRenderer` Port 実装。pdfplumber で PDF のテキスト層を抽出し `rendered_text` に載せ `render_status="ok"`。`MarkitdownRenderer`(Stage 7) / `MoonshineTranscriber`(Stage 9) と同型の設計：pdfplumber は render 時 lazy import、内部例外は広く catch → `render_status="failed"`（クラッシュしない）、stderr warning は `file_id[:8]` のみ（絶対パス秘匿）。**テキスト層ゼロ（スキャン PDF 等）は `ok` + 空文字**で「読めるテキスト無し」を Weave に正直に渡す（Moonshine の無音 → ok+空 同型）
+- `RenderAuthorizedMedia` に `pdf_renderer` を DI 追加（`pdf_renderer=None` で後方互換 = PDF は `skipped` にフォールバック、transcriber 同型）。`_route_mime` に `pdf` 状態を追加
+
+### Changed — PDF を passthrough から render へ移行（Read tool 非依存化）
+
+- `_route_mime` から `application/pdf` を `_PASSTHROUGH_MIME_EXACT` から除去し `pdf` ルート（テキスト層抽出）へ。従来は「`local_path` を `Read` で開く」passthrough だったが、render で `rendered_text` に本文を載せることで Read tool に依存しない到達経路へ一般化（L00473 分業＝決定論的 render は skill、判断は Weave）
+- `cmd_poll` / `cmd_watch` に `PdfRenderer` を lazy import 注入（`cmd_watch` は ImportError 時 `pdf_renderer=None` で skipped フォールバック、transcriber 同型）
+- ドキュメント同期（README Quickstart / SKILL Daily Workflow + Security / ROUTINE_PROMPT Step 5 render_status）：PDF を passthrough → render（ok + rendered_text）に更新
+
+### Infrastructure
+
+- `pyproject.toml` に `pdfplumber>=0.11`（本番依存、MIT、pure-python）と dev extras に `reportlab>=4.0`（PDF fixture 動的生成用、docx を python-docx で生成するのと同型）を追加
+- `bootstrap.sh` Heavy モードに pdfplumber install を追加
+
+### Decision Notes
+
+- **pdfplumber(MIT) を採用、pymupdf(AGPL) は不採用**：日本語テキスト層抽出の基本品質は両者同一（smoke 比較で確認）。配布ライセンス安全性で MIT の pdfplumber を選択。AGPL の pymupdf は同等品質だが配布制約のため不採用。`MediaRenderer` Port 構造は不変で内部ライブラリのみ差し替え可能（Reversibility）
+- スキャン PDF（テキスト層なし）は **(i) 空 ok + Weave 側で警告**方針（OCR は導入しない、YAGNI）。文字化け PDF（ToUnicode 不備）への強さは Live E2E（次フェーズ）で確認
+
+### Tests
+
+- **Total: 339 passed**（0.7.4 の 332 → +5 PdfRenderer adapter／routing は `test_pdf_is_passthrough` を `test_pdf_calls_pdf_renderer` + skip フォールバック + download skip 継承の 3 件に置換 = 差し引き +7、計 +5 net）
+- **Live E2E（実 Telegram で PDF 送信 → 要約往復・文字化け PDF・スキャン PDF）は次フェーズ（Stage 10.4）** に申し送り
+
 ## [0.7.4] - 2026-05-29 — E2E Phase 2 PASS + FINDING 2 格上げ修正（窓畳みオーバーラン → SIGTERM リスク）
 
 ### Verified — E2E Phase 2（Cloud Routine 実機、本番 580s 窓・2h・SIGTERM 非発火）
