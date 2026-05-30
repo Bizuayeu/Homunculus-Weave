@@ -42,8 +42,10 @@ if [ "${TELEGRAM_SECRETARY_MEDIA_ENABLE_DOWNLOAD:-true}" != "false" ]; then
     _ts_log "Heavy mode: installing markitdown (docx/pptx/xlsx render)..."
     python -m pip install --quiet "markitdown[docx,pptx,xlsx]>=0.1.6" || _ts_die "markitdown install failed"
     # Stage 10: PDF テキスト層抽出（pdfplumber、MIT、pure-python）。passthrough(Read tool 依存)からの移行。
-    _ts_log "installing pdfplumber (PDF text-layer render)..."
-    python -m pip install --quiet "pdfplumber>=0.11" || _ts_die "pdfplumber install failed"
+    # Stage 11: 画像 PDF を pypdfium2 で全ページ画像化し to_pil() で png 保存（Pillow）。pdfplumber が
+    # 両者を transitive に引くが、pdf_renderer が pypdfium2 を直接 import するため再現性重視で明示 install。
+    _ts_log "installing pdfplumber + pypdfium2 + Pillow (PDF text-layer & image render)..."
+    python -m pip install --quiet "pdfplumber>=0.11" "pypdfium2>=4.18.0" "Pillow>=9.1" || _ts_die "pdf deps install failed"
     # voice(moonshine+av) は BUNDLE_VOICE=false で除外可（moonshine Community License は年商$1M未満のみ
     # 商用無料・~134MB model ゆえ大規模/ライセンス回避向け）。未導入時は watch が transcriber=None で
     # 起動し音声を skipped にフォールバック（FINDING B、render usecase は transcriber Optional）。

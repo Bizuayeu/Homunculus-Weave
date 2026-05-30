@@ -133,7 +133,7 @@ def cmd_poll(args: argparse.Namespace) -> int:
             render_results = RenderAuthorizedMedia(
                 MarkitdownRenderer(),
                 transcriber=MoonshineTranscriber(),
-                pdf_renderer=PdfRenderer(),
+                pdf_renderer=PdfRenderer(image_max_pages=config.pdf_image_max_pages),
             ).execute(download_results)
 
     for u in updates:
@@ -195,7 +195,7 @@ def cmd_watch(args: argparse.Namespace) -> int:
             try:
                 from adapters.render.pdf_renderer import PdfRenderer
 
-                pdf_renderer = PdfRenderer()
+                pdf_renderer = PdfRenderer(image_max_pages=config.pdf_image_max_pages)
             except ImportError:
                 pdf_renderer = None
             render_uc = RenderAuthorizedMedia(

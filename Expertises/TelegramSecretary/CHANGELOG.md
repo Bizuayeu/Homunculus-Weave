@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.9.0] - 2026-05-30 — Stage 11 PDF Multipage/Image（Vision 経路、`derived_image_paths` 共通基盤）
+
+Stage 10.4 Live E2E P3 で実証されたスキャン PDF 中身読取の実需に対し、**OCR ではなく Vision 経路**を採用（決裁 2026-05-30）。画像 PDF（スキャン/図面）を `pypdfium2` で全ページ画像化し、Weave が先頭1枚から**段階 Vision** する。画像化（決定論・安い）と Vision（高い・判断）を分離（L00473）。`RenderedMedia.derived_image_paths` は **Stage 9.6-ii 動画 key frame Vision と相乗りする共通基盤**。
+
+### Added — 画像 PDF の全ページ画像化（Vision 経路）
+
+- `RenderedMedia` に `derived_image_paths: list[str]`（派生ページ画像パス）と `page_count: Optional[int]`（PDF 総ページ数）を `default` 付き追加（Stage 7.1 `file_name` 同型の後方互換、既存構築は無変更で green）
+- `PdfRenderer` を**二経路化**：テキスト層あり → ページ境界マーカー `--- page N ---` 挿入 + `page_count`（Weave の位置把握）／テキスト層が空（スキャン・図面 PDF）→ `pypdfium2` で全ページ画像化（cap 内）→ `derived_image_paths` + `page_count`、`rendered_text=""`
+- `StdoutEventEmitter._build_media_payload` に `derived_image_paths` / `page_count` 出力（v2 維持・フィールド追加のみ、欠落は `[]`/null で後方互換）
+- `Config` に `pdf_image_max_pages`（env `TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES`、既定 20）＝超多ページ画像化の安全弁。cmd_poll/cmd_watch の `PdfRenderer` に DI
+
+### Changed — 段階 Vision（ROUTINE_PROMPT Step 5）
+
+- `derived_image_paths` 非空なら Weave が**先頭1枚 Read → `page_count` で総量把握 → 残り要否を判断**（明白なら確認なし、多量/不明なら send-reply で確認）→ 残りはディスク済みを Read（追加 render コストゼロ）。`page_count` を両経路共通メタにし、テキスト（位置把握）と画像（段階 Vision）で判断枠組みを一貫
+- ドキュメント同期（README Quickstart PDF / SKILL Daily Workflow + Security / ROUTINE_PROMPT スキーマ・render_status・media 処理）
+
+### Infrastructure
+
+- `pyproject.toml` / `bootstrap.sh` に `pypdfium2>=4.18.0` + `Pillow>=9.1` を**直接宣言**。pdfplumber>=0.11 が両者を transitive に引くことを実機確認したが、`pdf_renderer` が `pypdfium2` を直接 import する以上、再現性のため直接化（コードが直接使う依存は明示する原則）
+
+### Decision Notes
+
+- **OCR ではなく Vision を採用**（建設ドメインの図面・写真比重 + Stage 9.6-ii との共通基盤投資効果）。OCR は Vision でも読めない低解像度スキャン用の劣後 fallback として温存（`MediaRenderer` Port 差し替えで後付け、IMPLEMENTATION_PLAN 末尾「OCR 申し送り」に調査退避）
+- **画像化（決定論）と Vision（判断）を分離**：コードは全ページ png 化までで、どれを Vision するかは Weave が `page_count` で段階判断（トークン節約）。テキスト PDF の段階化は YAGNI（トークン経済が画像の 1/N で軽く、`--- page N ---` マーカーで位置把握のみ）
+- **派生画像は `media/` フラット直下保存**：既存 `cleanup_media_dir` の retention にそのまま乗る（サブディレクトリだと retention 漏れで機密スキャン画像が残存）
+- **新規依存ゼロ→直接宣言に格上げ**：pypdfium2/Pillow は pdfplumber が引くが再現性のため明示（3-Strike #1 pypdfium2 API・#2 Pillow を実機検証で解消）
+
+### Tests
+
+- **Total: 358 passed**（0.8.1 の 339 → +19：Domain +6 / emit +4 / PdfRenderer +4 / config +4 / main characterization +1）。pypdfium2 実 API（`PdfDocument`→`render(scale=2.0)`→`to_pil().save()`）を adapter test で検証
+- **Live E2E（実 Telegram でスキャン/図面/多ページ PDF → 段階 Vision 往復）は Stage 11.5 に申し送り**（fresh session 要、他 Stage 同様）
+
 ## [0.8.1] - 2026-05-30 — Stage 10.4 PDF Render: Live E2E PASS
 
 [0.8.0] で実装した Stage 10（PDF Render）の **Telegram 実機 Live E2E を Cloud Routine 上で走破**。最重要の「Read tool を使わず PDF 内容に到達できるか」が肯定され、本命の不確実点だった文字化け PDF も pdfplumber でクリーン抽出を確認。
