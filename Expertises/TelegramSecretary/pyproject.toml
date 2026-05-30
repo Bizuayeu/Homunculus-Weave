@@ -19,6 +19,10 @@ dependencies = [
     # av (PyAV) = ffmpeg を wheel 内包し OGG/OPUS/mp4 を 16kHz mono float へ decode（システム ffmpeg 不要）。
     "moonshine-voice>=0.0.59",
     "av>=17.0",
+    # Stage 10: PDF のテキスト層を抽出して rendered_text に載せ、passthrough(Read tool 依存)から
+    # render(Read tool 非依存)へ移行。pdfplumber は MIT（配布安全）。pymupdf(AGPL) は同等品質だが
+    # 配布制約のため不採用（IMPLEMENTATION_PLAN Stage 10 Decision Notes 参照）。pure-python。
+    "pdfplumber>=0.11",
 ]
 
 [project.optional-dependencies]
@@ -33,6 +37,9 @@ dev = [
     "python-docx>=1.1",
     "python-pptx>=1.0",
     "openpyxl>=3.1",
+    # Stage 10: PDF fixture をテスト内で動的生成（git に巨大バイナリを置かない方針、
+    # docx を python-docx で生成するのと同型）。reportlab は本番依存ではない。
+    "reportlab>=4.0",
 ]
 
 [tool.pytest.ini_options]

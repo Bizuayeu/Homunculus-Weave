@@ -58,13 +58,42 @@ def test_image_png_is_passthrough():
     assert renderer.render_calls == []
 
 
-def test_pdf_is_passthrough():
+def test_pdf_calls_pdf_renderer():
+    """Stage 10: PDF は passthrough をやめ、pdf_renderer でテキスト層抽出（Read tool 非依存）。
+
+    markitdown renderer（docx 等）には回さず、専用 pdf_renderer ルートに乗る。
+    """
+    dr = _download_result(1, "application/pdf", file_id="pdf")
+    renderer = FakeMediaRenderer()
+    pdf_renderer = FakeMediaRenderer(rendered_text="PDF 本文テキスト", render_status="ok")
+    uc = RenderAuthorizedMedia(renderer, pdf_renderer=pdf_renderer)
+    results = uc.execute([dr])
+
+    assert results[0].rendered.render_status == "ok"
+    assert results[0].rendered.rendered_text == "PDF 本文テキスト"
+    assert len(pdf_renderer.render_calls) == 1  # pdf_renderer が呼ばれる
+    assert renderer.render_calls == []  # markitdown renderer は呼ばれない
+
+
+def test_pdf_skipped_without_pdf_renderer():
+    """pdf_renderer 未注入なら PDF は skipped（後方互換・フォールバック、transcriber 同型）。"""
     dr = _download_result(1, "application/pdf")
     renderer = FakeMediaRenderer()
-    uc = RenderAuthorizedMedia(renderer)
+    uc = RenderAuthorizedMedia(renderer)  # pdf_renderer なし
     results = uc.execute([dr])
-    assert results[0].rendered.render_status == "passthrough"
+    assert results[0].rendered.render_status == "skipped"
     assert renderer.render_calls == []
+
+
+def test_pdf_download_skip_propagates():
+    """size 超過で download skip された PDF は render も skip（pdf_renderer 注入でも）。"""
+    dr = _download_result(1, "application/pdf", skip_reason="media_size_exceeded")
+    pdf_renderer = FakeMediaRenderer()
+    uc = RenderAuthorizedMedia(FakeMediaRenderer(), pdf_renderer=pdf_renderer)
+    results = uc.execute([dr])
+    assert results[0].rendered.render_status == "skipped"
+    assert results[0].skip_reason == "media_size_exceeded"
+    assert pdf_renderer.render_calls == []
 
 
 def test_plain_text_is_passthrough():
