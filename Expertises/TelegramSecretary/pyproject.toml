@@ -23,6 +23,12 @@ dependencies = [
     # render(Read tool 非依存)へ移行。pdfplumber は MIT（配布安全）。pymupdf(AGPL) は同等品質だが
     # 配布制約のため不採用（IMPLEMENTATION_PLAN Stage 10 Decision Notes 参照）。pure-python。
     "pdfplumber>=0.11",
+    # Stage 11: 画像 PDF（スキャン・図面）を pypdfium2 で全ページ画像化し to_pil() で png 保存（Vision 経路）。
+    # pdf_renderer が pypdfium2 を直接 import するため直接依存として明示（pdfplumber>=0.11 が両者を
+    # transitive に引くが、コードが直接使う依存は明示する原則＋再現性のため直接化）。
+    # Pillow は pypdfium2.bitmap.to_pil() が要する（pypdfium2 は Pillow を任意依存にするため明示）。
+    "pypdfium2>=4.18.0",
+    "Pillow>=9.1",
 ]
 
 [project.optional-dependencies]

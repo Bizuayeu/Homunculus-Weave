@@ -12,6 +12,7 @@ from domain.authorization import AuthorizedChats
 DEFAULT_MEDIA_MAX_SIZE_BYTES = 20 * 1024 * 1024  # 20 MB
 DEFAULT_MEDIA_RETENTION_HOURS = 24
 DEFAULT_OUTBOUND_MAX_SIZE_BYTES = 50 * 1024 * 1024  # 50 MB（Telegram bot API 送信上限）
+DEFAULT_PDF_IMAGE_MAX_PAGES = 20  # 画像 PDF 全ページ画像化の安全弁（超多ページの disk/トークン暴走防止）
 
 
 @dataclass(frozen=True)
@@ -23,6 +24,7 @@ class Config:
     media_retention_hours: int = DEFAULT_MEDIA_RETENTION_HOURS
     media_enable_download: bool = True
     outbound_max_size_bytes: int = DEFAULT_OUTBOUND_MAX_SIZE_BYTES
+    pdf_image_max_pages: int = DEFAULT_PDF_IMAGE_MAX_PAGES
 
     @property
     def individuals_path(self) -> Path:
@@ -80,6 +82,10 @@ class Config:
             "TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES",
             default=DEFAULT_OUTBOUND_MAX_SIZE_BYTES,
         )
+        pdf_image_max_pages = cls._parse_positive_int(
+            "TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES",
+            default=DEFAULT_PDF_IMAGE_MAX_PAGES,
+        )
 
         return cls(
             bot_token=token,
@@ -89,6 +95,7 @@ class Config:
             media_retention_hours=retention,
             media_enable_download=enable_download,
             outbound_max_size_bytes=outbound_max_size,
+            pdf_image_max_pages=pdf_image_max_pages,
         )
 
     @staticmethod

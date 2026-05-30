@@ -275,3 +275,66 @@ def test_media_voice_is_immutable():
     media = MediaAttachment.from_voice_api({"file_id": "v"})
     with pytest.raises(AttributeError):
         media.kind = "audio"  # type: ignore[misc]
+
+
+# === Stage 11.1: RenderedMedia derived_image_paths + page_count ===
+
+
+def test_rendered_media_defaults_derived_images_empty_and_page_count_none():
+    """既存構築（2 field のみ）が後方互換: derived_image_paths=[] / page_count=None。"""
+    rendered = RenderedMedia(rendered_text="body", render_status="ok")
+    assert rendered.derived_image_paths == []
+    assert rendered.page_count is None
+
+
+def test_rendered_media_holds_derived_images_and_page_count():
+    """画像 PDF: 派生ページ画像パスと総ページ数を保持する。"""
+    rendered = RenderedMedia(
+        rendered_text="",
+        render_status="ok",
+        derived_image_paths=["a.png", "b.png"],
+        page_count=12,
+    )
+    assert rendered.rendered_text == ""
+    assert rendered.render_status == "ok"
+    assert rendered.derived_image_paths == ["a.png", "b.png"]
+    assert rendered.page_count == 12
+
+
+def test_rendered_media_positional_construction_unbroken():
+    """位置引数の既存構築 RenderedMedia(None, "passthrough") を壊さない（field 順序）。"""
+    rendered = RenderedMedia(None, "passthrough")
+    assert rendered.rendered_text is None
+    assert rendered.render_status == "passthrough"
+    assert rendered.derived_image_paths == []
+    assert rendered.page_count is None
+
+
+def test_rendered_media_default_derived_images_are_independent():
+    """default_factory=list ゆえインスタンス毎に独立（共有ミュータブル default のバグ回避）。"""
+    a = RenderedMedia(rendered_text="x", render_status="ok")
+    b = RenderedMedia(rendered_text="y", render_status="ok")
+    assert a.derived_image_paths is not b.derived_image_paths
+
+
+def test_rendered_media_new_fields_immutable():
+    """新 field も frozen（再代入で AttributeError）。"""
+    rendered = RenderedMedia(
+        rendered_text="",
+        render_status="ok",
+        derived_image_paths=["a.png"],
+        page_count=1,
+    )
+    with pytest.raises(AttributeError):
+        rendered.page_count = 2  # type: ignore[misc]
+
+
+def test_rendered_media_status_validation_unchanged_with_new_fields():
+    """render_status の 4 状態検証は新 field 追加後も不変。"""
+    with pytest.raises(ValueError):
+        RenderedMedia(
+            rendered_text=None,
+            render_status="bogus",
+            derived_image_paths=["x.png"],
+            page_count=1,
+        )
