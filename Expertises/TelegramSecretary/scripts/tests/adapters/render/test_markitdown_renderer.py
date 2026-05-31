@@ -99,13 +99,13 @@ def test_renders_pptx_to_markdown(tmp_path: Path, renderer: MarkitdownRenderer):
     prs = Presentation()
     slide = prs.slides.add_slide(prs.slide_layouts[5])  # blank
     title_box = slide.shapes.add_textbox(left=0, top=0, width=5000000, height=500000)
-    title_box.text_frame.text = "高尾八城プロジェクト"
+    title_box.text_frame.text = "サンプルプロジェクト"
     prs.save(str(pptx_path))
 
     rendered = renderer.render(_pptx_media(), pptx_path)
     assert rendered.render_status == "ok"
     assert rendered.rendered_text is not None
-    assert "高尾八城" in rendered.rendered_text
+    assert "サンプル" in rendered.rendered_text
 
 
 # === 失敗系: クラッシュさせず flag 化 ===
@@ -139,8 +139,8 @@ def test_renders_garbage_bytes_returns_ok_as_text_passthrough(
     """markitdown は寛容: garbage バイト列 (.docx 拡張子) でも text として何か返す。
 
     実挙動: magika ML model が file type を中身で推定し、plain text と判定すれば
-    バイト列をそのまま rendered_text として返す。**この設計を Weave 側に伝え**、
-    Weave が「意味のあるテキストか？」を判断する責務とする（L00473 分業）。
+    バイト列をそのまま rendered_text として返す。**この設計を エージェント 側に伝え**、
+    エージェント が「意味のあるテキストか？」を判断する責務とする（LLM 推論をコード外に出す分業）。
     """
     garbage = tmp_path / "garbage.docx"
     garbage.write_bytes(b"this is not a valid docx, just random bytes")

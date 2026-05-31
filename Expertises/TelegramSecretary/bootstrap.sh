@@ -9,7 +9,7 @@
 #     → installs only, env exports do not persist
 #
 # Single source of truth for runtime deps: Expertises/TelegramSecretary/pyproject.toml
-# NewsCaster bootstrap pattern と同型 (source/exec デュアル対応).
+# 姉妹エージェントの bootstrap パターンと同型 (source/exec デュアル対応).
 
 set -u
 

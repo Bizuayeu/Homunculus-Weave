@@ -71,7 +71,7 @@ class TelegramUpdate:
 
 @dataclass(frozen=True)
 class OutboundMessage:
-    """Weave 起草の送信メッセージ。"""
+    """エージェント 起草の送信メッセージ。"""
 
     chat_id: int
     text: str

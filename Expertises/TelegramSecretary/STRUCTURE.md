@@ -1,18 +1,34 @@
 # STRUCTURE: TelegramSecretary の構造地図
 
-「どこに何を置くか」の正典。設計の why は [DESIGN.md](./DESIGN.md)、整備手順は [DOCUMENTATION_PLAN.md](./DOCUMENTATION_PLAN.md)。
+「どこに何を置くか」の正典。設計の why は [DESIGN.md](./DESIGN.md)、整備の経緯は [docs/devlog/DOCUMENTATION_PLAN.md](./docs/devlog/DOCUMENTATION_PLAN.md)。
+
+## プレースホルダ規約
+
+配布物のドキュメント・テンプレートで使う山括弧トークンは、利用者が自分の値へ置換する：
+
+| プレースホルダ | 意味 | 例 |
+|---|---|---|
+| `<AGENT_NAME>` | 秘書エージェントの人格名 | あなたの AI 秘書の呼称 |
+| `<OWNER>` | 運用主体（principal） | あなた自身 |
+| `<ORGANIZATION>` | 組織名 | 所属企業・チーム |
+| `<REPO_ROOT>` | リポジトリルート | クローン先のルート |
+| `<PRIVATE_DIR>` | 非公開データ・人格定義の配置先 | 別の非公開リポ等 |
+| `<INSTALL_DIR>` | インストール先パス | TelegramSecretary 配置先 |
+| `<state_dir>` | 運用 state の保存先 | env `TELEGRAM_SECRETARY_STATE_DIR` |
+
+`SecretaryRole` はロール名として汎用使用（置換不要）。人格の実体定義は `<PRIVATE_DIR>/Identities/SecretaryRole.md`、雛型は [`templates/Identities/SecretaryRole.template.md`](./templates/Identities/SecretaryRole.template.md)。
 
 ## 全体像（3区分）
 
 | 区分 | git | 中身 |
 |---|---|---|
 | **public（配布物）** | 公開（将来 `plugins-weave/TelegramSecretary/`） | scripts（コード）・ドキュメント・テンプレート（雛型） |
-| **Private（実体）** | 別リポ `Homunculus-Weave-Private` | 人格実体・管理表実データ・運用 state |
-| **除外（開発中）** | `.gitignore` | `LineBridge/` 一式 |
+| **Private（実体）** | 別の非公開リポ（`<PRIVATE_DIR>`） | 人格実体・管理表実データ・運用 state |
+| **除外（開発中）** | `.gitignore` | 開発中ディレクトリ（`LineBridge/` 等）一式 |
 
 **鉄則**: public には個人情報・人格を一切焼き込まない。実体はすべて Private。これが配布可能性の担保。
 
-## public ツリー（`Expertises/TelegramSecretary/`）
+## public ツリー（`<INSTALL_DIR>/`）
 
 ```
 TelegramSecretary/
@@ -23,10 +39,13 @@ TelegramSecretary/
 ├── SECURITY.md               # 網羅的セキュリティ正典
 ├── ROUTINE_PROMPT.md         # Cloud Routine prompt body
 ├── CHANGELOG.md              # 変更履歴
-├── IMPLEMENTATION_PLAN.md    # コード実装の経緯（保持）
-├── DOCUMENTATION_PLAN.md     # 本整備計画（保持）
 ├── bootstrap.sh / watch_loop.sh
 ├── pyproject.toml
+│
+├── docs/devlog/              # 開発の歴史記録（一般化対象外の教材、配布除外可）
+│   ├── IMPLEMENTATION_PLAN.md
+│   ├── DOCUMENTATION_PLAN.md
+│   └── GOAL_KEEPALIVE_PLAN.md
 │
 ├── templates/                # ★雛型のみ（実データは Private）
 │   ├── INDIVIDUALS.template.json
@@ -60,12 +79,12 @@ TelegramSecretary/
 └── LineBridge/               # ← .gitignore（開発中、配布除外）
 ```
 
-## Private ツリー（`Homunculus-Weave-Private` 配下）
+## Private ツリー（`<PRIVATE_DIR>` 配下）
 
 ```
 <Private root>/
 ├── Identities/                       # ★人格定義（無いと人格的に振る舞えない）
-│   └── SecretaryRole.md              # SecretaryRole の存在論・対応原則（HatoriRole 同型）
+│   └── SecretaryRole.md              # SecretaryRole の存在論・対応原則（人格定義）
 │
 └── <TELEGRAM_SECRETARY_STATE_DIR>/   # 運用 state + 管理表実データ
     ├── README.md                     # ★蓄積データのユーザ用インデックス（生成物）
@@ -83,7 +102,7 @@ TelegramSecretary/
         └── archive/                   # （原則空。明示的廃棄時のみ）
 ```
 
-> `Identities/` と `<state_dir>/` の Private 内の正確な親パスは、大環主が Private リポ構成を確定する際に決定（D4 で作成依頼）。env `TELEGRAM_SECRETARY_STATE_DIR` で state_dir を指す。
+> `Identities/` と `<state_dir>/` の `<PRIVATE_DIR>` 内の正確な親パスは、利用者が自分の非公開リポ構成に合わせて決定する。env `TELEGRAM_SECRETARY_STATE_DIR` で state_dir を指す。
 
 ## どこに何を作るか（早見表）
 
@@ -102,20 +121,20 @@ TelegramSecretary/
 ## データフロー
 
 ```
-[起動] bootstrap → Weave 人格ロード（WeaveIdentity/Instruction/UserIdentity）
+[起動] bootstrap → エージェント人格ロード（本体 Identity / Instruction / UserIdentity）
                  → Identities/SecretaryRole.md を重ねる（SecretaryRole 起動）
                  → lease acquire → watch 起動
 
 [受信] Telegram → fetch → 認可 → 正規化 → media download/render → emit(JSON Lines)
-        → Monitor → Weave（SecretaryRole）が読む
+        → Monitor → エージェント（SecretaryRole）が読む
 
-[判断] Weave が文脈で判断（重要度の世界）:
+[判断] エージェントが文脈で判断（重要度の世界）:
         - 関係者を INDIVIDUALS に登録/更新すべきか
         - 依頼を TASKS に起票/進捗更新すべきか
         - 対応知を KNOWLEDGE に残すべきか
         → 該当する CLI subcommand を呼ぶ（決定論 I/O）
 
-[応答] Weave 起草 → 出力漏洩スキャン → send-reply（必要なら --file/--reply-to）
+[応答] エージェント起草 → 出力漏洩スキャン → send-reply（必要なら --file/--reply-to）
 
 [保守] archive_rotate: TASKS/INDIVIDUALS は日付 Archive、KNOWLEDGE は category 分割
         state README を再生成（件数・最終更新・分割状況）
@@ -123,4 +142,4 @@ TelegramSecretary/
 
 ## `/secretary` ラップ（操作の入口）
 
-管理表 CRUD の全インターフェース（`individuals|tasks|knowledge add|update|list|...`）は、マスタースキル `/secretary` の管理パネル経由でアクセスできる。Weave も人間ユーザーも、コマンド名を覚えずに `/secretary` から操作に到達する（LineBridge plan の `/secretary` 構想と統合）。
+管理表 CRUD の全インターフェース（`individuals|tasks|knowledge add|update|list|...`）は、マスタースキル `/secretary` の管理パネル経由でアクセスできる。エージェントも人間ユーザーも、コマンド名を覚えずに `/secretary` から操作に到達する（LINE 連携構想の `/secretary` 設計と統合）。
