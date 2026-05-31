@@ -67,12 +67,15 @@ TelegramSecretary/
 │   │   ├── fetch_authorized_updates.py / send_reply.py / ...
 │   │   └── manage_registry.py # ★管理表 CRUD UseCase（add/update/list/close...）
 │   ├── adapters/
+│   │   ├── media_failure.py  # render/transcribe 共通の失敗ログ + redact ヘルパ
 │   │   ├── telegram/         # api_gateway / media_downloader
 │   │   ├── state/            # json_state_store / emitter
 │   │   ├── render/ transcribe/ audio/
 │   │   └── registry/         # ★ json_individual_store / json_task_store / json_knowledge_store
 │   ├── infrastructure/
 │   │   ├── config.py / media_cleanup.py
+│   │   ├── composition.py    # Composition Root（load_config / build_media_stack）
+│   │   ├── exit_codes.py     # 終了コード（0/1/2/3/4）の SSoT
 │   │   └── archive_rotate.py # ★日付Archive（TASKS/INDIVIDUALS）+ カテゴリ分割（KNOWLEDGE）
 │   └── tests/                # 全層のテスト（配布物として公開）
 │
