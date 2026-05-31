@@ -9,9 +9,9 @@ mime-routing は UseCase 側（render_authorized_media._route_mime）が担い�
 """
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
+from adapters.media_failure import failed_render
 from domain.media import MediaAttachment, RenderedMedia
 
 
@@ -36,11 +36,8 @@ class MarkitdownRenderer:
             rendered_text = result.text_content
         except Exception:
             # 絶対パス・file_id 全文は秘匿、stderr に短い warning のみ
-            safe_id = media.file_id[:8]
-            print(
-                f"[markitdown-renderer] failed to render file_id={safe_id}",
-                file=sys.stderr,
+            return failed_render(
+                "markitdown-renderer", "render", "file_id", media.file_id[:8]
             )
-            return RenderedMedia(rendered_text=None, render_status="failed")
 
         return RenderedMedia(rendered_text=rendered_text, render_status="ok")

@@ -12,6 +12,7 @@ from typing import Any
 from adapters.registry.json_registry_store import JsonRegistryStore
 from domain.registry import Individual, Knowledge, Task
 from infrastructure.config import Config
+from infrastructure.exit_codes import EXIT_CONFIG_INVALID, EXIT_OK
 from usecases.manage_registry import RegistryService
 
 # name -> (Config の path property 名, キーフィールド, 値オブジェクトクラス)
@@ -33,15 +34,15 @@ def run_registry_command(config: Config, name: str, action: str, args: Any) -> i
 
     if action == "list":
         print(json.dumps(svc.list(), ensure_ascii=False, indent=2))
-        return 0
+        return EXIT_OK
 
     if action == "get":
         rec = svc.get(args.key)
         if rec is None:
             print(f"not found: {name} {key_field}={args.key}", file=sys.stderr)
-            return 2
+            return EXIT_CONFIG_INVALID
         print(json.dumps(rec, ensure_ascii=False, indent=2))
-        return 0
+        return EXIT_OK
 
     if action == "add":
         try:
@@ -49,19 +50,19 @@ def run_registry_command(config: Config, name: str, action: str, args: Any) -> i
             vo = vo_cls.from_dict(raw)  # 値オブジェクトで検証
         except (ValueError, KeyError, json.JSONDecodeError) as exc:
             print(f"invalid {name} record: {exc}", file=sys.stderr)
-            return 2
+            return EXIT_CONFIG_INVALID
         record = vo.to_dict()
         svc.add_or_update(record)
         print(f"saved {name} {key_field}={record[key_field]}")
-        return 0
+        return EXIT_OK
 
     if action == "remove":
         svc.remove(args.key)
         print(f"removed {name} {key_field}={args.key}")
-        return 0
+        return EXIT_OK
 
     print(f"unknown action: {action}", file=sys.stderr)
-    return 2
+    return EXIT_CONFIG_INVALID
 
 
 def _read_json_arg(args: Any) -> dict:
