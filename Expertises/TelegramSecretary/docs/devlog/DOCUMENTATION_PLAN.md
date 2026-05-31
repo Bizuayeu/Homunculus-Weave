@@ -1,5 +1,7 @@
 # Documentation & Data Architecture Plan: TelegramSecretary
 
+> ⚠️ **開発の歴史記録（devlog）** — 本ファイルはイベント駆動開発の証跡として保持される教材です。配布物の正典（README / SKILL / SECURITY / DESIGN / STRUCTURE）ではありません。本文中の固有名詞（エージェント名・運用主体名・組織名）・Loop 参照・当時のファイルパスは、記録時点のまま意図的に残してあります＝**一般化対象外**。配布パッケージには含めない想定です。
+
 > ドキュメント体系の整備と、管理表（INDIVIDUALS / TASKS / KNOWLEDGE）＋人格定義（Identities）のデータアーキテクチャ確定計画。
 > **本計画は削除しない**（勉強会資料＋イベント駆動開発の記録として保持。IMPLEMENTATION_PLAN.md / DESIGN.md も同様に保持）。
 >

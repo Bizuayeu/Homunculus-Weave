@@ -94,7 +94,7 @@ def test_task_rejects_invalid_priority():
 def test_knowledge_round_trip():
     d = {
         "id": "k1", "topic": "決済フロー", "category": "projects",
-        "content": "判断と理由", "related": [], "sources": ["t1", "L00500"],
+        "content": "判断と理由", "related": [], "sources": ["t1", "log-ref-1"],
         "created_at": "2026-01-01T00:00:00Z", "updated_at": "2026-01-01T00:00:00Z",
     }
     k = Knowledge.from_dict(d)

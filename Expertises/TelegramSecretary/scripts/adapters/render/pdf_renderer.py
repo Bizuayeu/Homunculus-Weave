@@ -2,7 +2,7 @@
 
 設計判断（Stage 11.5）: PDF は **常に画像化**する（テキスト層の有無を判定しない）。
 スタンプ・薄いテキスト層の誤判定（全ページ同一の文書番号印で text 経路に落ちて中身が
-読めない等）を構造的に排除する。Weave は画像を Vision で大枠把握（ROUTINE_PROMPT: 最大5枚）
+読めない等）を構造的に排除する。エージェント は画像を Vision で大枠把握（ROUTINE_PROMPT: 最大5枚）
 → 必要なら以下をオンデマンド呼び出し:
   - extract_text(): 全ページのテキスト層を pdfplumber 抽出（--- page N --- マーカー）
   - rasterize_pages(start, end): 任意ページ範囲を画像化（cap=image_max_pages を超える
@@ -37,7 +37,7 @@ class PdfRenderer:
 
     def __init__(self, image_max_pages: int = 20) -> None:
         # render() で画像化する先頭ページ数の cap（超多ページの disk/トークン暴走防止）。
-        # 21 枚目以降は rasterize_pages でオンデマンド生成。Weave の総量把握は page_count（総数）。
+        # 21 枚目以降は rasterize_pages でオンデマンド生成。エージェント の総量把握は page_count（総数）。
         self._image_max_pages = image_max_pages
 
     def render(self, media: MediaAttachment, local_path: Path) -> RenderedMedia:
@@ -67,7 +67,7 @@ class PdfRenderer:
     def extract_text(self, local_path: Path) -> RenderedMedia:
         """オンデマンド: 全ページのテキスト層を pdfplumber 抽出（--- page N --- マーカー）。
 
-        Weave が画像 Vision で大枠把握後「①全文テキスト」を選んだ時に呼ぶ（ROUTINE_PROMPT）。
+        エージェント が画像 Vision で大枠把握後「①全文テキスト」を選んだ時に呼ぶ（ROUTINE_PROMPT）。
         テキスト層が無い PDF（スキャン）は各ページ空 → rendered_text="" を返す（正直に）。
         """
         try:
@@ -102,7 +102,7 @@ class PdfRenderer:
     def rasterize_pages(self, local_path: Path, start: int, end: int) -> List[str]:
         """オンデマンド: [start, end)（0-indexed）ページを画像化しパス list を返す。
 
-        render() の cap(image_max_pages) を超える 21 枚目以降を Weave が「②個別ページ」で
+        render() の cap(image_max_pages) を超える 21 枚目以降を エージェント が「②個別ページ」で
         要求した時に呼ぶ。範囲は実ページ数でクランプ（はみ出しは黙ってクランプ、エラーにしない）。
         命名・保存先は render() と同一（local_path.stem プレフィックス＝一貫した file_id 由来）。
         """
@@ -129,7 +129,7 @@ class PdfRenderer:
         派生画像は local_path.parent フラット直下に local_path.stem プレフィックス命名で保存
         （media_downloader の {file_id}{ext} 命名により stem==file_id、cleanup_media_dir の
         is_file() フラット retention にそのまま乗る）。scale=2.0 は ~144dpi 相当で Vision 可読。
-        ファイル名は 1-indexed の page 番号（doc_page-001.png）で Weave のページ指定と一致。
+        ファイル名は 1-indexed の page 番号（doc_page-001.png）で エージェント のページ指定と一致。
         """
         target_dir = local_path.parent
         prefix = local_path.stem[:16]

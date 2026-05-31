@@ -7,7 +7,7 @@ transcribe し、transcript を RenderedMedia.rendered_text に乗せ render_sta
 model load は lazy（初回の実音声 render 時）。Cloud Routine 起動を速くし、
 空音声/前処理失敗では load しない。
 
-ライセンス: Moonshine Community License（年商 $1M 未満は商用も無料）。めぐる組本番は
+ライセンス: Moonshine Community License（年商 $1M 未満は商用も無料）。年商 $1M 以上の組織本番は
 Enterprise License or kotoba-whisper(Apache-2.0) へ Port 差し替え
 （IMPLEMENTATION_PLAN Stage 9.5 の申し送り参照）。
 """
@@ -47,7 +47,7 @@ class MoonshineTranscriber:
         return self._model
 
     def render(self, media: MediaAttachment, local_path: Path) -> RenderedMedia:
-        """音声を transcript 化。失敗は flag 化、Weave に正直に伝える。"""
+        """音声を transcript 化。失敗は flag 化、エージェント に正直に伝える。"""
         try:
             samples, rate = self._preprocessor.to_float_pcm(local_path)
             if not samples:

@@ -12,7 +12,7 @@ class RegistryService:
 
     records は dict ベース。値オブジェクト（Individual / Task / Knowledge）への
     変換・検証は呼び出し側（CLI）が担う。三世界分類: I/O は決定論的世界、
-    「何を登録/更新するか」の判断は Weave（重要度の世界）。
+    「何を登録/更新するか」の判断は エージェント（重要度の世界）。
     """
 
     def __init__(self, store: RegistryStore, key_field: str) -> None:

@@ -13,7 +13,7 @@ def test_normalize_fullwidth_to_halfwidth():
 
 
 def test_normalize_preserves_japanese():
-    assert normalize_input("こんにちは、Weave") == "こんにちは、Weave"
+    assert normalize_input("こんにちは、hello") == "こんにちは、hello"
 
 
 def test_normalize_unicode_variants():

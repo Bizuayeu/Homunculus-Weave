@@ -22,7 +22,7 @@ class TelegramMediaDownloader:
     """
 
     DEFAULT_BASE_URL = "https://api.telegram.org"
-    DEFAULT_USER_AGENT = "TelegramSecretary/0.1 (+Weave)"
+    DEFAULT_USER_AGENT = "TelegramSecretary/0.1 (+bot)"
 
     def __init__(
         self,

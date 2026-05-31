@@ -1,7 +1,7 @@
 """管理表（INDIVIDUALS / TASKS / KNOWLEDGE）CRUD の CLI ハンドラ。
 
 main.py の subcommand から呼ばれる。値オブジェクトで入力を検証してから永続化する
-（決定論的 I/O。何を登録/更新するかの判断は Weave = 重要度の世界）。
+（決定論的 I/O。何を登録/更新するかの判断は エージェント = 重要度の世界）。
 """
 from __future__ import annotations
 
