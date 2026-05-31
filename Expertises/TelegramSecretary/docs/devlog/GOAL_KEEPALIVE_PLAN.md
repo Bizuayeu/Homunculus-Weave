@@ -1,5 +1,7 @@
 # Implementation Plan: /goal deadline 駆動ロングポーリング + watch の early-exit / wall-clock 停止
 
+> ⚠️ **開発の歴史記録（devlog）** — 本ファイルはイベント駆動開発の証跡として保持される教材です。配布物の正典（README / SKILL / SECURITY / DESIGN / STRUCTURE）ではありません。本文中の固有名詞（エージェント名・運用主体名・組織名）・Loop 参照・当時のファイルパスは、記録時点のまま意図的に残してあります＝**一般化対象外**。配布パッケージには含めない想定です。
+
 > 本計画は `Expertises/ConsiderateCoder/rules/DEV.md` および `/plan-sdd` の方針で生成。**教材として完了後も保持する**（通常の IMPLEMENTATION_PLAN は全 Stage 完了後に削除するが、本計画は /goal × Cloud Routine × bash timeout 制御の設計記録として残す——大環主指示 2026-05-28）。
 > 既存 `IMPLEMENTATION_PLAN.md`（Stage 1-9, v0.6.0, 318 tests green）の上に乗る**増分計画**（Stage 10 相当、独立ファイル）。
 

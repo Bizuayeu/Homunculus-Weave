@@ -1,19 +1,21 @@
 # TelegramSecretary
 
-Telegram Bot API の long-polling を Cloud Routine 上で常駐させ、認可済みチャットからのメッセージに Weave（SecretaryRole）が即応する対話チャネル。
+> 📦 **配布物・プレースホルダ表記** — 本ドキュメント群の山括弧トークンは、利用者が自分の値に置換するプレースホルダです：`<AGENT_NAME>`（秘書エージェントの人格名）／`<OWNER>`（運用主体・principal）／`<ORGANIZATION>`（組織名）／`<REPO_ROOT>`（リポジトリルート）／`<PRIVATE_DIR>`（非公開データ・人格定義の配置先）／`<INSTALL_DIR>`（インストール先パス）。`SecretaryRole` はロール名として汎用使用します。規約の詳細は [STRUCTURE.md](./STRUCTURE.md) 参照。
 
-Webhook 不可な Cloud Routine 環境制約を、long-polling + /goal deadline 駆動ループで回避する設計（`watch --exit-on-message` で即応再起動。詳細は [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md)、GOAL_KEEPALIVE_PLAN.md）。
+Telegram Bot API の long-polling を Cloud Routine 上で常駐させ、認可済みチャットからのメッセージに秘書エージェント（`SecretaryRole` を被った `<AGENT_NAME>`）が即応する対話チャネル。
+
+Webhook 不可な Cloud Routine 環境制約を、long-polling + /goal deadline 駆動ループで回避する設計（`watch --exit-on-message` で即応再起動。実行手順は [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md)、設計の経緯は [`docs/devlog/GOAL_KEEPALIVE_PLAN.md`](./docs/devlog/GOAL_KEEPALIVE_PLAN.md) 参照）。
 
 ## アーキテクチャ
 
-Clean Architecture 4 層（Domain → UseCase → Interface → Infrastructure）。詳細は [`IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md)。
+Clean Architecture 4 層（Domain → UseCase → Interface → Infrastructure）。実装の経緯は [`docs/devlog/IMPLEMENTATION_PLAN.md`](./docs/devlog/IMPLEMENTATION_PLAN.md) 参照。
 
-LINE 経由の薄いラッパーは [`LineBridge/`](./LineBridge/) を参照（Railway 相乗りの別サービスとして実装予定）。
+LINE 連携の薄いラッパーは将来拡張（開発中、配布対象外）。
 
 ## Quickstart（ローカル動作確認）
 
 ```powershell
-cd C:\Users\anyth\DEV\homunculus\Weave\Expertises\TelegramSecretary
+cd <INSTALL_DIR>          # TelegramSecretary を配置したディレクトリ
 
 # 依存インストール
 python -m pip install -e ".[dev]"
@@ -76,7 +78,7 @@ python scripts/main.py poll --timeout 5
 python scripts/main.py poll --timeout 5
 # PDF は常に画像化 → render_status="ok" + rendered_text="" +
 #   derived_image_paths=[先頭 cap 枚 png] + page_count（実総数）（Stage 11.5、pypdfium2）
-#   → Weave は先頭最大 5 枚を Read で Vision → 大枠把握 → ①②③を判断
+#   → エージェントは先頭最大 5 枚を Read で Vision → 大枠把握 → ①②③を判断
 # ① 全文テキストが要る → オンデマンドで pdfplumber 抽出：
 python scripts/main.py render-pdf --path <local_path> --text
 #   → {"mode":"text","render_status":"ok","page_count":N,"rendered_text":"--- page 1 ---\n..."}
@@ -104,7 +106,7 @@ python scripts/main.py poll --timeout 5
 ### 生成物を送り返す（Stage 8 Outbound Media）
 
 ```powershell
-# Weave 生成物（画像/レポート）を Telegram に送り返す（lease 取得済み前提）
+# エージェント生成物（画像/レポート）を Telegram に送り返す（lease 取得済み前提）
 python scripts/main.py send-reply --chat-id <id> --update-id <uid> --text-file reply.txt --file figure.png
 # → --file は複数指定可。画像(.jpg/.png/.webp/.gif)→sendPhoto、他→sendDocument に自動振り分け
 # → 本文は添付1件かつ1024字以内なら caption に載る、それ以外は別 sendMessage で先送り
@@ -134,7 +136,7 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 
 **Stage 9 追加依存**（voice/audio/video transcript）:
 
-- `moonshine-voice>=0.0.59`（~56.5MB wheel、**torch-free**・onnxruntime）— 日本語 STT。日本語モデル `base-ja`（~134MB）は初回 transcribe 時にランタイムDL（`%LOCALAPPDATA%/moonshine_voice` 等にキャッシュ）。⚠️ **Community License は年商 $1M 未満のみ商用無料**。めぐる組の本番利用は Enterprise License（有償）か、`kotoba-whisper-v2.0`（Apache-2.0）への切替が必要
+- `moonshine-voice>=0.0.59`（~56.5MB wheel、**torch-free**・onnxruntime）— 日本語 STT。日本語モデル `base-ja`（~134MB）は初回 transcribe 時にランタイムDL（`%LOCALAPPDATA%/moonshine_voice` 等にキャッシュ）。⚠️ **Community License は年商 $1M 未満のみ商用無料**。年商 $1M 以上での本番利用は Enterprise License（有償）か、`kotoba-whisper-v2.0`（Apache-2.0）への切替が必要
 - `av>=17.0`（PyAV、~29MB wheel）— **ffmpeg を wheel 内包**し OGG/OPUS/mp4 を 16kHz mono float へ decode（システム ffmpeg 不要）
 - win_amd64 wheel + **Cloud Routine（Linux）wheel ともに動作検証済み**（Linux は 2026-05-30 Live E2E：`moonshine-voice 0.0.59` + `av 17.0.1`、システム ffmpeg 不在でも PyAV 同梱 ffmpeg でデコード）。**kotoba-whisper への切替は当面不要**（年商 $1M 到達 or License 方針変更時に再検討）
 
@@ -153,7 +155,7 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 | `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | **送信**添付の上限（既定 50MB = 52428800、Telegram bot API 上限）。超過は送信前に `AttachmentTooLarge` で弾く（exit 2、Stage 8） |
 | `TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES` | optional | PDF 受信時に事前画像化する先頭ページ数の上限（既定 20）。超多ページの disk/トークン暴走の安全弁。21 枚目以降は `render-pdf --pages` でオンデマンド、`page_count` は実総数を emit（Stage 11.5） |
 
-> **`/goal` deadline 駆動の運用変数**（`TS_SESSION_DURATION_SEC`=7200 / `TS_SESSION_DEADLINE_EPOCH`=now+duration / `TS_POLL_SET_SEC`=580 / `TS_POLL_BASH_TIMEOUT_MS`=600000 / `TS_MAX_TURNS`=300）は `bootstrap.sh` が export（SSoT）。グローバル `BASH_MAX_TIMEOUT_MS=600000` は `.private/.claude/settings.json`（`BASH_DEFAULT_TIMEOUT_MS` は据え置き＝他コマンド 2分）。
+> **`/goal` deadline 駆動の運用変数**（`TS_SESSION_DURATION_SEC`=7200 / `TS_SESSION_DEADLINE_EPOCH`=now+duration / `TS_POLL_SET_SEC`=580 / `TS_POLL_BASH_TIMEOUT_MS`=600000 / `TS_MAX_TURNS`=300）は `bootstrap.sh` が export（SSoT）。グローバル `BASH_MAX_TIMEOUT_MS=600000` は `<PRIVATE_DIR>/.claude/settings.json`（`BASH_DEFAULT_TIMEOUT_MS` は据え置き＝他コマンド 2分）。
 
 ## Subcommands
 
@@ -178,6 +180,4 @@ Cloud Routine の bootstrap がやや遅くなる点に留意（初回 `pip inst
 - [SECURITY.md](./SECURITY.md) — 網羅的セキュリティ正典（脅威モデル・配布前チェックリスト）
 - [ROUTINE_PROMPT.md](./ROUTINE_PROMPT.md) — Cloud Routine prompt body
 - [CHANGELOG.md](./CHANGELOG.md) — 変更履歴
-- [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) — 実装計画（本イベント駆動開発の経緯ゆえ保持・修正方針）
-- [DOCUMENTATION_PLAN.md](./DOCUMENTATION_PLAN.md) — ドキュメント体系・管理表データアーキテクチャの整備計画
-- [LineBridge/IMPLEMENTATION_PLAN.md](./LineBridge/IMPLEMENTATION_PLAN.md) — LINE 連携の薄ラッパー実装計画
+- [docs/devlog/](./docs/devlog/) — 開発の歴史記録（IMPLEMENTATION_PLAN / DOCUMENTATION_PLAN / GOAL_KEEPALIVE_PLAN、一般化対象外の教材）
