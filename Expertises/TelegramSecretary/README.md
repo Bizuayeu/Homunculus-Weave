@@ -118,7 +118,7 @@ python scripts/main.py send-reply --chat-id <id> --update-id <uid> --text-file r
 python -m pytest scripts/tests/ -v
 ```
 
-現在 **369 tests green**（Stage 1-11.5 実装完了、詳細内訳は CHANGELOG 参照）。**Stage 9 E2E（音声）・Stage 10.4 E2E（PDF テキスト層）ともに PASS（2026-05-30 Live E2E）**——Stage 9 は Linux wheel・A〜D ケース・retention、Stage 10.4 は Read tool 不使用での PDF 内容到達・文字化け PDF のクリーン抽出・スキャン PDF の空 ok・壊れ PDF の failed を確認。**Stage 11.5（PDF は常に画像化、テキスト全文・cap 超ページは `render-pdf` でオンデマンド）は pypdfium2/pdfplumber 実 API を adapter test で検証済み、Live E2E（最大 5 枚 Vision → `render-pdf` 往復）は申し送り**。Stage 5 / 6.5 / 7.5 / 8.5 / 11.5 E2E は実機検証フェーズ。
+現在 **369 tests green**（Stage 1-11.5 実装完了、詳細内訳は CHANGELOG 参照）。**Stage 9 E2E（音声）・Stage 10.4 E2E（PDF テキスト層）ともに PASS（2026-05-30 Live E2E）**——Stage 9 は Linux wheel・A〜D ケース・retention、Stage 10.4 は Read tool 不使用での PDF 内容到達・文字化け PDF のクリーン抽出・スキャン PDF の空 ok・壊れ PDF の failed を確認。**Stage 11.5（PDF は常に画像化、テキスト全文・cap 超ページは `render-pdf` でオンデマンド）は pypdfium2/pdfplumber 実 API を adapter test で検証済み、Live E2E（最大 5 枚 Vision → `render-pdf` 往復）も全5ケース PASS（2026-05-31 Cloud Routine 実機）**。Stage 5 / 6.5 / 7.5 / 8.5 E2E は実機検証フェーズ。
 
 ### 依存ツリー注記
 
