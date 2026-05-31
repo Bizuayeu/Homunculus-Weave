@@ -21,10 +21,10 @@ mime-routing は UseCase 側（render_authorized_media._route_mime）が担う�
 """
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import List
 
+from adapters.media_failure import failed_render, log_media_failure
 from domain.media import MediaAttachment, RenderedMedia
 
 
@@ -58,11 +58,9 @@ class PdfRenderer:
                 page_count=page_count,
             )
         except Exception:
-            print(
-                f"[pdf-renderer] failed to render file_id={media.file_id[:8]}",
-                file=sys.stderr,
+            return failed_render(
+                "pdf-renderer", "render", "file_id", media.file_id[:8]
             )
-            return RenderedMedia(rendered_text=None, render_status="failed")
 
     def extract_text(self, local_path: Path) -> RenderedMedia:
         """オンデマンド: 全ページのテキスト層を pdfplumber 抽出（--- page N --- マーカー）。
@@ -93,11 +91,9 @@ class PdfRenderer:
                 page_count=page_count,
             )
         except Exception:
-            print(
-                f"[pdf-renderer] failed to extract_text path={local_path.name[:8]}",
-                file=sys.stderr,
+            return failed_render(
+                "pdf-renderer", "extract_text", "path", local_path.name[:8]
             )
-            return RenderedMedia(rendered_text=None, render_status="failed")
 
     def rasterize_pages(self, local_path: Path, start: int, end: int) -> List[str]:
         """オンデマンド: [start, end)（0-indexed）ページを画像化しパス list を返す。
@@ -115,9 +111,8 @@ class PdfRenderer:
             finally:
                 pdf.close()
         except Exception:
-            print(
-                f"[pdf-renderer] failed to rasterize path={local_path.name[:8]}",
-                file=sys.stderr,
+            log_media_failure(
+                "pdf-renderer", "rasterize", "path", local_path.name[:8]
             )
             return []
 

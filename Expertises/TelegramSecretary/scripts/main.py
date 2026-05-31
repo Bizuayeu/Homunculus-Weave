@@ -6,13 +6,13 @@ import json
 import os
 import sys
 import uuid
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Sequence
+from typing import Optional, Sequence
 
 from adapters.state.emitter import StdoutEventEmitter
 from adapters.state.json_state_store import JsonLeaseStore, JsonOffsetStore
 from adapters.telegram.api_gateway import TelegramApiGateway
-from adapters.telegram.media_downloader import TelegramMediaDownloader
 from domain.exceptions import (
     AttachmentNotFound,
     AttachmentTooLarge,
@@ -24,31 +24,56 @@ from domain.lease import utc_now
 from domain.watch_window import WatchWindow
 from domain.models import OutboundMessage
 from domain.outbound import OutboundAttachment
+from infrastructure.composition import MediaStack, build_media_stack, load_config
 from infrastructure.config import Config
+from infrastructure.exit_codes import (
+    EXIT_AUTH_FAILED,
+    EXIT_CONFIG_INVALID,
+    EXIT_FETCH_FAILED,
+    EXIT_LEASE_CONFLICT,
+    EXIT_OK,
+)
 from infrastructure.media_cleanup import cleanup_media_dir
 from infrastructure.registry_cli import run_registry_command
 from usecases.acquire_lease import AcquireLease
-from usecases.download_authorized_media import DownloadAuthorizedMedia
 from usecases.fetch_authorized_updates import FetchAuthorizedUpdates
 from usecases.release_lease import ReleaseLease
-from usecases.render_authorized_media import RenderAuthorizedMedia
 from usecases.renew_lease import RenewLease
 from usecases.send_reply import SendReply
 
+# 終了コードは infrastructure/exit_codes.py が SSoT。後方互換のため re-export
+# （test_main.py / docs の `from main import EXIT_*` を温存）。
+__all__ = [
+    "EXIT_OK",
+    "EXIT_FETCH_FAILED",
+    "EXIT_CONFIG_INVALID",
+    "EXIT_AUTH_FAILED",
+    "EXIT_LEASE_CONFLICT",
+    "main",
+]
 
-EXIT_OK = 0
-EXIT_FETCH_FAILED = 1
-EXIT_CONFIG_INVALID = 2
-EXIT_AUTH_FAILED = 3
-EXIT_LEASE_CONFLICT = 4
+
+class _ConfigInvalid(Exception):
+    """config ロード失敗を CLI 境界へ伝える内部シグナル。
+
+    EnvironmentError は Python では OSError の別名であり、ハンドラ全体を
+    `except EnvironmentError` で包むと read_text 等の無関係な OSError まで
+    config エラーへ誤変換する。専用例外にして main() で 1 度だけ
+    EXIT_CONFIG_INVALID へ変換し、捕捉範囲を config ロードに限定する。
+    """
 
 
-def _load_config() -> Config | int:
+def _load_config() -> Config:
+    """env から Config を構築（fail-fast）。失敗は stderr に出して _ConfigInvalid を送出。
+
+    旧 union (`Config | int`) を廃止。EnvironmentError の捕捉はこの 1 点に限定し、
+    各ハンドラの `if isinstance(config, int): return config` 重複を消す。
+    """
     try:
-        return Config.from_env()
+        return load_config()
     except EnvironmentError as exc:
         print(f"config error: {exc}", file=sys.stderr)
-        return EXIT_CONFIG_INVALID
+        raise _ConfigInvalid from None
 
 
 def _session_owner(arg_owner: str | None) -> str:
@@ -61,8 +86,6 @@ def _session_owner(arg_owner: str | None) -> str:
 
 def cmd_validate_config(_: argparse.Namespace) -> int:
     config = _load_config()
-    if isinstance(config, int):
-        return config
     print(
         f"ok: bot_token=set "
         f"authorized_chats={len(config.authorized_chats.chat_ids)} "
@@ -73,8 +96,6 @@ def cmd_validate_config(_: argparse.Namespace) -> int:
 
 def cmd_lease(args: argparse.Namespace) -> int:
     config = _load_config()
-    if isinstance(config, int):
-        return config
     store = JsonLeaseStore(config.state_dir)
     owner = _session_owner(args.owner)
     now = utc_now()
@@ -96,8 +117,6 @@ def cmd_lease(args: argparse.Namespace) -> int:
 
 def cmd_poll(args: argparse.Namespace) -> int:
     config = _load_config()
-    if isinstance(config, int):
-        return config
 
     offset_store = JsonOffsetStore(config.state_dir)
     emitter = StdoutEventEmitter()
@@ -114,28 +133,20 @@ def cmd_poll(args: argparse.Namespace) -> int:
             print(f"fetch failed: {exc}", file=sys.stderr)
             return EXIT_FETCH_FAILED
 
-        # Heavy モード: media を持つ update があれば download → render
+        # Heavy モード: media を持つ update があれば download → render。
+        # poll/watch 共通の Composition Root build_media_stack で配線（transcriber/pdf は
+        # 未導入なら None で組み skipped にフォールバック）。
         if config.media_enable_download and any(u.update.media for u in updates):
-            with TelegramMediaDownloader(
-                bot_token=config.bot_token, gateway=gateway
-            ) as downloader:
-                download_results = DownloadAuthorizedMedia(downloader).execute(
+            stack = build_media_stack(config, gateway)
+            try:
+                download_results = stack.download_uc.execute(
                     updates,
                     config.state_dir / "media",
                     config.media_max_size_bytes,
                 )
-            # Stage 7.4: download 済み media を render（lazy import で markitdown
-            # 依存を validate-config / Medium モードから切り離す）
-            # Stage 10: PDF は passthrough をやめ pdf_renderer（pdfplumber でテキスト層抽出）へ
-            from adapters.render.markitdown_renderer import MarkitdownRenderer
-            from adapters.render.pdf_renderer import PdfRenderer
-            from adapters.transcribe.moonshine_transcriber import MoonshineTranscriber
-
-            render_results = RenderAuthorizedMedia(
-                MarkitdownRenderer(),
-                transcriber=MoonshineTranscriber(),
-                pdf_renderer=PdfRenderer(image_max_pages=config.pdf_image_max_pages),
-            ).execute(download_results)
+                render_results = stack.render_uc.execute(download_results)
+            finally:
+                stack.downloader.close()
 
     for u in updates:
         emitter.emit(
@@ -144,10 +155,109 @@ def cmd_poll(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+@dataclass
+class _CycleOutcome:
+    """1 watch サイクルの結果。exit_code 非 None ならループは即その値で return する。"""
+
+    exit_code: Optional[int]
+    had_messages: bool
+
+
+class _LazyMediaStack:
+    """watch ループ用の media stack 遅延ホルダ（FINDING A）。
+
+    media を初めて受けたサイクルで build_media_stack を 1 度だけ呼び、以降使い回す
+    （MarkItDown の magika model load が重いので毎サイクル作り直さない）。media を受けない
+    常駐では構築せず httpx だけで起動できる（fresh container で markitdown/moonshine 未導入でも落ちない）。
+    """
+
+    def __init__(self, config: Config, gateway) -> None:
+        self._config = config
+        self._gateway = gateway
+        self._stack: Optional[MediaStack] = None
+
+    def ensure(self) -> MediaStack:
+        if self._stack is None:
+            self._stack = build_media_stack(self._config, self._gateway)
+        return self._stack
+
+    def close(self) -> None:
+        if self._stack is not None:
+            self._stack.downloader.close()
+
+
+def _run_watch_cycle(
+    uc: FetchAuthorizedUpdates,
+    renew: RenewLease,
+    emitter: StdoutEventEmitter,
+    owner: str,
+    config: Config,
+    window: WatchWindow,
+    args: argparse.Namespace,
+    media_target_dir: Path,
+    media: _LazyMediaStack,
+) -> _CycleOutcome:
+    """watch の 1 サイクル（poll_timeout 丸め → fetch → media → emit → renew）。
+
+    制御フローは戻り値で表現する（ループ側を薄く保つ）:
+    - AuthFailure → exit_code=EXIT_AUTH_FAILED（renew せず即終了）
+    - transient fetch error → emit を飛ばすが renew は実行（heartbeat 維持、原実装の try/else 外 renew に準拠）
+    - lease 喪失 → exit_code=EXIT_LEASE_CONFLICT
+    - 正常 → exit_code=None, had_messages
+    """
+    # 最終サイクルが bash timeout を超えないよう long-poll を残り窓に丸める（FINDING C）。
+    # max_duration + timeout が bash_timeout/1000 を超えると、厳密 foreground では window 満了を
+    # 超えて回り SIGTERM される（Phase 2 実測 603s=580+timeout）。残り窓に丸めれば値(580/30)に
+    # 依存せず max_duration + timeout < bash_timeout の不変条件を保つ。
+    poll_timeout = args.timeout
+    if window.max_duration_seconds > 0:
+        remaining = window.remaining_seconds(utc_now())
+        if remaining < poll_timeout:
+            poll_timeout = max(1, int(remaining))
+
+    fetch_ok = True
+    updates: list = []
+    try:
+        updates = uc.execute(timeout_seconds=poll_timeout)
+    except AuthFailureError as exc:
+        print(f"auth failure: {exc}", file=sys.stderr)
+        return _CycleOutcome(exit_code=EXIT_AUTH_FAILED, had_messages=False)
+    except TelegramSecretaryError as exc:
+        # 一時的エラーはログして次サイクルへ（renew は下で実行し heartbeat を維持）
+        print(f"transient fetch error: {exc}", file=sys.stderr)
+        fetch_ok = False
+
+    had_messages = False
+    if fetch_ok:
+        download_results: list = []
+        render_results: list = []
+        if config.media_enable_download and any(u.update.media for u in updates):
+            stack = media.ensure()
+            download_results = stack.download_uc.execute(
+                updates,
+                media_target_dir,
+                config.media_max_size_bytes,
+            )
+            render_results = stack.render_uc.execute(download_results)
+        for u in updates:
+            emitter.emit(
+                u,
+                download_results=download_results,
+                render_results=render_results,
+            )
+        had_messages = bool(updates)
+
+    # アイドル時も heartbeat を維持。lease を失っていたら自己治癒で即終了
+    try:
+        renew.execute(owner=owner, now=utc_now())
+    except LeaseConflictError as exc:
+        print(f"lease lost during watch: {exc}", file=sys.stderr)
+        return _CycleOutcome(exit_code=EXIT_LEASE_CONFLICT, had_messages=had_messages)
+    return _CycleOutcome(exit_code=None, had_messages=had_messages)
+
+
 def cmd_watch(args: argparse.Namespace) -> int:
     config = _load_config()
-    if isinstance(config, int):
-        return config
 
     offset_store = JsonOffsetStore(config.state_dir)
     lease_store = JsonLeaseStore(config.state_dir)
@@ -160,97 +270,22 @@ def cmd_watch(args: argparse.Namespace) -> int:
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
         uc = FetchAuthorizedUpdates(gateway, offset_store, config.authorized_chats)
         renew = RenewLease(lease_store)
-        # media stack は「実際に media を受けた時」だけ遅延構築する（FINDING A）。
-        # markitdown / moonshine / av は重く、media を受けない限り不要。起動時に eager 構築すると
-        # 未導入の fresh container で watch が ModuleNotFoundError で落ちる。一度作ったら使い回す
-        # （MarkItDown の magika model load が重いので毎サイクル作り直さない）。
-        downloader: TelegramMediaDownloader | None = None
-        download_uc: DownloadAuthorizedMedia | None = None
-        render_uc: RenderAuthorizedMedia | None = None
-
-        def _ensure_media_stack() -> None:
-            nonlocal downloader, download_uc, render_uc
-            if download_uc is not None:
-                return
-            from adapters.render.markitdown_renderer import MarkitdownRenderer
-
-            downloader = TelegramMediaDownloader(
-                bot_token=config.bot_token, gateway=gateway
-            )
-            download_uc = DownloadAuthorizedMedia(downloader)
-            # 音声 transcriber(moonshine) は optional: 未導入（bootstrap で BUNDLE_VOICE=false により
-            # 除外、ライセンス/軽量化目的）なら None で構築し、音声/動画は skipped にフォールバック
-            # （render usecase は transcriber=None を許容）。markitdown render は維持される。
-            transcriber = None
-            try:
-                from adapters.transcribe.moonshine_transcriber import (
-                    MoonshineTranscriber,
-                )
-
-                transcriber = MoonshineTranscriber()
-            except ImportError:
-                transcriber = None
-            # Stage 10: PDF は passthrough をやめ pdf_renderer(pdfplumber) でテキスト層抽出。
-            # pdfplumber 未導入なら None で構築し PDF は skipped にフォールバック（transcriber 同型）。
-            pdf_renderer = None
-            try:
-                from adapters.render.pdf_renderer import PdfRenderer
-
-                pdf_renderer = PdfRenderer(image_max_pages=config.pdf_image_max_pages)
-            except ImportError:
-                pdf_renderer = None
-            render_uc = RenderAuthorizedMedia(
-                MarkitdownRenderer(),
-                transcriber=transcriber,
-                pdf_renderer=pdf_renderer,
-            )
+        media = _LazyMediaStack(config, gateway)
         try:
             while True:
-                had_messages = False
-                # 最終サイクルが bash timeout を超えないよう long-poll を残り窓に丸める（FINDING C）。
-                # max_duration + timeout が bash_timeout/1000 を超えると、厳密 foreground では window 満了を
-                # 超えて回り SIGTERM される（Phase 2 実測で満了が 603s=580+timeout に達した）。残り窓に
-                # 丸めれば満了が max_duration をほぼ超えず、値(580/30)に依存せず不変条件を保つ。
-                poll_timeout = args.timeout
-                if window.max_duration_seconds > 0:
-                    remaining = window.remaining_seconds(utc_now())
-                    if remaining < poll_timeout:
-                        poll_timeout = max(1, int(remaining))
-                try:
-                    updates = uc.execute(timeout_seconds=poll_timeout)
-                except AuthFailureError as exc:
-                    print(f"auth failure: {exc}", file=sys.stderr)
-                    return EXIT_AUTH_FAILED
-                except TelegramSecretaryError as exc:
-                    # 一時的エラーはログして次サイクルへ進む
-                    print(f"transient fetch error: {exc}", file=sys.stderr)
-                else:
-                    download_results: list = []
-                    render_results: list = []
-                    if config.media_enable_download and any(
-                        u.update.media for u in updates
-                    ):
-                        _ensure_media_stack()
-                        download_results = download_uc.execute(
-                            updates,
-                            media_target_dir,
-                            config.media_max_size_bytes,
-                        )
-                        render_results = render_uc.execute(download_results)
-                    for u in updates:
-                        emitter.emit(
-                            u,
-                            download_results=download_results,
-                            render_results=render_results,
-                        )
-                    had_messages = bool(updates)
-
-                # アイドル時も heartbeat を維持。lease を失っていたら自己治癒で即終了
-                try:
-                    renew.execute(owner=owner, now=utc_now())
-                except LeaseConflictError as exc:
-                    print(f"lease lost during watch: {exc}", file=sys.stderr)
-                    return EXIT_LEASE_CONFLICT
+                outcome = _run_watch_cycle(
+                    uc,
+                    renew,
+                    emitter,
+                    owner,
+                    config,
+                    window,
+                    args,
+                    media_target_dir,
+                    media,
+                )
+                if outcome.exit_code is not None:
+                    return outcome.exit_code
 
                 iterations += 1
                 # Stage 6.5 follow-up: N サイクル毎に cleanup hook（0=無効、default 120 ≒ 1h with timeout=30s）
@@ -266,11 +301,10 @@ def cmd_watch(args: argparse.Namespace) -> int:
                     break
                 if window.is_expired(utc_now()):
                     break
-                if args.exit_on_message and had_messages:
+                if args.exit_on_message and outcome.had_messages:
                     break
         finally:
-            if downloader is not None:
-                downloader.close()
+            media.close()
     return EXIT_OK
 
 
@@ -281,8 +315,6 @@ def cmd_cleanup_media(args: argparse.Namespace) -> int:
     cron 起動するか、人手で叩いて掃除する用途。
     """
     config = _load_config()
-    if isinstance(config, int):
-        return config
     target_dir = config.state_dir / "media"
     retention_seconds = config.media_retention_hours * 3600
     removed = cleanup_media_dir(target_dir, retention_seconds)
@@ -314,8 +346,6 @@ def cmd_render_pdf(args: argparse.Namespace) -> int:
     （cap 超の 21 枚目以降含む）を要求した時に叩く。結果は JSON 1 行で stdout。
     """
     config = _load_config()
-    if isinstance(config, int):
-        return config
 
     path = Path(args.path)
     if not path.exists():
@@ -355,8 +385,6 @@ def cmd_render_pdf(args: argparse.Namespace) -> int:
 
 def cmd_send_reply(args: argparse.Namespace) -> int:
     config = _load_config()
-    if isinstance(config, int):
-        return config
 
     owner = _session_owner(args.owner)
     text = Path(args.text_file).read_text(encoding="utf-8")
@@ -407,8 +435,6 @@ def cmd_send_reply(args: argparse.Namespace) -> int:
 
 def cmd_test(args: argparse.Namespace) -> int:
     config = _load_config()
-    if isinstance(config, int):
-        return config
 
     with TelegramApiGateway(bot_token=config.bot_token) as gateway:
         try:
@@ -426,8 +452,6 @@ def cmd_test(args: argparse.Namespace) -> int:
 def cmd_registry(args: argparse.Namespace) -> int:
     """個人/タスク/知識 管理表の CRUD。args.command が管理表名（individuals/tasks/knowledge）。"""
     config = _load_config()
-    if isinstance(config, int):
-        return config
     return run_registry_command(config, args.command, args.registry_action, args)
 
 
@@ -539,7 +563,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         "tasks": cmd_registry,
         "knowledge": cmd_registry,
     }
-    return handlers[args.command](args)
+    try:
+        return handlers[args.command](args)
+    except _ConfigInvalid:
+        return EXIT_CONFIG_INVALID
 
 
 if __name__ == "__main__":
