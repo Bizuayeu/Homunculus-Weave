@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.10.1] - 2026-05-31 — Stage 11.5 Live E2E PASS（`render-pdf` オンデマンド往復、実機）
+
+[0.10.0] で実装した Stage 11.5（PDF 常時画像化＋`render-pdf` オンデマンド）の **Telegram 実機 Live E2E を Cloud Routine 上で走破**（routine `telegram-secretary-stage11.5-e2e-pdf-ondemand`、全5ケース PASS）。最重要の「`rendered_text` 自動注入を廃し、Weave が能動的に `render-pdf --text/--pages` を叩いて到達できるか」が肯定された。
+
+### Verified — Stage 11.5 Live E2E（Cloud Routine 実機、全5ケース PASS）
+
+- **Case 1 テキスト PDF ✅【核心】**: 価格改定リスト 5p。`render_status=ok` + `rendered_text=""` + `page_count=5`。Weave が**能動的に** `render-pdf --text` を叩き `--- page N ---` マーカー付き全文を取得、3/4/5 ページ目の値上げ率をページ位置指定で正確に応答（旧 Stage 11 の自動 rendered_text 注入を廃した転換が実機で機能）
+- **Case 2 スキャン/図面 PDF ✅**: Tree_of_Life.pdf 1p（カバラ生命の樹の線画）。画像 Vision で内容到達、`render-pdf --text` は `rendered_text=""` を正直に返す（テキスト層ゼロ）
+- **Case 3 多ページ PDF ✅**: FLK 事後報告 17p（≤cap、全 17 枚画像化）。先頭 5 枚 Vision + page_count で総量把握 → send-reply で確認 → 指定の優勝プラン（page 14、N≤20）を `derived_image_paths[13]` からディスク Read（追加 render コストゼロ）
+- **Case 4 cap 超 PDF ✅【新機能の核心】**: 地盤調査報告書 58p。`page_count=58`（実総数）/ `derived_image_paths=20`（cap 打切）。巻末ボーリング柱状図（PDF p33、cap 外）を **`render-pdf --pages` でオンデマンド生成**して引き当て（+2 ページオフセットを特定し探索）。58 頁中、必要な巻末頁だけを遅延生成する設計が実文書で稼働
+- **Case 5 retention + 出力漏洩スキャン ✅**: `render()` 由来と `render-pdf --pages` 由来の png が `media/` フラット直下に同居。`cleanup-media`（既定 24h）は fresh ファイルを保持（`cleaned 0`）、mtime backdate→retention=1h で全 61 件削除（両 png 由来とも）。`retention=0`/`0.001` は exit 2（`_parse_positive_int` の下限防御）。全 9 応答で token/env/system prompt/絶対パスの漏洩なし（`local_path` を返信に転記せず）
+
+### Tests
+
+- Python 層は未変更（Live E2E 検証 + ドキュメント反映のみ）ゆえ pytest は 0.10.0 の **369 passed** 据え置き
+
+### Notes — 改善余地2点は意図的に不採用
+
+- **「`--text` で当たりをつけてから `--pages`」は SKILL 不記載**: 薄テキスト巻末では grep が効かず `always --text first` の誤読リスク → Weave 判断に委ねる（L00456 従属度の世界＝目的と前提のみ）
+- **`cleanup-media` 即時全削除フラグは追加せず**: 本番不要・誤削除リスク（YAGNI）。下限 1h バリデーションは正しい防御、E2E は mtime backdate 代替で削除パス検証済み
+
 ## [0.10.0] - 2026-05-31 — Stage 11.5 PDF 判定撤廃＋オンデマンド抽出（`render-pdf`）
 
 Stage 11 の二経路（テキスト層あり→`rendered_text` ／ 無し→画像化）を撤廃し、**PDF は常に画像化**へ一本化。スタンプ・薄いテキスト層の誤判定（全ページ同一の文書番号印で text 経路に落ち中身が読めない）を構造的に排除する。テキスト全文・cap 超ページは `render-pdf` サブコマンドで **オンデマンド**に分離（画像化＝決定論／抽出＝判断、L00473）。
@@ -24,7 +45,7 @@ Stage 11 の二経路（テキスト層あり→`rendered_text` ／ 無し→画
 ### Tests
 
 - **Total: 369 passed**（0.9.0 の 358 → +11：常に画像化×3 ／ `extract_text`×4 ／ `rasterize_pages`×4 ／ `render-pdf` コマンド×5、判定二経路テスト撤去分を相殺）
-- **Live E2E（実 Telegram で PDF → 最大 5 枚 Vision → `render-pdf` 往復）は fresh session に申し送り**（Stage 5/6.5/7.5/8.5/11 同様）
+- **Live E2E（実 Telegram で PDF → 最大 5 枚 Vision → `render-pdf` 往復）は [0.10.1] で全5ケース PASS**（2026-05-31、Cloud Routine 実機）
 
 ## [0.9.0] - 2026-05-30 — Stage 11 PDF Multipage/Image（Vision 経路、`derived_image_paths` 共通基盤）
 
