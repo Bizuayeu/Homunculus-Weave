@@ -23,6 +23,8 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+# pytest 出力をリダイレクトした手動実行の残骸（例: pytest > _pytest_out.txt）
+_pytest_out.txt
 .coverage
 htmlcov/
 *.egg-info/
