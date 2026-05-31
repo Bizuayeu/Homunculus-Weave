@@ -1,5 +1,20 @@
 # Changelog
 
+## [Unreleased] — scripts 内部リファクタ（Composition Root 導入）
+
+依存組み立て点の不在を是正する**振る舞い不変リファクタ**。CLI I/F・exit code・出力はすべて不変。
+
+### Changed
+
+- **Composition Root 新設** `infrastructure/composition.py`: `load_config()` の fail-fast（`Config | int` union を廃止）と `build_media_stack()`（poll の eager 構築と watch の lazy closure を1関数に統一）。各 `cmd_*` は組み立て済みを受け取り、自前で adapter を new しない
+- **exit code SSoT 化** `infrastructure/exit_codes.py`: `main.py` と `registry_cli.py` に分散していた終了コード（0/1/2/3/4）を一本化。`main` は後方互換のため re-export（`from main import EXIT_*` を温存）
+- **render 失敗定型の集約** `adapters/media_failure.py`: render/transcribe の except→stderr redact ログ→`RenderedMedia(failed)` 定型（5箇所）を helper に集約
+- **`cmd_watch` 分解**: 127 行から `_run_watch_cycle()` を抽出しループ本体を制御フローに薄化。`_load_config()` の union ガード（`isinstance(config, int)`）を全ハンドラから除去し fail-fast に統一
+
+### Tests
+
+- **369 → 376 passed**（新規 helper の単体テスト 7 追加：media_failure×2 / exit_codes×2 / composition×3）。既存 369 は挙動不変で全緑
+
 ## [0.10.1] - 2026-05-31 — Stage 11.5 Live E2E PASS（`render-pdf` オンデマンド往復、実機）
 
 [0.10.0] で実装した Stage 11.5（PDF 常時画像化＋`render-pdf` オンデマンド）の **Telegram 実機 Live E2E を Cloud Routine 上で走破**（routine `telegram-secretary-stage11.5-e2e-pdf-ondemand`、全5ケース PASS）。最重要の「`rendered_text` 自動注入を廃し、エージェント が能動的に `render-pdf --text/--pages` を叩いて到達できるか」が肯定された。

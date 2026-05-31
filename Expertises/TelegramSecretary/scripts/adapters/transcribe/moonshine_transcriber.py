@@ -13,11 +13,11 @@ Enterprise License or kotoba-whisper(Apache-2.0) へ Port 差し替え
 """
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Optional
 
 from adapters.audio.ffmpeg_preprocessor import FfmpegAudioPreprocessor
+from adapters.media_failure import failed_render
 from domain.media import MediaAttachment, RenderedMedia
 
 
@@ -59,9 +59,6 @@ class MoonshineTranscriber:
             text = "".join(line.text for line in transcript.lines)
             return RenderedMedia(rendered_text=text, render_status="ok")
         except Exception:
-            safe_id = media.file_id[:8]
-            print(
-                f"[moonshine-transcriber] failed to transcribe file_id={safe_id}",
-                file=sys.stderr,
+            return failed_render(
+                "moonshine-transcriber", "transcribe", "file_id", media.file_id[:8]
             )
-            return RenderedMedia(rendered_text=None, render_status="failed")
