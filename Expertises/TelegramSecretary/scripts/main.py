@@ -310,7 +310,7 @@ def _parse_page_range(spec: str) -> tuple[int, int]:
 def cmd_render_pdf(args: argparse.Namespace) -> int:
     """オンデマンド PDF 抽出: --text 全文テキスト / --pages N-M 個別ページ画像化。
 
-    Weave が画像 Vision で大枠把握後（ROUTINE_PROMPT）、①全文テキスト or ②個別ページ
+    エージェント が画像 Vision で大枠把握後（ROUTINE_PROMPT）、①全文テキスト or ②個別ページ
     （cap 超の 21 枚目以降含む）を要求した時に叩く。結果は JSON 1 行で stdout。
     """
     config = _load_config()
@@ -472,7 +472,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="N サイクル毎に cleanup_media_dir を発火（0=無効、default 120 ≒ 1h with timeout=30s）",
     )
 
-    p_send = sub.add_parser("send-reply", help="Weave 起草の返信を送信")
+    p_send = sub.add_parser("send-reply", help="エージェント 起草の返信を送信")
     p_send.add_argument("--chat-id", type=int, required=True)
     p_send.add_argument("--update-id", type=int, required=True)
     p_send.add_argument("--text-file", required=True)

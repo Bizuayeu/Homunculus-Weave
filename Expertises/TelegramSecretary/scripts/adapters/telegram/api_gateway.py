@@ -23,7 +23,7 @@ class TelegramApiGateway:
     """
 
     DEFAULT_BASE_URL = "https://api.telegram.org"
-    DEFAULT_USER_AGENT = "TelegramSecretary/0.1 (+Weave)"
+    DEFAULT_USER_AGENT = "TelegramSecretary/0.1 (+bot)"
     DEFAULT_MAX_RETRY_AFTER_SECONDS = 60
 
     def __init__(
