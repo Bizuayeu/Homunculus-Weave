@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.2.2] - 2026-05-31
+
+### Changed
+- `ROUTINE_PROMPT.md` Step 4/5 にハルシネーション防止の手続きガードを追加（コード非改変、Cloud Routine の手順のみ）
+  - Step 4: dry-run 出力（`/tmp/newscaster_dryrun.txt`）を必ず Read してから Step 5 へ進む明示 + Step 4（dry-run）と Step 5（WebFetch）の同一バッチ並列実行を禁止（Step 5 の WebFetch URL は dry-run 出力に依存）
+  - Step 4: placeholder が 1 つも無ければ Step 5 を丸ごとスキップ（書き換え対象ゼロ時に本文を生成しない）
+  - Step 5: WebFetch する URL は placeholder 直前の `- リンク:` 行から逐語コピー、推測で組み立てない
+  - Step 5: `- リンク:` が読めない／WebFetch 失敗の item は description 範囲だけでベタ化し、本文が取れないことを理由に内容を創作しない
+
+### Why
+- 過去の Cloud Routine 実行で、dry-run 出力を Read する前に WebFetch URL を推測で組み立てて並列実行し、実在しない URL への 404 量産と本文捏造が発生
+- 根本原因は「データ依存（Step 5 の入力 = Step 4 の出力）を越えて生成を並列化した手続き順序違反」。精神論でなく手続きで縛る
+- コード層の防波堤（`send-rendered` の placeholder 残存検出 = exit 1）は、捏造で placeholder を埋めて送るケースを弾けない。手続き層での予防が必要
+
+### Verification
+- `ROUTINE_PROMPT.md`（手続きドキュメント）のみの変更、コード非改変のため既存 137 tests に影響なし（テスト未実行）
+- 反映は翌 0:10 JST の Cloud Routine fresh clone 時（`prompt: ROUTINE_PROMPT.md を参照` 設計、RemoteTrigger update 不要）
+
 ## [0.2.1] - 2026-05-19
 
 ### Fixed
