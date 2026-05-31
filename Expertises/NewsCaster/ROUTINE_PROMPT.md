@@ -76,6 +76,8 @@ dry-run の出力形式：
 
 - `target_date`（`YYYY-MM-DD`）と `subject` を dry-run 出力の冒頭から抽出
 - 全フィードが 0 件なら subject の `(0件 / 0ソース)` と body の「前日付の新着エントリはありませんでした」が出る → Step 7 へ直接（送信スキップ）
+- ⚠️ **`/tmp/newscaster_dryrun.txt` を必ず Read してから Step 5 へ進む。Step 4（dry-run）と Step 5（WebFetch）を同一ツールバッチで並列実行しない** — Step 5 で WebFetch する URL は dry-run 出力に依存する。出力を読む前に「こうだろう」と撃つと、実在しない URL への 404 と本文の捏造を生む（過去の事故の主因）
+- ⚠️ **dry-run body に `{{WEAVE_COMPACT:...}}` プレースホルダが 1 つも無ければ Step 5 を丸ごとスキップ** し、dry-run body をそのまま `/tmp/newscaster_body_rendered.txt` にコピーして Step 6 へ（PASSTHROUGH のみ構成と同じ経路）。書き換える placeholder が無いのに本文を生成しない
 
 ## Step 5 — Weave による compact 書き換え（プレースホルダがある場合のみ）
 
@@ -86,6 +88,8 @@ dry-run の出力形式：
 - **やる**: 主張・新規性・固有名詞・具体的な数字
 - **やらない**: 比喩、修辞、誘導の枕詞、媒体の煽り表現、読者への問いかけ
 - **本文取得**: RSS の description は省略形（`[&#8230;]` で切れている）ことが多い。必要なら item の link URL を WebFetch して本体を取得してから圧縮する
+  - ⚠️ **WebFetch する URL は、その placeholder 直前の `- リンク:` 行から逐語コピーする。URL を記憶・推測から組み立てない** — フィードに無い URL を WebFetch すると 404 になり、本文を創作する誘惑が生じる
+  - ⚠️ **`- リンク:` が読めない、または WebFetch が失敗した item は、dry-run に出ている description の範囲だけでベタ化する。本文が取れないことを理由に内容を創作しない** — 取れない時は description の素の事実だけに縮める方が、捏造より常に良い
 
 書き換え結果（プレースホルダゼロの最終 body）を `/tmp/newscaster_body_rendered.txt` に保存。subject は dry-run と同じ。
 
