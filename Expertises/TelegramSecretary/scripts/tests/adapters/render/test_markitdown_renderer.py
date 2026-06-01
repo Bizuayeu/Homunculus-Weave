@@ -61,14 +61,14 @@ def test_renders_docx_to_markdown(tmp_path: Path, renderer: MarkitdownRenderer):
     doc = Document()
     doc.add_heading("仕様書", level=1)
     doc.add_paragraph("これは render 検証用の docx です。")
-    doc.add_paragraph("ブルーベリーは美味しい。")
+    doc.add_paragraph("本文の二段落目もテキストとして変換されます。")
     doc.save(str(doc_path))
 
     rendered = renderer.render(_docx_media(), doc_path)
     assert rendered.render_status == "ok"
     assert rendered.rendered_text is not None
     assert "仕様書" in rendered.rendered_text
-    assert "ブルーベリー" in rendered.rendered_text
+    assert "二段落目" in rendered.rendered_text
 
 
 def test_renders_xlsx_to_markdown(tmp_path: Path, renderer: MarkitdownRenderer):
@@ -78,17 +78,17 @@ def test_renders_xlsx_to_markdown(tmp_path: Path, renderer: MarkitdownRenderer):
     xlsx_path = tmp_path / "data.xlsx"
     wb = Workbook()
     ws = wb.active
-    ws.append(["品種", "色"])
-    ws.append(["Pink Popcorn", "ピンク"])
-    ws.append(["Pearl", "白"])
+    ws.append(["名称", "分類"])
+    ws.append(["Sample Alpha", "A"])
+    ws.append(["Sample Beta", "B"])
     wb.save(str(xlsx_path))
 
     rendered = renderer.render(_xlsx_media(), xlsx_path)
     assert rendered.render_status == "ok"
     assert rendered.rendered_text is not None
-    # markitdown は表をパイプ区切り or 類似形式に変換、品種名が含まれる
-    assert "Pink Popcorn" in rendered.rendered_text
-    assert "Pearl" in rendered.rendered_text
+    # markitdown は表をパイプ区切り or 類似形式に変換、セル値が含まれる
+    assert "Sample Alpha" in rendered.rendered_text
+    assert "Sample Beta" in rendered.rendered_text
 
 
 def test_renders_pptx_to_markdown(tmp_path: Path, renderer: MarkitdownRenderer):

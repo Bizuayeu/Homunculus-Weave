@@ -37,7 +37,7 @@ def test_fetch_parses_updates():
                         "update_id": 7,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave_user"},
+                            "from": {"id": 200, "username": "test_user"},
                             "text": "hi",
                         },
                     }

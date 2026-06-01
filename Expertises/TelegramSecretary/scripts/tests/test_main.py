@@ -118,7 +118,7 @@ def test_poll_emits_authorized_updates(env_ready, monkeypatch, capsys):
                         "update_id": 1,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave"},
+                            "from": {"id": 200, "username": "test_user"},
                             "text": "hi",
                         },
                     },
@@ -265,7 +265,7 @@ def test_watch_exit_on_message_breaks_after_emit(env_ready, monkeypatch):
                         "update_id": 1,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave"},
+                            "from": {"id": 200, "username": "test_user"},
                             "text": "hi",
                         },
                     }
@@ -348,7 +348,7 @@ def test_watch_heavy_mode_no_media_does_not_build_renderer(env_ready, monkeypatc
                         "update_id": 1,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave"},
+                            "from": {"id": 200, "username": "test_user"},
                             "text": "hi",
                         },
                     }
@@ -385,7 +385,7 @@ def test_watch_heavy_without_moonshine_does_not_crash(env_ready, monkeypatch):
                         "update_id": 1,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave"},
+                            "from": {"id": 200, "username": "test_user"},
                             "photo": [{"file_id": "X", "file_size": 99999999}],
                         },
                     }
@@ -679,7 +679,7 @@ def test_poll_medium_mode_emits_media_without_local_path(
                         "update_id": 1,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave"},
+                            "from": {"id": 200, "username": "test_user"},
                             "photo": [{"file_id": "AgACphoto", "file_size": 4096}],
                             "caption": "見て",
                         },
@@ -717,7 +717,7 @@ def test_poll_medium_mode_text_only_unchanged(env_ready, monkeypatch, capsys):
                         "update_id": 1,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave"},
+                            "from": {"id": 200, "username": "test_user"},
                             "text": "hi",
                         },
                     },
@@ -770,7 +770,7 @@ def test_poll_emits_caption_in_text_with_photo(env_ready, monkeypatch, capsys):
                         "update_id": 1,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave"},
+                            "from": {"id": 200, "username": "test_user"},
                             "photo": [{"file_id": "photo1", "file_size": 4096}],
                             "caption": "見える？",
                         },
@@ -1017,7 +1017,7 @@ def test_poll_medium_mode_emits_voice(env_ready, monkeypatch, capsys):
                         "update_id": 1,
                         "message": {
                             "chat": {"id": 100},
-                            "from": {"id": 200, "username": "weave"},
+                            "from": {"id": 200, "username": "test_user"},
                             "voice": {
                                 "file_id": "AwACvoice",
                                 "duration": 5,
