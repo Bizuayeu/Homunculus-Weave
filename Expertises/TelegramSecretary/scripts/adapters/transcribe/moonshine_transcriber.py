@@ -8,8 +8,7 @@ model load は lazy（初回の実音声 render 時）。Cloud Routine 起動を
 空音声/前処理失敗では load しない。
 
 ライセンス: Moonshine Community License（年商 $1M 未満は商用も無料）。年商 $1M 以上の組織本番は
-Enterprise License or kotoba-whisper(Apache-2.0) へ Port 差し替え
-（IMPLEMENTATION_PLAN Stage 9.5 の申し送り参照）。
+Enterprise License or kotoba-whisper(Apache-2.0) へ Port 差し替え。
 """
 from __future__ import annotations
 
