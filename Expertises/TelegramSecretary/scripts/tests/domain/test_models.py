@@ -8,7 +8,7 @@ def test_telegram_update_from_api_minimal():
         "update_id": 12345,
         "message": {
             "chat": {"id": 100},
-            "from": {"id": 200, "username": "weave_user"},
+            "from": {"id": 200, "username": "test_user"},
             "text": "hello",
         },
     }
@@ -16,7 +16,7 @@ def test_telegram_update_from_api_minimal():
     assert update.update_id == 12345
     assert update.chat_id == 100
     assert update.user_id == 200
-    assert update.username == "weave_user"
+    assert update.username == "test_user"
     assert update.text == "hello"
 
 

@@ -11,7 +11,7 @@ from usecases.fetch_authorized_updates import NormalizedUpdate
 def _normalized(text: str = "hi", flags=None) -> NormalizedUpdate:
     return NormalizedUpdate(
         update=TelegramUpdate(
-            update_id=1, chat_id=100, user_id=200, username="weave_user", text=text
+            update_id=1, chat_id=100, user_id=200, username="test_user", text=text
         ),
         normalized_text=text,
         injection_flags=list(flags or []),
@@ -85,7 +85,7 @@ def _normalized_with_media(
             update_id=1,
             chat_id=100,
             user_id=200,
-            username="weave_user",
+            username="test_user",
             text=text,
             media=media,
         ),
@@ -288,7 +288,7 @@ def test_emit_includes_message_id():
                 update_id=1,
                 chat_id=100,
                 user_id=200,
-                username="weave_user",
+                username="test_user",
                 text="hi",
                 message_id=678,
             ),
