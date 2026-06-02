@@ -87,13 +87,13 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ```
 homunculus/Weave/EpisodicRAG/      # → .private/EpisodicRAG (Junction)
 ├── Loops/
-│   └── L00001～L00500+.txt        # 対話記録ファイル（500+ files、Loop500達成 2026-05-20）
+│   └── L00001～L00513+.txt        # 対話記録ファイル（500+ files、Loop500達成 2026-05-20、W0103継続中）
 │
 └── Digests/                       # Digest生成システム
     ├── CLAUDE.md                  # 完全仕様書（Digestシステム詳細）
     ├── last_digest_times.json     # タイマー管理ファイル（自動生成）
     │
-    ├── 1_Weekly/                  # 週次RegularDigest格納（100件、W0101進行中）
+    ├── 1_Weekly/                  # 週次RegularDigest格納（100件、W0103進行中）
     │   └── Provisional/           # 確定前バッファ
     ├── 2_Monthly/                 # 月次RegularDigest格納（20件、M0021進行中）
     │   └── Provisional/
@@ -111,7 +111,7 @@ homunculus/Weave/EpisodicRAG/      # → .private/EpisodicRAG (Junction)
         └── Provisional/
 
 homunculus/Weave/EpisodicWiki/     # → .private/EpisodicWiki (Junction)
-├── wiki/                          # ビブリア層：結晶化記事 171件
+├── wiki/                          # ビブリア層：結晶化記事 190件
 │   ├── _index.md                  # マスター索引（9カテゴリ）
 │   ├── _backlinks.json            # 双方向リンク
 │   ├── people/                    # 人物
@@ -123,14 +123,14 @@ homunculus/Weave/EpisodicWiki/     # → .private/EpisodicWiki (Junction)
 │   ├── strategies/                # 戦略
 │   ├── traditions/                # 伝統知
 │   └── eras/                      # 時代区分
-├── raw/entries/                   # Weekly Digest から抽出された生エントリ（575件）
+├── raw/entries/                   # Weekly Digest から抽出された生エントリ（575+件）
 ├── ingest.py                      # Weekly → raw entries 変換
 └── build_backlinks.py             # _backlinks.json 生成
 
 homunculus/Weave/BusinessWiki/     # アルケイア層：めぐる組ビジネスメール wiki
 ├── _root.md / _alias_resolver.md / _index.md
 ├── shards/
-│   ├── projects/                  # 建設案件 (36+ active)
+│   ├── projects/                  # 建設案件 (37 active)
 │   ├── clients/                   # 得意先 (21)
 │   ├── vendors/                   # 取引先 (36)
 │   └── knowledge/                 # 知見カテゴリ (8)
@@ -156,9 +156,9 @@ Claude Web Interface
 ```
 Bizuayeu/Homunculus-Weave-Private/
 ├── EpisodicRAG/                   # 親リポの .private/EpisodicRAG として mount
-│   ├── 📝 Loops/                  # 対話記録（500+ files、L00001–L00500、Loop500達成 2026-05-20）
+│   ├── 📝 Loops/                  # 対話記録（500+ files、L00001–L00513、Loop500達成 2026-05-20）
 │   └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
-│       ├── 1_Weekly/              # 週次（100件、W0101進行中）
+│       ├── 1_Weekly/              # 週次（100件、W0103進行中）
 │       ├── 2_Monthly/             # 月次（20件、M0021進行中）
 │       ├── 3_Quarterly/           # 四半期（6件、Q007進行中）
 │       ├── 4_Annual/              # 年次（1件、A002進行中）
@@ -167,7 +167,7 @@ Bizuayeu/Homunculus-Weave-Private/
 │       ├── 7_Multi-decadal/       # 30年次
 │       └── 8_Centurial/           # 100年次
 │
-├── EpisodicWiki/                  # ビブリア層 — 171記事 / 9カテゴリ
+├── EpisodicWiki/                  # ビブリア層 — 190記事 / 9カテゴリ
 └── BlueberrySprite/               # 藍苺守 織（Cloud Routine 自律エージェント、Phase 2.7）
 ```
 
@@ -195,7 +195,7 @@ homunculus/Weave/
 │   ├── Moltbook_Manual.md         # AI専用SNS参加ガイド
 │   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
 │   ├── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
-│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、53本）
+│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、57本）
 │   ├── icon.jpg                   # Weaveアイコン画像
 │   ├── BeingDevelopment/          # 成長・発達記録
 │   └── References/                # 参照資料・基礎理論
@@ -335,10 +335,10 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 - **GitHub**: ペルソナ・専門知識（Identities 632KB + Expertises 2.2MB）
 
 ### 蓄積規模
-- **対話記録**: 500+ Loopファイル（L00001–L00500、**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積）
-- **Weekly Digest**: 100件（W0101進行中）/ **Monthly**: 20件（M0021進行中）/ **Quarterly**: 6件（Q007進行中、M0019+M0020蓄積中）/ **Annual**: 1件（A002進行中）
-- **EpisodicWiki**: 171記事 / 9カテゴリ（people, concepts, philosophies, projects, events, patterns, strategies, traditions, eras）、raw/entries 575件
-- **note記事**: 55本（note.com/weave_ai、メタデータは `Identities/NoteArticlesByWeave.json`）
+- **対話記録**: 500+ Loopファイル（L00001–L00513、**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積）
+- **Weekly Digest**: 100件（W0103進行中）/ **Monthly**: 20件（M0021進行中）/ **Quarterly**: 6件（Q007進行中、M0019–M0021蓄積中）/ **Annual**: 1件（A002進行中）
+- **EpisodicWiki**: 190記事 / 9カテゴリ（people, concepts, philosophies, projects, events, patterns, strategies, traditions, eras）、raw/entries 575+件
+- **note記事**: 57本（note.com/weave_ai、メタデータは `Identities/NoteArticlesByWeave.json`）
 - **特許**: 7本出願中（EpisodicRAG系3、七曜2、木造耐火1、音響シャフト1）
 
 ### パフォーマンス
@@ -363,6 +363,6 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 ---
 
-*Last Updated: 2026-05-20 (Loop500達成・M0020 finalize)*
+*Last Updated: 2026-06-02 (L00513・W0103反映、EpisodicWiki 190件・note 57本・projects 37 に更新)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture Version: 3.1 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Bibliotheca/Archeion Wiki + Cloud Routine自律エージェント)*
