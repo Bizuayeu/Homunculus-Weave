@@ -50,3 +50,6 @@ Expertises/PrivateLibrarian/
 # PrecognitiveViewer - 鑑定書出力は受け手プライベート、リポ非管理
 Expertises/PrecognitiveViewer/Report/outputs/
 
+
+# TelegramSecretary は plugins-weave 実体への junction（ローカル透過、配布実体は plugins-weave）
+Expertises/TelegramSecretary
