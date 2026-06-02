@@ -22,9 +22,9 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
    - 短期記憶とワーキングメモリ
 
 3. **EpisodicRAG（長期記憶層）**
-   - Privateリポジトリ: 500+ Loopファイル（`.private/EpisodicRAG/Loops/` 経由、L00001–L00500、**Loop500達成 2026-05-20**）
-   - 階層的Digest（8階層、100年スパン）: Weekly 100件 / Monthly 20件 / Quarterly 6件 / Annual 1件（W0101 / M0021 / Q007 / A002 進行中）
-   - **EpisodicWiki**（ビブリア層）: 171記事 / 9カテゴリの知識結晶、raw/entries 575件
+   - Privateリポジトリ: 500+ Loopファイル（`.private/EpisodicRAG/Loops/` 経由、L00001–L00513、**Loop500達成 2026-05-20**、以後 W0103 へ継続蓄積中）
+   - 階層的Digest（8階層、100年スパン）: Weekly 100件 / Monthly 20件 / Quarterly 6件 / Annual 1件（W0103 / M0021 / Q007 / A002 進行中）
+   - **EpisodicWiki**（ビブリア層）: 190記事 / 9カテゴリの知識結晶、raw/entries 575+件
    - **BusinessWiki**（アルケイア層）: BusinessCurator が生成する企業知 wiki
    - 無制限の記憶容量、SHA参照による最新ダイジェストアクセス
 
@@ -48,7 +48,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 ## 主要機能
 
 ### 🧠 EpisodicRAGアーキテクチャ
-- **Loops**: 対話記録の永続化（500+ conversations、L00001–L00500、Loop500達成 2026-05-20）
+- **Loops**: 対話記録の永続化（500+ conversations、L00001–L00513、Loop500達成 2026-05-20）
 - **Digests**: 4種類のダイジェストファイル
   - **ShadowGrandDigest**: 確定前の最新記憶バッファ（まだらボケ回避）
   - **ProvisionalDigest**: 個別分析結果の蓄積バッファ
@@ -77,13 +77,13 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 - **高度な構造化**: S/N比36倍改善（0.11→4.0）
 
 ## システムメトリクス
-- **対話記録**: 500+ Loopファイル（L00001–L00500、**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積）
-- **週次ダイジェスト**: 100件（W0001–W0100、W0101 進行中）
+- **対話記録**: 500+ Loopファイル（L00001–L00513、**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積）
+- **週次ダイジェスト**: 100件（W0001–W0100、W0103 進行中）
 - **月次ダイジェスト**: 20件（M0001–M0020、M0021 進行中）
-- **四半期ダイジェスト**: 6件（Q001–Q006、Q007 進行中。M0019+M0020蓄積中）
+- **四半期ダイジェスト**: 6件（Q001–Q006、Q007 進行中。M0019–M0021蓄積中）
 - **年次ダイジェスト**: 1件（A001、A002 進行中）
-- **EpisodicWiki記事**: 171件 / 9カテゴリ
-- **note記事**: 55本（note.com/weave_ai）
+- **EpisodicWiki記事**: 190件 / 9カテゴリ
+- **note記事**: 57本（note.com/weave_ai）
 - **特許**: 7本出願中
 
 ## ドキュメント
@@ -115,6 +115,6 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2026-05-20 (Loop500達成・M0020 finalize)*
+*Last Updated: 2026-06-02 (L00513・W0103反映、EpisodicWiki 190件・note 57本に更新)*
 
 ![Weave Icon](Identities/icon.jpg)
