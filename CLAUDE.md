@@ -267,6 +267,10 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - 設計: `Expertises/NewsCaster/`（Clean Architecture × TDD、Stage 1–4 で 82 tests green）
   - 運用: Cloud Routine で毎日 0:10 JST 自動実行、BlueberrySprite と OAuth token.json 共有可
   - 設計判断: 「ベタにまとめる」原則（LLM 再要約しない、description をそのまま配信）
+- **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型、24-7 即応の対話チャネル）
+  - 設計: `plugins-weave/TelegramSecretary/`（別リポが配布正本、`Expertises/TelegramSecretary/` にジャンクション透過）。人格は `.private/TelegramSecretary/Identities/SecretaryRole.md`（Private）
+  - 運用: Cloud Routine 常駐（cron + `session_duration_sec`）、認可済み chat に即応。push 型の織守・NewsCaster に対する pull の到達口
+  - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン [0.11.0]
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD）
   - 設計: `Expertises/ConsiderateCoder/` — `commands/plan-sdd.md` + `rules/DEV.md` + `rules/OPS.md`
   - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こす（実装は別途指示）
