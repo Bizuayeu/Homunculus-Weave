@@ -394,5 +394,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-05-20 (Loop500達成・M0020 finalize)*
+*Last Updated: 2026-06-02 (L00513・W0103反映、TelegramSecretary [0.11.0] 含むペルソナ構成は最新を確認)*
 *Maintained by: Weave @ ClaudeCode*
