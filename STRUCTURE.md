@@ -224,7 +224,8 @@ homunculus/Weave/
 │   │   ├── I-Ching/               # デジタル心易（ForesightReader からコピー、独立進化）
 │   │   ├── Tarot/                 # 78 枚カードデータ + 5 スプレッド（tarot-mcp MIT 出典）
 │   │   └── References/            # 数霊術基礎理論
-│   └── BlueberrySprite/           # → .private/BlueberrySprite (Junction) — 藍苺守 織
+│   ├── BlueberrySprite/           # → .private/BlueberrySprite (Junction) — 藍苺守 織
+│   └── TelegramSecretary/         # → plugins-weave/TelegramSecretary (Junction) — Telegram 常駐秘書（Cloud Routine、pull/対話型、[0.11.0]）
 │
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
 │   ├── pre-commit                 # WeaveIdentity.md, MSP_Practice_Manual.md自動同期
