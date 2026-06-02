@@ -6,6 +6,7 @@ stub に置換して軽量に検証する（実 markitdown/moonshine は test_ma
 """
 from __future__ import annotations
 
+import json
 import sys
 
 import pytest
@@ -28,20 +29,27 @@ def clean_env(monkeypatch):
 
 
 def test_load_config_raises_on_missing_env():
-    """env 欠損で EnvironmentError を raise（union int を返さない＝fail-fast）。"""
+    """env 欠損で EnvironmentError を raise（union int を返さない＝fail-fast）。
+
+    token チェックが config.json 読込より先なので、env 欠損で（config.json の有無に関わらず）raise。
+    """
     with pytest.raises(EnvironmentError):
         load_config()
 
 
 def test_load_config_returns_config_when_env_ready(monkeypatch, tmp_path):
-    """env が揃えば Config を返す。"""
+    """env が揃い config.json があれば Config を返す。"""
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "TEST")
     monkeypatch.setenv("TELEGRAM_SECRETARY_AUTHORIZED_CHATS", "[100]")
     monkeypatch.setenv("TELEGRAM_SECRETARY_STATE_DIR", str(tmp_path))
+    cfg = tmp_path / "config.json"
+    cfg.write_text(json.dumps({"session_duration_sec": 7200}), encoding="utf-8")
+    monkeypatch.setattr("infrastructure.config._default_config_path", lambda: cfg)
 
     config = load_config()
     assert config.bot_token == "TEST"
     assert config.authorized_chats.is_authorized(100)
+    assert config.session_duration_sec == 7200
 
 
 def test_build_media_stack_wires_pdf_cap_and_optional_none(monkeypatch, tmp_path):
@@ -66,6 +74,7 @@ def test_build_media_stack_wires_pdf_cap_and_optional_none(monkeypatch, tmp_path
         bot_token="t",
         authorized_chats=AuthorizedChats(frozenset({1})),
         state_dir=tmp_path,
+        session_duration_sec=7200,
         pdf_image_max_pages=9,
     )
     stack = build_media_stack(config, gateway=object())

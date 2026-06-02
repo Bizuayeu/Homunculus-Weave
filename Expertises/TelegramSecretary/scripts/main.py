@@ -89,8 +89,67 @@ def cmd_validate_config(_: argparse.Namespace) -> int:
     print(
         f"ok: bot_token=set "
         f"authorized_chats={len(config.authorized_chats.chat_ids)} "
-        f"state_dir={config.state_dir}"
+        f"state_dir={config.state_dir} "
+        f"session_duration_sec={config.session_duration_sec}"
     )
+    return EXIT_OK
+
+
+def cmd_show_config(_: argparse.Namespace) -> int:
+    """現在の設定を read-only 表示（秘匿はマスク）。未設定でも exit 0（設定確認パネル）。
+
+    validate-config は「設定が正しいか」を exit code で判定する gate。show-config は
+    「今どう設定されているか」を人間が眺める read-only パネルで、未設定でも 0 を返す。
+    """
+    try:
+        config = load_config()
+    except EnvironmentError as exc:
+        print(f"config not ready: {exc}")
+        return EXIT_OK
+    print("bot_token: set")  # ロード成功＝from_sources が必須チェック済み。値は出さない（秘匿）
+    print(f"authorized_chats: {len(config.authorized_chats.chat_ids)}")
+    print(f"state_dir: {config.state_dir}")
+    print(f"session_duration_sec: {config.session_duration_sec}")
+    print(f"agent_name: {config.agent_name or '(unset)'}")
+    print(f"private_dir: {config.private_dir or '(unset)'}")
+    lease = JsonLeaseStore(config.state_dir).load()
+    print(f"lease: {('owner=' + lease.owner) if lease else '(none)'}")
+    return EXIT_OK
+
+
+def cmd_init_config(args: argparse.Namespace) -> int:
+    """引数から <INSTALL_DIR>/config.json を生成（決定論 I/O）。
+
+    対話的な値収集は `/secretary` skill（重要度の世界）が担い、CLI は決定論 I/O に徹する
+    （DESIGN.md §3.4）。既存ファイルは --force 無しでは上書きしない。
+    """
+    from domain.session_config import SessionDuration
+    from infrastructure.config import _default_config_path
+
+    try:
+        SessionDuration.from_seconds(args.session_duration_sec)
+    except ValueError as exc:
+        print(f"invalid session_duration_sec: {exc}", file=sys.stderr)
+        return EXIT_CONFIG_INVALID
+
+    path = _default_config_path()
+    if path.exists() and not args.force:
+        print(
+            f"config.json already exists at {path} (use --force to overwrite)",
+            file=sys.stderr,
+        )
+        return EXIT_CONFIG_INVALID
+
+    data: dict = {"session_duration_sec": args.session_duration_sec}
+    if args.agent_name:
+        data["agent_name"] = args.agent_name
+    if args.private_dir:
+        data["private_dir"] = args.private_dir
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    print(f"wrote config.json to {path}")
     return EXIT_OK
 
 
@@ -461,6 +520,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("validate-config", help="env vars と設定の検証 (exit 0=OK / 2=設定欠損)")
 
+    sub.add_parser("show-config", help="現在の設定を read-only 表示（秘匿はマスク、未設定でも exit 0）")
+
+    p_init = sub.add_parser(
+        "init-config", help="config.json を生成（決定論 I/O、対話的収集は /secretary 経由）"
+    )
+    p_init.add_argument(
+        "--session-duration-sec",
+        type=int,
+        default=7200,
+        help="セッション継続秒（1〜86400、default 7200=2h。config.json の記入例値）",
+    )
+    p_init.add_argument("--agent-name", help="秘書エージェントの人格名")
+    p_init.add_argument("--private-dir", help="非公開データ・人格定義の配置先")
+    p_init.add_argument(
+        "--force", action="store_true", help="既存 config.json を上書きする"
+    )
+
     p_lease = sub.add_parser("lease", help="リースの取得/更新/解放")
     p_lease.add_argument("action", choices=["acquire", "renew", "release"])
     p_lease.add_argument("--owner", help="session owner id (省略時は env か uuid 生成)")
@@ -552,6 +628,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     handlers = {
         "validate-config": cmd_validate_config,
+        "show-config": cmd_show_config,
+        "init-config": cmd_init_config,
         "lease": cmd_lease,
         "poll": cmd_poll,
         "watch": cmd_watch,

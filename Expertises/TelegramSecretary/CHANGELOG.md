@@ -4,9 +4,20 @@
 
 ## [Unreleased]
 
+### Added
+
+- **運用設定の単一正典化（config.json）** — 手置換が必要だったプレースホルダ（人格名・private_dir 等）を `config.json`（`<INSTALL_DIR>/config.json`、`.gitignore` 除外）に集約。雛型は `templates/config.template.json`、`init-config` で生成。ROUTINE_PROMPT の Step 0 が config.json から `agent_name`/`private_dir` を動的読込し、**prompt 本文の複製・手置換が不要**に。
+- **継続時間の設定可能化（`session_duration_sec`）** — セッション枠を config.json で設定（範囲 1〜86400 秒、fail-fast）。本番（勤務帯調整）／テスト（短縮で keep-alive 高速検証）／観測（Cloud Routine 実行制限の実測）の三役。
+- **`show-config` / `init-config` サブコマンド** — 現設定の read-only 表示（秘匿マスク、未設定でも exit 0）と config.json 生成（範囲検証 + `--force` ガード）。
+
 ### Changed
 
+- **設定を純2層に整理** — env は秘匿（bot token / authorized chats）+ state_dir のみ、非秘匿の運用設定は config.json が単一正典。`config.py` が config.json を直読み（`from_env`→`from_sources`）。`config.json` の場所は `<INSTALL_DIR>` 直下に決め打ち（env で指さない＝鶏卵問題の回避）。
 - **Composition Root の導入** — 依存の組み立て点を一箇所（`infrastructure/composition.py`）に集約。設定読み込みを fail-fast 化し、`poll`/`watch` 共通のメディア処理スタック構築を統一。各 CLI ハンドラは組み立て済みの依存を受け取り、自前で生成しない。終了コードの定義も単一の正典に一本化。CLI・終了コード・出力は不変の内部リファクタ。
+
+### Removed
+
+- **`TS_SESSION_DURATION_SEC` の 7200 既定フォールバックを廃止** — `session_duration_sec` は config.json で必須（欠落は fail-fast）。bootstrap は config.json から duration をローカル取得して deadline 計算し、duration 設定値を env に出さない（純2層）。
 
 ## [0.10.1] - 2026-05-31
 
