@@ -9,6 +9,8 @@
 - **運用設定の単一正典化（config.json）** — 手置換が必要だったプレースホルダ（人格名・private_dir 等）を `config.json`（`<INSTALL_DIR>/config.json`、`.gitignore` 除外）に集約。雛型は `templates/config.template.json`、`init-config` で生成。ROUTINE_PROMPT の Step 0 が config.json から `agent_name`/`private_dir` を動的読込し、**prompt 本文の複製・手置換が不要**に。
 - **継続時間の設定可能化（`session_duration_sec`）** — セッション枠を config.json で設定（範囲 1〜86400 秒、fail-fast）。本番（勤務帯調整）／テスト（短縮で keep-alive 高速検証）／観測（Cloud Routine 実行制限の実測）の三役。
 - **`show-config` / `init-config` サブコマンド** — 現設定の read-only 表示（秘匿マスク、未設定でも exit 0）と config.json 生成（範囲検証 + `--force` ガード）。
+- **Cloud Routine ライフサイクル統合（`/telegram-secretary schedule` / `unschedule`）** — 常駐 routine 自体の登録・更新・停止を skill 操作化。`schedule` は upsert（`RemoteTrigger create` or `get→modify→update` ＋ `init-config`）、`unschedule` は `enabled:false` 停止（物理削除は claude.ai UI 手動）。RemoteTrigger スキーマ罠（events v1 ネスト・session_context 全置換）の回避は内蔵 `schedule` skill を正典参照。手順 SSoT は ROUTINE_PROMPT.md。
+- **ドキュメント命名統一** — ドキュメント内の旧称 `/secretary`（7 箇所）を skill 実名 `/telegram-secretary` に統一。
 
 ### Changed
 
@@ -118,7 +120,7 @@
 ### Added
 
 - 秘書の3管理表（関係者 INDIVIDUALS／依頼 TASKS／対応知 KNOWLEDGE）を Clean Architecture 4層で構築。正典は Private な JSON、配布物はテンプレートのみ（個人データを焼き込まない＝配布可能性の担保）。
-- 管理表 CRUD の CLI サブコマンド（`individuals|tasks|knowledge`）。操作主体はエージェント、書き込みは決定論的 I/O、入口は将来 `/secretary` でラップ。
+- 管理表 CRUD の CLI サブコマンド（`individuals|tasks|knowledge`）。操作主体はエージェント、書き込みは決定論的 I/O、入口は将来 `/telegram-secretary` でラップ。
 - 肥大化対策：TASKS／INDIVIDUALS は日付アーカイブ、KNOWLEDGE はカテゴリ分割（知識は蓄積が本質のため捨てない）。
 - 設計ドキュメント体系を整備（DESIGN／STRUCTURE／SECURITY）。
 

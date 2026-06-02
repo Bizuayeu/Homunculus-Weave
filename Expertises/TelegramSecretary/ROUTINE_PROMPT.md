@@ -230,3 +230,76 @@ source /tmp/telegram-secretary.env.sh && cd "$TELEGRAM_SECRETARY_REPO_ROOT" && \
 - `render_status="skipped"` → zip 等の未対応 mime、download skip、または音声で transcriber 未注入/Medium モード。`mime_type` を見て エージェント が判断
 - 音声の無音／壊れ／デコード不可 → `render_status="ok"` + `rendered_text=""`（失敗でなく「音声なし」として扱う）。空 transcript なら「無音か、音声として読めないファイルの可能性」と両義的に応答。**中間 wav はディスクに書かれない**（PyAV in-memory デコード）
 - `send-reply --file` の `attachment_not_found` / `attachment_too_large` → 送信前に exit 2 で弾かれる。添付パス確認 or サイズ縮小（`TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` 既定 50MB）。本文 text のみの送信は影響なし
+
+---
+
+## Cloud Routine ライフサイクル管理（schedule / unschedule）
+
+> **この節は「登録される prompt body」の一部ではない。** `/telegram-secretary` を呼んだエージェントが、この常駐 routine 自体を Cloud Routine に登録・更新・停止するための **メタ操作手順** である。`RemoteTrigger` ツールで操作する（Python CLI ではない — RemoteTrigger はツールゆえ `scripts/main.py` には置けない）。RemoteTrigger の body shape（events の v1 ネスト・`uuid` 必須形式等）の **正典は内蔵 `schedule` skill**。ここには **TS 固有の登録内容のみ**記し、汎用スキーマは転記しない（`schedule` skill / `MEMORY: reference_remote_trigger_update` を参照＝SSoT）。
+
+### Routine 設定（配布時プレースホルダ、登録後に実値を控える）
+
+BlueberrySprite ROUTINE_PROMPT の「Routine 設定」表と同型。配布物ゆえ実 ID は持たず、登録後に各自が控える。
+
+| 設定 | 値 |
+|---|---|
+| Name | `telegram-secretary` |
+| Routine ID | `<trigger_id>`（登録後に採番） |
+| Repositories | 本体リポ（人格定義）＋ Private（`<PRIVATE_DIR>`：SecretaryRole / state） |
+| Trigger | Schedule |
+| Cron | `<勤務帯。例 0 9-16 * * 1-5>`（各回の長さは config.json の `session_duration_sec`） |
+| Model | `claude-opus-4-8`（任意） |
+| Environment | `<environment_id>`（bot token / authorized chats を注入） |
+| Env vars | `TELEGRAM_BOT_TOKEN` / `TELEGRAM_SECRETARY_AUTHORIZED_CHATS`（＋任意の `TELEGRAM_SECRETARY_*`） |
+| 編集 URL | `https://claude.ai/code/routines/<trigger_id>` |
+
+### 前提：Environment の準備（初回・手動）
+
+bot token / authorized chats は **秘匿ゆえ Cloud Routine の Environment に注入**する（prompt body・commit に焼かない＝出力漏洩スキャン規律）。claude.ai の Environment 設定で登録し、`environment_id` を控える。env の **値は `RemoteTrigger` の body に書かない**（`environment_id` で参照する）。
+
+### schedule（登録 / 有効化 / 設定上書き＝upsert）
+
+「不在なら作る・あれば直す」を1操作で扱う。停止中の再開（`enabled:false→true`）も設定上書きの一種としてここに含む。
+
+1. **config.json を確定**（決定論・既存 CLI。RemoteTrigger とは責務分離）：
+
+```bash
+python scripts/main.py init-config --session-duration-sec <秒> --agent-name <名> [--private-dir <dir>] [--force]
+```
+
+2. **既存 trigger を探す**：`RemoteTrigger action=list` → `name == "telegram-secretary"` を探す（無ければ初回登録）。
+
+3. **upsert 分岐**：
+   - **不在 → create**：`RemoteTrigger action=create body={下記骨子}`
+   - **既存 → get→modify→update**：`RemoteTrigger action=get trigger_id=<id>` で `job_config` 全体を取得 → 変えたい部分（cron / prompt body / model / `enabled`）**だけ**差し替え → `RemoteTrigger action=update trigger_id=<id> body={取得した job_config 全体＋変更}`。
+
+4. **body 骨子（TS 固有の登録内容。汎用スキーマは `schedule` skill 正典）**：
+   - `name`: `telegram-secretary`
+   - `cron_expression`: 勤務帯（`session_duration_sec` と組で「9–17 時」等を表現。コードに時計を持たせない設計の表側）
+   - `enabled`: `true`（有効化。停止中の再開も同じ＝`enabled` を `true` に上書き）
+   - `job_config.ccr.environment_id`: 上記で控えた id
+   - `job_config.ccr.events[0].data.message.content`: **この ROUTINE_PROMPT.md の「## あなたへ」〜「## Failure modes」までの本文**（本ライフサイクル管理節は含めない）
+   - `job_config.ccr.session_context.sources`: 本体リポ＋ Private リポの git URL
+   - `job_config.ccr.session_context.allowed_tools`: `["Bash","Read","Write","Edit","Glob","Grep"]`
+   - `job_config.ccr.session_context.model`: 上表 Model
+
+5. **2つの罠**（詳細は `schedule` skill / `MEMORY: reference_remote_trigger_update` を正典参照）：
+   - **罠① events は v1 ネスト**：`data` 内に `uuid`（毎回新規 lowercase v4）/ `session_id` / `type:"user"` / `parent_tool_use_id:null` / `message` をネストする。`get` は flatten した v2 で返るので、その形のまま `update` に渡さない（`unknown field "type"` 等で 400）。
+   - **罠② session_context は全置換**：`update` は shallow merge せず置換する。必ず `get` で全体を取得し、必要部のみ変えて返す（`sources` / `outcomes` / `allowed_tools` / `model` の消失事故を防ぐ。観測履歴 2 件の実害あり）。
+
+6. **結果確認**：create/update レスポンス末尾の run 時刻・claude.ai URL をユーザーに伝え、時刻が意図通りか確認してもらう。
+
+### unschedule（停止＝enabled:false）
+
+routine を「二度と起動しない」状態にする。`RemoteTrigger` に `delete` action は無いため、**tool で到達できる最終地点は `enabled:false`**（cron が残っても fire しない）。物理削除（list から消す）は claude.ai UI 手動のみ。
+
+1. **対象 trigger を特定**：`RemoteTrigger action=list` → `name == "telegram-secretary"` の `trigger_id` を得る。
+2. **get→modify→update で `enabled` だけ false に**（罠②回避＝他を保持）：
+   - `RemoteTrigger action=get trigger_id=<id>` で `job_config` 全体を取得
+   - `enabled` を `false` に変更（**他は触らない**＝`sources` / `events` / `session_context` を保持）
+   - `RemoteTrigger action=update trigger_id=<id> body={取得した全体に enabled:false を反映}`
+3. **確認**：`RemoteTrigger action=get trigger_id=<id>` → `enabled == false` を確認。次の cron 時刻で起動しなくなる。
+4. **物理削除（任意・手動）**：list からも消したい場合は claude.ai の Routine 編集画面（`https://claude.ai/code/routines/<trigger_id>`）から手動削除する（**tool 不可**）。再開は schedule からやり直し。
+5. **`CronDelete` は使わない**：`CronDelete` はセッション限定・インメモリ cron 専用（Claude 終了で消滅、7 日失効）。永続 Cloud Routine の unschedule には**使えない別物**（誤用防止）。
+
+> **Reversibility**: unschedule は routine を止めるだけで、Private 側の state（`lease.json` / `offset.json` / `media/` / 管理表 JSON）と `config.json` は**消さない**。再 schedule（`enabled:true` に上書き、または create し直し）で即復帰できる。

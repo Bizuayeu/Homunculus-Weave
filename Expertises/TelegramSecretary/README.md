@@ -93,6 +93,10 @@ python scripts/main.py lease release
 
 `--owner` は省略可（`source bootstrap.sh` で env 経由自動同期、緊急時の上書きにのみ使用）。
 
+## Cloud Routine への登録（schedule / unschedule）
+
+常駐 routine 自体の Cloud Routine 登録・更新・停止は `/telegram-secretary` の `schedule`（登録 / 有効化 / 設定上書き＝upsert）/ `unschedule`（停止＝`enabled:false`）で行います。**`RemoteTrigger` ツール手順**（CLI ではない）で、手順は [ROUTINE_PROMPT.md](./ROUTINE_PROMPT.md) の「Cloud Routine ライフサイクル管理」節が SSoT。秘匿は Cloud Routine の Environment に注入、運用設定（`session_duration_sec` 等）は `init-config`。物理削除（list から消す）のみ claude.ai UI 手動です。
+
 ## テスト
 
 ```powershell
