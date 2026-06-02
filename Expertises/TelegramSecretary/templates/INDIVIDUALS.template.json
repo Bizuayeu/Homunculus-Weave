@@ -6,7 +6,7 @@
     "role": "principal | associate — principal=運用主体（管理権限）",
     "status": "pending | active | blocked",
     "telegram_chat_id": "int | null",
-    "line_user_id": "string | null — Phase B（LineBridge）で使用",
+    "line_user_id": "string | null — 他チャネル連携用（将来拡張）",
     "identity": {
       "category": "family | friend | client | vendor | employee | peer | introducer | other",
       "relationship_label": "string — 例: 取引先の営業部長",
@@ -15,7 +15,7 @@
       "context_notes": "string — 自由記述（PII 前提、Private 限定）",
       "priority_bias": "low | normal | high",
       "taboo_topics": "string[] — 避ける話題",
-      "shared_with": "uuid[] — 情報共有を許可した相手（LineBridge 連携時）"
+      "shared_with": "uuid[] — 情報共有を許可した相手（複数チャネル併用時）"
     },
     "created_at": "ISO8601",
     "updated_at": "ISO8601"
