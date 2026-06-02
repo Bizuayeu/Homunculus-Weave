@@ -145,6 +145,6 @@ TelegramSecretary/
         state README を再生成（件数・最終更新・分割状況）
 ```
 
-## `/secretary` ラップ（操作の入口）
+## `/telegram-secretary` ラップ（操作の入口）
 
-管理表 CRUD の全インターフェース（`individuals|tasks|knowledge add|update|list|...`）は、マスタースキル `/secretary` の管理パネル経由でアクセスできる。エージェントも人間ユーザーも、コマンド名を覚えずに `/secretary` から操作に到達する。
+管理表 CRUD の全インターフェース（`individuals|tasks|knowledge add|update|list|...`）は、マスタースキル `/telegram-secretary` の管理パネル経由でアクセスできる。エージェントも人間ユーザーも、コマンド名を覚えずに `/telegram-secretary` から操作に到達する。

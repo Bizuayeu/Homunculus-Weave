@@ -120,7 +120,7 @@ def cmd_show_config(_: argparse.Namespace) -> int:
 def cmd_init_config(args: argparse.Namespace) -> int:
     """引数から <INSTALL_DIR>/config.json を生成（決定論 I/O）。
 
-    対話的な値収集は `/secretary` skill（重要度の世界）が担い、CLI は決定論 I/O に徹する
+    対話的な値収集は `/telegram-secretary` skill（重要度の世界）が担い、CLI は決定論 I/O に徹する
     （DESIGN.md §3.4）。既存ファイルは --force 無しでは上書きしない。
     """
     from domain.session_config import SessionDuration
@@ -523,7 +523,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("show-config", help="現在の設定を read-only 表示（秘匿はマスク、未設定でも exit 0）")
 
     p_init = sub.add_parser(
-        "init-config", help="config.json を生成（決定論 I/O、対話的収集は /secretary 経由）"
+        "init-config", help="config.json を生成（決定論 I/O、対話的収集は /telegram-secretary 経由）"
     )
     p_init.add_argument(
         "--session-duration-sec",
@@ -612,7 +612,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--pages", help="画像化するページ範囲 N-M（1-indexed inclusive）"
     )
 
-    # 管理表 CRUD（individuals / tasks / knowledge）。/secretary が全操作をラップする入口
+    # 管理表 CRUD（individuals / tasks / knowledge）。/telegram-secretary が全操作をラップする入口
     for _name in ("individuals", "tasks", "knowledge"):
         p_reg = sub.add_parser(_name, help=f"{_name} 管理表の CRUD")
         p_reg.add_argument("registry_action", choices=["list", "get", "add", "remove"])
