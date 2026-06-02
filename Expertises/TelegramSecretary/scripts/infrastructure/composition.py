@@ -29,8 +29,11 @@ def load_config() -> Config:
     旧 `_load_config` の `Config | int` union を置き換える。union はハンドラ毎の
     `if isinstance(config, int): return config` ガード重複を生んでいた。例外伝播に統一し、
     CLI 境界で 1 度だけ exit code へ変換する。
+
+    `from_sources` は秘匿（token/chats）を env、運用設定（session_duration_sec 等）を
+    config.json（<INSTALL_DIR>/config.json 決め打ち）から読む（純2層）。
     """
-    return Config.from_env()
+    return Config.from_sources()
 
 
 @dataclass

@@ -11,6 +11,10 @@ LineBridge/
 # skill root の state/ のみ除外。adapters/state/ パッケージは除外しない（先頭スラッシュで限定）。
 /state/
 
+# 運用設定の実体（config.json）。skill root のみ除外（先頭スラッシュ）。
+# 秘匿は含まないが個人/インスタンス固有設定ゆえ配布しない。templates/config.template.json（雛型）は配布対象。
+/config.json
+
 # Python 生成物
 __pycache__/
 *.py[cod]

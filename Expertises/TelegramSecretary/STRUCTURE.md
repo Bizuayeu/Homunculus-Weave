@@ -18,13 +18,15 @@
 
 `SecretaryRole` はロール名として汎用使用（置換不要）。人格の実体定義は `<PRIVATE_DIR>/Identities/SecretaryRole.md`、雛型は [`templates/Identities/SecretaryRole.template.md`](./templates/Identities/SecretaryRole.template.md)。
 
+**運用設定は config.json に集約**: `agent_name` / `private_dir` / `session_duration_sec` は手置換せず `<INSTALL_DIR>/config.json`（`.gitignore` 除外、雛型 `templates/config.template.json`、`init-config` 生成）に置く。ROUTINE_PROMPT は Step 0 でこれを読み、`<INSTALL_DIR>` / `<REPO_ROOT>` は bootstrap が env 解決する（運用値の手置換は不要）。秘匿（bot token / authorized chats）は env、非秘匿の運用設定は config.json が単一正典（**純2層**）。
+
 ## 全体像（3区分）
 
 | 区分 | git | 中身 |
 |---|---|---|
 | **public（配布物）** | marketplace プラグインとして公開 | scripts（コード）・ドキュメント・テンプレート（雛型） |
 | **Private（実体）** | 別の非公開リポ（`<PRIVATE_DIR>`） | 人格実体・管理表実データ・運用 state |
-| **除外（開発専用）** | `.gitignore` | 開発専用ディレクトリ（`docs/devlog/`・`LineBridge/`）・生成物・`state/` |
+| **除外（開発専用・実体）** | `.gitignore` | 開発専用ディレクトリ（`docs/devlog/`・`LineBridge/`）・生成物・`state/`・`config.json`（運用設定の実体。雛型 `templates/config.template.json` は配布対象） |
 
 **鉄則**: public には個人情報・人格を一切焼き込まない。実体はすべて Private。これが配布可能性の担保。
 
@@ -44,6 +46,7 @@ TelegramSecretary/
 ├── .gitignore
 │
 ├── templates/                # 雛型のみ（実データは Private）
+│   ├── config.template.json   # 運用設定の雛型（実体は <INSTALL_DIR>/config.json、.gitignore）
 │   ├── INDIVIDUALS.template.json
 │   ├── TASKS.template.json
 │   ├── KNOWLEDGE.template.json
@@ -109,6 +112,7 @@ TelegramSecretary/
 
 | 作るもの | 配置 | 区分 |
 |---|---|---|
+| 運用設定 config.json | `<INSTALL_DIR>/config.json`（`.gitignore`） | 実体（除外） |
 | 関係者データ INDIVIDUALS.json | `<state_dir>/individuals/` | Private |
 | 依頼データ TASKS.json | `<state_dir>/tasks/` | Private |
 | 対応知 KNOWLEDGE.json（→category 分割） | `<state_dir>/knowledge/` | Private |

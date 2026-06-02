@@ -32,6 +32,10 @@ def env_ready(monkeypatch, tmp_path):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "TEST_TOKEN")
     monkeypatch.setenv("TELEGRAM_SECRETARY_AUTHORIZED_CHATS", "[100]")
     monkeypatch.setenv("TELEGRAM_SECRETARY_STATE_DIR", str(tmp_path))
+    # config.json（非秘匿の正典、session_duration_sec 必須）を tmp に用意し決め打ちパスを差し替え
+    cfg = tmp_path / "config.json"
+    cfg.write_text(json.dumps({"session_duration_sec": 7200}), encoding="utf-8")
+    monkeypatch.setattr("infrastructure.config._default_config_path", lambda: cfg)
     return tmp_path
 
 
@@ -53,6 +57,69 @@ def test_validate_config_invalid_json_chats(monkeypatch, tmp_path):
     monkeypatch.setenv("TELEGRAM_SECRETARY_AUTHORIZED_CHATS", "not json")
     monkeypatch.setenv("TELEGRAM_SECRETARY_STATE_DIR", str(tmp_path))
     assert main(["validate-config"]) == EXIT_CONFIG_INVALID
+
+
+def test_validate_config_shows_session_duration(env_ready, capsys):
+    """validate-config 出力に session_duration_sec が含まれる（config.json 由来）。"""
+    assert main(["validate-config"]) == EXIT_OK
+    assert "session_duration_sec=7200" in capsys.readouterr().out
+
+
+# --- show-config ---
+
+
+def test_show_config_displays_settings(env_ready, capsys):
+    """現設定を表示し、秘匿（token）は値を出さずキー存在のみ。"""
+    assert main(["show-config"]) == EXIT_OK
+    out = capsys.readouterr().out
+    assert "session_duration_sec: 7200" in out
+    assert "bot_token: set" in out
+    assert "TEST_TOKEN" not in out  # 秘匿マスク（値が漏れない）
+
+
+def test_show_config_when_not_ready_returns_ok(capsys):
+    """env/config.json 未設定でも exit 0（read-only パネル、未設定を表示）。"""
+    assert main(["show-config"]) == EXIT_OK
+    assert "config not ready" in capsys.readouterr().out
+
+
+# --- init-config ---
+
+
+def test_init_config_writes_file(monkeypatch, tmp_path):
+    """引数から config.json を生成（config ロード不要、書くだけ）。"""
+    target = tmp_path / "config.json"
+    monkeypatch.setattr("infrastructure.config._default_config_path", lambda: target)
+    rc = main(["init-config", "--session-duration-sec", "3600", "--agent-name", "Iris"])
+    assert rc == EXIT_OK
+    data = json.loads(target.read_text(encoding="utf-8"))
+    assert data["session_duration_sec"] == 3600
+    assert data["agent_name"] == "Iris"
+
+
+def test_init_config_refuses_overwrite_without_force(monkeypatch, tmp_path):
+    """既存 config.json は --force 無しで上書きしない（exit 2）。"""
+    target = tmp_path / "config.json"
+    target.write_text("{}", encoding="utf-8")
+    monkeypatch.setattr("infrastructure.config._default_config_path", lambda: target)
+    assert main(["init-config", "--session-duration-sec", "3600"]) == EXIT_CONFIG_INVALID
+
+
+def test_init_config_force_overwrites(monkeypatch, tmp_path):
+    """--force で既存を上書き。"""
+    target = tmp_path / "config.json"
+    target.write_text("{}", encoding="utf-8")
+    monkeypatch.setattr("infrastructure.config._default_config_path", lambda: target)
+    assert main(["init-config", "--session-duration-sec", "3600", "--force"]) == EXIT_OK
+    assert json.loads(target.read_text(encoding="utf-8"))["session_duration_sec"] == 3600
+
+
+def test_init_config_rejects_out_of_range(monkeypatch, tmp_path):
+    """範囲外（>86400）は生成前に弾く（ファイルを作らない）。"""
+    target = tmp_path / "config.json"
+    monkeypatch.setattr("infrastructure.config._default_config_path", lambda: target)
+    assert main(["init-config", "--session-duration-sec", "99999"]) == EXIT_CONFIG_INVALID
+    assert not target.exists()
 
 
 # --- lease ---

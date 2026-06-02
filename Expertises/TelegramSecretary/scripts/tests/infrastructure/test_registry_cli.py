@@ -14,6 +14,7 @@ def _config(tmp_path: Path) -> Config:
         bot_token="x",
         authorized_chats=AuthorizedChats.from_iterable([1]),
         state_dir=tmp_path,
+        session_duration_sec=7200,
     )
 
 
