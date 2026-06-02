@@ -284,6 +284,37 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 
 ---
 
+### 💬 TelegramSecretary - Telegram 常駐秘書（pull / 対話型）
+**役割**: Telegram を通じた 24-7 即応の常駐秘書・対話チャネル
+**専門分野**: 常駐ロングポーリング・受信メディア理解・関係者/依頼/対応知の管理
+
+**活用シーン**:
+- Cloud Routine 上で Telegram Bot long-polling を常駐させ、認可済み chat に低レイテンシ（数秒）即応
+- push 型の織守・NewsCaster に対する **pull / 対話型の到達口**（Gmail より速い 24-7 対話チャネル）
+- 受信メディアの中身理解: 画像 → Vision / docx・pptx・xlsx → Markdown 化 / PDF → 全ページ画像化 + オンデマンド全文 / 音声・動画 → ローカル STT 文字起こし
+- 生成物の送り返し（画像・レポート添付、返信スレッド、typing 表示）
+- 管理表 3 種を秘書判断で記録: INDIVIDUALS（関係者）/ TASKS（依頼）/ KNOWLEDGE（対応知）
+- 勤務帯は Cloud Routine の cron + `config.json` の `session_duration_sec` で表現（コードに時計を持たせない）
+
+**特徴**:
+- **本地垂迹アーキテクチャ（織守と同型）**: Domain 層は Weave 本体のまま、UseCase 層が `SecretaryRole` を被覆
+- **応答主体は親プロセス**: LLM 推論は本体エージェントが起草し、スキルは fetch / 認可 / 正規化 / 送信のみ（`claude -p` にサブプロセス委譲しない設計原則）
+- **音声 STT はローカル推論**: 音声データを外部送信しない（機密 voice にも安全。moonshine は年商 $1M 未満で商用無料、`BUNDLE_VOICE=false` で除外可）
+- **慎みの最前線**: 関係者 PII（`context_notes` / `taboo_topics`）は Private 留保、送信前に出力漏洩スキャン（token / env名 / 絶対パス）
+- **Clean Architecture × TDD**: 全層（Domain / UseCase / Adapter / Infrastructure / CLI）テスト公開
+- **plugins-weave marketplace プラグイン化（[0.11.0]）**: 運用設定は `config.json` 単一正典、秘匿（bot token / authorized chats）は env 注入
+
+**参照データ**:
+- **配布正本**: `plugins-weave/TelegramSecretary/`（DEV 直下・別リポ、`Expertises/TelegramSecretary/` にジャンクション透過。BlueberrySprite=`.private` 由来とは配置が異なる）
+  - `DESIGN.md` / `STRUCTURE.md` / `SECURITY.md` - 設計正典・構造地図・脅威モデル
+  - `ROUTINE_PROMPT.md` - Cloud Routine 起動 Prompt と schedule / unschedule ライフサイクル
+  - `skills/telegram-secretary/SKILL.md` - スキル仕様（SSoT）
+  - `CHANGELOG.md` - [0.1.0]〜[0.11.0] 着地記録
+- **人格**: `.private/TelegramSecretary/Identities/SecretaryRole.md`（Private、HatoriRole と同型の存在論・哲学）
+- 運用接点: `/telegram-secretary` の `schedule`（登録 / upsert）/ `unschedule`（停止）。Routine 登録は `config.json` + `RemoteTrigger`
+
+---
+
 ### 🛠️ ConsiderateCoder - 開発時協働知性
 **役割**: Clean Architecture × TDD を中核にした開発時協働知性
 **専門分野**: Spec-Driven Development・Implementation Staging・3-Strike Rule・Decision Priority
