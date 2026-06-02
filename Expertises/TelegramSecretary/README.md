@@ -1,8 +1,8 @@
 # TelegramSecretary
 
-> 📦 **プレースホルダ凡例** — ドキュメント内の山括弧トークンは、利用者が自分の値に置換します：`<AGENT_NAME>`（秘書エージェントの人格名）／`<OWNER>`（運用主体・principal）／`<ORGANIZATION>`（組織名）／`<REPO_ROOT>`（リポジトリルート）／`<PRIVATE_DIR>`（非公開データ・人格定義の配置先）／`<INSTALL_DIR>`（インストール先）。`SecretaryRole` はロール名として汎用使用します。詳細は [STRUCTURE.md](./STRUCTURE.md)。
+> 📦 **設定の置き場** — 環境固有の値は `<INSTALL_DIR>/config.json`（`agent_name` / `private_dir` / `session_duration_sec`、雛型 `templates/config.template.json`、`init-config` で生成）に集約します。秘匿（bot token / authorized chats）は env で注入。**運用値の手置換は不要**——人格名・private_dir は config.json、`<INSTALL_DIR>` / `<REPO_ROOT>` は bootstrap が env 解決します（`<INSTALL_DIR>`=インストール先 / `<OWNER>`=運用主体 はドキュメント上の読み替え表記）。詳細は [STRUCTURE.md](./STRUCTURE.md)。
 
-Telegram Bot API の long-polling を Cloud Routine 上で常駐させ、認可済みチャットからのメッセージに秘書エージェント（`SecretaryRole` を被った `<AGENT_NAME>`）が即応する対話チャネル。
+Telegram Bot API の long-polling を Cloud Routine 上で常駐させ、認可済みチャットからのメッセージに秘書エージェント（`SecretaryRole` を被った本体エージェント。人格名は config.json の `agent_name`）が即応する対話チャネル。
 
 公開 ingress を持てない Cloud Routine 環境でも、long-polling と deadline 駆動ループで 24-7 の即応を実現します（`watch --exit-on-message` がメッセージ受信時に即座に exit → 返信 → 再起動）。応答は親プロセスのエージェント本人が起草し、本スキルは fetch / 認可 / 正規化 / 送信のみを担います（応答生成をサブプロセスに投げない設計）。
 
@@ -29,13 +29,17 @@ cd <INSTALL_DIR>
 # 依存インストール
 python -m pip install -e ".[dev]"
 
-# 環境変数（最小構成）
+# 環境変数（秘匿のみ＝純2層）
 $env:TELEGRAM_BOT_TOKEN = "<bot-token-from-botfather>"
 $env:TELEGRAM_SECRETARY_AUTHORIZED_CHATS = "[<your-chat-id>]"
-$env:TELEGRAM_SECRETARY_STATE_DIR = ".\state"
+$env:TELEGRAM_SECRETARY_STATE_DIR = ".\state"   # 任意（既定 ./state）
 
-# 設定検証 → 疎通 ping → 1サイクル poll
+# 運用設定 config.json を生成（session_duration_sec 必須、範囲 1〜86400）
+python scripts/main.py init-config --session-duration-sec 7200 --agent-name YourSecretary
+
+# 設定検証 → 現設定の確認 → 疎通 ping → 1サイクル poll
 python scripts/main.py validate-config
+python scripts/main.py show-config
 python scripts/main.py test --chat-id <your-chat-id>
 python scripts/main.py poll --timeout 5
 
@@ -69,13 +73,15 @@ python scripts/main.py lease release
 | `TELEGRAM_SECRETARY_OUTBOUND_MAX_SIZE_BYTES` | optional | 送信添付の上限（既定 50MB、Telegram bot API 上限）。超過は送信前に弾く |
 | `TELEGRAM_SECRETARY_PDF_IMAGE_MAX_PAGES` | optional | PDF 受信時に事前画像化する先頭ページ数の上限（既定 20）。超過分は `render-pdf` でオンデマンド |
 
-> deadline 駆動ループの運用変数（`TS_SESSION_DURATION_SEC` / `TS_SESSION_DEADLINE_EPOCH` / `TS_POLL_SET_SEC` / `TS_POLL_BASH_TIMEOUT_MS` / `TS_MAX_TURNS`）は `bootstrap.sh` が export します。詳細は [ROUTINE_PROMPT.md](./ROUTINE_PROMPT.md)。
+> **継続時間は config.json の `session_duration_sec`**（範囲 1〜86400 秒、必須）。「9-17 時勤務」のような勤務帯は Cloud Routine の cron（例 `0 9-16 * * 1-5`）+ duration で表現します（コードに時計を持たせない）。deadline 駆動ループの運用変数（`TS_SESSION_DEADLINE_EPOCH` / `TS_POLL_SET_SEC` / `TS_POLL_BASH_TIMEOUT_MS` / `TS_MAX_TURNS`）は `bootstrap.sh` が config.json から算出して export します。詳細は [ROUTINE_PROMPT.md](./ROUTINE_PROMPT.md)。
 
 ## Subcommands
 
 | Command | 機能 | Exit code |
 |---|---|---|
-| `validate-config` | env と設定の検証 | 0=OK, 2=設定欠損 |
+| `validate-config` | env + config.json の検証 | 0=OK, 2=設定欠損 |
+| `show-config` | 現設定を read-only 表示（秘匿はマスク） | 0（未設定でも 0） |
+| `init-config [--session-duration-sec] [--agent-name] [--private-dir] [--force]` | config.json を生成（範囲検証、既存は `--force` で上書き） | 0, 2=範囲外/既存 |
 | `lease acquire\|renew\|release [--owner]` | リースロック操作（並走防止） | 0, 4=conflict, 2 |
 | `poll [--timeout]` | getUpdates 1サイクル、認可・正規化済み update を JSON Lines で emit | 0, 1=fetch失敗, 3=auth失敗 |
 | `watch [--max-duration] [--exit-on-message] [--max-iterations] [--cleanup-interval] [--owner]` | 長期 long-poll ループ（サイクル毎に lease 自動 renew）。`--max-duration`=窓満了で exit 0、`--exit-on-message`=メッセージ受信サイクルで exit 0 | 常駐 / 窓畳み |

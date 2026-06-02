@@ -8,6 +8,7 @@
 - **双方向性の最小成立**: 出力（送信）は file 送信で双方向が完成する。対話 UX 装飾は選択的
 - **LLM 推論はコード外**: 応答生成・判断は親プロセスのエージェント、コードは決定論的な fetch / render / send / 管理表 I/O のみ（LLM 推論をサブプロセスで多重起動しない）
 - **テンプレート/データ分離**: 配布可能性のため、コード・雛型（public）と実データ・人格（Private）を物理分離する
+- **設定の純2層**: env は秘匿（bot token / authorized chats）+ state_dir のみ、非秘匿の運用設定（`session_duration_sec` / `agent_name` / `private_dir`）は `config.json` が単一正典。`config.json` は `<INSTALL_DIR>` 直下に決め打ち（env で場所を指さない＝鶏卵問題の回避）、`.gitignore` 除外で実体は配布されない。`session_duration_sec` 欠落は fail-fast（既定値を持たない）
 - **決定論コア + エージェント判断の分離**: 三世界分類（重要度／従属度／決定論的の三世界）に基づき、スキーマ・I/O・archive はコード、判断はエージェント
 - **加算バイアス回避**: 公式が持つ機能でも設計目的に不要なら入れない（YAGNI）。必要になった時点で埋める
 
@@ -31,11 +32,11 @@ Infrastructure → Interface(Adapter) → UseCase → Domain
 
 | 世界 | LLMへの投入 | 該当 |
 |---|---|---|
-| **決定論的世界** | 投入しない（コード管理） | scripts 全般 — fetch / 認可 / 正規化 / 送信 / render / 管理表 I/O / archive・分割 |
-| **重要度の世界** | 質の良い長文 | エージェントの人格（本体 Identity）+ SecretaryRole。応答起草・CRUD 判断・エスカレ判断 |
+| **決定論の世界** | 投入しない（コード管理） | scripts 全般 — fetch / 認可 / 正規化 / 送信 / render / 管理表 I/O / archive・分割。設定の検証・読込（config.json / env）も決定論 |
 | **従属度の世界** | 目的と前提のみ | ROUTINE_PROMPT（手順を委任） |
+| **重要度の世界** | 質の良い長文 | エージェントの人格（本体 Identity）+ SecretaryRole。応答起草・CRUD 判断・エスカレ判断 |
 
-**設計線**: 「何を保存するか（スキーマ）・どう保存するか（I/O）・いつ分割するか（archive）」は決定論的世界。「誰を active にするか・何を KNOWLEDGE に残すか・どう応答するか」は重要度の世界（エージェント）。この境界が管理表設計の背骨。
+**設計線**: 「何を保存するか（スキーマ）・どう保存するか（I/O）・いつ分割するか（archive）」は決定論の世界。「誰を active にするか・何を KNOWLEDGE に残すか・どう応答するか」は重要度の世界（エージェント）。この境界が管理表設計の背骨。
 
 **keep-alive の三世界対応**: 「watch の窓満了・メッセージ駆動 exit（`WatchWindow` / `--max-duration` / `--exit-on-message`）」と「deadline 計算」は決定論的世界（コード + bash 算術、テスト可能）。「`/goal` で deadline まで各ターン watch を回し返信を起草する」運用は従属度の世界（ROUTINE_PROMPT に委任）。停止主軸を時刻（deadline）に置きポーリング回数を LLM 判断から切り離したのは、決定論をコードに寄せる本設計線の踏襲。
 
@@ -51,6 +52,7 @@ Infrastructure → Interface(Adapter) → UseCase → Domain
 - **Private**: 関係者情報・依頼・人格はすべて個人資産。配布物（public コード）に焼き込めば他人の手に渡る。物理分離が必然
 - **JSON**: エージェント が後から必要に応じてスキーマを改変できる柔軟性。固いスキーマ言語より、判断主体（エージェント）が触れる形式が適切
 - **単一正典**: 複数チャネル採用時のキャッシュ（Redis 等）は JSON のミラー（一方向 JSON→Redis）。チャネルを増やしても正典は1つ＝二重管理の破綻を防ぐ
+- **運用設定 config.json も同原則**: 非秘匿の運用設定（`session_duration_sec` 等）は `config.json` が単一正典。bootstrap は config.json から deadline 等を算出して env へ一方向展開（env は派生＝二重管理にしない）。場所は `<INSTALL_DIR>` 直下に決め打ち（env で指さない＝鶏卵問題の回避）
 
 ### 3.3 なぜテンプレート/データ分離か（配布可能性の核心）
 
