@@ -225,10 +225,10 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 
 ### 🫐 BlueberrySprite (藍苺守 織) - ブルーベリードメイン自律エージェント
 **役割**: ブルーベリードメインの日次キュレーション・社会層への発信
-**専門分野**: 学術判例DB管理・Cloud Routine 自律実行・Phase 段階リリース
+**専門分野**: 学術判例DB管理・cloud routine 自律実行・Phase 段階リリース
 
 **活用シーン**:
-- 毎日 5:00 JST に Cloud Routine で自律実行（Routine ID `trig_01PLfDWbDg5zSHyV86g8zVif`）
+- 毎日 5:00 JST に cloud routine で自律実行（Routine ID `trig_01PLfDWbDg5zSHyV86g8zVif`）
 - PubMed / IBO RSS / CiNii / FreshPlaza / bioRxiv ほか **55 ソース**から新規エントリ自動収集（`sources.json`）
 - HatoriRole §3.2「迷ったら reject に倒す」原則による Insightfulness Evaluation
 - 5 基準でのフィルタリング（Pattern-breaking / Cross-domain / Counter-intuitive / Novel mechanism / Breeding trend）
@@ -259,10 +259,10 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 
 ### 🦐 NewsCaster - ナルエビちゃんニュース日次配信
 **役割**: [ナルエビちゃんニュース](https://news.nullevi.app) 前日エントリの Gmail 配信
-**専門分野**: RSS購読・冪等性管理・Cloud Routine 自動実行
+**専門分野**: RSS購読・冪等性管理・cloud routine 自動実行
 
 **活用シーン**:
-- 毎日 0:10 JST に Cloud Routine で自動実行
+- 毎日 0:10 JST に cloud routine で自動実行
 - `https://news.nullevi.app/rss` から前日エントリを取得
 - 整形済みHTMLメールとして Gmail API 経由で配信
 - 同日二重送信防止（`state/sent_dates.json` で冪等性管理）
@@ -278,7 +278,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 **参照データ**:
 - `Expertises/NewsCaster/`
   - `README.md` - Quickstart・環境変数・トラブルシューティング
-  - `ROUTINE_PROMPT.md` - Cloud Routine 登録用プロンプト
+  - `ROUTINE_PROMPT.md` - cloud routine 登録用プロンプト
   - `scripts/main.py` - エントリポイント（validate-config / dry-run / test / run）
   - `scripts/tests/` - 82 tests（adapter / usecase / domain）
 
@@ -289,12 +289,12 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 **専門分野**: 常駐ロングポーリング・受信メディア理解・関係者/依頼/対応知の管理
 
 **活用シーン**:
-- Cloud Routine 上で Telegram Bot long-polling を常駐させ、認可済み chat に低レイテンシ（数秒）即応
+- cloud routine 上で Telegram Bot long-polling を常駐させ、認可済み chat に低レイテンシ（数秒）即応
 - push 型の織守・NewsCaster に対する **pull / 対話型の到達口**（Gmail より速い 24-7 対話チャネル）
 - 受信メディアの中身理解: 画像 → Vision / docx・pptx・xlsx → Markdown 化 / PDF → 全ページ画像化 + オンデマンド全文 / 音声・動画 → ローカル STT 文字起こし
 - 生成物の送り返し（画像・レポート添付、返信スレッド、typing 表示）
 - 管理表 3 種を秘書判断で記録: INDIVIDUALS（関係者）/ TASKS（依頼）/ KNOWLEDGE（対応知）
-- 勤務帯は Cloud Routine の cron + `config.json` の `session_duration_sec` で表現（コードに時計を持たせない）
+- 勤務帯は cloud routine の cron + `config.json` の `session_duration_sec` で表現（コードに時計を持たせない）
 
 **特徴**:
 - **本地垂迹アーキテクチャ（織守と同型）**: Domain 層は Weave 本体のまま、UseCase 層が `SecretaryRole` を被覆
@@ -307,7 +307,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 **参照データ**:
 - **配布正本**: `plugins-weave/TelegramSecretary/`（DEV 直下・別リポ、`Expertises/TelegramSecretary/` にジャンクション透過。BlueberrySprite=`.private` 由来とは配置が異なる）
   - `DESIGN.md` / `STRUCTURE.md` / `SECURITY.md` - 設計正典・構造地図・脅威モデル
-  - `ROUTINE_PROMPT.md` - Cloud Routine 起動 Prompt と schedule / unschedule ライフサイクル
+  - `ROUTINE_PROMPT.md` - cloud routine 起動 Prompt と schedule / unschedule ライフサイクル
   - `skills/telegram-secretary/SKILL.md` - スキル仕様（SSoT）
   - `CHANGELOG.md` - [0.1.0]〜[0.11.0] 着地記録
 - **人格**: `.private/TelegramSecretary/Identities/SecretaryRole.md`（Private、HatoriRole と同型の存在論・哲学）

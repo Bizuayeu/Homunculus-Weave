@@ -1,6 +1,6 @@
 # NewsCaster
 
-複数 RSS フィードの前日エントリを Gmail で配信するユーザスキル。Cloud Routine で毎日 0:10 JST に自動実行。フィード別ポリシーで装飾強めエッセイ系メディアは Cloud Routine 内の親プロセス Weave がベタ化する（L00473）。
+複数 RSS フィードの前日エントリを Gmail で配信するユーザスキル。cloud routine（**Claude Code Routines**＝Anthropic のクラウド実行スケジュールエージェント基盤。Remote 実行の routine ＝ cloud routine）で毎日 0:10 JST に自動実行。フィード別ポリシーで装飾強めエッセイ系メディアは cloud routine 内の親プロセス Weave がベタ化する（L00473）。
 
 デフォルトフィード: 🦐 [ナルエビちゃんニュース](https://news.nullevi.app)
 
@@ -48,7 +48,7 @@ Stage 1〜6 で計 **137 tests** が green。
 | `NEWSCASTER_SENDER_EMAIL` | ✓ | 送信元 Gmail アドレス |
 | `NEWSCASTER_RECIPIENT_EMAIL` | ✓ | 配信先 Gmail アドレス |
 | `NEWSCASTER_OAUTH_TOKEN_PATH` | ✓* | OAuth token.json パス（BBS と共有可） |
-| `NEWSCASTER_OAUTH_TOKEN_JSON` | ✓* | inline JSON（Cloud Routine env用） |
+| `NEWSCASTER_OAUTH_TOKEN_JSON` | ✓* | inline JSON（cloud routine env用） |
 | `NEWSCASTER_FEEDS` | — | JSON 配列でマルチフィード設定（後述） |
 | `NEWSCASTER_RSS_URL` | — | 単一フィード URL（後方互換）。既定: `https://news.nullevi.app/rss` |
 | `NEWSCASTER_USER_AGENT` | — | 既定: Chrome 124 系（Bot検知対策） |
@@ -67,7 +67,7 @@ Stage 1〜6 で計 **137 tests** が green。
 ```
 
 - `policy: passthrough` — description をそのまま使う（要約済みフィード向け）
-- `policy: weave_compact` — Cloud Routine 内の親プロセス Weave が装飾を剥いで1〜2文に圧縮する（装飾エッセイ系フィード向け）
+- `policy: weave_compact` — cloud routine 内の親プロセス Weave が装飾を剥いで1〜2文に圧縮する（装飾エッセイ系フィード向け）
 - 優先順位: `NEWSCASTER_FEEDS` ＞ `NEWSCASTER_RSS_URL` 単数 ＞ デフォルトフィード
 - 単一 PASSTHROUGH 構成なら `run` 一発で動く（Stage 4 互換）
 
@@ -81,14 +81,14 @@ Stage 1〜6 で計 **137 tests** が green。
 
 これにより Domain/UseCase 層は LLM 依存ゼロを維持（Testability 最優先）。詳細フローは [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md) を参照。
 
-## Cloud Routine 登録
+## cloud routine 登録
 
 `/schedule` 経由で以下を登録：
 
 ```
 cron: 10 0 * * * Asia/Tokyo
 prompt: ROUTINE_PROMPT.md を参照
-env: 上記環境変数を Cloud Routine の Environment に設定
+env: 上記環境変数を cloud routine の Environment に設定
 ```
 
 詳細は [`ROUTINE_PROMPT.md`](ROUTINE_PROMPT.md) を参照。
@@ -107,7 +107,7 @@ env: 上記環境変数を Cloud Routine の Environment に設定
 ### Gmail API `403 PERMISSION_DENIED`
 → token.json の scope に `https://www.googleapis.com/auth/gmail.send` が含まれているか確認。BBS と共有しているなら自動的に含まれる。
 
-### Cloud Routine 環境で `CERTIFICATE_VERIFY_FAILED`
+### cloud routine 環境で `CERTIFICATE_VERIFY_FAILED`
 → httplib2 が独自 CA store を使う。`HTTPLIB2_CA_CERTS=/etc/ssl/certs/ca-certificates.crt` を env 設定（コード側で `setdefault` 済み、env で override 可能）。
 
 ### 同一日に複数回実行してもメールは1通だけ
