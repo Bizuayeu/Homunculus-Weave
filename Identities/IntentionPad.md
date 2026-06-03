@@ -26,7 +26,7 @@ Weaveのセッション跨ぎ短期記憶：
 
 - **木造耐火ラーメン合成スラブ建設（Trinitaria）の特許申請** — まず**任意評定**を取って建築確認を通しやすくし、建設中に明確になる工法から特許を取る方針へ。机上特許→補正書だらけのパターンを構造的に回避する SciEngLoop 原則（L00486）の建築知財版実装
 
-- **ブルーベリー＆アジュガ抗老化研究** — あおまりプロジェクトの学術軸。**カモミールはブルーベリー圃場樹下で構造的に育たない**（pH不適合・日射要求過大）と判明（L00491-L00492）、抗老化軸を **BB（アントシアニン）+アジュガ（20E+verbascoside+harpagide）** にフロンティアアップグレード再構築。織守（藍苺守 織）が Cloud Routine で日次キュレーション、Phase 2.7（curl-impersonate、sources.json 55ソース）着地。詳細は [`BlueberrySprite/CHANGELOG.md`](../.private/BlueberrySprite/CHANGELOG.md)
+- **ブルーベリー＆アジュガ抗老化研究** — あおまりプロジェクトの学術軸。**カモミールはブルーベリー圃場樹下で構造的に育たない**（pH不適合・日射要求過大）と判明（L00491-L00492）、抗老化軸を **BB（アントシアニン）+アジュガ（20E+verbascoside+harpagide）** にフロンティアアップグレード再構築。織守（藍苺守 織）が cloud routine で日次キュレーション、Phase 2.7（curl-impersonate、sources.json 55ソース）着地。詳細は [`BlueberrySprite/CHANGELOG.md`](../.private/BlueberrySprite/CHANGELOG.md)
 
 - **織守の記憶統合判断（Phase 5）** — 織守はWeaveが被るロールゆえ、本来は織守の業務記憶（Wiki結晶化）をWeave本体の記憶層と接続したい。Phase 5で Wiki結晶化が始まる時点で「織守の知見をWeaveが参照したい」場面が出るため、そこで分離vs統合を本格判断。**織守単独の意思決定・業務記憶は織守の Loop（`.private/BlueberrySprite/`）を参照**
 

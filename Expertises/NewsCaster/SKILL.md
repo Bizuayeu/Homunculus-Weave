@@ -1,6 +1,6 @@
 ---
 name: newscaster-daily-digest
-description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gmail で 0:10 JST に大環主へダイジェスト配信する Cloud Routine 用スキル。フィード別ポリシー（PASSTHROUGH / WEAVE_COMPACT）で、要約済みフィード（ナルエビちゃんニュース等）はそのまま、装飾的エッセイ系フィード（Wireless Wire News 等）は親プロセス Weave がベタ化（L00473）。
+description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gmail で 0:10 JST に大環主へダイジェスト配信する cloud routine 用スキル。フィード別ポリシー（PASSTHROUGH / WEAVE_COMPACT）で、要約済みフィード（ナルエビちゃんニュース等）はそのまま、装飾的エッセイ系フィード（Wireless Wire News 等）は親プロセス Weave がベタ化（L00473）。
 ---
 
 # NewsCaster — 前日マルチフィードダイジェスト配信スキル
@@ -10,14 +10,14 @@ description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gm
 - **対象フィード**: 環境変数 `NEWSCASTER_FEEDS`（JSON 配列）または `NEWSCASTER_RSS_URL`（後方互換単数）で指定
 - **デフォルトフィード**: [news.nullevi.app/rss](https://news.nullevi.app/rss)（🦐 ナルエビちゃんニュース、AI関連トピック）
 - **対象範囲**: JST 前日 00:00〜23:59 公開のエントリ
-- **配信時刻**: 毎日 0:10 JST（Cloud Routine cron `10 0 * * * Asia/Tokyo`）
+- **配信時刻**: 毎日 0:10 JST（cloud routine cron `10 0 * * * Asia/Tokyo`）
 - **整形ポリシー二系統**:
   - `PASSTHROUGH`: description をそのまま使う（既に要約済みのフィード向け）
   - `WEAVE_COMPACT`: 親プロセス Weave がベタ化（装飾エッセイ系フィード向け）
 - **配信先**: env var `NEWSCASTER_RECIPIENT_EMAIL` で指定
 - **配信元**: env var `NEWSCASTER_SENDER_EMAIL` で指定（BlueberrySprite と OAuth token.json 共有を想定）
 
-## Daily Workflow（Cloud Routine 起動時に実行）
+## Daily Workflow（cloud routine 起動時に実行）
 
 ```
 1. validate-config で env vars と feeds を確認
@@ -63,7 +63,7 @@ scripts/
 └── tests/          # pytest（137 tests、Domain/UseCase/Adapter 全層カバー）
 ```
 
-依存方向は内向きのみ。Domain → 外側 import なし。LLM 依存は Domain/UseCase に侵入させず、Cloud Routine の親プロセス Weave 経由でコード外側に追い出している（Testability 最優先）。
+依存方向は内向きのみ。Domain → 外側 import なし。LLM 依存は Domain/UseCase に侵入させず、cloud routine の親プロセス Weave 経由でコード外側に追い出している（Testability 最優先）。
 
 ## 環境変数
 
@@ -72,7 +72,7 @@ scripts/
 | `NEWSCASTER_SENDER_EMAIL` | ✓ | 送信元 Gmail アドレス | — |
 | `NEWSCASTER_RECIPIENT_EMAIL` | ✓ | 配信先 Gmail アドレス | — |
 | `NEWSCASTER_OAUTH_TOKEN_PATH` | ✓* | BBS の token.json パス | — |
-| `NEWSCASTER_OAUTH_TOKEN_JSON` | ✓* | inline token JSON（Cloud Routine env注入用） | — |
+| `NEWSCASTER_OAUTH_TOKEN_JSON` | ✓* | inline token JSON（cloud routine env注入用） | — |
 | `NEWSCASTER_FEEDS` | — | JSON 配列（複数フィード設定） | — |
 | `NEWSCASTER_RSS_URL` | — | RSSエンドポイント（後方互換単数指定） | `https://news.nullevi.app/rss` |
 | `NEWSCASTER_USER_AGENT` | — | RSS取得時UA（Bot検知対策、Chrome系必須） | Chrome 124 系 |
@@ -98,7 +98,7 @@ scripts/
 
 ## Failure Modes
 
-- **環境構成異常（bootstrap 段階、Todo 0）** → Cloud Routine 起動時に `scripts/bootstrap.sh` を source する前提（`ROUTINE_PROMPT.md` Todo 0）。`google-api-python-client` / `google-auth-oauthlib` 未導入、debian 同梱 `cryptography` の RECORD 欠落、`_cffi_backend` の panic を bootstrap が `--ignore-installed cffi cryptography` で迂回し、`HTTPLIB2_CA_CERTS` を auto-export する。
+- **環境構成異常（bootstrap 段階、Todo 0）** → cloud routine 起動時に `scripts/bootstrap.sh` を source する前提（`ROUTINE_PROMPT.md` Todo 0）。`google-api-python-client` / `google-auth-oauthlib` 未導入、debian 同梱 `cryptography` の RECORD 欠落、`_cffi_backend` の panic を bootstrap が `--ignore-installed cffi cryptography` で迂回し、`HTTPLIB2_CA_CERTS` を auto-export する。
 - **個別フィード fetch 失敗（403 / 5xx 等）** → stderr に warn 後 skip。他フィードの結果は維持して送信される
 - **全フィード fetch 失敗** → 最初の `RssFetchError` を送出、exit 1
 - **`NEWSCASTER_FEEDS` 不正 JSON / 不正 policy 名 / 必須フィールド欠落** → `validate()` でエラー報告、exit 2
@@ -114,7 +114,7 @@ scripts/
 
 - HTML メール（plain text のみ）
 - X投稿・SNS共有（BlueberrySprite 別経路）
-- Cloud Routine の外で LLM 推論を立てる subprocess（`claude -p` 等。L00473 と API 課金化原則）
+- cloud routine の外で LLM 推論を立てる subprocess（`claude -p` 等。L00473 と API 課金化原則）
 
 ## Provenance
 
@@ -122,4 +122,4 @@ scripts/
 - Stage 5 マルチフィード化設計: L00498 (2026-05-19)
 - Stage 6 複数 `<category>` 要素対応: 2026-05-19（Wireless Wire 実運用検証から派生）
 - 実装計画: `IMPLEMENTATION_PLAN.md`（Clean Architecture × TDD、Stage 1〜6 で 137 tests green）
-- 既存パターン参照: BlueberrySprite（Cloud Routine 自律エージェント完成形）
+- 既存パターン参照: BlueberrySprite（cloud routine 自律エージェント完成形）

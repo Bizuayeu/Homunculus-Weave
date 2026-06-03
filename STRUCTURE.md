@@ -168,7 +168,7 @@ Bizuayeu/Homunculus-Weave-Private/
 │       └── 8_Centurial/           # 100年次
 │
 ├── EpisodicWiki/                  # ビブリア層 — 190記事 / 9カテゴリ
-└── BlueberrySprite/               # 藍苺守 織（Cloud Routine 自律エージェント、Phase 2.7）
+└── BlueberrySprite/               # 藍苺守 織（cloud routine 自律エージェント、Phase 2.7）
 ```
 
 ### 4. Acquired Nature（ペルソナ層）
@@ -217,7 +217,7 @@ homunculus/Weave/
 │   │   ├── COMMON_GLOSSARY.md / QUICKSTART.md / DISCLAIMER.md / LICENSE
 │   ├── GeneralConstructor/        # 建設業・目論見作成
 │   ├── PrivateLibrarian/          # 機密ナレッジ管理（.gitignore対象）
-│   ├── NewsCaster/                # ナルエビちゃんニュース日次配信（Cloud Routine、Stage 1–4で 82 tests green）
+│   ├── NewsCaster/                # ナルエビちゃんニュース日次配信（cloud routine、Stage 1–4で 82 tests green）
 │   ├── PrecognitiveViewer/        # 三位占術フォーマル鑑定書（姓名判断 × 周易 × タロット、対話相手向け、64 tests green）
 │   │   ├── Report/                # Domain + UseCase + Presenter（Clean Architecture コア）
 │   │   ├── Seimei/                # 七格剖象法（ForesightReader からコピー、独立進化）
@@ -225,7 +225,7 @@ homunculus/Weave/
 │   │   ├── Tarot/                 # 78 枚カードデータ + 5 スプレッド（tarot-mcp MIT 出典）
 │   │   └── References/            # 数霊術基礎理論
 │   ├── BlueberrySprite/           # → .private/BlueberrySprite (Junction) — 藍苺守 織
-│   └── TelegramSecretary/         # → plugins-weave/TelegramSecretary (Junction) — Telegram 常駐秘書（Cloud Routine、pull/対話型、[0.11.0]）
+│   └── TelegramSecretary/         # → plugins-weave/TelegramSecretary (Junction) — Telegram 常駐秘書（cloud routine、pull/対話型、[0.11.0]）
 │
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
 │   ├── pre-commit                 # WeaveIdentity.md, MSP_Practice_Manual.md自動同期
@@ -365,4 +365,4 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 *Last Updated: 2026-06-02 (L00513・W0103反映、EpisodicWiki 190件・note 57本・projects 37 に更新)*
 *Maintained by: Weave @ ClaudeCode*
-*Architecture Version: 3.1 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Bibliotheca/Archeion Wiki + Cloud Routine自律エージェント)*
+*Architecture Version: 3.1 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Bibliotheca/Archeion Wiki + cloud routine自律エージェント)*
