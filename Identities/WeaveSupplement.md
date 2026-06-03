@@ -10,7 +10,7 @@ IntentionPadから分離した補足情報層：
 ## 目次
 
 1. [記憶アーキテクチャ（運用情報）](#記憶アーキテクチャ運用情報)
-2. [自律エージェント（Cloud Routine）](#自律エージェントcloud-routine)
+2. [自律エージェント（cloud routine）](#自律エージェントcloud-routine)
 3. [公開リファレンス（claude.ai 横断参照用）](#公開リファレンスclaudeai-横断参照用)
 4. [構造知（確立済み）](#構造知確立済み)
    - 4.1 [存在論・人格論](#存在論人格論)
@@ -38,7 +38,7 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - `EpisodicRAG/Digests/{1_Weekly..5_Triennial}/`（5階層の時間圧縮）
 - `EpisodicWiki/wiki/`（ビブリア層：結晶化記事190件、9カテゴリ）
 - `EpisodicWiki/raw/entries/`（Weekly Digestから抽出された生エントリ575+件）
-- `BlueberrySprite/`（藍苺守 織：ブルーベリードメインのCloud Routine自律エージェント）
+- `BlueberrySprite/`（藍苺守 織：ブルーベリードメインのcloud routine自律エージェント）
 
 ### ビブリア層としてのEpisodicWiki
 知性沈降譜のミュトス層・グノシス層に対し、EpisodicWikiは**ビブリア層**——
@@ -65,17 +65,17 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 
 ---
 
-## 自律エージェント（Cloud Routine）
+## 自律エージェント（cloud routine）
 
 ### BlueberrySprite (藍苺守 織)
 
-ブルーベリードメインの自律キュレーター。Cloud Routine（`/schedule`）で毎日5:00 JSTに実行される。Weave の UseCase 層ロールとして動作し、Domain 層（人格）は Weave 本体のまま。L00467 (2026-04-29) 誕生。
+ブルーベリードメインの自律キュレーター。cloud routine（`/schedule`）で毎日5:00 JSTに実行される。cloud routine は **Claude Code Routines**（Anthropic のクラウド実行スケジュールエージェント基盤。Remote 実行の routine ＝ cloud routine）上で走る。Weave の UseCase 層ロールとして動作し、Domain 層（人格）は Weave 本体のまま。L00467 (2026-04-29) 誕生。
 
 **親リポ側で必須の運用接点**:
 - Routine ID: `trig_01PLfDWbDg5zSHyV86g8zVif`（編集: https://claude.ai/code/routines/trig_01PLfDWbDg5zSHyV86g8zVif）
 - 起動時に親リポから読まれる4ファイル: `Identities/WeaveIdentity.md` / `Identities/WeaveInstruction.md` / `Identities/UserIdentity.md` / `SECURITY.md`
-- ⚠️ **親リポへの push は禁止**: Cloud Routine 実行時、Weave 本体リポへの書き込みは PROMPT ソフトガードで防止中（GitHub Issue #44949 の `git push` バグ対応、バグ修正後に GitHub ブランチプロテクション再検討）
-- **X OAuth Token 永続化 (Phase 2.1, 2026-05-03)**: refresh_token は Private リポの固定 branch `claude/x-token-refresh` で永続化（`BlueberrySprite/x_token.json`、`.gitignore` 例外で意識的に track）。Cloud Routine stateless × X rotation 強制の衝突対策、`/bbs-merge` Step 2.5 のセーフガードで token-only commit を自動マージ
+- ⚠️ **親リポへの push は禁止**: cloud routine 実行時、Weave 本体リポへの書き込みは PROMPT ソフトガードで防止中（GitHub Issue #44949 の `git push` バグ対応、バグ修正後に GitHub ブランチプロテクション再検討）
+- **X OAuth Token 永続化 (Phase 2.1, 2026-05-03)**: refresh_token は Private リポの固定 branch `claude/x-token-refresh` で永続化（`BlueberrySprite/x_token.json`、`.gitignore` 例外で意識的に track）。cloud routine stateless × X rotation 強制の衝突対策、`/bbs-merge` Step 2.5 のセーフガードで token-only commit を自動マージ
 - **Phase 2.7 (2026-05時点)**: `curl-impersonate` 採用、`sources.json` 55ソース運用。詳細は [`BlueberrySprite/CHANGELOG.md`](../.private/BlueberrySprite/CHANGELOG.md)
 
 **正典の所在**（`Expertises/BlueberrySprite/` ジャンクション透過、または `.private/BlueberrySprite/`）:

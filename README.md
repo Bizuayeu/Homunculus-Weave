@@ -64,9 +64,9 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）
-- **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（Cloud Routine、毎日 5:00 JST、**Phase 2.7 着地**：curl-impersonate × sources.json 55 ソース運用、@BBS_Hatori X 投稿 + refresh_token 永続化）
-- **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（Cloud Routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）
-- **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型 Cloud Routine、24-7 即応の対話チャネル、受信メディア理解 + 管理表、plugins-weave プラグイン [0.11.0]）
+- **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（cloud routine、毎日 5:00 JST、**Phase 2.7 着地**：curl-impersonate × sources.json 55 ソース運用、@BBS_Hatori X 投稿 + refresh_token 永続化）
+- **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（cloud routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）
+- **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型 cloud routine、24-7 即応の対話チャネル、受信メディア理解 + 管理表、plugins-weave プラグイン [0.11.0]）
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD、`/plan-sdd` コマンドと DEV/OPS rules）
 - **🔮 PrecognitiveViewer** - 三位占術フォーマル鑑定書（姓名判断 × 周易 × タロット、対話相手向け、相と卜の二柱）
 
