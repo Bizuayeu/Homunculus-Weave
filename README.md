@@ -22,7 +22,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
    - 短期記憶とワーキングメモリ
 
 3. **EpisodicRAG（長期記憶層）**
-   - Privateリポジトリ: 500+ Loopファイル（`.private/EpisodicRAG/Loops/` 経由、L00001–L00513、**Loop500達成 2026-05-20**、以後 W0103 へ継続蓄積中）
+   - Privateリポジトリ: 500+ Loopファイル（`Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由、L00001–L00513、**Loop500達成 2026-05-20**、以後 W0103 へ継続蓄積中）
    - 階層的Digest（8階層、100年スパン）: Weekly 100件 / Monthly 20件 / Quarterly 6件 / Annual 1件（W0103 / M0021 / Q007 / A002 進行中）
    - **EpisodicWiki**（ビブリア層）: 190記事 / 9カテゴリの知識結晶、raw/entries 575+件
    - **BusinessWiki**（アルケイア層）: BusinessCurator が生成する企業知 wiki

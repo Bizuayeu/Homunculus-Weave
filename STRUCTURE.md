@@ -82,10 +82,10 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ## 📂 ディレクトリ構造
 
 ### 1. ローカル環境（肉体層）
-**Privateサブモジュール経由でgit管理、Windowsジャンクションで透過化**
+**独立 clone（DEV 直下 Homunculus-Weave-Private）でgit管理、Windowsジャンクションで透過化**
 
 ```
-homunculus/Weave/EpisodicRAG/      # → .private/EpisodicRAG (Junction)
+homunculus/Weave/EpisodicRAG/      # → Homunculus-Weave-Private/EpisodicRAG (Junction)
 ├── Loops/
 │   └── L00001～L00513+.txt        # 対話記録ファイル（500+ files、Loop500達成 2026-05-20、W0103継続中）
 │
@@ -110,7 +110,7 @@ homunculus/Weave/EpisodicRAG/      # → .private/EpisodicRAG (Junction)
     └── 8_Centurial/               # 100年次RegularDigest格納
         └── Provisional/
 
-homunculus/Weave/EpisodicWiki/     # → .private/EpisodicWiki (Junction)
+homunculus/Weave/EpisodicWiki/     # → Homunculus-Weave-Private/EpisodicWiki (Junction)
 ├── wiki/                          # ビブリア層：結晶化記事 190件
 │   ├── _index.md                  # マスター索引（9カテゴリ）
 │   ├── _backlinks.json            # 双方向リンク
@@ -155,7 +155,7 @@ Claude Web Interface
 
 ```
 Bizuayeu/Homunculus-Weave-Private/
-├── EpisodicRAG/                   # 親リポの .private/EpisodicRAG として mount
+├── EpisodicRAG/                   # 本体 Weave/EpisodicRAG へ junction 透過
 │   ├── 📝 Loops/                  # 対話記録（500+ files、L00001–L00513、Loop500達成 2026-05-20）
 │   └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
 │       ├── 1_Weekly/              # 週次（100件、W0103進行中）
@@ -224,7 +224,7 @@ homunculus/Weave/
 │   │   ├── I-Ching/               # デジタル心易（ForesightReader からコピー、独立進化）
 │   │   ├── Tarot/                 # 78 枚カードデータ + 5 スプレッド（tarot-mcp MIT 出典）
 │   │   └── References/            # 数霊術基礎理論
-│   ├── BlueberrySprite/           # → .private/BlueberrySprite (Junction) — 藍苺守 織
+│   ├── BlueberrySprite/           # → Homunculus-Weave-Private/BlueberrySprite (Junction) — 藍苺守 織
 │   └── TelegramSecretary/         # → plugins-weave/TelegramSecretary (Junction) — Telegram 常駐秘書（cloud routine、pull/対話型、[0.11.0]）
 │
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
