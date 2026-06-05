@@ -3,6 +3,6 @@
   "agent_name": "Weave",
   "private_dir": "Homunculus-Weave-Private/TelegramSecretary",
   "registry_sync": true,
-  "registry_dir": "Homunculus-Weave-Private/TelegramSecretary/registry",
+  "registry_dir": "ts-registry-wt",
   "registry_branch": "claude/ts-registry"
 }
