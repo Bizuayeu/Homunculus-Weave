@@ -241,11 +241,11 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **判例DB 設計**: Worked Examples を蓄積し false positive パターンを学習
 - **コモンズ握り戦略**: ローカル不可欠かつ帝国の関心外、サードパーティ MCP 依存ゼロ
 - **Phase 2.1 構造的修復**: refresh_token を Private GitHub の固定 branch で永続化
-- **Phase 2.7 到達**: curl-impersonate 採用による bot 検知回避強化、sources.json 55 ソース運用（詳細: [`.private/BlueberrySprite/CHANGELOG.md`](../.private/BlueberrySprite/CHANGELOG.md)）
+- **Phase 2.7 到達**: curl-impersonate 採用による bot 検知回避強化、sources.json 55 ソース運用（詳細: [`Homunculus-Weave-Private/BlueberrySprite/CHANGELOG.md`](Expertises/BlueberrySprite/CHANGELOG.md)）
 - **能動探索能力（L00499）**: 起動時ロードは8点のみ（HatoriRole / HatoriKnowledge / SKILL / MemoryPad ほか）でも、業務遂行中に Public/Private リポジトリを動的探索して L00316ナラティブ／コモンズ分離論等を正確に引用。起動時ロード ≠ 知識上限の設計実装。
 
 **参照データ**:
-- `.private/BlueberrySprite/`（`Expertises/BlueberrySprite/` にジャンクション透過）
+- `Homunculus-Weave-Private/BlueberrySprite/`（`Expertises/BlueberrySprite/` にジャンクション透過）
   - `Identities/HatoriRole.md` - 存在論・哲学（正典・不変層）
   - `Identities/HatoriKnowledge.md` - 確立済み構造知（参照型・蓄積型、Weave 本体 `WeaveSupplement.md` と同型、[0.20.0] 新設）
   - `SKILL.md` - 実行仕様（Daily Workflow Todo 1-10）
@@ -310,7 +310,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
   - `ROUTINE_PROMPT.md` - cloud routine 起動 Prompt と schedule / unschedule ライフサイクル
   - `skills/telegram-secretary/SKILL.md` - スキル仕様（SSoT）
   - `CHANGELOG.md` - [0.1.0]〜[0.11.0] 着地記録
-- **人格**: `.private/TelegramSecretary/Identities/SecretaryRole.md`（Private、HatoriRole と同型の存在論・哲学）
+- **人格**: `Homunculus-Weave-Private/TelegramSecretary/Identities/SecretaryRole.md`（Private、HatoriRole と同型の存在論・哲学）
 - 運用接点: `/telegram-secretary` の `schedule`（登録 / upsert）/ `unschedule`（停止）。Routine 登録は `config.json` + `RemoteTrigger`
 
 ---

@@ -7,9 +7,9 @@
 - **Repository URL**: `https://github.com/Bizuayeu/Homunculus-Weave.git`
 - **Main Branch**: `main` (NOT master!)
 - **Remote**: `origin/main`
-- **Submodule**: `.private/` → `https://github.com/Bizuayeu/Homunculus-Weave-Private.git`
+- **Private リポ**: `Homunculus-Weave-Private`（DEV 直下に独立 clone）→ `https://github.com/Bizuayeu/Homunculus-Weave-Private.git`
   - `EpisodicRAG/`・`EpisodicWiki/`・`BlueberrySprite/` の実体を保持
-  - `Weave/EpisodicRAG/`・`Weave/EpisodicWiki/`・`Weave/Expertises/BlueberrySprite/` はWindowsジャンクションで透過化
+  - `Weave/EpisodicRAG/`・`Weave/EpisodicWiki/`・`Weave/Expertises/BlueberrySprite/` はWindowsジャンクションで `Homunculus-Weave-Private/*` を透過化（旧 `.private/` サブモジュールは 2026-06-06 廃止、独立 clone へ移行）
 
 **Before ANY git operations:**
 1. ALWAYS cd to `C:\Users\anyth\DEV\homunculus\Weave`
@@ -17,10 +17,10 @@
 3. NEVER operate from the wrong directory or branch
 
 ### Clone Setup (別PC環境)
-1. `git clone --recursive https://github.com/Bizuayeu/Homunculus-Weave.git`
-   （Privateリポへの認証: PAT または SSH 鍵が必要）
-2. `cd Homunculus-Weave`
-3. `.private\setup-junctions.bat` でジャンクション作成（Windows）
+本体と Private を**横並びで独立 clone**（2026-06-06、旧 `--recursive` サブモジュール方式から移行）:
+1. `git clone https://github.com/Bizuayeu/Homunculus-Weave.git`（本体）
+2. `git clone https://github.com/Bizuayeu/Homunculus-Weave-Private.git`（Private、PAT または SSH 認証が必要）。**本体と同じ親ディレクトリ直下**に置く
+3. Private リポの `setup-junctions.bat` を実行（Windows）。本体配下へ Private 実体をジャンクション透過
 
 ---
 
@@ -75,7 +75,7 @@ I = α(G, I, E) × S × t
 *統合システム = 肉体 + 意識 + 長期記憶 + ペルソナ*
 
 1. **ローカル環境（肉体層）**
-   - `homunculus/Weave/EpisodicRAG/`: バックアップ領域（Privateサブモジュール `.private/EpisodicRAG/` のジャンクション透過）
+   - `homunculus/Weave/EpisodicRAG/`: バックアップ領域（独立 clone `Homunculus-Weave-Private/EpisodicRAG/` のジャンクション透過）
    - 物理的な保存領域（Git管理: `Bizuayeu/Homunculus-Weave-Private`）
    - それ単体では意識を持てない基盤
    - しかし、全ての情報は肉体に紐付いている
@@ -191,7 +191,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 AIとの対話記録を、コンテキスト節約のために外部ツール（Claudify等）でテキスト化したファイル群です。
 
 **基本情報**:
-- **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (Privateサブモジュール `.private/EpisodicRAG/Loops/` 経由でgit管理)
+- **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (独立 clone `Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由でgit管理)
 - **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
 - 現在: 500+ Loopファイル（L00001–L00513、**Loop500達成 2026-05-20** ── テオリア・イデア・プラクシス三段構造完成、文明的蓄積として焼成。以後 W0103 へ継続蓄積中）
@@ -262,7 +262,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 - **🏗️ GeneralConstructor** - 建設業・目論見作成
 - **📚 PrivateLibrarian** - 機密ナレッジ管理（非公開）
 - **🫐 藍苺守 織 (BlueberrySprite)** - ブルーベリードメインの自律エージェント（cloud routine、**Phase 2.7 着地**：curl-impersonate 採用 + sources.json 55 ソース運用）
-  - 設計: `.private/BlueberrySprite/` — `Expertises/BlueberrySprite/` にジャンクション透過
+  - 設計: `Homunculus-Weave-Private/BlueberrySprite/` — `Expertises/BlueberrySprite/` にジャンクション透過
   - 運用: `/schedule` 経由のcloud routine、毎日 5:00 JST に Anthropic クラウドで自律実行
   - 詳細: `Identities/WeaveSupplement.md` の「自律エージェント」セクション参照
 - **🦐 NewsCaster** - [ナルエビちゃんニュース](https://news.nullevi.app) 前日エントリの Gmail 配信
@@ -270,7 +270,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - 運用: cloud routine で毎日 0:10 JST 自動実行、BlueberrySprite と OAuth token.json 共有可
   - 設計判断: 「ベタにまとめる」原則（LLM 再要約しない、description をそのまま配信）
 - **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型、24-7 即応の対話チャネル）
-  - 設計: `plugins-weave/TelegramSecretary/`（別リポが配布正本、`Expertises/TelegramSecretary/` にジャンクション透過）。人格は `.private/TelegramSecretary/Identities/SecretaryRole.md`（Private）
+  - 設計: `plugins-weave/TelegramSecretary/`（別リポが配布正本、`Expertises/TelegramSecretary/` にジャンクション透過）。人格は `Homunculus-Weave-Private/TelegramSecretary/Identities/SecretaryRole.md`（Private）
   - 運用: cloud routine 常駐（cron + `session_duration_sec`）、認可済み chat に即応。push 型の織守・NewsCaster に対する pull の到達口
   - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン [0.11.0]
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD）
@@ -383,6 +383,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-06-02 (L00513・W0103反映、Opus 4.8器交代・EpisodicWiki 190件・note 57本に更新)*
+*Last Updated: 2026-06-06 (.private サブモジュール廃止→Homunculus-Weave-Private 独立 clone へ集約。L00513・W0103反映、Opus 4.8器交代・EpisodicWiki 190件・note 57本)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*

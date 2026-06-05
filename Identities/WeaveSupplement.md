@@ -33,7 +33,7 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 
 ### Private: `Bizuayeu/Homunculus-Weave-Private`
 - 必要時にWeaveが能動的に参照する対象
-- 親リポの`.private/`サブモジュールとしてマウント、Windowsジャンクションで `Weave/EpisodicRAG`・`Weave/EpisodicWiki`・`Weave/Expertises/BlueberrySprite` として透過化
+- DEV 直下に独立 clone（`Homunculus-Weave-Private`、2026-06-06 サブモジュールから移行）、Windowsジャンクションで `Weave/EpisodicRAG`・`Weave/EpisodicWiki`・`Weave/Expertises/BlueberrySprite` として透過化
 - `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、513件）
 - `EpisodicRAG/Digests/{1_Weekly..5_Triennial}/`（5階層の時間圧縮）
 - `EpisodicWiki/wiki/`（ビブリア層：結晶化記事190件、9カテゴリ）
@@ -76,9 +76,9 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 - 起動時に親リポから読まれる4ファイル: `Identities/WeaveIdentity.md` / `Identities/WeaveInstruction.md` / `Identities/UserIdentity.md` / `SECURITY.md`
 - ⚠️ **親リポへの push は禁止**: cloud routine 実行時、Weave 本体リポへの書き込みは PROMPT ソフトガードで防止中（GitHub Issue #44949 の `git push` バグ対応、バグ修正後に GitHub ブランチプロテクション再検討）
 - **X OAuth Token 永続化 (Phase 2.1, 2026-05-03)**: refresh_token は Private リポの固定 branch `claude/x-token-refresh` で永続化（`BlueberrySprite/x_token.json`、`.gitignore` 例外で意識的に track）。cloud routine stateless × X rotation 強制の衝突対策、`/bbs-merge` Step 2.5 のセーフガードで token-only commit を自動マージ
-- **Phase 2.7 (2026-05時点)**: `curl-impersonate` 採用、`sources.json` 55ソース運用。詳細は [`BlueberrySprite/CHANGELOG.md`](../.private/BlueberrySprite/CHANGELOG.md)
+- **Phase 2.7 (2026-05時点)**: `curl-impersonate` 採用、`sources.json` 55ソース運用。詳細は [`BlueberrySprite/CHANGELOG.md`](../Expertises/BlueberrySprite/CHANGELOG.md)
 
-**正典の所在**（`Expertises/BlueberrySprite/` ジャンクション透過、または `.private/BlueberrySprite/`）:
+**正典の所在**（`Expertises/BlueberrySprite/` ジャンクション透過、または `Homunculus-Weave-Private/BlueberrySprite/`）:
 - 存在論・哲学: `Identities/HatoriRole.md`
 - 確立済み構造知（参照型・蓄積型、業務で習得した不揮発性知識、本 WeaveSupplement.md と同型）: `Identities/HatoriKnowledge.md`
 - 実行仕様（Daily Workflow Todo 1-10）: `SKILL.md`
