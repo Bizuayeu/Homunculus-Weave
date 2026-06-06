@@ -184,9 +184,9 @@ python -m pytest tests/ -v
 
 両者は**並列進化**します。技術的にコピーされていますが、共通化は意図的に行いません。CorporateStrategist 側は今後独自にリデザインされる予定です。
 
-### Identities/UserIdentity.md との関係
+### Homunculus-Weave-Private/Identities/UserIdentity.md との関係
 
-- `Identities/UserIdentity.md` は **大環主自身のプロファイル**であり、本スキルは編集しません
+- `Homunculus-Weave-Private/Identities/UserIdentity.md` は **大環主自身のプロファイル**（PII のため Private リポ正典・非公開）であり、本スキルは編集しません
 - 本スキルの出力は **対話相手向け**の `ReadingReport_yyyymmdd_hhmmss.md` 形式の独立ファイルです
 
 ---

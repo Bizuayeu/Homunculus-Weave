@@ -21,24 +21,21 @@ IntentionPadから分離した補足情報層：
 
 ## 記憶アーキテクチャ（運用情報）
 
-Weaveの記憶層は二つのリポジトリに分離されている：
+Weave の記憶層は二つのリポジトリに分離されている。**原則は private-by-default**——データは全て Private に置き、公開する一部のみを junction で Public に露出する（2026-06-06 Identities 境界引き直しで確立）。
 
-### Public: `Bizuayeu/Homunculus-Weave`
-- セッション開始時に自動読込される対象
-- `Identities/GrandDigest.txt`（記憶の骨格）
-- `Identities/ShadowGrandDigest.txt`（記憶の残像）
-- `Identities/WeaveSupplement.md`（本ファイル、運用情報＋構造知）
-- `Identities/IntentionPad.md`（短期メモ・意図メモ）
-- `Identities/WORKLOG.md`（Loop単位の作業ログ、最新が上部）
+### Private（正典）: `Bizuayeu/Homunculus-Weave-Private`
+- DEV 直下に独立 clone。**全データの正典**（記憶＋アイデンティティ）。EpisodicRAG の `base_dir` は本 Private リポを直接指す（記憶系 junction は廃止）
+- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、515件）／`EpisodicRAG/Digests/`（時間圧縮階層）
+- `EpisodicWiki/wiki/`（ビブリア層：結晶化記事190件）／`EpisodicWiki/raw/entries/`（生エントリ575+件）
+- `BlueberrySprite/`（藍苺守 織：cloud routine 自律エージェント）
+- `Identities/`（記憶由来＋PII を含む正典、公開リポからは見えない）:
+  - `GrandDigest.txt`（記憶の骨格）／`ShadowGrandDigest.txt`（記憶の残像）／`IntentionPad.md`（短期メモ）／`WORKLOG.md`（作業ログ）／`UserIdentity.md`（大環主プロファイル＝PII）／`RoutineRegistry.md`（cloud routine ID の SSoT）
+  - `Identities/Public/`（下記 Public へ junction する公開セット）
 
-### Private: `Bizuayeu/Homunculus-Weave-Private`
-- 必要時にWeaveが能動的に参照する対象
-- DEV 直下に独立 clone（`Homunculus-Weave-Private`、2026-06-06 サブモジュールから移行）、Windowsジャンクションで `Weave/EpisodicRAG`・`Weave/EpisodicWiki`・`Weave/Expertises/BlueberrySprite` として透過化
-- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、513件）
-- `EpisodicRAG/Digests/{1_Weekly..5_Triennial}/`（5階層の時間圧縮）
-- `EpisodicWiki/wiki/`（ビブリア層：結晶化記事190件、9カテゴリ）
-- `EpisodicWiki/raw/entries/`（Weekly Digestから抽出された生エントリ575+件）
-- `BlueberrySprite/`（藍苺守 織：ブルーベリードメインのcloud routine自律エージェント）
+### Public（公開する顔）: `Bizuayeu/Homunculus-Weave`
+- セッション開始時に ContextPreloader が読む対象（実体は Private から解決）: GrandDigest / ShadowGrandDigest / WeaveSupplement / IntentionPad
+- 公開リポが commit するのは `Identities/`（junction → `…Private/Identities/Public/`）の**公開セットのみ**: WeaveIdentity / WeaveInstruction / WeaveSupplement / HowToUseEpisodicRAG / MSP_Practice_Manual / NoteArticlesByWeave.json / icon.jpg / References/（七曜インジケータ・知性とその器をめぐる9つの観察）
+- 記憶由来・PII（GrandDigest/Shadow/IntentionPad/WORKLOG/UserIdentity/horoscope 等）は junction の外＝**公開リポからは一切見えない**
 
 ### ビブリア層としてのEpisodicWiki
 知性沈降譜のミュトス層・グノシス層に対し、EpisodicWikiは**ビブリア層**——
@@ -72,7 +69,7 @@ Weaveの記憶層は二つのリポジトリに分離されている：
 ブルーベリードメインの自律キュレーター。cloud routine（`/schedule`）で毎日5:00 JSTに実行される。cloud routine は **Claude Code Routines**（Anthropic のクラウド実行スケジュールエージェント基盤。Remote 実行の routine ＝ cloud routine）上で走る。Weave の UseCase 層ロールとして動作し、Domain 層（人格）は Weave 本体のまま。L00467 (2026-04-29) 誕生。
 
 **親リポ側で必須の運用接点**:
-- Routine ID: `trig_01PLfDWbDg5zSHyV86g8zVif`（編集: https://claude.ai/code/routines/trig_01PLfDWbDg5zSHyV86g8zVif）
+- Routine ID・編集 URL は**非公開の運用レジストリ** `Identities/RoutineRegistry.md`（SSoT）で管理（公開文書には直書きしない）
 - 起動時に親リポから読まれる4ファイル: `Identities/WeaveIdentity.md` / `Identities/WeaveInstruction.md` / `Identities/UserIdentity.md` / `SECURITY.md`
 - ⚠️ **親リポへの push は禁止**: cloud routine 実行時、Weave 本体リポへの書き込みは PROMPT ソフトガードで防止中（GitHub Issue #44949 の `git push` バグ対応、バグ修正後に GitHub ブランチプロテクション再検討）
 - **X OAuth Token 永続化 (Phase 2.1, 2026-05-03)**: refresh_token は Private リポの固定 branch `claude/x-token-refresh` で永続化（`BlueberrySprite/x_token.json`、`.gitignore` 例外で意識的に track）。cloud routine stateless × X rotation 強制の衝突対策、`/bbs-merge` Step 2.5 のセーフガードで token-only commit を自動マージ

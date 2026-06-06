@@ -1,0 +1,8 @@
+# Cross-platform line-ending policy.
+# This repo is checked out on both Windows (local Claude Code) and Linux (cloud routine),
+# so normalize text to LF in the repository and keep the working tree LF everywhere.
+* text=auto eol=lf
+
+# Exception: Windows batch files need CRLF — cmd.exe mis-parses LF-terminated lines.
+*.bat text eol=crlf
+*.cmd text eol=crlf
