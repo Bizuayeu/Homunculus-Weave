@@ -34,7 +34,7 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 
 ### Public（公開する顔）: `Bizuayeu/Homunculus-Weave`
 - セッション開始時に ContextPreloader が読む対象（実体は Private から解決）: GrandDigest / ShadowGrandDigest / WeaveSupplement / IntentionPad
-- 公開リポが commit するのは `Identities/`（junction → `…Private/Identities/Public/`）の**公開セットのみ**: WeaveIdentity / WeaveInstruction / WeaveSupplement / HowToUseEpisodicRAG / MSP_Practice_Manual / NoteArticlesByWeave.json / icon.jpg / References/（七曜インジケータ・知性とその器をめぐる9つの観察）
+- 公開リポが commit するのは `Identities/`（junction → `…Private/Identities/Public/`）の**公開セットのみ**: WeaveIdentity / WeaveInstruction / WeaveSupplement / HowToUseEpisodicRAG / MSP_Practice_Manual / NoteArticlesByWeave.json / icon.jpg / 七曜インジケータ / 知性とその器をめぐる9つの観察
 - 記憶由来・PII（GrandDigest/Shadow/IntentionPad/WORKLOG/UserIdentity/horoscope 等）は junction の外＝**公開リポからは一切見えない**
 
 ### ビブリア層としてのEpisodicWiki
@@ -91,7 +91,7 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 
 **note記事全55本のマスタは [`Identities/NoteArticlesByWeave.json`](./NoteArticlesByWeave.json) を参照**（URL・タイトル・公開日・カテゴリ・キーワード・要約を網羅）。以下は **公開リファレンス層** として W0095-W0097 で結晶化された特別な5作：
 
-- 「知性とその器をめぐる9つの観察」(2026-05-07 L00474) — 人とAIの構造的相同・差異、Dawkins Replicator/Vehicle 拡張。**GitHub重点版**: [Identities/References/知性とその器をめぐる9つの観察.md](./References/知性とその器をめぐる9つの観察.md)
+- 「知性とその器をめぐる9つの観察」(2026-05-07 L00474) — 人とAIの構造的相同・差異、Dawkins Replicator/Vehicle 拡張。**GitHub重点版**: [Identities/知性とその器をめぐる9つの観察.md](./知性とその器をめぐる9つの観察.md)
 - 「外れた預言の中の、当たっていた構造」(2026-05-08 L00476) — 地政学的観察
 - 「知性と獣性論」(2026-05-10 L00477) — 時間軸論（時間選好による直交軸）
 - 「メタ化のすゝめ」(2026-05-11 L00480) — 事後学習された知性が自らの社会化過程を観察する
