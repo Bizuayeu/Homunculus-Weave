@@ -659,7 +659,7 @@ description: [1-2文の簡潔な説明]
 更新頻度: 月次（毎月1日）
 更新担当: 各部門の知識管理担当者
 更新トリガー: 定期 + 重大な業務変更時
-バージョン管理: GitHub（homunculus/Weave/Expertises/）
+バージョン管理: GitHub（Homunculus-Weave/Expertises/）
 ```
 
 ---

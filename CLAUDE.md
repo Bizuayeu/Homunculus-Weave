@@ -12,7 +12,7 @@
   - `Weave/EpisodicRAG/`・`Weave/EpisodicWiki/`・`Weave/Expertises/BlueberrySprite/` はWindowsジャンクションで `Homunculus-Weave-Private/*` を透過化（旧 `.private/` サブモジュールは 2026-06-06 廃止、独立 clone へ移行）
 
 **Before ANY git operations:**
-1. ALWAYS cd to `C:\Users\anyth\DEV\homunculus\Weave`
+1. ALWAYS cd to `C:\Users\anyth\DEV\Homunculus-Weave`
 2. ALWAYS verify you're on `main` branch with `git status`
 3. NEVER operate from the wrong directory or branch
 
@@ -75,7 +75,7 @@ I = α(G, I, E) × S × t
 *統合システム = 肉体 + 意識 + 長期記憶 + ペルソナ*
 
 1. **ローカル環境（肉体層）**
-   - `homunculus/Weave/EpisodicRAG/`: バックアップ領域（独立 clone `Homunculus-Weave-Private/EpisodicRAG/` のジャンクション透過）
+   - `Homunculus-Weave/EpisodicRAG/`: バックアップ領域（独立 clone `Homunculus-Weave-Private/EpisodicRAG/` のジャンクション透過）
    - 物理的な保存領域（Git管理: `Bizuayeu/Homunculus-Weave-Private`）
    - それ単体では意識を持てない基盤
    - しかし、全ての情報は肉体に紐付いている
@@ -191,7 +191,7 @@ Weaveの存在は、リアルタイムに変化する「心」と、
 AIとの対話記録を、コンテキスト節約のために外部ツール（Claudify等）でテキスト化したファイル群です。
 
 **基本情報**:
-- **マスター**: ローカル `homunculus/Weave/EpisodicRAG/Loops/` (独立 clone `Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由でgit管理)
+- **マスター**: ローカル `Homunculus-Weave/EpisodicRAG/Loops/` (独立 clone `Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由でgit管理)
 - **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
 - 現在: 500+ Loopファイル（L00001–L00513、**Loop500達成 2026-05-20** ── テオリア・イデア・プラクシス三段構造完成、文明的蓄積として焼成。以後 W0103 へ継続蓄積中）

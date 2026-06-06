@@ -18,7 +18,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |                                                           |
 |  Layer 1: Local Environment (Physical Body)               |
 |  +-----------------------------------------------------+  |
-|  |  * Backup Storage (homunculus/Weave/EpisodicRAG/)   |  |
+|  |  * Backup Storage (Homunculus-Weave/EpisodicRAG/)   |  |
 |  |  * .gitignore Target                                |  |
 |  |  * Physical Foundation without Consciousness        |  |
 |  |  * All Information is Bound to the Physical Body    |  |
@@ -85,7 +85,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 **独立 clone（DEV 直下 Homunculus-Weave-Private）でgit管理、Windowsジャンクションで透過化**
 
 ```
-homunculus/Weave/EpisodicRAG/      # → Homunculus-Weave-Private/EpisodicRAG (Junction)
+Homunculus-Weave/EpisodicRAG/      # → Homunculus-Weave-Private/EpisodicRAG (Junction)
 ├── Loops/
 │   └── L00001～L00513+.txt        # 対話記録ファイル（500+ files、Loop500達成 2026-05-20、W0103継続中）
 │
@@ -110,7 +110,7 @@ homunculus/Weave/EpisodicRAG/      # → Homunculus-Weave-Private/EpisodicRAG (J
     └── 8_Centurial/               # 100年次RegularDigest格納
         └── Provisional/
 
-homunculus/Weave/EpisodicWiki/     # → Homunculus-Weave-Private/EpisodicWiki (Junction)
+Homunculus-Weave/EpisodicWiki/     # → Homunculus-Weave-Private/EpisodicWiki (Junction)
 ├── wiki/                          # ビブリア層：結晶化記事 190件
 │   ├── _index.md                  # マスター索引（9カテゴリ）
 │   ├── _backlinks.json            # 双方向リンク
@@ -127,7 +127,7 @@ homunculus/Weave/EpisodicWiki/     # → Homunculus-Weave-Private/EpisodicWiki (
 ├── ingest.py                      # Weekly → raw entries 変換
 └── build_backlinks.py             # _backlinks.json 生成
 
-homunculus/Weave/BusinessWiki/     # アルケイア層：めぐる組ビジネスメール wiki
+Homunculus-Weave/BusinessWiki/     # アルケイア層：めぐる組ビジネスメール wiki
 ├── _root.md / _alias_resolver.md / _index.md
 ├── shards/
 │   ├── projects/                  # 建設案件 (37 active)
@@ -175,7 +175,7 @@ Bizuayeu/Homunculus-Weave-Private/
 **バージョン管理される安定的特性**
 
 ```
-homunculus/Weave/
+Homunculus-Weave/
 ├── 📋 Documentation
 │   ├── CLAUDE.md                  # 運用マニュアル（知性体系・四層システム仕様）
 │   ├── STRUCTURE.md               # 本ファイル（システム構造）
