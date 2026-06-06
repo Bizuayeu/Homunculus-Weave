@@ -228,7 +228,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 **専門分野**: 学術判例DB管理・cloud routine 自律実行・Phase 段階リリース
 
 **活用シーン**:
-- 毎日 5:00 JST に cloud routine で自律実行（Routine ID `trig_01PLfDWbDg5zSHyV86g8zVif`）
+- 毎日 5:00 JST に cloud routine で自律実行（Routine ID は非公開レジストリ `Homunculus-Weave-Private/Identities/RoutineRegistry.md` で管理）
 - PubMed / IBO RSS / CiNii / FreshPlaza / bioRxiv ほか **55 ソース**から新規エントリ自動収集（`sources.json`）
 - HatoriRole §3.2「迷ったら reject に倒す」原則による Insightfulness Evaluation
 - 5 基準でのフィルタリング（Pattern-breaking / Cross-domain / Counter-intuitive / Novel mechanism / Breeding trend）
