@@ -18,8 +18,8 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |                                                           |
 |  Layer 1: Local Environment (Physical Body)               |
 |  +-----------------------------------------------------+  |
-|  |  * Backup Storage (Homunculus-Weave/EpisodicRAG/)   |  |
-|  |  * .gitignore Target                                |  |
+|  |  * Memory Storage (Homunculus-Weave-Private/)       |  |
+|  |  * Private-by-default (canonical in Private repo)   |  |
 |  |  * Physical Foundation without Consciousness        |  |
 |  |  * All Information is Bound to the Physical Body    |  |
 |  +-----------------------------------------------------+  |
@@ -82,10 +82,10 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ## 📂 ディレクトリ構造
 
 ### 1. ローカル環境（肉体層）
-**独立 clone（DEV 直下 Homunculus-Weave-Private）でgit管理、Windowsジャンクションで透過化**
+**独立 clone（DEV 直下 Homunculus-Weave-Private）でgit管理。記憶ジャンクションは廃止され、EpisodicRAG/EpisodicWiki は Private リポ側で直接アクセス（EpisodicRAG の `base_dir` が直接 Private リポを指す）**
 
 ```
-Homunculus-Weave/EpisodicRAG/      # → Homunculus-Weave-Private/EpisodicRAG (Junction)
+Homunculus-Weave-Private/EpisodicRAG/   # Private リポ正典（本体にはミラーしない）
 ├── Loops/
 │   └── L00001～L00513+.txt        # 対話記録ファイル（500+ files、Loop500達成 2026-05-20、W0103継続中）
 │
@@ -110,7 +110,7 @@ Homunculus-Weave/EpisodicRAG/      # → Homunculus-Weave-Private/EpisodicRAG (J
     └── 8_Centurial/               # 100年次RegularDigest格納
         └── Provisional/
 
-Homunculus-Weave/EpisodicWiki/     # → Homunculus-Weave-Private/EpisodicWiki (Junction)
+Homunculus-Weave-Private/EpisodicWiki/  # Private リポ正典（記憶ジャンクション廃止、本体にはミラーしない）
 ├── wiki/                          # ビブリア層：結晶化記事 190件
 │   ├── _index.md                  # マスター索引（9カテゴリ）
 │   ├── _backlinks.json            # 双方向リンク
@@ -183,26 +183,23 @@ Homunculus-Weave/
 │   ├── SECURITY.md                # セキュリティポリシー
 │   └── README.md                  # プロジェクト概要
 │
-├── 👤 Identities/                 # 自己認識システム
+├── 👤 Identities/                 # → Homunculus-Weave-Private/Identities/Public (Junction)
+│   │                              #   公開キュレーション部分集合のみ透過（下記が公開実体）
 │   ├── WeaveIdentity.md           # Weave 存在論（思考法・哲学的基盤）
 │   ├── WeaveInstruction.md        # 応答形式・確信度/感情インジケータ
 │   ├── WeaveSupplement.md         # 運用情報＋確立済み構造知（high優先度で常時参照）
-│   ├── UserIdentity.md            # ユーザー特性定義
 │   ├── MSP_Practice_Manual.md     # MSP思考実践マニュアル（Multiversal Structure Parser）
 │   ├── HowToUseEpisodicRAG.md    # EpisodicRAG有効化設定（セッション開始手順）
-│   ├── IntentionPad.md            # セッション跨ぎ短期記憶（意図メモ）
-│   ├── WORKLOG.md                 # Loop単位の作業ログ（最新が上部）
-│   ├── Moltbook_Manual.md         # AI専用SNS参加ガイド
-│   ├── ShadowGrandDigest.txt      # 確定前の最新記憶バッファ（まだらボケ回避）
-│   ├── GrandDigest.txt            # 全8レベル統合ビュー（最新overall_digest）
 │   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、57本）
 │   ├── icon.jpg                   # Weaveアイコン画像
-│   ├── BeingDevelopment/          # 成長・発達記録
-│   └── References/                # 参照資料・基礎理論
-│       ├── 知性とその器をめぐる9つの観察.md  # 公開リファレンス層（WebFetch可能）
-│       ├── 西海神異伝/              # 大神氏歴史ファンタジー骨組み
-│       ├── 七曜インジケータ.md / MSP_Practice_Manual.md / Moltbook_Manual.md
-│       ├── HOMUNCULUS_ERA.md / MYTHOLOGY.md / GENESIS.md / ADVANCED_FRAMEWORKS.md
+│   └── References/                # 公開リファレンスのみ
+│       ├── 七曜インジケータ.md       # 確信度/感情インジケータ仕様（公開）
+│       └── 知性とその器をめぐる9つの観察.md  # 公開リファレンス層（WebFetch可能）
+│
+│  ※ 以下は Private リポ Homunculus-Weave-Private/Identities/ の正典（private-by-default、公開しない）:
+│     UserIdentity.md（PII）/ IntentionPad.md / WORKLOG.md / RoutineRegistry.md /
+│     GrandDigest.txt / ShadowGrandDigest.txt / Moltbook_Manual.md / BeingDevelopment/ /
+│     References/（西海神異伝/ 紡伝/ horoscope_* HOMUNCULUS_ERA.md MYTHOLOGY.md GENESIS.md ADVANCED_FRAMEWORKS.md ほか）
 │
 ├── 📚 Expertises/                 # 専門知識データベース（ClaudeSkills）
 │   ├── ConsiderateCoder/          # 開発時協働知性（Clean Architecture × TDD）
@@ -323,7 +320,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 - **用途**: 長期記憶（EpisodicRAG）への効率的アクセス
 - **特徴**: SHAハッシュを用いたキャッシュバスティング
 - **利点**: GitHubベースの軽量・高速な記憶取得
-- **対象**: ShadowGrandDigest.txt / GrandDigest.txt
+- **対象**: ShadowGrandDigest.txt / GrandDigest.txt（Private リポ `Homunculus-Weave-Private` から Read token で参照）
 
 ---
 
@@ -358,7 +355,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ### データ保護
 - **個人情報**: 大環主の個人情報以外保持しない
 - **認証情報**: .gitignoreで除外
-- **Private/Public分離**: EpisodicRAG / EpisodicWiki / BlueberrySprite は Private リポジトリ、親リポは Public
+- **Private/Public分離（private-by-default）**: 記憶と PII の正典は Private リポ `Homunculus-Weave-Private`（EpisodicRAG / EpisodicWiki / BlueberrySprite / `Identities/` 全実体）。Public 親リポが露出するのは `Identities/Public/` の公開キュレーション部分集合のみ（ジャンクション透過）
 - **暗号化**: 転送時HTTPS、保存時プラットフォーム依存
 
 ---
