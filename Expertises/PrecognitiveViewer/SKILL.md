@@ -80,7 +80,7 @@ from datetime import datetime
 # PrecognitiveViewer の親ディレクトリを path に追加するだけで OK
 # （Seimei/ と I-Ching/ への path 追加は PrecognitiveViewer/__init__.py が
 #   bootstrap として自動的に行うため、追加の path 操作は不要）
-sys.path.insert(0, str(Path("homunculus/Weave/Expertises").resolve()))
+sys.path.insert(0, str(Path("Homunculus-Weave/Expertises").resolve()))
 
 from PrecognitiveViewer.Report.composer_usecase import ReadingReportComposerUseCase
 from PrecognitiveViewer.Report.domain import Recipient
@@ -169,7 +169,7 @@ PrecognitiveViewer/
 ## 🧪 テスト実行
 
 ```bash
-cd homunculus/Weave/Expertises/PrecognitiveViewer
+cd Homunculus-Weave/Expertises/PrecognitiveViewer
 python -m pytest tests/ -v
 ```
 

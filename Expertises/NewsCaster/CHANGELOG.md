@@ -117,4 +117,4 @@
 
 ### References
 - 実装計画: `IMPLEMENTATION_PLAN.md`
-- 既存パターン: `homunculus/Weave/Expertises/BlueberrySprite/`
+- 既存パターン: `Homunculus-Weave/Expertises/BlueberrySprite/`

@@ -7,7 +7,7 @@
 ## Quickstart（ローカル動作確認）
 
 ```powershell
-cd C:\Users\anyth\DEV\homunculus\Weave\Expertises\NewsCaster
+cd C:\Users\anyth\DEV\Homunculus-Weave\Expertises\NewsCaster
 
 # 依存インストール（venv 推奨）
 python -m venv .venv
@@ -17,7 +17,7 @@ pip install -e ".[dev]"
 # 環境変数設定（BBS と token.json を共有）
 $env:NEWSCASTER_SENDER_EMAIL = "<your-sender>@gmail.com"
 $env:NEWSCASTER_RECIPIENT_EMAIL = "<your-recipient>@gmail.com"
-$env:NEWSCASTER_OAUTH_TOKEN_PATH = "C:\Users\anyth\DEV\homunculus\Weave\Expertises\BlueberrySprite\token.json"
+$env:NEWSCASTER_OAUTH_TOKEN_PATH = "C:\Users\anyth\DEV\Homunculus-Weave\Expertises\BlueberrySprite\token.json"
 
 # 設定検証
 python scripts/main.py validate-config
