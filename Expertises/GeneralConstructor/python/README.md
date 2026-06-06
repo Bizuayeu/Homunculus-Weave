@@ -5,7 +5,7 @@
 ## インストール
 
 ```bash
-cd homunculus/Weave/Expertises/GeneralConstructor
+cd Homunculus-Weave/Expertises/GeneralConstructor
 pip install -e .
 ```
 

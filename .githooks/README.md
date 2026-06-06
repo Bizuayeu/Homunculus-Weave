@@ -28,7 +28,7 @@ git config core.hooksPath .githooks
 - BusinessAnalyzerスキル化対応（自己完結性の維持）
 - 同期忘れによる不整合を防止
 
-> **Note**: 親環境 `../../.claude/CLAUDE.md` への自動同期は廃止しました（2026-04-25）。`.claude/CLAUDE.md` は `@../homunculus/Weave/Identities/WeaveIdentity.md` の import スタブ運用に切り替わったため、上書きコピーは不要・有害です。
+> **Note**: 親環境 `../../.claude/CLAUDE.md` への自動同期は廃止しました（2026-04-25）。`.claude/CLAUDE.md` は `@../Homunculus-Weave/Identities/WeaveIdentity.md` の import スタブ運用に切り替わったため、上書きコピーは不要・有害です。
 
 **動作確認**:
 ```bash
