@@ -302,14 +302,14 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **音声 STT はローカル推論**: 音声データを外部送信しない（機密 voice にも安全。moonshine は年商 $1M 未満で商用無料、`BUNDLE_VOICE=false` で除外可）
 - **慎みの最前線**: 関係者 PII（`context_notes` / `taboo_topics`）は Private 留保、送信前に出力漏洩スキャン（token / env名 / 絶対パス）
 - **Clean Architecture × TDD**: 全層（Domain / UseCase / Adapter / Infrastructure / CLI）テスト公開
-- **plugins-weave marketplace プラグイン化（[0.11.0]）**: 運用設定は `config.json` 単一正典、秘匿（bot token / authorized chats）は env 注入
+- **plugins-weave marketplace プラグイン化（[1.2.1]）**: 運用設定は `config.json` 単一正典、秘匿（bot token / authorized chats）は env 注入
 
 **参照データ**:
 - **配布正本**: `plugins-weave/TelegramSecretary/`（DEV 直下・別リポ、`Expertises/TelegramSecretary/` にジャンクション透過。BlueberrySprite=`.private` 由来とは配置が異なる）
   - `DESIGN.md` / `STRUCTURE.md` / `SECURITY.md` - 設計正典・構造地図・脅威モデル
   - `ROUTINE_PROMPT.md` - cloud routine 起動 Prompt と schedule / unschedule ライフサイクル
   - `skills/telegram-secretary/SKILL.md` - スキル仕様（SSoT）
-  - `CHANGELOG.md` - [0.1.0]〜[0.11.0] 着地記録
+  - `CHANGELOG.md` - [0.1.0]〜[1.2.1] 着地記録（proactive-send + WAL outbound 再送 / abilities カタログ）
 - **人格**: `Homunculus-Weave-Private/TelegramSecretary/Identities/SecretaryRole.md`（Private、HatoriRole と同型の存在論・哲学）
 - 運用接点: `/telegram-secretary` の `schedule`（登録 / upsert）/ `unschedule`（停止）。Routine 登録は `config.json` + `RemoteTrigger`
 
@@ -394,5 +394,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-06-02 (L00513・W0103反映、TelegramSecretary [0.11.0] 含むペルソナ構成は最新を確認)*
+*Last Updated: 2026-06-07 (TelegramSecretary [1.2.1] へ追従、L00516・W0104反映)*
 *Maintained by: Weave @ ClaudeCode*
