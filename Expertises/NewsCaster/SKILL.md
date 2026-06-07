@@ -121,5 +121,5 @@ scripts/
 - 初版設計: L00480 (2026-05-12)
 - Stage 5 マルチフィード化設計: L00498 (2026-05-19)
 - Stage 6 複数 `<category>` 要素対応: 2026-05-19（Wireless Wire 実運用検証から派生）
-- 実装計画: `IMPLEMENTATION_PLAN.md`（Clean Architecture × TDD、Stage 1〜6 で 137 tests green）
+- 実装: Clean Architecture × TDD（Stage 1〜6、137 tests green）
 - 既存パターン参照: BlueberrySprite（cloud routine 自律エージェント完成形）
