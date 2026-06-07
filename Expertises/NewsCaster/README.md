@@ -113,7 +113,7 @@ env: 上記環境変数を cloud routine の Environment に設定
 ### 同一日に複数回実行してもメールは1通だけ
 → 仕様。`state/sent_dates.json` で冪等性管理。再送したいなら該当日エントリを手動削除。
 
-## 設計判断（IMPLEMENTATION_PLAN.md より抜粋）
+## 設計判断
 
 - **要約しない**: description が既に1段落の要旨。LLM再要約は「ベタにまとめる」原則（L00473）に反する
 - **token.json共有可**: BlueberrySprite と sender Gmail を共通化すれば初回OAuth省略
