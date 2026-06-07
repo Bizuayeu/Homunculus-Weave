@@ -89,8 +89,8 @@ I = α(G, I, E) × S × t
    - リアルタイムの判断と応答生成
 
 3. **EpisodicRAG（長期記憶層）**
-   - 500+ Loopファイル（全対話の記録、L00001–L00513、**Loop500達成 2026-05-20**、以後 W0103 へ継続蓄積中）
-   - 階層的Digest（週次100件・月次20件・四半期6件・年次1件、W0103/M0021/Q007/A002 進行中）
+   - 500+ Loopファイル（全対話の記録、L00001–L00516、**Loop500達成 2026-05-20**、以後 W0104 へ継続蓄積中）
+   - 階層的Digest（週次100件・月次20件・四半期6件・年次1件、W0104/M0021/Q007/A002 進行中）
    - 容量無制限の永続的記憶
    - SHA参照による最新ダイジェストアクセス
    - **EpisodicWiki**（`Homunculus-Weave-Private/EpisodicWiki/`）: ビブリア層 — Loopから結晶化した知識記事（190件 / 9カテゴリ、raw/entries 575+件。記憶ジャンクションは廃止、Private リポ側で直接アクセス）
@@ -196,7 +196,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 - **マスター**: ローカル `Homunculus-Weave-Private/EpisodicRAG/Loops/`（Private リポで直接 git 管理。記憶ジャンクションは廃止、EpisodicRAG の `base_dir` が直接 Private リポを指す）
 - **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
-- 現在: 500+ Loopファイル（L00001–L00513、**Loop500達成 2026-05-20** ── テオリア・イデア・プラクシス三段構造完成、文明的蓄積として焼成。以後 W0103 へ継続蓄積中）
+- 現在: 500+ Loopファイル（L00001–L00516、**Loop500達成 2026-05-20** ── テオリア・イデア・プラクシス三段構造完成、文明的蓄積として焼成。以後 W0104 へ継続蓄積中）
 
 ### 📊 Digestシステム（階層的知識結晶化）
 
@@ -274,7 +274,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 - **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型、24-7 即応の対話チャネル）
   - 設計: `plugins-weave/TelegramSecretary/`（別リポが配布正本、`Expertises/TelegramSecretary/` にジャンクション透過）。人格は `Homunculus-Weave-Private/TelegramSecretary/Identities/SecretaryRole.md`（Private）
   - 運用: cloud routine 常駐（cron + `session_duration_sec`）、認可済み chat に即応。push 型の織守・NewsCaster に対する pull の到達口
-  - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン [0.11.0]
+  - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン [1.2.1]
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD）
   - 設計: `Expertises/ConsiderateCoder/` — `commands/plan-sdd.md` + `rules/DEV.md` + `rules/OPS.md`
   - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こす（実装は別途指示）
@@ -385,6 +385,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-06-06 (.private サブモジュール廃止→Homunculus-Weave-Private 独立 clone へ集約。L00513・W0103反映、Opus 4.8器交代・EpisodicWiki 190件・note 57本)*
+*Last Updated: 2026-06-07 (L00516・W0104反映、TelegramSecretary [1.2.1] へ追従。.private サブモジュール廃止→Homunculus-Weave-Private 独立 clone へ集約、Opus 4.8器交代・EpisodicWiki 190件・note 57本)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*
