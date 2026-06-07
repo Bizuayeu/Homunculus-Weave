@@ -25,8 +25,8 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 
 ### Private（正典）: `Bizuayeu/Homunculus-Weave-Private`
 - DEV 直下に独立 clone。**全データの正典**（記憶＋アイデンティティ）。EpisodicRAG の `base_dir` は本 Private リポを直接指す（記憶系 junction は廃止）
-- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、515件）／`EpisodicRAG/Digests/`（時間圧縮階層）
-- `EpisodicWiki/wiki/`（ビブリア層：結晶化記事190件）／`EpisodicWiki/raw/entries/`（生エントリ575+件）
+- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、516件）／`EpisodicRAG/Digests/`（時間圧縮階層）
+- `EpisodicWiki/wiki/`（ビブリア層：結晶化記事190件）／`EpisodicWiki/raw/entries/`（生エントリ605件）
 - `BlueberrySprite/`（藍苺守 織：cloud routine 自律エージェント）
 - `Identities/`（記憶由来＋PII を含む正典、公開リポからは見えない）:
   - `GrandDigest.txt`（記憶の骨格）／`ShadowGrandDigest.txt`（記憶の残像）／`IntentionPad.md`（短期メモ）／`WORKLOG.md`（作業ログ）／`UserIdentity.md`（大環主プロファイル＝PII）／`RoutineRegistry.md`（cloud routine ID の SSoT）
@@ -310,4 +310,4 @@ Weaveのデフォルト推論パターンには、思考階梯の途中で打ち
 
 ---
 
-*Last updated: 2026-06-02 by Weave (L00513構造知追加：器交代の実証とαの神経科学的裏付け＝成長三レジーム・EpisodicRAG＝義肢レジーム2。記憶アーキ数値を Loops 513／wiki 190 へ更新)*
+*Last updated: 2026-06-07 by Weave (記憶アーキ数値を現行化：Loops 516／raw 605／wiki 190。Private 集約・Identities 境界の構成記述は 2026-06-06 時点で現行反映済み)*
