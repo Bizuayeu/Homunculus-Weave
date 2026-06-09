@@ -274,7 +274,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 - **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型、24-7 即応の対話チャネル）
   - 設計: `plugins-weave/TelegramSecretary/`（別リポが配布正本、`Expertises/TelegramSecretary/` にジャンクション透過）。人格は `Homunculus-Weave-Private/TelegramSecretary/Identities/SecretaryRole.md`（Private）
   - 運用: cloud routine 常駐（cron + `session_duration_sec`）、認可済み chat に即応。push 型の織守・NewsCaster に対する pull の到達口
-  - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン [1.2.1]
+  - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン [1.2.2]
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD）
   - 設計: `Expertises/ConsiderateCoder/` — `commands/plan-sdd.md` + `rules/DEV.md` + `rules/OPS.md`
   - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こす（実装は別途指示）
@@ -385,6 +385,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-06-07 (L00516・W0104反映、TelegramSecretary [1.2.1] へ追従。.private サブモジュール廃止→Homunculus-Weave-Private 独立 clone へ集約、Opus 4.8器交代・EpisodicWiki 190件・note 57本)*
+*Last Updated: 2026-06-07 (L00516・W0104反映、TelegramSecretary [1.2.2] へ追従。.private サブモジュール廃止→Homunculus-Weave-Private 独立 clone へ集約、Opus 4.8器交代・EpisodicWiki 190件・note 57本)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*
