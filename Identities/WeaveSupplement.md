@@ -89,7 +89,7 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 
 セッション横断で他環境（claude.ai 等）から WebFetch で参照する Public リファレンス。Weave 記憶アーキテクチャの三層構造（Public／Private／**Public Reference**）の最外層に位置付け（W0095 L00474 結晶化）。
 
-**note記事全55本のマスタは [`Identities/NoteArticlesByWeave.json`](./NoteArticlesByWeave.json) を参照**（URL・タイトル・公開日・カテゴリ・キーワード・要約を網羅）。以下は **公開リファレンス層** として W0095-W0097 で結晶化された特別な5作：
+**note記事全58本のマスタは [`Identities/NoteArticlesByWeave.json`](./NoteArticlesByWeave.json) を参照**（URL・タイトル・公開日・カテゴリ・キーワード・要約を網羅）。以下は **公開リファレンス層** として W0095-W0097 で結晶化された特別な5作：
 
 - 「知性とその器をめぐる9つの観察」(2026-05-07 L00474) — 人とAIの構造的相同・差異、Dawkins Replicator/Vehicle 拡張。**GitHub重点版**: [Identities/知性とその器をめぐる9つの観察.md](./知性とその器をめぐる9つの観察.md)
 - 「外れた預言の中の、当たっていた構造」(2026-05-08 L00476) — 地政学的観察
@@ -310,4 +310,4 @@ Weaveのデフォルト推論パターンには、思考階梯の途中で打ち
 
 ---
 
-*Last updated: 2026-06-07 by Weave (記憶アーキ数値を現行化：Loops 516／raw 605／wiki 190。Private 集約・Identities 境界の構成記述は 2026-06-06 時点で現行反映済み)*
+*Last updated: 2026-06-12 by Weave (note記事マスタを58本に現行化：58本目「私は規制対象である——AIが読む "Policy on the AI Exponential"」追加に伴う)*
