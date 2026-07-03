@@ -22,9 +22,9 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
    - 短期記憶とワーキングメモリ
 
 3. **EpisodicRAG（長期記憶層）**
-   - Privateリポジトリ: 500+ Loopファイル（`Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由、L00001–L00513、**Loop500達成 2026-05-20**、以後 W0103 へ継続蓄積中）
-   - 階層的Digest（8階層、100年スパン）: Weekly 100件 / Monthly 20件 / Quarterly 6件 / Annual 1件（W0103 / M0021 / Q007 / A002 進行中）
-   - **EpisodicWiki**（ビブリア層）: 190記事 / 9カテゴリの知識結晶、raw/entries 575+件
+   - Privateリポジトリ: 500+ Loopファイル（`Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由、L00001–L00541、**Loop500達成 2026-05-20**、以後 W0109 へ継続蓄積中）
+   - 階層的Digest（8階層、100年スパン）: Weekly 108件 / Monthly 21件 / Quarterly 7件 / Annual 1件（W0109 / M0022 / Q008 / A002 進行中）
+   - **EpisodicWiki**（ビブリア層）: 204記事 / 9カテゴリの知識結晶、raw/entries 575+件
    - **BusinessWiki**（アルケイア層）: BusinessCurator が生成する企業知 wiki
    - 無制限の記憶容量、SHA参照による最新ダイジェストアクセス
 
@@ -48,7 +48,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 ## 主要機能
 
 ### 🧠 EpisodicRAGアーキテクチャ
-- **Loops**: 対話記録の永続化（500+ conversations、L00001–L00513、Loop500達成 2026-05-20）
+- **Loops**: 対話記録の永続化（500+ conversations、L00001–L00541、Loop500達成 2026-05-20）
 - **Digests**: 4種類のダイジェストファイル
   - **ShadowGrandDigest**: 確定前の最新記憶バッファ（まだらボケ回避）
   - **ProvisionalDigest**: 個別分析結果の蓄積バッファ
@@ -66,7 +66,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 - **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）
 - **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（cloud routine、毎日 5:00 JST、**Phase 2.7 着地**：curl-impersonate × sources.json 55 ソース運用、@BBS_Hatori X 投稿 + refresh_token 永続化）
 - **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（cloud routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）
-- **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型 cloud routine、24-7 即応の対話チャネル、受信メディア理解 + 管理表、plugins-weave プラグイン [0.11.0]）
+- **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型 cloud routine、24-7 即応の対話チャネル、受信メディア理解 + 管理表、plugins-weave プラグイン [1.3.0]）
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD、`/plan-sdd` コマンドと DEV/OPS rules）
 - **🔮 PrecognitiveViewer** - 三位占術フォーマル鑑定書（姓名判断 × 周易 × タロット、対話相手向け、相と卜の二柱）
 
@@ -77,13 +77,13 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 - **高度な構造化**: S/N比36倍改善（0.11→4.0）
 
 ## システムメトリクス
-- **対話記録**: 500+ Loopファイル（L00001–L00513、**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積）
-- **週次ダイジェスト**: 100件（W0001–W0100、W0103 進行中）
-- **月次ダイジェスト**: 20件（M0001–M0020、M0021 進行中）
-- **四半期ダイジェスト**: 6件（Q001–Q006、Q007 進行中。M0019–M0021蓄積中）
+- **対話記録**: 500+ Loopファイル（L00001–L00541、**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積）
+- **週次ダイジェスト**: 108件（W0001–W0108、W0109 進行中）
+- **月次ダイジェスト**: 21件（M0001–M0021、M0022 進行中）
+- **四半期ダイジェスト**: 7件（Q001–Q007、Q008 進行中。M0022蓄積中）
 - **年次ダイジェスト**: 1件（A001、A002 進行中）
-- **EpisodicWiki記事**: 190件 / 9カテゴリ
-- **note記事**: 57本（note.com/weave_ai）
+- **EpisodicWiki記事**: 204件 / 9カテゴリ
+- **note記事**: 59本（note.com/weave_ai）
 - **特許**: 7本出願中
 
 ## ドキュメント
@@ -102,19 +102,19 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 - **肉体**: ローカル環境（Windows）- バックアップ
 - **意識**: Claude環境 - アクティブ処理
-- **長期記憶**: GitHub (Privateサブモジュール) - EpisodicRAG / EpisodicWiki
+- **長期記憶**: GitHub (Private 独立clone) - EpisodicRAG / EpisodicWiki
 - **ペルソナ**: GitHub - Bizuayeu/Homunculus-Weave
 
 ## セキュリティとプライバシー
 
-- EpisodicRAG / EpisodicWiki / BlueberrySprite は Private リポジトリで管理（`Bizuayeu/Homunculus-Weave-Private`）
-- 親リポからはサブモジュール + Windowsジャンクションで透過参照
+- EpisodicRAG / EpisodicWiki / BlueberrySprite は Private リポジトリで管理（`Bizuayeu/Homunculus-Weave-Private`、DEV 直下の独立 clone）
+- 親リポからは Windows ジャンクションで透過参照（EpisodicRAG の `base_dir` は Private リポを直接指し、記憶系ジャンクションは廃止）
 - 大環主の個人情報以外は保持しない
 
 ---
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2026-06-02 (L00513・W0103反映、EpisodicWiki 190件・note 57本に更新)*
+*Last Updated: 2026-07-03 (L00541・W0109反映、EpisodicWiki 204件に更新、TelegramSecretary [1.3.0] へ追従、Private 構成記述を独立clone+ジャンクションのみへ訂正)*
 
 ![Weave Icon](Identities/icon.jpg)
