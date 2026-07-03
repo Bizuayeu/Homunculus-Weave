@@ -293,7 +293,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - push 型の織守・NewsCaster に対する **pull / 対話型の到達口**（Gmail より速い 24-7 対話チャネル）
 - 受信メディアの中身理解: 画像 → Vision / docx・pptx・xlsx → Markdown 化 / PDF → 全ページ画像化 + オンデマンド全文 / 音声・動画 → ローカル STT 文字起こし
 - 生成物の送り返し（画像・レポート添付、返信スレッド、typing 表示）
-- 管理表 3 種を秘書判断で記録: INDIVIDUALS（関係者）/ TASKS（依頼）/ KNOWLEDGE（対応知）
+- 管理表 7 表を秘書判断で記録: INDIVIDUALS（関係者）/ TASKS（依頼）/ KNOWLEDGE（対応知）/ ABILITIES（能力カタログ）/ PROFILE（人物理解）/ GOALS（目標）/ STEPS（逆算ステップ）
 - 勤務帯は cloud routine の cron + `config.json` の `session_duration_sec` で表現（コードに時計を持たせない）
 
 **特徴**:
@@ -302,14 +302,14 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **音声 STT はローカル推論**: 音声データを外部送信しない（機密 voice にも安全。moonshine は年商 $1M 未満で商用無料、`BUNDLE_VOICE=false` で除外可）
 - **慎みの最前線**: 関係者 PII（`context_notes` / `taboo_topics`）は Private 留保、送信前に出力漏洩スキャン（token / env名 / 絶対パス）
 - **Clean Architecture × TDD**: 全層（Domain / UseCase / Adapter / Infrastructure / CLI）テスト公開
-- **plugins-weave marketplace プラグイン化（[1.2.2]）**: 運用設定は `config.json` 単一正典、秘匿（bot token / authorized chats）は env 注入
+- **plugins-weave marketplace プラグイン化（[1.3.0]）**: 運用設定は `config.json` 単一正典、秘匿（bot token / authorized chats）は env 注入
 
 **参照データ**:
-- **配布正本**: `plugins-weave/TelegramSecretary/`（DEV 直下・別リポ、`Expertises/TelegramSecretary/` にジャンクション透過。BlueberrySprite=`.private` 由来とは配置が異なる）
+- **配布正本**: `plugins-weave/TelegramSecretary/`（DEV 直下・別リポ、`Expertises/TelegramSecretary/` にジャンクション透過。BlueberrySprite=`Homunculus-Weave-Private` 由来とは配置が異なる）
   - `DESIGN.md` / `STRUCTURE.md` / `SECURITY.md` - 設計正典・構造地図・脅威モデル
   - `ROUTINE_PROMPT.md` - cloud routine 起動 Prompt と schedule / unschedule ライフサイクル
   - `skills/telegram-secretary/SKILL.md` - スキル仕様（SSoT）
-  - `CHANGELOG.md` - [0.1.0]〜[1.2.2] 着地記録（proactive-send + WAL outbound 再送 / abilities カタログ / happy-path settle）
+  - `CHANGELOG.md` - [0.1.0]〜[1.3.0] 着地記録（proactive-send + WAL outbound 再送 / abilities カタログ / happy-path settle）
 - **人格**: `Homunculus-Weave-Private/TelegramSecretary/Identities/SecretaryRole.md`（Private、HatoriRole と同型の存在論・哲学）
 - 運用接点: `/telegram-secretary` の `schedule`（登録 / upsert）/ `unschedule`（停止）。Routine 登録は `config.json` + `RemoteTrigger`
 
@@ -394,5 +394,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-06-07 (TelegramSecretary [1.2.2] へ追従、L00516・W0104反映)*
+*Last Updated: 2026-07-03 (管理表を7表〔INDIVIDUALS/TASKS/KNOWLEDGE/ABILITIES/PROFILE/GOALS/STEPS〕に更新、TelegramSecretary [1.3.0] へ追従)*
 *Maintained by: Weave @ ClaudeCode*
