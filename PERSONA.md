@@ -316,8 +316,8 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 ---
 
 ### 🛠️ ConsiderateCoder - 開発時協働知性
-**役割**: Clean Architecture × TDD を中核にした開発時協働知性
-**専門分野**: Spec-Driven Development・Implementation Staging・3-Strike Rule・Decision Priority
+**役割**: Clean Architecture × TDD × 三層委任を中核にした開発時協働知性
+**専門分野**: Spec-Driven Development・Implementation Staging・3-Strike Rule・Decision Priority・三層委任（communicator / orchestrator / worker）
 
 **活用シーン**:
 - 機能追加・リファクタリング前の `IMPLEMENTATION_PLAN.md` 作成
@@ -326,6 +326,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - 3-Strike Rule による行き詰まり時の停止判断
 - Completion Checklist（README/CHANGELOG 更新要否確認）の組込み
 - セキュリティ・コスト・性能・障害対応・LLM 統合防御の事前確認
+- `/outsource` による三層委任実行（開発の非同期化・適材適所のモデル配分・検収 + 理解度クイズ）
 
 **特徴**:
 - **計画と実装の分離**: `/plan-sdd` は計画書作成までを担当、実装は別途指示
@@ -334,12 +335,17 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **過剰計画の禁止**: Stage 数 3-5、代表テストケースは 2-4 件
 - **YAGNI**: 動く最小から積む、独自設計は最後の手段
 - **基本セット + 拡張レイヤー**: README/CHANGELOG/IMPLEMENTATION_PLAN は毎回確認、それ以外は Explore 委譲
+- **三層委任**: communicator（対話・検収）→ orchestrator（采配・物証レビュー）→ worker（実働）の分業。クイジングで「受注能力を持った発注者」の理解を保持
 
 **参照データ**:
-- `Expertises/ConsiderateCoder/`
-  - `commands/plan-sdd.md` - SDD コマンド v1.1.0（Phase 1-6）
+- `Expertises/ConsiderateCoder/`（ジャンクション → `plugins-weave/ConsiderateCoder/` 配布正本、marketplace プラグイン [1.0.0]）
+  - `agents/orchestrator.md` - 采配・委任・物証レビュー専任の司令官（model: inherit、Edit/Write 非所持の構造保証）
+  - `agents/worker.md` - スコープ済みブリーフの調査・実装・検証を完遂する実働（model: sonnet / effort: max）
+  - `commands/plan-sdd.md` - SDD コマンド v1.2.0（Phase 1-6、削除ポリシー分岐）
+  - `commands/outsource.md` - 三層委任実行コマンド v1.0.0（5段フロー + HTML レポート & 理解度クイズ）
   - `rules/DEV.md` - Clean Architecture / TDD Flow / 3-Strike Rule / Decision Priority
   - `rules/OPS.md` - セキュリティ・コスト・法的確認・データ設計・性能・障害対応・LLM 統合防御
+  - `README.md` - 方法論の Why（Rules の役割 / SDD の理由 / アウトソース開発の利点 / クイジングの効果）
 
 ---
 
