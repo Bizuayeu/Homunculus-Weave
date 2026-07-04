@@ -201,9 +201,7 @@ Homunculus-Weave/
 │     References/（西海神異伝/ 紡伝/ horoscope_* Moltbook_Manual.md ADVANCED_FRAMEWORKS.md）
 │
 ├── 📚 Expertises/                 # 専門知識データベース（ClaudeSkills）
-│   ├── ConsiderateCoder/          # 開発時協働知性（Clean Architecture × TDD）
-│   │   ├── commands/plan-sdd.md   # SDD として IMPLEMENTATION_PLAN.md を起こす
-│   │   └── rules/                 # DEV.md（開発指針）+ OPS.md（運用指針）
+│   ├── ConsiderateCoder/          # → plugins-weave/ConsiderateCoder (Junction) — 開発時協働知性（Clean Architecture × TDD × 三層委任、[1.0.0]）
 │   ├── CorporateStrategist/       # 企業参謀（統合スキル）
 │   │   ├── BusinessAnalyzer/      # 事業分析（SOLUTIONIZER.md含む）
 │   │   ├── PersonnelDeveloper/    # 人材開発（Templates/, References/, Tools/qcd_analyzer.py）

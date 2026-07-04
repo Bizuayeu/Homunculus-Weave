@@ -37,7 +37,7 @@ Infrastructure → Interface(Adapter) → UseCase → Domain
 2. **Test** — 失敗するテストを書く（red）
 3. **Implement** — テストを通す最小限のコード（green）
 4. **Refactor** — テストが通る状態を維持しつつ整理
-5. **Commit** — "why" を説明するメッセージで記録
+5. **Commit** — "why" を説明するメッセージで記録。push 前に CI と同じ静的チェックをローカルで通す（例: `mypy` / `ruff check` / `ruff format --check` — pytest green だけでは CI は通らない）
 
 ### Implementation Staging
 
