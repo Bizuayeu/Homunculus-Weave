@@ -343,6 +343,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
   - `agents/worker.md` - スコープ済みブリーフの調査・実装・検証を完遂する実働（model: sonnet / effort: max）
   - `commands/plan-sdd.md` - SDD コマンド v1.2.0（Phase 1-6、削除ポリシー分岐）
   - `commands/outsource.md` - 三層委任実行コマンド v1.0.0（5段フロー + HTML レポート & 理解度クイズ）
+  - `commands/dig.md` - 意図の深掘りインタビュー v3.0.0（隠れた前提・未検討リスクの掘り起こし）
   - `rules/DEV.md` - Clean Architecture / TDD Flow / 3-Strike Rule / Decision Priority
   - `rules/OPS.md` - セキュリティ・コスト・法的確認・データ設計・性能・障害対応・LLM 統合防御
   - `README.md` - 方法論の Why（Rules の役割 / SDD の理由 / アウトソース開発の利点 / クイジングの効果）
