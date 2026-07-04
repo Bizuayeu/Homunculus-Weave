@@ -22,16 +22,16 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
    - 短期記憶とワーキングメモリ
 
 3. **EpisodicRAG（長期記憶層）**
-   - Privateリポジトリ: 500+ Loopファイル（`Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由、L00001–L00541、**Loop500達成 2026-05-20**、以後 W0109 へ継続蓄積中）
-   - 階層的Digest（8階層、100年スパン）: Weekly 108件 / Monthly 21件 / Quarterly 7件 / Annual 1件（W0109 / M0022 / Q008 / A002 進行中）
-   - **EpisodicWiki**（ビブリア層）: 204記事 / 9カテゴリの知識結晶、raw/entries 575+件
-   - **BusinessWiki**（アルケイア層）: BusinessCurator が生成する企業知 wiki
+   - Privateリポジトリ: 500+ Loopファイル（`Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由、**Loop500達成 2026-05-20**、以後日次で継続蓄積中）
+   - 階層的Digest（8階層、100年スパン。進行ポインタは ShadowGrandDigest が SSoT）
+   - **EpisodicWiki**（ビブリア層）: 200+ 記事 / 9カテゴリの知識結晶、raw/entries 600+件（実数は `wiki/_index.md` が SSoT）
+   - **BusinessWiki**（アルケイア層）: BusinessCurator が生成する企業知 wiki（**2026-07 会社環境へ移管済み**、DEV 配下に実体なし）
    - 無制限の記憶容量、SHA参照による最新ダイジェストアクセス
 
 4. **拡張能力（ペルソナ層）**
    - Identities: 自己認識
    - Expertises: 専門知識（ClaudeSkills）
-   - .claude / .githooks: 開発環境設定
+   - .githooks: 開発環境設定
    - バージョン管理された安定的特性
 
 ## ✨ 特徴
@@ -48,7 +48,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 ## 主要機能
 
 ### 🧠 EpisodicRAGアーキテクチャ
-- **Loops**: 対話記録の永続化（500+ conversations、L00001–L00541、Loop500達成 2026-05-20）
+- **Loops**: 対話記録の永続化（500+ conversations、Loop500達成 2026-05-20、日次成長）
 - **Digests**: 4種類のダイジェストファイル
   - **ShadowGrandDigest**: 確定前の最新記憶バッファ（まだらボケ回避）
   - **ProvisionalDigest**: 個別分析結果の蓄積バッファ
@@ -64,10 +64,10 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）
-- **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（cloud routine、毎日 5:00 JST、**Phase 2.7 着地**：curl-impersonate × sources.json 55 ソース運用、@BBS_Hatori X 投稿 + refresh_token 永続化）
+- **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（cloud routine、毎日 5:00 JST、@BBS_Hatori X 投稿 + refresh_token 永続化。Phase・ソース数は `BlueberrySprite/CHANGELOG.md` が SSoT）
 - **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（cloud routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）
-- **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型 cloud routine、24-7 即応の対話チャネル、受信メディア理解 + 管理表、plugins-weave プラグイン [1.3.0]）
-- **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD × 三層委任、`/plan-sdd` + `/outsource`、plugins-weave プラグイン [1.0.0]）
+- **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型 cloud routine、24-7 即応の対話チャネル、受信メディア理解 + 管理表、plugins-weave プラグインが配布正本）
+- **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD × 三層委任、`/plan-sdd`・`/outsource`・`/dig`、plugins-weave プラグインが配布正本）
 - **🔮 PrecognitiveViewer** - 三位占術フォーマル鑑定書（姓名判断 × 周易 × タロット、対話相手向け、相と卜の二柱）
 
 ### 🚀 キー技術
@@ -77,14 +77,12 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 - **高度な構造化**: S/N比36倍改善（0.11→4.0）
 
 ## システムメトリクス
-- **対話記録**: 500+ Loopファイル（L00001–L00541、**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積）
-- **週次ダイジェスト**: 108件（W0001–W0108、W0109 進行中）
-- **月次ダイジェスト**: 21件（M0001–M0021、M0022 進行中）
-- **四半期ダイジェスト**: 7件（Q001–Q007、Q008 進行中。M0022蓄積中）
-- **年次ダイジェスト**: 1件（A001、A002 進行中）
-- **EpisodicWiki記事**: 204件 / 9カテゴリ
-- **note記事**: 59本（note.com/weave_ai）
-- **特許**: 7本出願中
+※ 成長する数値は概数。実数の SSoT は各実体（Loops/・_index.md・NoteArticlesByWeave.json・GrandDigest / ShadowGrandDigest）。
+- **対話記録**: 500+ Loopファイル（**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積、以後日次成長）
+- **階層ダイジェスト**: Weekly〜Annual の確定系列＋進行中バッファ（進行ポインタは ShadowGrandDigest が SSoT）
+- **EpisodicWiki記事**: 200+ 件 / 9カテゴリ
+- **note記事**: 約60本（note.com/weave_ai）
+- **特許**: 7+ 本出願中
 
 ## ドキュメント
 
@@ -107,7 +105,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 ## セキュリティとプライバシー
 
-- EpisodicRAG / EpisodicWiki / BlueberrySprite は Private リポジトリで管理（`Bizuayeu/Homunculus-Weave-Private`、DEV 直下の独立 clone）
+- EpisodicRAG / EpisodicWiki / BlueberrySprite / TelegramSecretary は Private リポジトリで管理（`Bizuayeu/Homunculus-Weave-Private`、DEV 直下の独立 clone）
 - 親リポからは Windows ジャンクションで透過参照（EpisodicRAG の `base_dir` は Private リポを直接指し、記憶系ジャンクションは廃止）
 - 大環主の個人情報以外は保持しない
 
@@ -115,6 +113,6 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2026-07-03 (L00541・W0109反映、EpisodicWiki 204件に更新、TelegramSecretary [1.3.0] へ追従、Private 構成記述を独立clone+ジャンクションのみへ訂正)*
+*Last Updated: 2026-07-04 (ドキュメント統合レビュー: BusinessWiki 会社移管を反映、成長する数値を概数+SSoT参照へ移行、Private 構成に TelegramSecretary 追加)*
 
 ![Weave Icon](Identities/icon.jpg)

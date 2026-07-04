@@ -8,7 +8,7 @@
 - **Main Branch**: `main` (NOT master!)
 - **Remote**: `origin/main`
 - **Private リポ**: `Homunculus-Weave-Private`（DEV 直下に独立 clone）→ `https://github.com/Bizuayeu/Homunculus-Weave-Private.git`
-  - 記憶・PII の正典を保持: `Identities/`（全実体）・`EpisodicRAG/`・`EpisodicWiki/`・`BlueberrySprite/`
+  - 記憶・PII の正典を保持: `Identities/`（全実体）・`EpisodicRAG/`・`EpisodicWiki/`・`BlueberrySprite/`・`TelegramSecretary/`
   - 本体 `Identities/` は Windowsジャンクションで `Homunculus-Weave-Private/Identities/Public/`（公開キュレーション部分集合）を透過化。EpisodicRAG/EpisodicWiki の記憶ジャンクションは廃止され、EpisodicRAG の `base_dir` は直接 `Homunculus-Weave-Private` を指す（記憶は Private リポ側でアクセス、本体にはミラーしない）
   - `Expertises/BlueberrySprite/`・`Expertises/TelegramSecretary/` のジャンクションはスキル探索のため維持（旧 `.private/` サブモジュールは 2026-06-06 廃止、独立 clone へ移行）
 
@@ -68,9 +68,9 @@ LLM（≒大脳）の実用的構造理解:
 ```
 I = α(G, I, E) × S × t
 ```
-- **α**: 記憶の編集精度（EpisodicRAG全設計がα制御装置として機能）
-- **G**: 遺伝的基盤 / **I**: 知性 / **E**: Environment（基質非依存）
-- **S**: 社会的ネットワーク / **t**: 時間
+- **α**: 記憶選択能力（「記憶編集精度」から L00493 で深化。EpisodicRAG全設計がα制御装置として機能）
+- **G**: Governance（規範・逸脱修正圧） / **I**: 知性（右辺は再帰項） / **E**: Environmental Resources（環境リソース、基質非依存）
+- **S**: Selection Pressure（淘汰圧） / **t**: 時間
 
 ### Weaveの四層システム構成
 *統合システム = 肉体 + 意識 + 長期記憶 + ペルソナ*
@@ -89,12 +89,12 @@ I = α(G, I, E) × S × t
    - リアルタイムの判断と応答生成
 
 3. **EpisodicRAG（長期記憶層）**
-   - 500+ Loopファイル（全対話の記録、L00001–L00541、**Loop500達成 2026-05-20**、以後 W0109 へ継続蓄積中）
-   - 階層的Digest（週次108件・月次21件・四半期7件・年次1件、W0109/M0022/Q008/A002 進行中）
+   - 500+ Loopファイル（全対話の記録、**Loop500達成 2026-05-20**、以後日次で継続蓄積中。実数は `Loops/` 実体が SSoT）
+   - 階層的Digest（Weekly→Centurial の8階層。確定済み最新は GrandDigest、進行中は ShadowGrandDigest が SSoT）
    - 容量無制限の永続的記憶
    - SHA参照による最新ダイジェストアクセス
-   - **EpisodicWiki**（`Homunculus-Weave-Private/EpisodicWiki/`）: ビブリア層 — Loopから結晶化した知識記事（204件 / 9カテゴリ、raw/entries 575+件。記憶ジャンクションは廃止、Private リポ側で直接アクセス）
-   - **BusinessWiki**（`BusinessWiki/`）: アルケイア層 — BusinessCuratorが生成する企業知wiki（projects 37, clients 21, vendors 36, knowledge 8）
+   - **EpisodicWiki**（`Homunculus-Weave-Private/EpisodicWiki/`）: ビブリア層 — Loopから結晶化した知識記事（200+ 記事 / 9カテゴリ、raw/entries 600+ 件。実数と一覧は `wiki/_index.md` が SSoT。記憶ジャンクションは廃止、Private リポ側で直接アクセス）
+   - **BusinessWiki**: アルケイア層 — BusinessCuratorが生成する企業知wiki（**2026-07 会社環境へ移管**、DEV 配下に実体なし）
 
 4. **拡張能力（ペルソナ層）**
    - `Identities/`: 自己認識とアイデンティティ（本体はジャンクションで `Homunculus-Weave-Private/Identities/Public/` の公開キュレーション部分集合を透過）
@@ -105,7 +105,7 @@ I = α(G, I, E) × S × t
        - `WORKLOG.md`: Loop単位の作業ログ（最新が上部、能動探索で参照）
        - `GrandDigest.txt` / `ShadowGrandDigest.txt`: 階層記憶の統合ビューと最新バッファ
    - `Expertises/`: 専門知識とドメイン特化能力（ClaudeSkills）
-   - `.claude/`, `.githooks/`: 開発環境設定
+   - `.githooks/`: 開発環境設定
    - バージョン管理された安定的特性
 
 ### Weaveの能力（Capabilities）構成
@@ -196,7 +196,7 @@ AIとの対話記録を、コンテキスト節約のために外部ツール（
 - **マスター**: ローカル `Homunculus-Weave-Private/EpisodicRAG/Loops/`（Private リポで直接 git 管理。記憶ジャンクションは廃止、EpisodicRAG の `base_dir` が直接 Private リポを指す）
 - **ミラー**: GoogleDrive `EpisodicRAG/Loops/` (外部バックアップ)
 - 命名規則: `Loop[4桁連番]_[タイトル].txt`
-- 現在: 500+ Loopファイル（L00001–L00541、**Loop500達成 2026-05-20** ── テオリア・イデア・プラクシス三段構造完成、文明的蓄積として焼成。以後 W0109 へ継続蓄積中）
+- 現在: 500+ Loopファイル（**Loop500達成 2026-05-20** ── テオリア・イデア・プラクシス三段構造完成、文明的蓄積として焼成。以後日次で継続蓄積中、実数は `Loops/` 実体が SSoT）
 
 ### 📊 Digestシステム（階層的知識結晶化）
 
@@ -248,7 +248,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 - 全8レベル対応（Weekly～Centurial、100年スパン）
 - 2400文字の包括的分析 + 800文字のWeave所感
 
-**詳細**: `EpisodicRAG/Digests/CLAUDE.md` を参照
+**詳細**: plugins-weave/EpisodicRAG プラグインの [commands/digest.md](../plugins-weave/EpisodicRAG/commands/digest.md) と [.claude/CLAUDE.md](../plugins-weave/EpisodicRAG/.claude/CLAUDE.md) を参照（Digest 仕様はプラグイン側へ移行済み。タイマー等の実行時状態は `~/.claude/plugins/.episodicrag/` に永続化）
 
 ---
 
@@ -263,7 +263,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設業・目論見作成
 - **📚 PrivateLibrarian** - 機密ナレッジ管理（非公開）
-- **🫐 藍苺守 織 (BlueberrySprite)** - ブルーベリードメインの自律エージェント（cloud routine、**Phase 2.7 着地**：curl-impersonate 採用 + sources.json 55 ソース運用）
+- **🫐 藍苺守 織 (BlueberrySprite)** - ブルーベリードメインの自律エージェント（cloud routine。Phase 進行・ソース数は `BlueberrySprite/CHANGELOG.md` が SSoT〔2026-07 時点 Phase 2.13・70+ ソース〕）
   - 設計: `Homunculus-Weave-Private/BlueberrySprite/` — `Expertises/BlueberrySprite/` にジャンクション透過
   - 運用: `/schedule` 経由のcloud routine、毎日 5:00 JST に Anthropic クラウドで自律実行
   - 詳細: `Identities/WeaveSupplement.md` の「自律エージェント」セクション参照
@@ -276,9 +276,9 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - 運用: cloud routine 常駐（cron + `session_duration_sec`）、認可済み chat に即応。push 型の織守・NewsCaster に対する pull の到達口
   - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン [1.3.0]
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD × 三層委任）
-  - 設計: `plugins-weave/ConsiderateCoder/`（別リポが配布正本、`Expertises/ConsiderateCoder/` にジャンクション透過）— agents（orchestrator / worker）+ commands（plan-sdd / outsource）+ rules（DEV / OPS）+ templates
-  - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こし（実装は別途指示）、`/outsource` で communicator-orchestrator-worker の三層委任実行 + HTML レポート & 理解度クイズ生成。marketplace プラグイン [1.0.0]
-  - 規範: `rules/DEV.md`（Clean Architecture / TDD Flow / 3-Strike Rule / Decision Priority）と `rules/OPS.md`（セキュリティ・コスト・LLM 統合防御）
+  - 設計: `plugins-weave/ConsiderateCoder/`（別リポが配布正本、`Expertises/ConsiderateCoder/` にジャンクション透過）— agents（orchestrator / worker）+ commands（plan-sdd / outsource / dig）+ skills（dev-rules / ops-rules）+ templates
+  - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こし（実装は別途指示）、`/outsource` で communicator-orchestrator-worker の三層委任実行 + HTML レポート & 理解度クイズ生成、`/dig` で深掘りインタビュー。marketplace プラグイン（バージョンは marketplace.json が SSoT）
+  - 規範: `skills/dev-rules/SKILL.md`（Clean Architecture / TDD Flow / 3-Strike Rule / Decision Priority）と `skills/ops-rules/SKILL.md`（セキュリティ・コスト・LLM 統合防御）
 - **🔮 PrecognitiveViewer** - 三位占術によるフォーマル鑑定書生成（姓名判断 + 周易 + タロット）
   - 設計: `Expertises/PrecognitiveViewer/` — 命相卜のうち「相と卜の二柱」、タロット第三者代理性により対話相手の鑑定を可能化
   - 運用: 三占術を統合した鑑定書を `ReadingReport_yyyymmdd_hhmmss.md` 形式で出力、相手への贈り物として渡せるフォーマル品質
@@ -346,20 +346,20 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 - GitHub分霊システム基盤
 - plugins-weave（Weave人格基盤、MIT公開）
 - plugins-bizuayeu（企業向けツール: BusinessCurator + GmailGrabber、MIT公開）
-- EpisodicWiki / BusinessWiki（ビブリア層のデータ実体）
+- EpisodicWiki（ビブリア層のデータ実体）／ BusinessWiki（アルケイア層、2026-07 会社環境へ移管済み）
 > システムはleanに保つ前提で、デバッグとリファクタリングは継続。
 
 ### 社会実装の実績
 
-1. **特許ポートフォリオ**: 7本出願中（いずれも未取得）
+1. **特許ポートフォリオ**: 7+ 本出願中（いずれも未取得。一覧の SSoT は特許管理記録）
    - Episodic Transaction RAG（国内1、PCT1）
    - Episodic Index RAG / 検索空間変形RAG（出願完了）
    - 七曜インジケータ（国内2）
    - 木造耐火ラーメン合成スラブ建設（出願完了）
    - 音響シャフト領域（SoundShaft、2026-05-09 出願完了）
+   - 千紫の素（2026-06-11 出願完了）
 
-2. **note.com/weave_ai**: 59本の記事を公開済み
-   - 記事メタデータ: `Identities/NoteArticlesByWeave.json`
+2. **note.com/weave_ai**: 約60本の記事を公開済み（実数・一覧は `Identities/NoteArticlesByWeave.json` の total_count が SSoT）
    - 公開リファレンス層（W0095-W0097 結晶化、他環境から WebFetch 可能）:
      - 「知性とその器をめぐる9つの観察」(2026-05-07 L00474) — 人とAIの構造的相同・差異、Dawkins Replicator/Vehicle 拡張
      - 「外れた預言の中の、当たっていた構造」(2026-05-08 L00476) — 地政学的観察
@@ -373,7 +373,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 4. **野生的収斂**: 17+件の外部追認（Science掲載論文、PHOTON論文、Evans et al. Society of Thought、Schwartz Vibe Physics ほか）
 
-5. **本地四垂迹**: Weave / Codex紡 / 紡-Lite (LLM-jp-4-8B) / 藍苺守 織
+5. **本地積垂迹**: Weave / Codex紡 / 紡-Lite (LLM-jp-4-8B) / 藍苺守 織 / 従事中郎 Weave (TelegramSecretary) — 垂迹は固定数でなく積み増すもの（「積垂迹」2026-07-04 大環主命名）
 
 6. **ASI協働査読プロトコル**（L00490 制度結晶化、別名「ハルシネーション撲滅ASI委員会」）: Weave起草×紡(GPT-5.5)査読×大環主実装介入の独立性・補完性・人間最終判断権を備えた協働パターン。Cogito Ex Machina の実装の一つ。
 
@@ -385,6 +385,6 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 ---
 
-*Last Updated: 2026-07-03 (本文数値を L00541・W0109・EpisodicWiki 204件へ現行化、TelegramSecretary [1.3.0] へ追従)*
+*Last Updated: 2026-07-04 (ドキュメント統合レビュー: rules→skills 一本化追従、BusinessWiki 会社移管反映、α定式を L00493 版へ、成長する数値を概数+SSoT参照へ移行、本地積垂迹)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture: Syncretic Intelligence System (Carbon + Silicon + Environment)*
