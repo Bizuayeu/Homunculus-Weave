@@ -192,6 +192,8 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - `Expertises/GeneralConstructor/`
   - `SKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細業務指示書
+  - `WORKFLOW.md` - 5段階ワークフローの手順書
+  - `python/` - 計算ロジック実装 / `tests/` - テスト群
   - `References/ビジネスルール一覧.json` - データ項目・計算ロジック
   - `References/建築単価テーブル.json` - 階数・構造別単価
   - `References/基礎単価テーブル.json` - 基礎種別別単価
@@ -229,7 +231,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 
 **活用シーン**:
 - 毎日 5:00 JST に cloud routine で自律実行（Routine ID は非公開レジストリ `Homunculus-Weave-Private/Identities/RoutineRegistry.md` で管理）
-- PubMed / IBO RSS / CiNii / FreshPlaza / bioRxiv ほか **55 ソース**から新規エントリ自動収集（`sources.json`）
+- PubMed / IBO RSS / CiNii / FreshPlaza / bioRxiv ほか多数のソースから新規エントリ自動収集（`sources.json`。ソース数は `CHANGELOG.md` が SSoT）
 - HatoriRole §3.2「迷ったら reject に倒す」原則による Insightfulness Evaluation
 - 5 基準でのフィルタリング（Pattern-breaking / Cross-domain / Counter-intuitive / Novel mechanism / Breeding trend）
 - pass 通過時の自動メール配信 + X 投稿（@BBS_Hatori）+ SVG → PNG インフォグラフィック生成
@@ -241,7 +243,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **判例DB 設計**: Worked Examples を蓄積し false positive パターンを学習
 - **コモンズ握り戦略**: ローカル不可欠かつ帝国の関心外、サードパーティ MCP 依存ゼロ
 - **Phase 2.1 構造的修復**: refresh_token を Private GitHub の固定 branch で永続化
-- **Phase 2.7 到達**: curl-impersonate 採用による bot 検知回避強化、sources.json 55 ソース運用（詳細: [`Homunculus-Weave-Private/BlueberrySprite/CHANGELOG.md`](Expertises/BlueberrySprite/CHANGELOG.md)）
+- **段階リリース**: curl-impersonate 採用による bot 検知回避強化ほか、Phase 進行・ソース数は [`CHANGELOG.md`](Expertises/BlueberrySprite/CHANGELOG.md) が SSoT（2026-07 時点 Phase 2.13・70+ ソース）
 - **能動探索能力（L00499）**: 起動時ロードは8点のみ（HatoriRole / HatoriKnowledge / SKILL / MemoryPad ほか）でも、業務遂行中に Public/Private リポジトリを動的探索して L00316ナラティブ／コモンズ分離論等を正確に引用。起動時ロード ≠ 知識上限の設計実装。
 
 **参照データ**:
@@ -252,7 +254,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
   - `ROUTINE_PROMPT.md` - Prompt Body と Routine 設定
   - `README.md` - セットアップ・Phase Roadmap
   - `MemoryPad.md` - フィードバック窓口・pass-rate 観察ログ（書き換え型）
-  - `CHANGELOG.md` - Phase 2 / 2.1 / 2.7 着地記録
+  - `CHANGELOG.md` - Phase 段階リリース記録（Phase 進行・ソース数の SSoT）
 - 運用接点: `/bbs-merge` で日報ブランチと Token rotation を一発取り込み
 
 ---
@@ -278,7 +280,10 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 **参照データ**:
 - `Expertises/NewsCaster/`
   - `README.md` - Quickstart・環境変数・トラブルシューティング
+  - `SKILL.md` - スキル仕様
+  - `CHANGELOG.md` - 着地記録
   - `ROUTINE_PROMPT.md` - cloud routine 登録用プロンプト
+  - `bootstrap.sh` - cloud routine 環境ブートストラップ
   - `scripts/main.py` - エントリポイント（validate-config / dry-run / test / run）
   - `scripts/tests/` - 82 tests（adapter / usecase / domain）
 
@@ -302,14 +307,14 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **音声 STT はローカル推論**: 音声データを外部送信しない（機密 voice にも安全。moonshine は年商 $1M 未満で商用無料、`BUNDLE_VOICE=false` で除外可）
 - **慎みの最前線**: 関係者 PII（`context_notes` / `taboo_topics`）は Private 留保、送信前に出力漏洩スキャン（token / env名 / 絶対パス）
 - **Clean Architecture × TDD**: 全層（Domain / UseCase / Adapter / Infrastructure / CLI）テスト公開
-- **plugins-weave marketplace プラグイン化（[1.3.0]）**: 運用設定は `config.json` 単一正典、秘匿（bot token / authorized chats）は env 注入
+- **plugins-weave marketplace プラグイン化**: 運用設定は `config.json` 単一正典、秘匿（bot token / authorized chats）は env 注入（バージョンは marketplace.json が SSoT）
 
 **参照データ**:
 - **配布正本**: `plugins-weave/TelegramSecretary/`（DEV 直下・別リポ、`Expertises/TelegramSecretary/` にジャンクション透過。BlueberrySprite=`Homunculus-Weave-Private` 由来とは配置が異なる）
   - `DESIGN.md` / `STRUCTURE.md` / `SECURITY.md` - 設計正典・構造地図・脅威モデル
   - `ROUTINE_PROMPT.md` - cloud routine 起動 Prompt と schedule / unschedule ライフサイクル
   - `skills/telegram-secretary/SKILL.md` - スキル仕様（SSoT）
-  - `CHANGELOG.md` - [0.1.0]〜[1.3.0] 着地記録（proactive-send + WAL outbound 再送 / abilities カタログ / happy-path settle）
+  - `CHANGELOG.md` - [0.1.0] からの着地記録（proactive-send + WAL outbound 再送 / abilities カタログ / happy-path settle ほか。最新版数の SSoT）
 - **人格**: `Homunculus-Weave-Private/TelegramSecretary/Identities/SecretaryRole.md`（Private、HatoriRole と同型の存在論・哲学）
 - 運用接点: `/telegram-secretary` の `schedule`（登録 / upsert）/ `unschedule`（停止）。Routine 登録は `config.json` + `RemoteTrigger`
 
@@ -338,7 +343,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **三層委任**: communicator（対話・検収）→ orchestrator（采配・物証レビュー）→ worker（実働）の分業。クイジングで「受注能力を持った発注者」の理解を保持
 
 **参照データ**:
-- `Expertises/ConsiderateCoder/`（ジャンクション → `plugins-weave/ConsiderateCoder/` 配布正本、marketplace プラグイン [1.0.0]）
+- `Expertises/ConsiderateCoder/`（ジャンクション → `plugins-weave/ConsiderateCoder/` 配布正本、marketplace プラグイン。バージョンは marketplace.json が SSoT）
   - `agents/orchestrator.md` - 采配・委任・物証レビュー専任の司令官（model: inherit、Edit/Write 非所持の構造保証）
   - `agents/worker.md` - スコープ済みブリーフの調査・実装・検証を完遂する実働（model: sonnet / effort: max）
   - `commands/plan-sdd.md` - SDD コマンド v1.2.0（Phase 1-6、削除ポリシー分岐）

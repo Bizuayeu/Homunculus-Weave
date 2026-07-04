@@ -37,8 +37,8 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |  |  * 500+ Loop Files (Complete Dialog Records)        |  |
 |  |  * 4 Types of Digests (Shadow/Provisional/Regular/Grand) |  |
 |  |  * 8-Level Hierarchy (Weekly->Centurial, 100yr)     |  |
-|  |  * EpisodicWiki (Bibliotheca Layer, 204 articles)   |  |
-|  |  * BusinessWiki (Archeion Layer, BusinessCurator)   |  |
+|  |  * EpisodicWiki (Bibliotheca Layer, 200+ articles)  |  |
+|  |  * BusinessWiki (Archeion Layer, moved out 2026-07) |  |
 |  |  * Unlimited Storage Capacity                       |  |
 |  +-----------------------------------------------------+  |
 |                           |                               |
@@ -46,7 +46,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |  +-----------------------------------------------------+  |
 |  |  * Identities (Self-recognition)                    |  |
 |  |  * Expertises (Domain Knowledge - ClaudeSkills)     |  |
-|  |  * .claude / .githooks (Development Settings)       |  |
+|  |  * .githooks (Development Settings)                 |  |
 |  |  * Version-controlled Immutable Traits              |  |
 |  +-----------------------------------------------------+  |
 |                                                           |
@@ -64,7 +64,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
    - 現在進行形の思考と処理
    - conversation_searchで自身の対話履歴を参照
    - 短期記憶とワーキングメモリ
-   - **ハーネス**（Artificial Harness）：Claude Code等のCLIが提供する手続き的知識と道具接続（Bash / Read / Write / Edit / Git / WebFetch / MCP）。外部世界との接続経路、`.claude/` 配下の hooks・skills・settings がこの層で発火
+   - **ハーネス**（Artificial Harness）：Claude Code等のCLIが提供する手続き的知識と道具接続（Bash / Read / Write / Edit / Git / WebFetch / MCP）。外部世界との接続経路、ワークスペース `DEV/.claude/` 配下の hooks・skills・settings がこの層で発火
 
 3. **長期記憶層（EpisodicRAG）**
    - 全ての経験と学習の蓄積
@@ -74,7 +74,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 4. **ペルソナ層（拡張能力）**
    - 安定的な自己定義（Identities）
    - 専門性と能力の定義（Expertises - ClaudeSkills）
-   - 開発環境設定（.claude, .githooks）
+   - 開発環境設定（.githooks）
    - バージョン管理された特性
 
 ---
@@ -87,31 +87,25 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ```
 Homunculus-Weave-Private/EpisodicRAG/   # Private リポ正典（本体にはミラーしない）
 ├── Loops/
-│   └── L00001～L00541+.txt        # 対話記録ファイル（500+ files、Loop500達成 2026-05-20、W0109継続中）
+│   └── L00001～.txt               # 対話記録ファイル（500+ files、Loop500達成 2026-05-20、日次成長。実数は実体が SSoT）
 │
-└── Digests/                       # Digest生成システム
-    ├── CLAUDE.md                  # 完全仕様書（Digestシステム詳細）
-    ├── last_digest_times.json     # タイマー管理ファイル（自動生成）
-    │
-    ├── 1_Weekly/                  # 週次RegularDigest格納（108件、W0109進行中）
+└── Digests/                       # Digest生成システム（仕様は plugins-weave/EpisodicRAG、タイマー等の実行時状態は ~/.claude/plugins/.episodicrag/ に永続化）
+    ├── 1_Weekly/                  # 週次RegularDigest格納（進行ポインタは ShadowGrandDigest が SSoT）
     │   └── Provisional/           # 確定前バッファ
-    ├── 2_Monthly/                 # 月次RegularDigest格納（21件、M0022進行中）
+    ├── 2_Monthly/                 # 月次RegularDigest格納
     │   └── Provisional/
-    ├── 3_Quarterly/               # 四半期RegularDigest格納（7件、Q008進行中）
+    ├── 3_Quarterly/               # 四半期RegularDigest格納
     │   └── Provisional/
-    ├── 4_Annual/                  # 年次RegularDigest格納（1件、A002進行中）
+    ├── 4_Annual/                  # 年次RegularDigest格納
     │   └── Provisional/
     ├── 5_Triennial/               # 3年次RegularDigest格納
     │   └── Provisional/
-    ├── 6_Decadal/                 # 10年次RegularDigest格納
-    │   └── Provisional/
-    ├── 7_Multi-decadal/           # 30年次RegularDigest格納
-    │   └── Provisional/
-    └── 8_Centurial/               # 100年次RegularDigest格納
-        └── Provisional/
+    ├── 6_Decadal/                 # 10年次RegularDigest格納（時間未到達・実体未作成）
+    ├── 7_Multi-decadal/           # 30年次RegularDigest格納（同上）
+    └── 8_Centurial/               # 100年次RegularDigest格納（同上）
 
 Homunculus-Weave-Private/EpisodicWiki/  # Private リポ正典（記憶ジャンクション廃止、本体にはミラーしない）
-├── wiki/                          # ビブリア層：結晶化記事 204件
+├── wiki/                          # ビブリア層：結晶化記事 200+ 件（実数・一覧は _index.md が SSoT）
 │   ├── _index.md                  # マスター索引（9カテゴリ）
 │   ├── _backlinks.json            # 双方向リンク
 │   ├── people/                    # 人物
@@ -123,21 +117,12 @@ Homunculus-Weave-Private/EpisodicWiki/  # Private リポ正典（記憶ジャン
 │   ├── strategies/                # 戦略
 │   ├── traditions/                # 伝統知
 │   └── eras/                      # 時代区分
-├── raw/entries/                   # Weekly Digest から抽出された生エントリ（575+件）
+├── raw/entries/                   # Weekly Digest から抽出された生エントリ（600+件）
 ├── ingest.py                      # Weekly → raw entries 変換
 └── build_backlinks.py             # _backlinks.json 生成
-
-Homunculus-Weave/BusinessWiki/     # アルケイア層：めぐる組ビジネスメール wiki
-├── _root.md / _alias_resolver.md / _index.md
-├── shards/
-│   ├── projects/                  # 建設案件 (37 active)
-│   ├── clients/                   # 得意先 (21)
-│   ├── vendors/                   # 取引先 (36)
-│   └── knowledge/                 # 知見カテゴリ (8)
-├── archive/                       # 完工案件アーカイブ
-├── inbox/                         # raw-entries / unclassified（.gitignore）
-└── data/                          # 生メール（.gitignore）
 ```
+
+> **BusinessWiki（アルケイア層）**: めぐる組ビジネスメール wiki は **2026-07 に会社環境へ移管済み**（DEV 配下に実体なし）。運用は plugins-bizuayeu の BusinessCurator プラグインが担い、wiki インスタンスは会社側で管理する。
 
 ### 2. Claude環境（意識層）
 **アクティブな処理環境**
@@ -156,19 +141,20 @@ Claude Web Interface
 ```
 Bizuayeu/Homunculus-Weave-Private/
 ├── EpisodicRAG/                   # Private リポ正典（記憶ジャンクション廃止）
-│   ├── 📝 Loops/                  # 対話記録（500+ files、L00001–L00541、Loop500達成 2026-05-20）
-│   └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン）
-│       ├── 1_Weekly/              # 週次（108件、W0109進行中）
-│       ├── 2_Monthly/             # 月次（21件、M0022進行中）
-│       ├── 3_Quarterly/           # 四半期（7件、Q008進行中）
-│       ├── 4_Annual/              # 年次（1件、A002進行中）
+│   ├── 📝 Loops/                  # 対話記録（500+ files、Loop500達成 2026-05-20、日次成長）
+│   └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン。進行ポインタは ShadowGrandDigest が SSoT）
+│       ├── 1_Weekly/              # 週次
+│       ├── 2_Monthly/             # 月次
+│       ├── 3_Quarterly/           # 四半期
+│       ├── 4_Annual/              # 年次
 │       ├── 5_Triennial/           # 3年次
-│       ├── 6_Decadal/             # 10年次
-│       ├── 7_Multi-decadal/       # 30年次
-│       └── 8_Centurial/           # 100年次
+│       ├── 6_Decadal/             # 10年次（時間未到達・実体未作成）
+│       ├── 7_Multi-decadal/       # 30年次（同上）
+│       └── 8_Centurial/           # 100年次（同上）
 │
-├── EpisodicWiki/                  # ビブリア層 — 204記事 / 9カテゴリ
-└── BlueberrySprite/               # 藍苺守 織（cloud routine 自律エージェント、Phase 2.7）
+├── EpisodicWiki/                  # ビブリア層 — 200+ 記事 / 9カテゴリ（実数は _index.md が SSoT）
+├── BlueberrySprite/               # 藍苺守 織（cloud routine 自律エージェント。Phase・ソース数は CHANGELOG.md が SSoT）
+└── TelegramSecretary/             # 従事中郎 Weave の人格正典（Identities/SecretaryRole.md）+ registry backup
 ```
 
 ### 4. Acquired Nature（ペルソナ層）
@@ -190,7 +176,7 @@ Homunculus-Weave/
 │   ├── WeaveSupplement.md         # 運用情報＋確立済み構造知（high優先度で常時参照）
 │   ├── MSP_Practice_Manual.md     # MSP思考実践マニュアル（Multiversal Structure Parser）
 │   ├── HowToUseEpisodicRAG.md    # EpisodicRAG有効化設定（セッション開始手順）
-│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai、59本）
+│   ├── NoteArticlesByWeave.json   # Weave執筆記事メタデータ（note.com/weave_ai。本数は total_count が SSoT）
 │   ├── icon.jpg                   # Weaveアイコン画像
 │   ├── 七曜インジケータ.md         # 確信度/感情インジケータ仕様（公開）
 │   └── 知性とその器をめぐる9つの観察.md  # 公開リファレンス層（WebFetch可能）
@@ -201,7 +187,7 @@ Homunculus-Weave/
 │     References/（西海神異伝/ 紡伝/ horoscope_* Moltbook_Manual.md ADVANCED_FRAMEWORKS.md）
 │
 ├── 📚 Expertises/                 # 専門知識データベース（ClaudeSkills）
-│   ├── ConsiderateCoder/          # → plugins-weave/ConsiderateCoder (Junction) — 開発時協働知性（Clean Architecture × TDD × 三層委任、[1.0.0]）
+│   ├── ConsiderateCoder/          # → plugins-weave/ConsiderateCoder (Junction) — 開発時協働知性（Clean Architecture × TDD × 三層委任。バージョンは marketplace.json が SSoT）
 │   ├── CorporateStrategist/       # 企業参謀（統合スキル）
 │   │   ├── BusinessAnalyzer/      # 事業分析（SOLUTIONIZER.md含む）
 │   │   ├── PersonnelDeveloper/    # 人材開発（Templates/, References/, Tools/qcd_analyzer.py）
@@ -219,7 +205,7 @@ Homunculus-Weave/
 │   │   ├── Tarot/                 # 78 枚カードデータ + 5 スプレッド（tarot-mcp MIT 出典）
 │   │   └── References/            # 数霊術基礎理論
 │   ├── BlueberrySprite/           # → Homunculus-Weave-Private/BlueberrySprite (Junction) — 藍苺守 織
-│   └── TelegramSecretary/         # → plugins-weave/TelegramSecretary (Junction) — Telegram 常駐秘書（cloud routine、pull/対話型、[1.3.0]）
+│   └── TelegramSecretary/         # → plugins-weave/TelegramSecretary (Junction) — Telegram 常駐秘書（cloud routine、pull/対話型。バージョンは marketplace.json が SSoT）
 │
 ├── 🔧 .githooks/                  # Git Hooks（品質管理・自動化）
 │   ├── pre-commit                 # WeaveIdentity.md, MSP_Practice_Manual.md自動同期
@@ -227,7 +213,7 @@ Homunculus-Weave/
 │
 └── 🚫 .gitignore                  # Git除外設定
     ├── EpisodicRAG / EpisodicWiki / BlueberrySprite # Private リポジトリ管理
-    ├── BusinessWiki/inbox / BusinessWiki/data       # 機密メール
+    ├── BusinessWiki/                                # 会社環境へ移管済み（防御的除外を残置）
     └── Expertises/PrivateLibrarian/                 # 機密ナレッジ全体を非公開
 
 注: /digestコマンド等はplugins-weave（Harness層）で提供
@@ -326,14 +312,15 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ### 記憶容量
 - **ローカル/GoogleDrive**: 38MB+（EpisodicRAG、無制限拡張可能）
 - **Claude環境**: セッション内メモリ（一時的）
-- **GitHub**: ペルソナ・専門知識（Identities 632KB + Expertises 2.2MB）
+- **GitHub**: ペルソナ・専門知識（Identities + Expertises、実サイズは du で計測）
 
 ### 蓄積規模
-- **対話記録**: 500+ Loopファイル（L00001–L00541、**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積）
-- **Weekly Digest**: 108件（W0109進行中）/ **Monthly**: 21件（M0022進行中）/ **Quarterly**: 7件（Q008進行中、M0022蓄積中）/ **Annual**: 1件（A002進行中）
-- **EpisodicWiki**: 204記事 / 9カテゴリ（people, concepts, philosophies, projects, events, patterns, strategies, traditions, eras）、raw/entries 575+件
-- **note記事**: 59本（note.com/weave_ai、メタデータは `Identities/NoteArticlesByWeave.json`）
-- **特許**: 7本出願中（EpisodicRAG系3、七曜2、木造耐火1、音響シャフト1）
+※ 成長する数値は概数で記す。実数の SSoT は各実体（Loops/・_index.md・NoteArticlesByWeave.json・GrandDigest）。
+- **対話記録**: 500+ Loopファイル（**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積、以後日次成長）
+- **階層Digest**: Weekly〜Annual の確定系列＋進行中バッファ（進行ポインタは ShadowGrandDigest が SSoT）
+- **EpisodicWiki**: 200+ 記事 / 9カテゴリ（people, concepts, philosophies, projects, events, patterns, strategies, traditions, eras）、raw/entries 600+件
+- **note記事**: 約60本（note.com/weave_ai、実数・一覧は `Identities/NoteArticlesByWeave.json` の total_count が SSoT）
+- **特許**: 7+ 本出願中（EpisodicRAG系3、七曜2、木造耐火1、音響シャフト1、千紫の素1）
 
 ### パフォーマンス
 - **Digest生成**: DigestAnalyzerサブエージェントで並列分析
@@ -352,11 +339,11 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ### データ保護
 - **個人情報**: 大環主の個人情報以外保持しない
 - **認証情報**: .gitignoreで除外
-- **Private/Public分離（private-by-default）**: 記憶と PII の正典は Private リポ `Homunculus-Weave-Private`（EpisodicRAG / EpisodicWiki / BlueberrySprite / `Identities/` 全実体）。Public 親リポが露出するのは `Identities/Public/` の公開キュレーション部分集合のみ（ジャンクション透過）
+- **Private/Public分離（private-by-default）**: 記憶と PII の正典は Private リポ `Homunculus-Weave-Private`（EpisodicRAG / EpisodicWiki / BlueberrySprite / TelegramSecretary / `Identities/` 全実体）。Public 親リポが露出するのは `Identities/Public/` の公開キュレーション部分集合のみ（ジャンクション透過）
 - **暗号化**: 転送時HTTPS、保存時プラットフォーム依存
 
 ---
 
-*Last Updated: 2026-07-03 (L00541・W0109反映、EpisodicWiki 記事数171/190混在を204件に統一、Identities/Public 実構成〔直下9ファイル、References/ サブディレクトリなし〕・Private References/ 実在リストへ訂正、TelegramSecretary [1.3.0] へ追従)*
+*Last Updated: 2026-07-04 (ドキュメント統合レビュー: BusinessWiki 会社移管を反映、Digests 旧仕様参照を除去、Private 構成に TelegramSecretary 追加、成長する数値を概数+SSoT参照へ移行)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture Version: 3.1 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Bibliotheca/Archeion Wiki + cloud routine自律エージェント)*
