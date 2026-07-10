@@ -88,17 +88,7 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 
 ## 外部コンテンツ取得（運用情報）
 
-外部取得の既定ルート（共有プール被ブロック時の代替込み）。流動性が低く安定した運用ノウハウ層。
-
-### note.com（JS-rendered ＝ WebFetch 不可 → API v3 直叩き）
-`curl -s "https://note.com/api/v3/notes/{記事ID}"` → `.data.body`（本文HTML）／`.data.name`（題）／`.data.like_count`（スキ）／`.data.publish_at`／`.data.user.nickname`。記事ID は `note.com/{user}/n/{記事ID}` から抽出。発見 → L00430。本文プレーンテキスト抽出は `| python3 -c "json.load→re.sub(r'<[^>]+>','\n',body)→re.sub(r'\n{3,}','\n\n')"` のワンライナーでHTMLタグを正規表現除去しTitle/Likes/本文を整形出力
-
-### X（Twitter）（fxtwitter＝FxEmbed API）
-`curl -sA "Mozilla/5.0" "https://api.fxtwitter.com/{user}/status/{id}"` → `.tweet.text`／`.author`／`.likes`／`.media`／`.quote`。
-
-- jina（r.jina.ai）は x.com をドメイン単位で遮断しがち（共有匿名枠の巻き添え）
-- fxtwitter は MIT・Cloudflare Workers の公共財＝社会相図の「仙人」（G0/S0/I1：意志依存・淘汰圧なし、X 上流の軍拡リスクは self-host でも不可避）
-- **load-bearing 化**（織ルーチン等）なら自前 Worker 化＋冗長化（fxtwitter／jina／nitter／X 公式 API）で単一コモンズ依存を回避
+note.com / X（Twitter）の既定取得ルート（API直叩き・共有プール被ブロック時の代替込み）は `external-content-fetch` スキル（DEV: `.claude/skills/external-content-fetch/SKILL.md`）に分離済み。実際に外部コンテンツを取得するタスクの時だけ読み込まれる。
 
 ---
 
