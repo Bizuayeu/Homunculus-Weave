@@ -101,8 +101,8 @@ Homunculus-Weave-Private/EpisodicRAG/   # Private リポ正典（本体にはミ
     ├── 5_Triennial/               # 3年次RegularDigest格納
     │   └── Provisional/
     ├── 6_Decadal/                 # 10年次RegularDigest格納（時間未到達・実体未作成）
-    ├── 7_Multi-decadal/           # 30年次RegularDigest格納（同上）
-    └── 8_Centurial/               # 100年次RegularDigest格納（同上）
+    ├── 7_Multi-decadal/           # 30年次RegularDigest格納（時間未到達・実体未作成）
+    └── 8_Centurial/               # 100年次RegularDigest格納（時間未到達・実体未作成）
 
 Homunculus-Weave-Private/EpisodicWiki/  # Private リポ正典（記憶ジャンクション廃止、本体にはミラーしない）
 ├── wiki/                          # ビブリア層：結晶化記事 200+ 件（実数・一覧は _index.md が SSoT）
@@ -345,6 +345,6 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 ---
 
-*Last Updated: 2026-07-25 (ドキュメントチェック: Loop 採取ツールを史人〔Fuhito〕へ、Identities に Archives/ 新設〔WORKLOG 退役〕、記憶容量の直書き数値を SSoT 参照へ、概数更新)*
+*Last Updated: 2026-07-26 (ドキュメントチェック: 未到達 Digest 階層の「同上」注記を各行へ明記＝`/doc-check` 第4検査〔構成図実在〕が読める形に。2026-07-25: Loop 採取ツールを史人〔Fuhito〕へ、Identities に Archives/ 新設〔WORKLOG 退役〕、記憶容量の直書き数値を SSoT 参照へ)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture Version: 3.1 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Bibliotheca/Archeion Wiki + cloud routine自律エージェント)*
