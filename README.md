@@ -22,7 +22,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
    - 短期記憶とワーキングメモリ
 
 3. **EpisodicRAG（長期記憶層）**
-   - Privateリポジトリ: 500+ Loopファイル（`Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由、**Loop500達成 2026-05-20**、以後日次で継続蓄積中）
+   - Privateリポジトリ: 560+ Loopファイル（`Homunculus-Weave-Private/EpisodicRAG/Loops/` 経由、**Loop500達成 2026-05-20**、以後日次で継続蓄積中）
    - 階層的Digest（8階層、100年スパン。進行ポインタは ShadowGrandDigest が SSoT）
    - **EpisodicWiki**（ビブリア層）: 200+ 記事 / 9カテゴリの知識結晶、raw/entries 600+件（実数は `wiki/_index.md` が SSoT）
    - **BusinessWiki**（アルケイア層）: BusinessCurator が生成する企業知 wiki（**2026-07 会社環境へ移管済み**、DEV 配下に実体なし）
@@ -48,7 +48,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 ## 主要機能
 
 ### 🧠 EpisodicRAGアーキテクチャ
-- **Loops**: 対話記録の永続化（500+ conversations、Loop500達成 2026-05-20、日次成長）
+- **Loops**: 対話記録の永続化（560+ conversations、Loop500達成 2026-05-20、日次成長）
 - **Digests**: 4種類のダイジェストファイル
   - **ShadowGrandDigest**: 確定前の最新記憶バッファ（まだらボケ回避）
   - **ProvisionalDigest**: 個別分析結果の蓄積バッファ
@@ -64,6 +64,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
 - **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）
+- **📚 PrivateLibrarian** - 機密ナレッジ管理（非公開、`.gitignore` 対象）
 - **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（cloud routine、毎日 5:00 JST、@BBS_Hatori X 投稿 + refresh_token 永続化。Phase・ソース数は `BlueberrySprite/CHANGELOG.md` が SSoT）
 - **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（cloud routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）
 - **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型 cloud routine、24-7 即応の対話チャネル、受信メディア理解 + 管理表、plugins-weave プラグインが配布正本）
@@ -74,15 +75,15 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 - **conversation_search**: 対話履歴の軽量参照（2-3KB/検索）
 - **ClaudeSkills**: SKILL.md形式でパッケージ化された専門性
 - **SHA参照**: GitHubベースの軽量・高速な記憶取得
-- **高度な構造化**: S/N比36倍改善（0.11→4.0）
+- **階層的ダイジェスト**: 生ログを8階層に畳み、文脈あたりの信号密度を上げる（Loop → Weekly → … → Centurial）
 
 ## システムメトリクス
 ※ 成長する数値は概数。実数の SSoT は各実体（Loops/・_index.md・NoteArticlesByWeave.json・GrandDigest / ShadowGrandDigest）。
-- **対話記録**: 500+ Loopファイル（**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積、以後日次成長）
+- **対話記録**: 560+ Loopファイル（**Loop500達成 2026-05-20** 時点で 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積、以後日次成長）
 - **階層ダイジェスト**: Weekly〜Annual の確定系列＋進行中バッファ（進行ポインタは ShadowGrandDigest が SSoT）
 - **EpisodicWiki記事**: 200+ 件 / 9カテゴリ
-- **note記事**: 約60本（note.com/weave_ai）
-- **特許**: 7+ 本出願中
+- **note記事**: 約70本（note.com/weave_ai）
+- **特許**: 出願済み 9 件 ＋ 出願準備中 1 件（いずれも未取得。一覧の SSoT は特許管理記録）
 
 ## ドキュメント
 
@@ -113,6 +114,6 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2026-07-04 (ドキュメント統合レビュー: BusinessWiki 会社移管を反映、成長する数値を概数+SSoT参照へ移行、Private 構成に TelegramSecretary 追加)*
+*Last Updated: 2026-07-25 (ドキュメントチェック: 概数を更新、ペルソナ一覧に PrivateLibrarian を補完)*
 
 ![Weave Icon](Identities/icon.jpg)

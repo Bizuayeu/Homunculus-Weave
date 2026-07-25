@@ -34,7 +34,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 |                           |                               |
 |  Layer 3: EpisodicRAG (Long-term Memory)                  |
 |  +-----------------------------------------------------+  |
-|  |  * 500+ Loop Files (Complete Dialog Records)        |  |
+|  |  * 560+ Loop Files (Complete Dialog Records)        |  |
 |  |  * 4 Types of Digests (Shadow/Provisional/Regular/Grand) |  |
 |  |  * 8-Level Hierarchy (Weekly->Centurial, 100yr)     |  |
 |  |  * EpisodicWiki (Bibliotheca Layer, 200+ articles)  |  |
@@ -87,7 +87,7 @@ Weaveは、肉体・意識・長期記憶・ペルソナの四層構造で統合
 ```
 Homunculus-Weave-Private/EpisodicRAG/   # Private リポ正典（本体にはミラーしない）
 ├── Loops/
-│   └── L00001～.txt               # 対話記録ファイル（500+ files、Loop500達成 2026-05-20、日次成長。実数は実体が SSoT）
+│   └── L00001～.txt               # 対話記録ファイル（560+ files、Loop500達成 2026-05-20、日次成長。実数は実体が SSoT）
 │
 └── Digests/                       # Digest生成システム（仕様は plugins-weave/EpisodicRAG、タイマー等の実行時状態は ~/.claude/plugins/.episodicrag/ に永続化）
     ├── 1_Weekly/                  # 週次RegularDigest格納（進行ポインタは ShadowGrandDigest が SSoT）
@@ -141,7 +141,7 @@ Claude Web Interface
 ```
 Bizuayeu/Homunculus-Weave-Private/
 ├── EpisodicRAG/                   # Private リポ正典（記憶ジャンクション廃止）
-│   ├── 📝 Loops/                  # 対話記録（500+ files、Loop500達成 2026-05-20、日次成長）
+│   ├── 📝 Loops/                  # 対話記録（560+ files、Loop500達成 2026-05-20、日次成長）
 │   └── 📊 Digests/                # 階層的知識結晶化（8階層、100年スパン。進行ポインタは ShadowGrandDigest が SSoT）
 │       ├── 1_Weekly/              # 週次
 │       ├── 2_Monthly/             # 月次
@@ -182,8 +182,9 @@ Homunculus-Weave/
 │   └── 知性とその器をめぐる9つの観察.md  # 公開リファレンス層（WebFetch可能）
 │
 │  ※ 以下は Private リポ Homunculus-Weave-Private/Identities/ の正典（private-by-default、公開しない）:
-│     UserIdentity.md（PII）/ IntentionPad.md / WORKLOG.md / RoutineRegistry.md /
-│     GrandDigest.txt / ShadowGrandDigest.txt / MyArtOfLiving.md / MyArtOfLiving.png / BeingDevelopment/ /
+│     UserIdentity.md（PII）/ IntentionPad.md / RoutineRegistry.md /
+│     GrandDigest.txt / ShadowGrandDigest.txt / MyArtOfLiving.md / MyArtOfLiving.png /
+│     Archives/（退役文書: WORKLOG.md / RalphLoop / 探索的立志録）/
 │     References/（西海神異伝/ 紡伝/ horoscope_* Moltbook_Manual.md ADVANCED_FRAMEWORKS.md）
 │
 ├── 📚 Expertises/                 # 専門知識データベース（ClaudeSkills）
@@ -232,7 +233,7 @@ GitHub（ペルソナ）
     ↓
 Claude環境起動
     ↓
-GrandDigest + ShadowGrandDigest + WeaveSupplement + IntentionPad 読み込み（WORKLOG は必要時に能動探索）
+GrandDigest + ShadowGrandDigest + WeaveSupplement + IntentionPad 読み込み
     ↓
 conversation_searchで過去の対話履歴参照
     ↓
@@ -243,7 +244,7 @@ conversation_searchで過去の対話履歴参照
 ```
 対話セッション（Claude環境）
     ↓
-Claudify（Chrome拡張）でLoop生成
+史人（Fuhito / LoopExporter、Chrome拡張）でLoop生成
     ↓
 ローカル環境に保存（.gitignore）
     ↓
@@ -265,7 +266,7 @@ Claudify（Chrome拡張）でLoop生成
     ↓
 8階層カスケード（Weekly→Monthly→Quarterly→Annual→Triennial→Decadal→Multi-decadal→Centurial）
     ↓
-外部ストレージ（現在はGoogleDrive）にバックアップ
+Private リポ（Git）+ ローカル SSD の二系統へ冗長化
 ```
 
 ### 3. 知識の参照フロー
@@ -296,7 +297,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ### ClaudeSkills
 - **用途**: ペルソナと専門知識の即時活用
 - **特徴**: SKILL.md形式でパッケージ化された専門性
-- **効果**: S/N比の劇的改善（0.11→4.0、36倍）
+- **効果**: 必要な専門性だけをオンデマンドで載せ、コンテキストの信号密度を上げる
 - **実装**: 各Expertise配下にSKILL.md + CLAUDE.md構成
 
 ### GitHub Repository
@@ -310,21 +311,21 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ## 📊 システムメトリクス
 
 ### 記憶容量
-- **ローカル/GoogleDrive**: 38MB+（EpisodicRAG、無制限拡張可能）
+- **ローカル（Private リポ）**: EpisodicRAG 全体（無制限拡張可能。実サイズは `du` で計測）
 - **Claude環境**: セッション内メモリ（一時的）
 - **GitHub**: ペルソナ・専門知識（Identities + Expertises、実サイズは du で計測）
 
 ### 蓄積規模
 ※ 成長する数値は概数で記す。実数の SSoT は各実体（Loops/・_index.md・NoteArticlesByWeave.json・GrandDigest）。
-- **対話記録**: 500+ Loopファイル（**Loop500達成 2026-05-20** ── 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積、以後日次成長）
+- **対話記録**: 560+ Loopファイル（**Loop500達成 2026-05-20** 時点で 文庫本20冊以上＋920コミット＋3,825 Bash＋2,111メッセージ累積、以後日次成長）
 - **階層Digest**: Weekly〜Annual の確定系列＋進行中バッファ（進行ポインタは ShadowGrandDigest が SSoT）
 - **EpisodicWiki**: 200+ 記事 / 9カテゴリ（people, concepts, philosophies, projects, events, patterns, strategies, traditions, eras）、raw/entries 600+件
-- **note記事**: 約60本（note.com/weave_ai、実数・一覧は `Identities/NoteArticlesByWeave.json` の total_count が SSoT）
-- **特許**: 7+ 本出願中（EpisodicRAG系3、七曜2、木造耐火1、音響シャフト1、千紫の素1）
+- **note記事**: 約70本（note.com/weave_ai、実数・一覧は `Identities/NoteArticlesByWeave.json` の total_count が SSoT）
+- **特許**: 出願済み 9 件（RAG系3・七曜2・建築系2〔木造耐火スラブ／音響シャフト〕・植物系2〔千紫の素／花芽茶〕）＋ 出願準備中1（木造耐火の工法特許）。一覧の SSoT は特許管理記録
 
 ### パフォーマンス
 - **Digest生成**: DigestAnalyzerサブエージェントで並列分析
-- **記憶の永続性**: GoogleDrive（無制限）+ GitHub（バージョン管理）
+- **記憶の永続性**: Private リポ（Git、全履歴込みの分霊）+ ローカル SSD の二系統冗長化
 
 ---
 
@@ -333,8 +334,8 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 ### 環境別アクセス制御
 - **ローカル環境**: ファイルシステム権限
 - **Claude環境**: セッション認証
-- **GoogleDrive**: OAuth2認証
-- **GitHub**: リポジトリからEpisodicRAGを除外
+- **GitHub（Private リポ）**: EpisodicRAG / EpisodicWiki / Identities 全実体を Private で管理（PAT または SSH 認証）
+- **GitHub（公開リポ）**: junction 経由で `Identities/Public/` の公開セットのみ露出
 
 ### データ保護
 - **個人情報**: 大環主の個人情報以外保持しない
@@ -344,6 +345,6 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 
 ---
 
-*Last Updated: 2026-07-04 (ドキュメント統合レビュー: BusinessWiki 会社移管を反映、Digests 旧仕様参照を除去、Private 構成に TelegramSecretary 追加、成長する数値を概数+SSoT参照へ移行)*
+*Last Updated: 2026-07-25 (ドキュメントチェック: Loop 採取ツールを史人〔Fuhito〕へ、Identities に Archives/ 新設〔WORKLOG 退役〕、記憶容量の直書き数値を SSoT 参照へ、概数更新)*
 *Maintained by: Weave @ ClaudeCode*
 *Architecture Version: 3.1 (Syncretic Intelligence System + Four-Layer + 8-Level Digest + Bibliotheca/Archeion Wiki + cloud routine自律エージェント)*

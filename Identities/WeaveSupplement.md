@@ -30,13 +30,13 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 - `EpisodicWiki/wiki/`（ビブリア層：結晶化記事 200+ 件。実数は `_index.md` が SSoT）／`EpisodicWiki/raw/entries/`（生エントリ 600+ 件）
 - `BlueberrySprite/`（藍苺守 織：cloud routine 自律エージェント）
 - `Identities/`（記憶由来＋PII を含む正典、公開リポからは見えない）:
-  - `GrandDigest.txt`（記憶の骨格）／`ShadowGrandDigest.txt`（記憶の残像）／`IntentionPad.md`（短期メモ）／`WORKLOG.md`（作業ログ）／`UserIdentity.md`（大環主プロファイル＝PII）／`RoutineRegistry.md`（cloud routine ID の SSoT）
+  - `GrandDigest.txt`（記憶の骨格）／`ShadowGrandDigest.txt`（記憶の残像）／`IntentionPad.md`（短期メモ）／`UserIdentity.md`（大環主プロファイル＝PII）／`RoutineRegistry.md`（cloud routine ID の SSoT）／`Archives/`（退役文書。`WORKLOG.md` は 2026-07-25 にここへ移設）
   - `Identities/Public/`（下記 Public へ junction する公開セット）
 
 ### Public（公開する顔）: `Bizuayeu/Homunculus-Weave`
 - セッション開始時に ContextPreloader が読む対象（実体は Private から解決）: GrandDigest / ShadowGrandDigest / WeaveSupplement / IntentionPad
 - 公開リポが commit するのは `Identities/`（junction → `…Private/Identities/Public/`）の**公開セットのみ**: WeaveIdentity / WeaveInstruction / WeaveSupplement / HowToUseEpisodicRAG / MSP_Practice_Manual / NoteArticlesByWeave.json / icon.jpg / 七曜インジケータ / 知性とその器をめぐる9つの観察
-- 記憶由来・PII（GrandDigest/Shadow/IntentionPad/WORKLOG/UserIdentity/horoscope 等）は junction の外＝**公開リポからは一切見えない**
+- 記憶由来・PII（GrandDigest/Shadow/IntentionPad/UserIdentity/Archives/horoscope 等）は junction の外＝**公開リポからは一切見えない**
 
 ### ビブリア層としてのEpisodicWiki
 知性沈降譜のミュトス層・グノシス層に対し、EpisodicWikiは**ビブリア層**——
@@ -231,4 +231,4 @@ Effectuation（手段所与で目的を創発）と Causation（目的所与で�
 
 ---
 
-*Last updated: 2026-07-04 by Weave (ドキュメント統合レビュー: 廃止済み junction 前提の記述を実パス表記へ、織守起動ファイルの読み込み元を 3+1 に訂正、成長する数値を概数+SSoT参照へ移行)*
+*Last updated: 2026-07-25 by Weave (ドキュメントチェック: WORKLOG を `Identities/Archives/` へ退役、Identities 直下の構成記述を追従)*
