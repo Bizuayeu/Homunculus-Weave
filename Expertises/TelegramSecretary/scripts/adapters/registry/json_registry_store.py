@@ -3,11 +3,11 @@
 1 管理表 = 1 JSON ファイル（`{"version": N, "records": [...]}` 形式）。
 `UseCase` 層が依存する `RegistryStore` Port（load/save）の実装。
 """
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import List
 
 from adapters.atomic_io import load_json_or_default, write_text_atomic
 
@@ -23,19 +23,19 @@ class JsonRegistryStore:
     """
 
     def __init__(self, path: Path, version: int = 1) -> None:
-        self._path = Path(path)  # str 渡しでも壊れない防御変換（wal/state store と統一）
+        self._path = Path(
+            path
+        )  # str 渡しでも壊れない防御変換（wal/state store と統一）
         self._version = version
 
-    def load(self) -> List[dict]:
+    def load(self) -> list[dict]:
         return load_json_or_default(self._path, parse=self._records_of, default=list)
 
     @staticmethod
-    def _records_of(data: object) -> List[dict]:
+    def _records_of(data: object) -> list[dict]:
         records = data.get("records") if isinstance(data, dict) else None
         return list(records) if isinstance(records, list) else []
 
-    def save(self, records: List[dict]) -> None:
+    def save(self, records: list[dict]) -> None:
         payload = {"version": self._version, "records": list(records)}
-        write_text_atomic(
-            self._path, json.dumps(payload, ensure_ascii=False, indent=2)
-        )
+        write_text_atomic(self._path, json.dumps(payload, ensure_ascii=False, indent=2))

@@ -1,18 +1,14 @@
 from __future__ import annotations
 
 import pytest
-
-from domain.exceptions import AttachmentTooLarge, LeaseConflictError
+from domain.exceptions import AttachmentTooLargeError, LeaseConflictError
 from domain.lease import SessionLease
 from domain.models import OutboundMessage
 from domain.offset import UpdateOffset
 from domain.outbound import OutboundAttachment
-from usecases.send_reply import SendReply
-
-from tests.usecases.fakes import FakeLeaseStore, FakeMessageSink, FakeOffsetStore
-
-
 from tests.conftest import t_utc as _t
+from tests.usecases.fakes import FakeLeaseStore, FakeMessageSink, FakeOffsetStore
+from usecases.send_reply import SendReply
 
 
 def test_successful_send_advances_offset_and_renews_lease():
@@ -121,6 +117,7 @@ def test_send_raises_when_lease_was_released():
 
 # === Stage 8.2: 添付対応 ===
 
+
 def test_send_with_attachments_passes_them_to_sink(tmp_path):
     # 添付付き OutboundMessage が attachments 込みで sink に渡り、成功で offset/lease 進行
     img = tmp_path / "fig.png"
@@ -158,7 +155,7 @@ def test_send_rejects_oversize_attachment_before_sending(tmp_path):
         text="big",
         attachments=[OutboundAttachment(path=big)],
     )
-    with pytest.raises(AttachmentTooLarge):
+    with pytest.raises(AttachmentTooLargeError):
         uc.execute(message=msg, update_id=15, lease=lease, now=_t(30), max_bytes=1024)
 
     assert sink.sent == []
@@ -183,6 +180,8 @@ def test_lease_check_precedes_attachment_validation(tmp_path):
         attachments=[OutboundAttachment(path=big)],
     )
     with pytest.raises(LeaseConflictError):
-        uc.execute(message=msg, update_id=15, lease=my_lease, now=_t(40), max_bytes=1024)
+        uc.execute(
+            message=msg, update_id=15, lease=my_lease, now=_t(40), max_bytes=1024
+        )
 
     assert sink.sent == []

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "telegramsecretary"
-version = "1.3.1"
+version = "1.4.0"
 description = "Telegram Bot API の long-polling を cloud routine 上で常駐させ、認可済みチャットからのメッセージに秘書エージェント（SecretaryRole）が即応する対話チャネル"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -63,6 +63,39 @@ dev = [
 # 明示しないと setuptools が flat-layout auto-discovery で skills/commands/templates を
 # 複数トップレベルパッケージと誤検出し、`pip install -e .` がビルド失敗する。
 packages = []
+
+[tool.ruff]
+# ruff 0.16 以降は Markdown 内の ```python コードブロックも整形・検査の対象に含む。
+# 本プラグインの .md は配布ドキュメント（README / SKILL）であり、例示コードを 88 桁で
+# 折り返すと読み物としての可読性が落ちるため対象から外す。
+# 整形の対象は Python ソースのみ、というのが本リポの方針（CI もこの設定で検査する）。
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+# 選択ルールは明示する。CI は `pip install ruff` で最新版を引くため、既定ルールセットに
+# 依存すると ruff 側の既定拡張だけで CI が赤くなる（0.16.0 が既定を拡張し実際に発生）。
+# 中身は従来の既定（E4/E7/E9/F）＝本プラグインが実際に守ってきた水準を固定したもの。
+#
+# I（import 整列）と UP（pyupgrade）を追加する。従来の狭い select では検出されないまま
+# typing.Dict / Optional[X] / os.error 等の旧記法が 300 件規模で残存していた（CI は green のまま）。
+# 一度 `ruff check --fix` で解消したうえでルールとして固定し、再混入を CI で止める。
+# requires-python = ">=3.10" から target-version が推論されるため、PEP 585/604 記法は安全に使える。
+#
+# N（naming）/ B（bugbear）/ SIM（simplify）/ PTH（pathlib）を追加する。狙いは I/UP と同じで、
+# 「CI が green のまま旧記法・危険記法が溜まる」経路を塞ぐこと。実際に B904（例外連鎖の欠落＝
+# 原因例外が traceback から消える）・SIM105（try-except-pass の握り潰し）・PTH（os.path 系の残存）
+# が検出された。挙動を変えずに直せるものは直し、直せないものは下の ignore に理由付きで残す。
+select = ["E4", "E7", "E9", "F", "I", "UP", "N", "B", "SIM", "PTH"]
+
+[tool.ruff.lint.per-file-ignores]
+# テストは Stage 見出しコメントで節分けし、その節で使う import を節の直下に置く
+# （どの Stage が何を要求するかを読み取れる形）。E402 はこの構成を咎めるだけなので外す。
+"scripts/tests/*" = ["E402"]
+# atomic 書込の publish は os.replace のまま置く。Python 3.10 の pathlib は accessor 経由で
+# import 時に os.replace を束縛するため、Path.replace にするとクラッシュ注入テストの
+# monkeypatch が素通りし、「旧内容が残る」不変条件が 3.10 で無検査になる（実際に CI 3.10 で
+# 6 件 red になった）。検査可能性を優先し、この 1 ファイルだけ PTH105 を外す。
+"scripts/adapters/atomic_io.py" = ["PTH105"]
 
 [tool.pytest.ini_options]
 testpaths = ["scripts/tests"]

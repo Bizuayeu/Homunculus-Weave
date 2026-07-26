@@ -2,6 +2,47 @@
 
 すべての主要な変更をこのファイルに記録する。形式は [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/)、バージョニングは [Semantic Versioning](https://semver.org/lang/ja/) に準拠する。
 
+## [1.4.0] - 2026-07-26 — 例外名を N818 準拠へ改名（破壊的変更）
+
+### Breaking Changes
+
+- **例外クラス 4 件を `Error` 接尾辞へ改名** — v1.3.2 で `ignore` に退避していた N818 を解除し、検出された全件を改名した。互換 alias は置かない（旧名で import している利用側は明示的に壊す＝minor bump で通知する）
+
+| 旧名 | 新名 | 所在 |
+|------|------|------|
+| `MediaSizeLimitExceeded` | `MediaSizeLimitExceededError` | `scripts/domain/exceptions.py` |
+| `AttachmentNotFound` | `AttachmentNotFoundError` | `scripts/domain/exceptions.py` |
+| `AttachmentTooLarge` | `AttachmentTooLargeError` | `scripts/domain/exceptions.py` |
+| `_ConfigInvalid` | `_ConfigInvalidError` | `scripts/main.py`（CLI 境界の内部シグナル、公開 API ではない） |
+
+- 影響は `domain/exceptions.py` を直接 import する利用側に限られる。CLI の終了コード・env 変数名・emit される JSON の形と値（`skip_reason="media_size_exceeded"` 等）はいずれも不変
+
+### Changed
+
+- **pyproject の `ignore = ["N818"]` を削除** — 例外命名は以後 CI が恒久的に検査する。v1.3.2 の ignore コメントが名指ししていたのは 3 件だったが、機械に数えさせた実数は 4 件だった（`scripts/main.py` の内部シグナル `_ConfigInvalid` が手書きの列挙から漏れていた）。「理由付きで ignore する」運用でも対象の列挙は人手で腐る、という一例
+- **SECURITY.md / SKILL.md / devlog の記述を新名へ追従** — 旧名の残存は本 CHANGELOG の履歴記述のみ（`git grep` で確認）
+
+### Notes
+
+- 挙動の変更なし。テスト 602 passed（v1.3.2 から増減なし＝改名が既存契約を保った物証）
+
+## [1.3.2] - 2026-07-26 — lint ルールの拡張と検査範囲の全体化
+
+### Changed
+
+- **ruff の select に `N` / `B` / `SIM` / `PTH` を追加** — 従来の `E4,E7,E9,F,I,UP` では「CI が green のまま危険記法が溜まる」経路が残っていた。実際に B904 5 件・SIM105 4 件・PTH 4 件・SIM114 1 件を検出。うち 13 件を挙動を変えずに解消し、残 1 件（PTH105）は下記の理由で意図的に見送った。以後の再混入は CI が止める
+- **例外連鎖を復元（B904、5 箇所）** — `config.py` の `raise OSError(...)` を `... from exc` へ。原因例外（`json.JSONDecodeError` / `ValueError`）が traceback から切れており、config 不正の一次原因を追えなかった。メッセージ文字列は不変
+- **握り潰しを `contextlib.suppress` へ（SIM105、4 箇所）** — atomic 書込の tmp 掃除・`rebase --abort`・lease clear・`sendChatAction` の best-effort。「握るのが意図」であることが構文で読める形にした（挙動不変）
+- **パス操作を pathlib へ統一（PTH、3 箇所）** — `os.unlink` / `open()` を `Path.unlink` / `Path.open` へ
+- **CI の ruff 検査範囲を `scripts/` から `.` へ** — 双子リポ ShioriSecretary と同型化。`scripts/` 限定だと `skills/` 等に置いた `.py` が素通りする。除外は pyproject の `extend-exclude` で明示管理し、workflow 側には書かない
+
+### Notes
+
+- **PTH105（atomic 書込の `os.replace`、1 件）は `scripts/adapters/atomic_io.py` の per-file-ignores で除外** — `Path.replace` へ替えたところ CI の Python 3.10 で 6 件 red になった。3.10 の pathlib は accessor 経由で import 時に `os.replace` を束縛するため、`Path.replace` にするとクラッシュ注入テストの `monkeypatch.setattr(atomic_io.os, "replace", ...)` が素通りし、「publish 前クラッシュで旧内容が残る」不変条件が 3.10 で無検査になる。lint の見栄えより検査可能性を採った（`requires-python` は `>=3.10`）
+- N818（例外名の `Error` 接尾辞、4 件）は `ignore` に理由付きで登録し見送り。`MediaSizeLimitExceeded` / `AttachmentNotFound` / `AttachmentTooLarge` は SECURITY.md・SKILL.md・usecases・tests から名指しで参照される公開 API であり、patch リリースでの改名は利用側を壊す。破壊的変更として次の minor にまとめる
+- v1.3.1 以降に入った lint 基盤（`ruff format` の全体適用・CI ゲート化・ruff 0.16.0 の版固定・`I`/`UP` の恒久ルール化）も本リリースに含む
+- 挙動の変更なし。テスト 602 passed（増減なしが、リファクタが既存契約を保った物証）
+
 ## [1.3.1] - 2026-07-26 — 音声デコード失敗の可視化と役割呼称の整理
 
 ### Fixed

@@ -11,10 +11,10 @@ render 毎に開閉する（キャッシュは解決結果のみ＝transcript �
 ライセンス: Moonshine Community License（年商 $1M 未満は商用も無料）。年商 $1M 以上の組織本番は
 Enterprise License or kotoba-whisper(Apache-2.0) へ Port 差し替え。
 """
+
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from adapters.audio.ffmpeg_preprocessor import FfmpegAudioPreprocessor
 from adapters.media_failure import failed_render
@@ -32,7 +32,7 @@ class MoonshineTranscriber:
     def __init__(
         self,
         language: str = "ja",
-        preprocessor: Optional[FfmpegAudioPreprocessor] = None,
+        preprocessor: FfmpegAudioPreprocessor | None = None,
     ) -> None:
         self._language = language
         self._preprocessor = preprocessor or FfmpegAudioPreprocessor()
@@ -43,7 +43,9 @@ class MoonshineTranscriber:
             import moonshine_voice
             from moonshine_voice.transcriber import Transcriber
 
-            model_path, model_arch = moonshine_voice.get_model_for_language(self._language)
+            model_path, model_arch = moonshine_voice.get_model_for_language(
+                self._language
+            )
             self._model = (Transcriber, model_path, model_arch)
         return self._model
 

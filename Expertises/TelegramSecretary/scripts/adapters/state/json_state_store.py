@@ -4,13 +4,14 @@ save は `atomic_io.write_text_atomic`（tmp + os.replace）——書込中ク�
 offset/lease を全損させない（破損 offset は initial へ巻き戻り重複再取得、破損 lease は
 排他喪失につながるため、そもそも破損ファイルを作らない側に倒す）。
 """
+
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from adapters.atomic_io import load_json_or_default, write_text_atomic
 from domain.lease import SessionLease
@@ -48,7 +49,7 @@ class JsonLeaseStore:
         self._dir = Path(state_dir)
         self._path = self._dir / self.FILENAME
 
-    def load(self) -> Optional[SessionLease]:
+    def load(self) -> SessionLease | None:
         return load_json_or_default(self._path, parse=self._parse, default=lambda: None)
 
     @staticmethod
@@ -91,7 +92,5 @@ class JsonLeaseStore:
 
     def clear(self) -> None:
         if self._path.exists():
-            try:
+            with contextlib.suppress(OSError):
                 self._path.unlink()
-            except OSError:
-                pass
