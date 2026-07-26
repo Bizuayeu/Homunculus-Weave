@@ -1,10 +1,11 @@
 """Telegram Bot API への HTTP クライアント。getUpdates / sendMessage を提供。"""
+
 from __future__ import annotations
 
-from typing import Any, List, Optional
+import contextlib
+from typing import Any
 
 import httpx
-
 from adapters.telegram import http_retry
 from domain.exceptions import AuthFailureError, TelegramSecretaryError
 from domain.models import OutboundMessage, TelegramUpdate
@@ -30,7 +31,7 @@ class TelegramApiGateway:
         self,
         bot_token: str,
         base_url: str = DEFAULT_BASE_URL,
-        client: Optional[httpx.Client] = None,
+        client: httpx.Client | None = None,
         retry_count: int = 2,
         request_timeout: float = 40.0,
         max_retry_after_seconds: int = DEFAULT_MAX_RETRY_AFTER_SECONDS,
@@ -50,13 +51,15 @@ class TelegramApiGateway:
     def close(self) -> None:
         self._client.close()
 
-    def __enter__(self) -> "TelegramApiGateway":
+    def __enter__(self) -> TelegramApiGateway:
         return self
 
     def __exit__(self, *exc_info: Any) -> None:
         self.close()
 
-    def fetch(self, offset: UpdateOffset, timeout_seconds: int = 30) -> List[TelegramUpdate]:
+    def fetch(
+        self, offset: UpdateOffset, timeout_seconds: int = 30
+    ) -> list[TelegramUpdate]:
         url = f"{self._base_url}/bot{self._bot_token}/getUpdates"
         params = {"offset": offset.value, "timeout": timeout_seconds}
         response = self._request_with_retry("GET", url, params=params)
@@ -76,7 +79,7 @@ class TelegramApiGateway:
         self._send_with_attachments(message)
 
     def _send_text(
-        self, chat_id: int, text: str, reply_to_message_id: Optional[int]
+        self, chat_id: int, text: str, reply_to_message_id: int | None
     ) -> None:
         url = f"{self._base_url}/bot{self._bot_token}/sendMessage"
         payload: dict[str, Any] = {"chat_id": chat_id, "text": text}
@@ -116,8 +119,8 @@ class TelegramApiGateway:
         self,
         chat_id: int,
         attachment: OutboundAttachment,
-        caption: Optional[str],
-        reply_to_message_id: Optional[int],
+        caption: str | None,
+        reply_to_message_id: int | None,
     ) -> None:
         method = "sendPhoto" if attachment.is_photo() else "sendDocument"
         field = "photo" if attachment.is_photo() else "document"
@@ -141,12 +144,10 @@ class TelegramApiGateway:
     def send_chat_action(self, chat_id: int, action: str = "typing") -> None:
         """typing 等のチャットアクションを送る（best-effort、失敗は本応答を妨げない）。"""
         url = f"{self._base_url}/bot{self._bot_token}/sendChatAction"
-        try:
+        with contextlib.suppress(TelegramSecretaryError):  # best-effort
             self._request_with_retry(
                 "POST", url, json={"chat_id": chat_id, "action": action}
             )
-        except TelegramSecretaryError:
-            pass  # best-effort
 
     def get_file(self, file_id: str) -> str:
         """Telegram /getFile で file_id から file_path を取得（Stage 6.3）。
@@ -163,12 +164,12 @@ class TelegramApiGateway:
         result = data.get("result") or {}
         file_path = result.get("file_path")
         if not file_path:
-            raise TelegramSecretaryError(
-                f"getFile response missing file_path: {data}"
-            )
+            raise TelegramSecretaryError(f"getFile response missing file_path: {data}")
         return str(file_path)
 
-    def _request_with_retry(self, method: str, url: str, **kwargs: Any) -> httpx.Response:
+    def _request_with_retry(
+        self, method: str, url: str, **kwargs: Any
+    ) -> httpx.Response:
         # network error の固定文言: exc には token 込み URL が混入し得るため、ヘルパ側が
         # from None で chain を切り、この文言だけを raise する（redact）
         return http_retry.request_with_retry(
@@ -182,7 +183,7 @@ class TelegramApiGateway:
         )
 
     @staticmethod
-    def _classify_status(response: httpx.Response) -> Optional[str]:
+    def _classify_status(response: httpx.Response) -> str | None:
         """Bot API 応答の status 分類（http_retry.request_with_retry の callback 契約）。
 
         - 401 → AuthFailureError（致命、retry しない）

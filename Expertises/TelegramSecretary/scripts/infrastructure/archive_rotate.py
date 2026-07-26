@@ -7,33 +7,34 @@
 本モジュールは決定論的な自動実行（subcommand）を持たず、エージェントが判断した分割の「計算」だけを担う。
 実ファイルの移動・書き出しはエージェントが `JsonRegistryStore` と組み合わせて行う。
 """
+
 from __future__ import annotations
 
-from typing import Callable, Dict, List, Tuple
+from collections.abc import Callable
 
 
 def partition_for_archive(
-    records: List[dict], should_archive: Callable[[dict], bool]
-) -> Tuple[List[dict], List[dict]]:
+    records: list[dict], should_archive: Callable[[dict], bool]
+) -> tuple[list[dict], list[dict]]:
     """`should_archive` が True のレコードを archive 側へ分離。順序保持。
 
     返り値は `(keep, archive)`。keep を現役ファイル、archive を `archive/<NAME>_<YYYY-MM>.json` へ。
     """
-    keep: List[dict] = []
-    archive: List[dict] = []
+    keep: list[dict] = []
+    archive: list[dict] = []
     for r in records:
         (archive if should_archive(r) else keep).append(r)
     return keep, archive
 
 
 def split_by_category(
-    records: List[dict], category_key: str = "category", default: str = "general"
-) -> Dict[str, List[dict]]:
+    records: list[dict], category_key: str = "category", default: str = "general"
+) -> dict[str, list[dict]]:
     """`category` ごとに records をグループ化（KNOWLEDGE のシャード分割用）。
 
     category 欠落・空のレコードは `default`（"general"）に集約。各グループ内の順序は保持。
     """
-    out: Dict[str, List[dict]] = {}
+    out: dict[str, list[dict]] = {}
     for r in records:
         cat = r.get(category_key) or default
         out.setdefault(cat, []).append(r)

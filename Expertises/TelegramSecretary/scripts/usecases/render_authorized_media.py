@@ -10,16 +10,15 @@ mime-routing は UseCase 側に閉じる:
 
 download 段階で skip された media（size 超過等）は render も skip。
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
 
 from domain.media import MediaAttachment, RenderedMedia
 from usecases.download_authorized_media import MediaDownloadResult
 from usecases.ports import MediaRenderer
-
 
 _PASSTHROUGH_MIME_PREFIXES = ("image/",)
 _PASSTHROUGH_MIME_EXACT = frozenset(
@@ -31,7 +30,9 @@ _PASSTHROUGH_MIME_EXACT = frozenset(
         "application/json",
     }
 )
-_PDF_MIME_EXACT = frozenset({"application/pdf"})  # Stage 10: pdfplumber でテキスト層抽出
+_PDF_MIME_EXACT = frozenset(
+    {"application/pdf"}
+)  # Stage 10: pdfplumber でテキスト層抽出
 _RENDER_MIME_EXACT = frozenset(
     {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",  # docx
@@ -40,7 +41,10 @@ _RENDER_MIME_EXACT = frozenset(
         "text/html",
     }
 )
-_TRANSCRIBE_MIME_PREFIXES = ("audio/", "video/")  # Stage 9.4/9.6: 音声・動画音声トラックを STT で transcript 化
+_TRANSCRIBE_MIME_PREFIXES = (
+    "audio/",
+    "video/",
+)  # Stage 9.4/9.6: 音声・動画音声トラックを STT で transcript 化
 
 
 @dataclass(frozen=True)
@@ -52,8 +56,8 @@ class RenderResult:
 
     update_id: int
     media: MediaAttachment
-    local_path: Optional[Path]
-    skip_reason: Optional[str]
+    local_path: Path | None
+    skip_reason: str | None
     rendered: RenderedMedia
 
 
@@ -76,8 +80,8 @@ class RenderAuthorizedMedia:
     def __init__(
         self,
         renderer: MediaRenderer,
-        transcriber: Optional[MediaRenderer] = None,
-        pdf_renderer: Optional[MediaRenderer] = None,
+        transcriber: MediaRenderer | None = None,
+        pdf_renderer: MediaRenderer | None = None,
     ) -> None:
         self._renderer = renderer
         self._transcriber = transcriber
@@ -85,10 +89,10 @@ class RenderAuthorizedMedia:
 
     def execute(
         self,
-        download_results: List[MediaDownloadResult],
-    ) -> List[RenderResult]:
+        download_results: list[MediaDownloadResult],
+    ) -> list[RenderResult]:
         """各 download_result を mime-routing し、必要なら renderer を呼ぶ。"""
-        results: List[RenderResult] = []
+        results: list[RenderResult] = []
         for dr in download_results:
             rendered = self._render_one(dr)
             results.append(

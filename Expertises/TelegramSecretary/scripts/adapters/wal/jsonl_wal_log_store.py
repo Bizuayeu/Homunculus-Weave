@@ -3,11 +3,11 @@
 `adapters/state/json_state_store.py` の単一ファイル + 親 mkdir + 破損フォールバックを
 JSONL 用に踏襲する。git push は既存 `GitCliAdapter` を再利用（本 Adapter は I/O のみ）。
 """
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import List
 
 from adapters.atomic_io import load_jsonl, write_text_atomic
 from domain.wal import WalEntry
@@ -30,13 +30,13 @@ class JsonlWalLogStore:
     def append(self, entry: WalEntry) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         line = json.dumps(entry.to_dict(), ensure_ascii=False)
-        with open(self._path, "a", encoding="utf-8") as f:
+        with self._path.open("a", encoding="utf-8") as f:
             f.write(line + "\n")
 
-    def load(self) -> List[WalEntry]:
+    def load(self) -> list[WalEntry]:
         return load_jsonl(self._path, parse_line=WalEntry.from_dict)
 
-    def rewrite(self, entries: List[WalEntry]) -> None:
+    def rewrite(self, entries: list[WalEntry]) -> None:
         text = "".join(
             json.dumps(e.to_dict(), ensure_ascii=False) + "\n" for e in entries
         )

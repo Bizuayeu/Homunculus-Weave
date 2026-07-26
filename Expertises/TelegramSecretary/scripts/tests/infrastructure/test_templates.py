@@ -4,13 +4,13 @@
 値オブジェクトの実スキーマから乖離すると、雛型を見て実体ファイルを作る利用者を
 壊れたレコードへ誘導する。キー集合の一致をテストで張る。
 """
+
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
 import pytest
-
 from domain.registry import Goal, Profile, Step
 
 TEMPLATES_DIR = Path(__file__).parents[3] / "templates"

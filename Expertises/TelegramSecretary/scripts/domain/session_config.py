@@ -1,4 +1,5 @@
 """session 総枠（継続時間）の値オブジェクト。0 < x ≤ 86400 を保証。"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -20,7 +21,7 @@ class SessionDuration:
     seconds: int
 
     @classmethod
-    def from_seconds(cls, value: int) -> "SessionDuration":
+    def from_seconds(cls, value: int) -> SessionDuration:
         """範囲内なら値オブジェクトを返し、範囲外（< MIN / > MAX）なら ValueError。"""
         if value < MIN_SECONDS or value > MAX_SECONDS:
             raise ValueError(

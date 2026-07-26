@@ -11,13 +11,16 @@ WAL JSONL の「破損行スキップ」）も 4 store で同型だったため�
 state/registry/wal の兄弟パッケージどこからも引けるよう、media_failure.py と同じく
 adapters 直下に中立配置。
 """
+
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, List, TypeVar
+from typing import TypeVar
 
 T = TypeVar("T")
 
@@ -35,15 +38,19 @@ def write_text_atomic(path: Path, text: str) -> None:
     fd, tmp_name = tempfile.mkstemp(
         dir=str(target.parent), prefix=target.name + ".", suffix=".tmp"
     )
+    tmp_path = Path(tmp_name)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(text)
+        # Path.replace ではなく os.replace のまま置く（PTH105 は per-file-ignores で除外）。
+        # Python 3.10 の pathlib は accessor 経由で import 時に os.replace を束縛するため、
+        # Path.replace にすると monkeypatch.setattr(atomic_io.os, "replace", ...) を素通りし、
+        # 「publish 前クラッシュで旧内容が残る」ことを守るテストが 3.10 で無検査になる
+        # （requires-python は >=3.10、CI も 3.10 を回す）。atomic 性より検査可能性を採る。
         os.replace(tmp_name, str(target))
     except BaseException:
-        try:
-            os.unlink(tmp_name)
-        except OSError:
-            pass
+        with contextlib.suppress(OSError):
+            tmp_path.unlink()
         raise
 
 
@@ -66,7 +73,7 @@ def load_json_or_default(
         return default()
 
 
-def load_jsonl(path: Path, parse_line: Callable[[dict], T]) -> List[T]:
+def load_jsonl(path: Path, parse_line: Callable[[dict], T]) -> list[T]:
     """JSONL を 1 行ずつ parse_line(decoded) する。破損行・空行はスキップして読める行だけ返す。
 
     一部の行が壊れていても全損させない（WAL の破損行スキップと同型の安全側）。
@@ -75,7 +82,7 @@ def load_jsonl(path: Path, parse_line: Callable[[dict], T]) -> List[T]:
     target = Path(path)
     if not target.exists():
         return []
-    items: List[T] = []
+    items: list[T] = []
     for raw in target.read_text(encoding="utf-8").splitlines():
         line = raw.strip()
         if not line:

@@ -4,13 +4,15 @@ registry_dir を含む git リポで、管理表の commit/push/pull-rebase/fetc
 git メッセージは LC_ALL=C で英語固定し non-fast-forward を確実に検出する。
 固定ブランチ運用・force 不使用の競合設計は DESIGN.md §3.6 を参照。
 """
+
 from __future__ import annotations
 
+import contextlib
 import os
 import re
 import subprocess
+from collections.abc import Sequence
 from pathlib import Path
-from typing import List, Sequence
 
 from domain.exceptions import GitSyncError, PushRejectedError, RegistryWorktreeError
 
@@ -48,7 +50,9 @@ class GitCliAdapter:
         self._remote = remote
         self._branch = branch
 
-    def _run(self, args: Sequence[str], check: bool = True) -> subprocess.CompletedProcess:
+    def _run(
+        self, args: Sequence[str], check: bool = True
+    ) -> subprocess.CompletedProcess:
         try:
             result = subprocess.run(
                 ["git", *args],
@@ -77,12 +81,14 @@ class GitCliAdapter:
             raise GitSyncError(f"git {' '.join(args)} could not run: {exc}") from None
         if check and result.returncode != 0:
             # args にも remote URL（認証埋め込みの可能性）が乗り得るため、メッセージ全体を通す。
-            raise GitSyncError(_scrub_credentials(
-                f"git {' '.join(args)} failed (rc={result.returncode}): {result.stderr.strip()}"
-            ))
+            raise GitSyncError(
+                _scrub_credentials(
+                    f"git {' '.join(args)} failed (rc={result.returncode}): {result.stderr.strip()}"
+                )
+            )
         return result
 
-    def commit(self, paths: List[Path], message: str) -> bool:
+    def commit(self, paths: list[Path], message: str) -> bool:
         """paths を stage して commit。staged 差分が無ければ False（no-op）。"""
         self._run(["add", "--", *[str(p) for p in paths]])
         staged = self._run(["diff", "--cached", "--quiet"], check=False)
@@ -98,7 +104,9 @@ class GitCliAdapter:
             blob = (result.stderr + "\n" + result.stdout).lower()
             if any(m in blob for m in _NON_FF_MARKERS):
                 raise PushRejectedError(_scrub_credentials(result.stderr.strip()))
-            raise GitSyncError(_scrub_credentials(f"git push failed: {result.stderr.strip()}"))
+            raise GitSyncError(
+                _scrub_credentials(f"git push failed: {result.stderr.strip()}")
+            )
 
     def pull_rebase(self) -> None:
         """remote の固定 branch を pull --rebase で取り込む（外部更新の統合）。
@@ -110,11 +118,10 @@ class GitCliAdapter:
         try:
             self._run(["pull", "--rebase", self._remote, self._branch])
         except GitSyncError:
-            try:
-                # check=False: rebase 中でない等で abort が非 0 でも元エラーを優先する。
+            # check=False: rebase 中でない等で abort が非 0 でも元エラーを優先する。
+            # suppress: abort 自体の起動失敗（timeout/OSError 翻訳）も best-effort で握る。
+            with contextlib.suppress(GitSyncError):
                 self._run(["rebase", "--abort"], check=False)
-            except GitSyncError:
-                pass  # abort 自体の起動失敗（timeout/OSError 翻訳）も best-effort で握る
             raise
 
     def _assert_independent_worktree(self) -> None:
