@@ -3,17 +3,17 @@
 watch ループの cleanup hook（N サイクルに 1 回呼ぶ）と、単独実行 (CLI 起動) の
 両方を意図した、純粋関数寄りの薄いラッパー。
 """
+
 from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Optional
 
 
 def cleanup_media_dir(
     target_dir: Path,
     retention_seconds: int,
-    now: Optional[float] = None,
+    now: float | None = None,
 ) -> int:
     """target_dir 内の mtime が retention_seconds 超過のファイルを削除。
 

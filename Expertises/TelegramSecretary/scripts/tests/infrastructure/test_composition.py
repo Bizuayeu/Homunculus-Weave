@@ -4,13 +4,13 @@ load_config の fail-fast（union 廃止）と build_media_stack の配線（pdf
 optional transcriber/pdf の None フォールバック）を pin する。重い renderer 構築は
 stub に置換して軽量に検証する（実 markitdown/moonshine は test_main の E2E が担う）。
 """
+
 from __future__ import annotations
 
 import json
 import sys
 
 import pytest
-
 from domain.authorization import AuthorizedChats
 from infrastructure.composition import MediaStack, build_media_stack, load_config
 from infrastructure.config import Config

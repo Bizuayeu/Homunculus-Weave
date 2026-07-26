@@ -6,11 +6,13 @@ main.py の subcommand から呼ばれる。値オブジェクトで入力を検
 `REGISTRY_SPEC` / `read_json_arg` / `registry_service` は wal_cli と共有する公開名
 （旧 private 名の越境 import を解消）。git/sync の DI 組み立ては composition.py に移設済み。
 """
+
 from __future__ import annotations
 
 import json
 import sys
-from typing import Any, NamedTuple, Type
+from pathlib import Path
+from typing import Any, NamedTuple
 
 from adapters.registry.json_registry_store import JsonRegistryStore
 from domain.exceptions import GitSyncError
@@ -39,7 +41,7 @@ class RegistrySpec(NamedTuple):
 
     path_attr: str  # Config の path property 名
     key_field: str  # レコードの一意キー
-    record_cls: Type  # 検証に使う値オブジェクトクラス
+    record_cls: type  # 検証に使う値オブジェクトクラス
 
 
 # name -> RegistrySpec。wal_cli の kind -> key_field 導出と main.py の subparser 生成も
@@ -63,7 +65,9 @@ def registry_service(config: Config, name: str) -> RegistryService:
     )
 
 
-def run_registry_command(config: Config, name: str, action: str, args: Any, sync=None) -> int:
+def run_registry_command(
+    config: Config, name: str, action: str, args: Any, sync=None
+) -> int:
     spec = REGISTRY_SPEC[name]
     svc = registry_service(config, name)
 
@@ -90,7 +94,9 @@ def run_registry_command(config: Config, name: str, action: str, args: Any, sync
             return EXIT_CONFIG_INVALID
         record = vo.to_dict()
         svc.add_or_update(record)
-        _sync_after_change(config, name, f"registry: add {name} {record[spec.key_field]}", sync)
+        _sync_after_change(
+            config, name, f"registry: add {name} {record[spec.key_field]}", sync
+        )
         print(f"saved {name} {spec.key_field}={record[spec.key_field]}")
         return EXIT_OK
 
@@ -112,7 +118,7 @@ def read_json_arg(args: Any) -> dict:
     （CLI 層の捕捉で EXIT_CONFIG_INVALID に翻訳される）。
     """
     if getattr(args, "json_file", None):
-        with open(args.json_file, encoding="utf-8") as f:
+        with Path(args.json_file).open(encoding="utf-8") as f:
             text = f.read()
     elif getattr(args, "json", None):
         text = args.json

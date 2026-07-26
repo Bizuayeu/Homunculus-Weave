@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from infrastructure.archive_rotate import partition_for_archive, split_by_category
 
-
 # === partition_for_archive（TASKS/INDIVIDUALS 日付 Archive 用） ===
+
 
 def test_partition_separates_by_predicate():
     records = [{"id": "a", "status": "done"}, {"id": "b", "status": "open"}]
@@ -26,6 +26,7 @@ def test_partition_empty():
 
 
 # === split_by_category（KNOWLEDGE シャード分割用） ===
+
 
 def test_split_by_category_groups():
     records = [

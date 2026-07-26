@@ -4,7 +4,6 @@ from dataclasses import FrozenInstanceError
 from pathlib import Path
 
 import pytest
-
 from domain.models import OutboundMessage
 from domain.outbound import OutboundAttachment
 
@@ -14,14 +13,19 @@ from domain.outbound import OutboundAttachment
 
 # === OutboundAttachment.is_photo ===
 
+
 def test_is_photo_true_for_image_suffixes():
     for suffix in (".jpg", ".jpeg", ".png", ".webp", ".gif"):
-        assert OutboundAttachment(path=Path(f"figure{suffix}")).is_photo() is True, suffix
+        assert OutboundAttachment(path=Path(f"figure{suffix}")).is_photo() is True, (
+            suffix
+        )
 
 
 def test_is_photo_false_for_document_suffixes():
     for suffix in (".docx", ".pdf", ".md", ".xlsx", ".txt"):
-        assert OutboundAttachment(path=Path(f"report{suffix}")).is_photo() is False, suffix
+        assert OutboundAttachment(path=Path(f"report{suffix}")).is_photo() is False, (
+            suffix
+        )
 
 
 def test_is_photo_normalizes_case():
@@ -31,6 +35,7 @@ def test_is_photo_normalizes_case():
 
 
 # === OutboundMessage.attachments（後方互換） ===
+
 
 def test_outbound_message_defaults_to_no_attachments():
     msg = OutboundMessage(chat_id=100, text="hi")

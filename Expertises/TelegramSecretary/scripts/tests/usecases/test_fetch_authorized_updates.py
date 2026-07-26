@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from domain.authorization import AuthorizedChats
 from domain.models import TelegramUpdate
-from usecases.fetch_authorized_updates import FetchAuthorizedUpdates
-
 from tests.usecases.fakes import FakeOffsetStore, FakeUpdateSource
+from usecases.fetch_authorized_updates import FetchAuthorizedUpdates
 
 
 def _update(uid: int, chat_id: int, text: str = "hello") -> TelegramUpdate:
@@ -38,7 +37,9 @@ def test_authorized_update_is_normalized_and_returned():
 
 def test_unauthorized_update_is_dropped():
     source = FakeUpdateSource(
-        batches=[[_update(10, chat_id=999, text="bad"), _update(11, chat_id=100, text="ok")]]
+        batches=[
+            [_update(10, chat_id=999, text="bad"), _update(11, chat_id=100, text="ok")]
+        ]
     )
     offset_store = FakeOffsetStore()
     allowlist = AuthorizedChats.from_iterable([100])
@@ -73,6 +74,7 @@ def test_injection_flag_is_attached_but_does_not_block():
 
 
 # === Stage 6.2: caption 統合 + media 引き継ぎ ===
+
 
 def test_caption_is_merged_into_normalized_text():
     payload = {
@@ -156,6 +158,7 @@ def test_update_without_media_has_empty_media_list_backward_compat():
 
 # === Stage 9.2: voice / audio / video が fetch を通る ===
 
+
 def test_voice_update_passes_through_fetch():
     """voice 付き update が認可フィルタを通り media に乗る。"""
     payload = {
@@ -163,7 +166,12 @@ def test_voice_update_passes_through_fetch():
         "message": {
             "chat": {"id": 100},
             "from": {"id": 1},
-            "voice": {"file_id": "v1", "duration": 5, "mime_type": "audio/ogg", "file_size": 8192},
+            "voice": {
+                "file_id": "v1",
+                "duration": 5,
+                "mime_type": "audio/ogg",
+                "file_size": 8192,
+            },
         },
     }
     update = TelegramUpdate.from_api(payload)

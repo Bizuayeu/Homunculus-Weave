@@ -5,11 +5,11 @@
 git 操作は GitSyncPort（adapters 実装）越し。固定ブランチ運用・force 不使用の競合設計は
 DESIGN.md §3.6 を参照。
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
 
 from domain.exceptions import GitSyncError, PushRejectedError
 from usecases.ports import GitSyncPort
@@ -35,7 +35,7 @@ class RegistrySyncService:
     def __init__(self, git: GitSyncPort) -> None:
         self._git = git
 
-    def sync(self, paths: List[Path], message: str) -> SyncResult:
+    def sync(self, paths: list[Path], message: str) -> SyncResult:
         """paths を commit（ローカル即時）し push（best-effort）する。
 
         - 変更が無ければ commit は no-op で push もしない

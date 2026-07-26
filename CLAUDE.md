@@ -274,7 +274,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 - **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型、24-7 即応の対話チャネル）
   - 設計: `plugins-weave/TelegramSecretary/`（別リポが配布正本、`Expertises/TelegramSecretary/` にジャンクション透過）。人格は `Homunculus-Weave-Private/TelegramSecretary/Identities/SecretaryRole.md`（Private）
   - 運用: cloud routine 常駐（cron + `session_duration_sec`）、認可済み chat に即応。push 型の織守・NewsCaster に対する pull の到達口
-  - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン [1.3.0]
+  - 特徴: 本地垂迹（UseCase=SecretaryRole）、受信メディア理解（Vision / Markdown化 / PDF / 音声STT）、応答は親プロセスが起草。plugins-weave marketplace プラグイン（バージョンは marketplace.json が SSoT）
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD × 三層委任）
   - 設計: `plugins-weave/ConsiderateCoder/`（別リポが配布正本、`Expertises/ConsiderateCoder/` にジャンクション透過）— agents（orchestrator / worker）+ commands（plan-sdd / outsource / dig）+ skills（dev-rules / ops-rules）+ templates
   - 運用: `/plan-sdd` で SDD として IMPLEMENTATION_PLAN.md を起こし（実装は別途指示）、`/outsource` で communicator-orchestrator-worker の三層委任実行 + HTML レポート & 理解度クイズ生成、`/dig` で深掘りインタビュー。marketplace プラグイン（バージョンは marketplace.json が SSoT）
