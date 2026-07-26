@@ -1,4 +1,5 @@
 """TelegramSecretary CLI entrypoint。subcommands を argparse で分岐。"""
+
 from __future__ import annotations
 
 import argparse
@@ -6,24 +7,24 @@ import json
 import os
 import sys
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Sequence
 
 from adapters.state.emitter import StdoutEventEmitter
 from adapters.state.json_state_store import JsonLeaseStore, JsonOffsetStore
 from adapters.telegram.api_gateway import TelegramApiGateway
 from domain.exceptions import (
-    AttachmentNotFound,
-    AttachmentTooLarge,
+    AttachmentNotFoundError,
+    AttachmentTooLargeError,
     AuthFailureError,
     LeaseConflictError,
     TelegramSecretaryError,
 )
 from domain.lease import utc_now
-from domain.watch_window import WatchWindow
 from domain.models import OutboundMessage
 from domain.outbound import OutboundAttachment
+from domain.watch_window import WatchWindow
 from infrastructure.composition import MediaStack, build_media_stack, load_config
 from infrastructure.config import Config
 from infrastructure.exit_codes import (
@@ -49,9 +50,9 @@ from infrastructure.wal_cli import (
 )
 from usecases.acquire_lease import AcquireLease
 from usecases.fetch_authorized_updates import FetchAuthorizedUpdates
+from usecases.proactive_send import ProactiveSend
 from usecases.release_lease import ReleaseLease
 from usecases.renew_lease import RenewLease
-from usecases.proactive_send import ProactiveSend
 from usecases.send_reply import SendReply
 
 # 終了コードは infrastructure/exit_codes.py が SSoT。後方互換のため re-export
@@ -66,7 +67,7 @@ __all__ = [
 ]
 
 
-class _ConfigInvalid(Exception):
+class _ConfigInvalidError(Exception):
     """config ロード失敗を CLI 境界へ伝える内部シグナル。
 
     EnvironmentError は Python では OSError の別名であり、ハンドラ全体を
@@ -77,16 +78,16 @@ class _ConfigInvalid(Exception):
 
 
 def _load_config() -> Config:
-    """env から Config を構築（fail-fast）。失敗は stderr に出して _ConfigInvalid を送出。
+    """env から Config を構築（fail-fast）。失敗は stderr に出して _ConfigInvalidError を送出。
 
     旧 union (`Config | int`) を廃止。EnvironmentError の捕捉はこの 1 点に限定し、
     各ハンドラの `if isinstance(config, int): return config` 重複を消す。
     """
     try:
         return load_config()
-    except EnvironmentError as exc:
+    except OSError as exc:
         print(f"config error: {exc}", file=sys.stderr)
-        raise _ConfigInvalid from None
+        raise _ConfigInvalidError from None
 
 
 def _session_owner(arg_owner: str | None) -> str:
@@ -116,10 +117,12 @@ def cmd_show_config(_: argparse.Namespace) -> int:
     """
     try:
         config = load_config()
-    except EnvironmentError as exc:
+    except OSError as exc:
         print(f"config not ready: {exc}")
         return EXIT_OK
-    print("bot_token: set")  # ロード成功＝from_sources が必須チェック済み。値は出さない（秘匿）
+    print(
+        "bot_token: set"
+    )  # ロード成功＝from_sources が必須チェック済み。値は出さない（秘匿）
     print(f"authorized_chats: {len(config.authorized_chats.chat_ids)}")
     print(f"state_dir: {config.state_dir}")
     print(f"session_duration_sec: {config.session_duration_sec}")
@@ -173,11 +176,15 @@ def cmd_lease(args: argparse.Namespace) -> int:
     now = utc_now()
     try:
         if args.action == "acquire":
-            lease = AcquireLease(store).execute(owner=owner, now=now, ttl_seconds=args.ttl)
+            lease = AcquireLease(store).execute(
+                owner=owner, now=now, ttl_seconds=args.ttl
+            )
             print(f"acquired owner={lease.owner} ttl={lease.ttl_seconds}")
         elif args.action == "renew":
             lease = RenewLease(store).execute(owner=owner, now=now)
-            print(f"renewed owner={lease.owner} heartbeat={lease.heartbeat.isoformat()}")
+            print(
+                f"renewed owner={lease.owner} heartbeat={lease.heartbeat.isoformat()}"
+            )
         elif args.action == "release":
             ReleaseLease(store).execute(owner=owner)
             print(f"released owner={owner}")
@@ -231,7 +238,7 @@ def cmd_poll(args: argparse.Namespace) -> int:
 class _CycleOutcome:
     """1 watch サイクルの結果。exit_code 非 None ならループは即その値で return する。"""
 
-    exit_code: Optional[int]
+    exit_code: int | None
     had_messages: bool
 
 
@@ -246,7 +253,7 @@ class _LazyMediaStack:
     def __init__(self, config: Config, gateway) -> None:
         self._config = config
         self._gateway = gateway
-        self._stack: Optional[MediaStack] = None
+        self._stack: MediaStack | None = None
 
     def ensure(self) -> MediaStack:
         if self._stack is None:
@@ -404,7 +411,7 @@ def _parse_page_range(spec: str) -> tuple[int, int]:
     if "-" in spec:
         lo_s, hi_s = spec.split("-", 1)
         start = int(lo_s) - 1
-        end = int(hi_s) if hi_s.strip() else 10 ** 9
+        end = int(hi_s) if hi_s.strip() else 10**9
     else:
         start = int(spec) - 1
         end = start + 1
@@ -460,7 +467,7 @@ def cmd_render_pdf(args: argparse.Namespace) -> int:
     return EXIT_CONFIG_INVALID
 
 
-def _read_text_file(path_str: str) -> Optional[str]:
+def _read_text_file(path_str: str) -> str | None:
     """--text-file を読む（send-reply / proactive-send 共通）。OK なら本文、NG なら None
     （stderr 出力済み、呼び出し側で EXIT_CONFIG_INVALID）。`_load_owned_lease` と同型。
 
@@ -494,7 +501,7 @@ def _load_owned_lease(config: Config, owner: str):
 
 def _outbound_exception_to_exit(exc: TelegramSecretaryError) -> int:
     """送信例外を exit code にマップ（send-reply / proactive-send 共通）。"""
-    if isinstance(exc, (AttachmentNotFound, AttachmentTooLarge)):
+    if isinstance(exc, (AttachmentNotFoundError, AttachmentTooLargeError)):
         print(f"attachment error: {exc}", file=sys.stderr)
         return EXIT_CONFIG_INVALID
     if isinstance(exc, AuthFailureError):
@@ -665,11 +672,13 @@ def build_parser() -> argparse.ArgumentParser:
     ).set_defaults(handler=cmd_validate_config)
 
     sub.add_parser(
-        "show-config", help="現在の設定を read-only 表示（秘匿はマスク、未設定でも exit 0）"
+        "show-config",
+        help="現在の設定を read-only 表示（秘匿はマスク、未設定でも exit 0）",
     ).set_defaults(handler=cmd_show_config)
 
     p_init = sub.add_parser(
-        "init-config", help="config.json を生成（決定論 I/O、対話的収集は /telegram-secretary 経由）"
+        "init-config",
+        help="config.json を生成（決定論 I/O、対話的収集は /telegram-secretary 経由）",
     )
     p_init.set_defaults(handler=cmd_init_config)
     p_init.add_argument(
@@ -688,16 +697,22 @@ def build_parser() -> argparse.ArgumentParser:
     p_lease.set_defaults(handler=cmd_lease)
     p_lease.add_argument("action", choices=["acquire", "renew", "release"])
     p_lease.add_argument("--owner", help="session owner id (省略時は env か uuid 生成)")
-    p_lease.add_argument("--ttl", type=int, default=300, help="TTL seconds (default 300)")
+    p_lease.add_argument(
+        "--ttl", type=int, default=300, help="TTL seconds (default 300)"
+    )
 
     p_poll = sub.add_parser("poll", help="getUpdates 1 サイクル")
     p_poll.set_defaults(handler=cmd_poll)
-    p_poll.add_argument("--timeout", type=int, default=30, help="long-poll timeout seconds")
+    p_poll.add_argument(
+        "--timeout", type=int, default=30, help="long-poll timeout seconds"
+    )
 
     p_watch = sub.add_parser("watch", help="バックグラウンド long-poll ループ")
     p_watch.set_defaults(handler=cmd_watch)
     p_watch.add_argument("--timeout", type=int, default=30)
-    p_watch.add_argument("--owner", help="session owner id (lease renew 用、省略時は env か uuid)")
+    p_watch.add_argument(
+        "--owner", help="session owner id (lease renew 用、省略時は env か uuid)"
+    )
     p_watch.add_argument(
         "--max-iterations",
         type=int,
@@ -727,7 +742,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_send.add_argument("--chat-id", type=int, required=True)
     p_send.add_argument("--update-id", type=int, required=True)
     p_send.add_argument("--text-file", required=True)
-    p_send.add_argument("--owner", help="session owner id (lease 検証用、省略時は env か uuid)")
+    p_send.add_argument(
+        "--owner", help="session owner id (lease 検証用、省略時は env か uuid)"
+    )
     p_send.add_argument(
         "--file",
         action="append",
@@ -797,21 +814,26 @@ def build_parser() -> argparse.ArgumentParser:
         p_reg.add_argument("registry_action", choices=["list", "get", "add", "remove"])
         p_reg.add_argument("--key", help="get/remove のキー（uuid または id）")
         p_reg.add_argument("--json", help="add するレコードの JSON 文字列")
-        p_reg.add_argument("--json-file", dest="json_file", help="add するレコードの JSON ファイル")
+        p_reg.add_argument(
+            "--json-file", dest="json_file", help="add するレコードの JSON ファイル"
+        )
 
     # P×A 役割のデータ駆動判定（起動時オリエンテーションが1回叩く）
     sub.add_parser(
-        "role-status", help="PROFILE/GOALS から現在の役割（秘書/執事/コーチ/アネゴ）を判定"
+        "role-status",
+        help="PROFILE/GOALS から現在の役割（秘書/執事/コーチ/アネゴ）を判定",
     ).set_defaults(handler=cmd_role_status)
 
     # 起動時 fetch（registry_sync 有効時、固定ブランチから最新管理表を引く。ROUTINE_PROMPT が起動時に1回叩く）
     sub.add_parser(
-        "registry-sync", help="起動時に固定ブランチから管理表を fetch（R2-3、registry_sync 有効時）"
+        "registry-sync",
+        help="起動時に固定ブランチから管理表を fetch（R2-3、registry_sync 有効時）",
     ).set_defaults(handler=cmd_registry_sync)
 
     # WAL（Write-Ahead Log）: 送信前 intent 書込→push→起動時 redo（registry_sync 有効時のみ稼働）
     p_wal_append = sub.add_parser(
-        "wal-append", help="WAL に intent を pending 追記（送信前、registry_sync 有効時）"
+        "wal-append",
+        help="WAL に intent を pending 追記（送信前、registry_sync 有効時）",
     )
     p_wal_append.set_defaults(handler=cmd_wal_append)
     p_wal_append.add_argument(
@@ -826,13 +848,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
 
     p_wal_push = sub.add_parser(
-        "wal-push", help="WAL ログを commit & push（must-succeed、失敗は exit 非0＝送信前ゲート）"
+        "wal-push",
+        help="WAL ログを commit & push（must-succeed、失敗は exit 非0＝送信前ゲート）",
     )
     p_wal_push.set_defaults(handler=cmd_wal_push)
     p_wal_push.add_argument("--message", help="commit メッセージ")
 
     sub.add_parser(
-        "wal-redo", help="起動時に WAL pending を registry へ redo（registry_sync 有効時）"
+        "wal-redo",
+        help="起動時に WAL pending を registry へ redo（registry_sync 有効時）",
     ).set_defaults(handler=cmd_wal_redo)
 
     return parser
@@ -845,7 +869,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     # 旧 handlers dict（subcommand 名との二重管理）は廃止
     try:
         return args.handler(args)
-    except _ConfigInvalid:
+    except _ConfigInvalidError:
         return EXIT_CONFIG_INVALID
 
 

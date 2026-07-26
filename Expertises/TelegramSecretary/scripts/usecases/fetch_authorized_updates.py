@@ -1,8 +1,8 @@
 """getUpdates → 認可フィルタ → 正規化 → injection フラグ → emit する UseCase。"""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List
 
 from domain.authorization import AuthorizedChats
 from domain.media import merge_caption_into_text
@@ -17,7 +17,7 @@ class NormalizedUpdate:
 
     update: TelegramUpdate
     normalized_text: str
-    injection_flags: List[str]
+    injection_flags: list[str]
 
 
 class FetchAuthorizedUpdates:
@@ -31,7 +31,7 @@ class FetchAuthorizedUpdates:
         self._offset_store = offset_store
         self._allowlist = allowlist
 
-    def execute(self, timeout_seconds: int = 30) -> List[NormalizedUpdate]:
+    def execute(self, timeout_seconds: int = 30) -> list[NormalizedUpdate]:
         """1 サイクル分の update を取得・認可・正規化して返す。
 
         - 未認可 chat の update は Domain で破棄、エージェントに渡さない
@@ -44,7 +44,7 @@ class FetchAuthorizedUpdates:
         if not updates:
             return []
 
-        normalized_list: List[NormalizedUpdate] = []
+        normalized_list: list[NormalizedUpdate] = []
         max_update_id = offset.value - 1
         for u in updates:
             if u.update_id > max_update_id:
@@ -56,7 +56,9 @@ class FetchAuthorizedUpdates:
             merged = merge_caption_into_text(text, caption)
             flags = flag_injection(merged)
             normalized_list.append(
-                NormalizedUpdate(update=u, normalized_text=merged, injection_flags=flags)
+                NormalizedUpdate(
+                    update=u, normalized_text=merged, injection_flags=flags
+                )
             )
 
         # 認可不問で取得した更新を全て消費したことを記録（offset advance）
