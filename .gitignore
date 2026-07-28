@@ -9,8 +9,19 @@ desktop.ini
 *.log
 .temp/
 
-# 認証情報
+# 認証情報 — token/PAT/鍵は env か Environment に注入し、リポには置かない。
+# 実ファイル名を知っていることに依存せず、形状で網を張る（他リポと同水準）。
 .git-credentials
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.token
+*.pat
+credentials/
+client_secret*.json
+token*.json
 
 # IDE
 .vscode/
