@@ -39,7 +39,7 @@ def case_001():
 @pytest.fixture
 def tables():
     """テーブルデータ"""
-    data_path = Path(__file__).parent.parent / "References"
+    data_path = Path(__file__).parent.parent / "python" / "data"
     return load_tables(data_path)
 
 

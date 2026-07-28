@@ -67,14 +67,14 @@ def run_calculation(
 
     Args:
         input_dict: 入力パラメータ辞書
-        data_path: テーブルデータのディレクトリパス（省略時は References/ を使用）
+        data_path: テーブルデータのディレクトリパス（省略時は python/data/ を使用）
 
     Returns:
         計算結果の辞書
     """
     # テーブルデータのパスを決定
     if data_path is None:
-        data_path = Path(__file__).parent.parent / "References"
+        data_path = Path(__file__).parent / "data"
 
     # テーブル読み込み
     tables = load_tables(data_path)
@@ -110,7 +110,7 @@ def main():
         "--data-path", "-d",
         type=Path,
         default=None,
-        help="テーブルデータのディレクトリパス（省略時は References/）",
+        help="テーブルデータのディレクトリパス（省略時は python/data/）",
     )
     parser.add_argument(
         "--pretty", "-p",
