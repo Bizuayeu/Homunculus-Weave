@@ -35,6 +35,19 @@ class Tables:
     山留工法: List[RetainingMethodEntry] = field(default_factory=list)
 
 
+def _read_table(data_path: Path, name: str) -> dict:
+    """必須テーブルJSONを読み込む（欠落は即エラー）
+
+    テーブルが欠けたまま空で計算を続けると、エラー無しに過少な単価で
+    採算判断が出る（静かな失敗）。読み込み時点で落とす。
+    """
+    file = data_path / f"{name}.json"
+    if not file.exists():
+        raise FileNotFoundError(f"Required table not found: {file}")
+    with open(file, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
 def load_tables(data_path: Path | str) -> Tables:
     """指定ディレクトリからすべてのテーブルを読み込む
 
@@ -45,110 +58,25 @@ def load_tables(data_path: Path | str) -> Tables:
         Tables: 全テーブルを保持するデータクラス
 
     Raises:
-        FileNotFoundError: ディレクトリが存在しない場合
+        FileNotFoundError: ディレクトリ、または必須テーブルが存在しない場合
     """
     if isinstance(data_path, str):
         data_path = Path(data_path)
     if not data_path.exists():
         raise FileNotFoundError(f"Data directory not found: {data_path}")
 
-    tables = Tables()
+    def rows(name: str, model):
+        return [model.model_validate(entry) for entry in _read_table(data_path, name)[name]]
 
-    # 建築単価テーブル
-    building_price_file = data_path / "建築単価テーブル.json"
-    if building_price_file.exists():
-        with open(building_price_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.建築単価 = BuildingPriceTable.model_validate(data)
-
-    # 基礎単価テーブル
-    foundation_price_file = data_path / "基礎単価テーブル.json"
-    if foundation_price_file.exists():
-        with open(foundation_price_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.基礎単価 = [
-                FoundationPriceEntry.model_validate(entry)
-                for entry in data.get("基礎単価テーブル", [])
-            ]
-
-    # 山留単価テーブル
-    retaining_price_file = data_path / "山留単価テーブル.json"
-    if retaining_price_file.exists():
-        with open(retaining_price_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.山留単価 = [
-                RetainingWallPriceEntry.model_validate(entry)
-                for entry in data.get("山留単価テーブル", [])
-            ]
-
-    # 解体単価テーブル
-    demolition_price_file = data_path / "解体単価テーブル.json"
-    if demolition_price_file.exists():
-        with open(demolition_price_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.解体単価 = [
-                DemolitionPriceEntry.model_validate(entry)
-                for entry in data.get("解体単価テーブル", [])
-            ]
-
-    # 貸床単価テーブル
-    rental_price_file = data_path / "貸床単価テーブル.json"
-    if rental_price_file.exists():
-        with open(rental_price_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.貸床単価 = [
-                RentalPriceEntry.model_validate(entry)
-                for entry in data.get("貸床単価テーブル", [])
-            ]
-
-    # 施工条件テーブル
-    condition_file = data_path / "施工条件テーブル.json"
-    if condition_file.exists():
-        with open(condition_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.施工条件 = [
-                ConstructionConditionEntry.model_validate(entry)
-                for entry in data.get("施工条件テーブル", [])
-            ]
-
-    # 建物形状テーブル
-    shape_file = data_path / "建物形状テーブル.json"
-    if shape_file.exists():
-        with open(shape_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.建物形状 = [
-                BuildingShapeEntry.model_validate(entry)
-                for entry in data.get("建物形状テーブル", [])
-            ]
-
-    # 地盤評価テーブル
-    ground_file = data_path / "地盤評価テーブル.json"
-    if ground_file.exists():
-        with open(ground_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.地盤評価 = [
-                GroundEvaluationEntry.model_validate(entry)
-                for entry in data.get("地盤評価テーブル", [])
-            ]
-
-    # 基礎種別テーブル
-    foundation_type_file = data_path / "基礎種別テーブル.json"
-    if foundation_type_file.exists():
-        with open(foundation_type_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.基礎種別 = [
-                FoundationTypeEntry.model_validate(entry)
-                for entry in data.get("基礎種別テーブル", [])
-            ]
-
-    # 山留工法テーブル
-    retaining_method_file = data_path / "山留工法テーブル.json"
-    if retaining_method_file.exists():
-        with open(retaining_method_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            tables.山留工法 = [
-                RetainingMethodEntry.model_validate(entry)
-                for entry in data.get("山留工法テーブル", [])
-            ]
-
-    return tables
+    return Tables(
+        建築単価=BuildingPriceTable.model_validate(_read_table(data_path, "建築単価テーブル")),
+        基礎単価=rows("基礎単価テーブル", FoundationPriceEntry),
+        山留単価=rows("山留単価テーブル", RetainingWallPriceEntry),
+        解体単価=rows("解体単価テーブル", DemolitionPriceEntry),
+        貸床単価=rows("貸床単価テーブル", RentalPriceEntry),
+        施工条件=rows("施工条件テーブル", ConstructionConditionEntry),
+        建物形状=rows("建物形状テーブル", BuildingShapeEntry),
+        地盤評価=rows("地盤評価テーブル", GroundEvaluationEntry),
+        基礎種別=rows("基礎種別テーブル", FoundationTypeEntry),
+        山留工法=rows("山留工法テーブル", RetainingMethodEntry),
+    )
