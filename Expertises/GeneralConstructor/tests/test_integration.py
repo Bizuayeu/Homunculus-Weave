@@ -17,7 +17,7 @@ class TestFullPipeline:
     @pytest.fixture
     def tables(self):
         """テーブルデータをロード"""
-        data_path = Path(__file__).parent.parent / "References"
+        data_path = Path(__file__).parent.parent / "python" / "data"
         return load_tables(str(data_path))
 
     @pytest.fixture
@@ -173,7 +173,7 @@ class TestMultipleCases:
     @pytest.fixture
     def tables(self):
         """テーブルデータをロード"""
-        data_path = Path(__file__).parent.parent / "References"
+        data_path = Path(__file__).parent.parent / "python" / "data"
         return load_tables(str(data_path))
 
     def get_all_fixtures(self):
@@ -234,7 +234,7 @@ class TestEdgeCases:
     @pytest.fixture
     def tables(self):
         """テーブルデータをロード"""
-        data_path = Path(__file__).parent.parent / "References"
+        data_path = Path(__file__).parent.parent / "python" / "data"
         return load_tables(str(data_path))
 
     def test_minimum_area_project(self, tables):

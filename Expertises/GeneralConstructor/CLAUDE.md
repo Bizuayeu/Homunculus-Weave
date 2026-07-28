@@ -32,14 +32,14 @@
 - 対話スレッド内のクイックサマリー
 
 ### 要参照ディレクトリ
-`Expertises/GeneralConstructor/References/`
 
-このディレクトリには、以下の機密データが格納されています：
+`Expertises/GeneralConstructor/python/data/` — 構造化データ（計算モジュールが読む正典）:
 - ビジネスルール一覧.json
 - 各種単価テーブル（建築、基礎、山留、解体、貸床）
 - 判定ロジック（地盤評価、基礎種別、土質試験）
 - 施工条件テーブル
-- 業務ナレッジ（企画・設計の勘所）
+
+`Expertises/GeneralConstructor/References/` — 業務ナレッジ（企画・設計の勘所）
 
 ---
 
