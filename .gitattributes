@@ -6,3 +6,6 @@
 # Exception: Windows batch files need CRLF — cmd.exe mis-parses LF-terminated lines.
 *.bat text eol=crlf
 *.cmd text eol=crlf
+
+# PowerShell scripts likewise need CRLF — LF-terminated try/catch blocks fail to parse.
+*.ps1 text eol=crlf
