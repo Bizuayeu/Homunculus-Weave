@@ -53,7 +53,7 @@ python -m python.main input.json
 python -m python.main input.json --output result.json --pretty
 
 # カスタムデータディレクトリを指定
-python -m python.main input.json --data-path /path/to/References
+python -m python.main input.json --data-path /path/to/data
 ```
 
 ## 入力パラメータ

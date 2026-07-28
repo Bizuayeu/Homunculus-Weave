@@ -104,7 +104,7 @@ print(f"表面利回: {result['表面利回']}%")
 
 - `WORKFLOW.md` - AI側の詳細ワークフロー
 - `python/` - 計算モジュール
-- `References/` - 単価テーブル・判定ロジック
+- `python/data/` - 単価テーブル・判定ロジック
 - `References/250712_企画の勘所.txt` - 企画ノウハウ
 - `References/250712_設計の勘所.txt` - 設計ノウハウ
 

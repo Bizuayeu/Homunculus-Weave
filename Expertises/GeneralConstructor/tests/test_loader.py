@@ -1,4 +1,5 @@
 """Phase 2: ローダー実装のテスト（TDD Red Phase）"""
+import shutil
 import pytest
 from pathlib import Path
 from pydantic import ValidationError
@@ -7,13 +8,14 @@ from pydantic import ValidationError
 from python.loader import load_tables, Tables
 
 
+@pytest.fixture
+def data_path():
+    """単価テーブル・判定ロジックJSONの所在"""
+    return Path(__file__).parent.parent / "python" / "data"
+
+
 class TestLoadTables:
     """テーブル読み込みのテスト"""
-
-    @pytest.fixture
-    def data_path(self):
-        """テストデータのパス"""
-        return Path(__file__).parent.parent / "python" / "data"
 
     def test_load_building_price_table(self, data_path):
         """建築単価テーブルJSONの読み込み"""
@@ -81,9 +83,31 @@ class TestLoadTablesErrors:
         with pytest.raises(FileNotFoundError):
             load_tables(Path("nonexistent_directory"))
 
-    def test_tables_is_dataclass_like(self):
+    def test_empty_directory_raises(self, tmp_path):
+        """テーブルが1つも無いディレクトリでエラー
+
+        空テーブルのまま計算を続行すると、エラー無しに過少な単価で
+        採算判断が出てしまう（静かな失敗）。読み込み時点で落とす。
+        """
+        with pytest.raises(FileNotFoundError):
+            load_tables(tmp_path)
+
+    def test_partially_missing_table_raises(self, tmp_path, data_path):
+        """必須テーブルが1つでも欠けていればエラー"""
+        for src in data_path.glob("*.json"):
+            if src.name != "建築単価テーブル.json":
+                shutil.copy(src, tmp_path / src.name)
+
+        with pytest.raises(FileNotFoundError):
+            load_tables(tmp_path)
+
+    def test_missing_table_error_names_the_file(self, tmp_path):
+        """エラーメッセージに欠落したファイル名が含まれる"""
+        with pytest.raises(FileNotFoundError, match="建築単価テーブル.json"):
+            load_tables(tmp_path)
+
+    def test_tables_is_dataclass_like(self, data_path):
         """TablesはDataclass的にアクセス可能"""
-        data_path = Path(__file__).parent.parent / "python" / "data"
         tables = load_tables(data_path)
 
         # 属性アクセスが可能

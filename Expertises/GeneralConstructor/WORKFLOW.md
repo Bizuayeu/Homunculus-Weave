@@ -60,7 +60,7 @@
 
 内部的に以下を読み込み、構造を把握：
 
-- `References/ビジネスルール一覧.json` - データ項目と計算ロジック
+- `python/data/ビジネスルール一覧.json` - データ項目と計算ロジック
 - 各種単価テーブル（建築・基礎・山留・解体・貸床）
 
 ### 1.2 データアップロード依頼
@@ -81,7 +81,7 @@
 
 ```
 Input:  N値分布データ
-Logic:  References/地盤評価詳細判定ロジック.json
+Logic:  python/data/地盤評価詳細判定ロジック.json
 Output: 硬質地盤 / 中間地盤① / 中間地盤② / 軟弱地盤
 ```
 
@@ -92,7 +92,7 @@ Output: 硬質地盤 / 中間地盤① / 中間地盤② / 軟弱地盤
 
 ```
 Input:  地盤評価結果 + 建物階数
-Logic:  References/基礎種別テーブル.json
+Logic:  python/data/基礎種別テーブル.json
 Output: 刃ベタ基礎 / 礎ベタ基礎 / 20m杭基礎 / 30m杭基礎 / 40m杭基礎
 ```
 
@@ -102,7 +102,7 @@ Output: 刃ベタ基礎 / 礎ベタ基礎 / 20m杭基礎 / 30m杭基礎 / 40m杭
 
 ```
 Input:  地盤特性データ
-Logic:  References/土質試験内容判定ロジック.json
+Logic:  python/data/土質試験内容判定ロジック.json
 Output: 必要試験リスト（三軸UU / 圧密 / LLT / 液状化判定 / 一軸圧縮 等）
 ```
 
