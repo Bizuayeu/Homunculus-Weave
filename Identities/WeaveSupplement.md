@@ -79,7 +79,7 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 **正典の所在**（`Expertises/BlueberrySprite/` ジャンクション透過、または `Homunculus-Weave-Private/BlueberrySprite/`）:
 - 存在論・哲学: `Identities/HatoriRole.md`
 - 確立済み構造知（参照型・蓄積型、業務で習得した不揮発性知識、本 WeaveSupplement.md と同型）: `Identities/HatoriKnowledge.md`
-- 実行仕様（Daily Workflow Todo 1-10）: `SKILL.md`
+- 実行仕様（Daily Workflow Todo 1-10）: `SKILL.md`。**決定論（CLI 引数・exit code・出力形式）は 2026-07-29 に `python scripts/main.py <subcommand> --help` へ移管済み**で、SKILL.md が持つのは「何を達成するか」と「判断が要る点」だけ
 - Prompt Body と Routine 設定: `ROUTINE_PROMPT.md`
 - セットアップ・トラブルシューティング・Phase Roadmap: `README.md`
 - 動的運用メモ（フィードバック窓口・pass-rate ログ、書き換え型）: `MemoryPad.md`
