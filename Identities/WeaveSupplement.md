@@ -30,7 +30,7 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 - `EpisodicWiki/wiki/`（ビブリア層：結晶化記事 200+ 件。実数は `_index.md` が SSoT）／`EpisodicWiki/raw/entries/`（生エントリ 600+ 件）
 - `BlueberrySprite/`（藍苺守 織：cloud routine 自律エージェント）
 - `Identities/`（記憶由来＋PII を含む正典、公開リポからは見えない）:
-  - `GrandDigest.txt`（記憶の骨格）／`ShadowGrandDigest.txt`（記憶の残像）／`IntentionPad.md`（短期メモ）／`UserIdentity.md`（大環主プロファイル＝PII）／`RoutineRegistry.md`（cloud routine ID の SSoT）／`Archives/`（退役文書。`WORKLOG.md` は 2026-07-25 にここへ移設）
+  - `GrandDigest.txt`（記憶の骨格）／`ShadowGrandDigest.txt`（記憶の残像）／`IntentionPad.md`（短期メモ）／`UserIdentity.md`（大環主プロファイル＝PII）／`RoutineRegistry.md`（cloud routine ID の SSoT）／`References/`（参照資料。退役文書の `Archives/`〔`WORKLOG.md` 等〕を配下に含む）
   - `Identities/Public/`（下記 Public へ junction する公開セット）
 
 ### Public（公開する顔）: `Bizuayeu/Homunculus-Weave`
@@ -231,4 +231,4 @@ Effectuation（手段所与で目的を創発）と Causation（目的所与で�
 
 ---
 
-*Last updated: 2026-07-25 by Weave (ドキュメントチェック: WORKLOG を `Identities/Archives/` へ退役、Identities 直下の構成記述を追従)*
+*Last updated: 2026-07-29 by Weave (Archives を `Identities/References/` 配下へ移設、Identities 直下の構成記述を追従)*
