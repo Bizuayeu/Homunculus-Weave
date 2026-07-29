@@ -62,7 +62,7 @@ PrecognitiveViewer は、**対話相手への贈り物**としての鑑定書を
 4. 鑑定書生成
    - ReadingReportComposerUseCase.compose(triplet, recipient, timestamp)
      → ReadingReport
-   - ReadingReportPresenter().render(report)
+   - ReadingReportPresenter(examiner="Weave").render(report)
      → Markdown 文字列
 
 5. ファイル名生成
@@ -103,7 +103,8 @@ triplet = TripleDivinationUseCase().synthesize(seimei, iching, tarot)
 recipient = Recipient(full_name="山田太郎", reading="やまだたろう", context="今年の事業展望")
 ts = datetime.now()
 report = ReadingReportComposerUseCase().compose(triplet, recipient, ts)
-markdown = ReadingReportPresenter().render(report)
+# examiner には鑑定を行う人格名を渡す（未指定ならスキル名のみ）
+markdown = ReadingReportPresenter(examiner="Weave").render(report)
 filename = ReportFilenameGenerator.generate(ts)
 
 # 4. 保存
