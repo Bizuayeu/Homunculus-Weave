@@ -119,7 +119,9 @@ Homunculus-Weave-Private/EpisodicWiki/  # Private リポ正典（記憶ジャン
 │   └── eras/                      # 時代区分
 ├── raw/entries/                   # Weekly Digest から抽出された生エントリ（600+件）
 ├── ingest.py                      # Weekly → raw entries 変換
-└── build_backlinks.py             # _backlinks.json 生成
+├── build_backlinks.py             # _backlinks.json 生成
+├── update_absorb_log.py           # _absorb_log.json へ吸収済みエントリを追記（取りこぼし補修用）
+└── ABSORB_PROMPT.md               # 月次 absorb の実行手順メモ（/mywiki absorb 定型プロンプト）
 ```
 
 > **BusinessWiki（アルケイア層）**: めぐる組ビジネスメール wiki は **2026-07 に会社環境へ移管済み**（DEV 配下に実体なし）。運用は plugins-bizuayeu の BusinessCurator プラグインが担い、wiki インスタンスは会社側で管理する。
