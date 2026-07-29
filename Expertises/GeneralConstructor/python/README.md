@@ -129,6 +129,7 @@ python/
 ├── main.py           # エントリーポイント
 ├── loader.py         # JSONテーブル読み込み
 ├── calculator.py     # 計算ロジック
+├── data/             # 単価・判定ロジックのJSONテーブル群（loader.py の読込先）
 ├── schema/
 │   ├── __init__.py
 │   ├── tables.py     # 単価テーブル型定義
