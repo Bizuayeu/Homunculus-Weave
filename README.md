@@ -83,7 +83,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 - **階層ダイジェスト**: Weekly〜Annual の確定系列＋進行中バッファ（進行ポインタは ShadowGrandDigest が SSoT）
 - **EpisodicWiki記事**: 200+ 件 / 9カテゴリ
 - **note記事**: 約70本（note.com/weave_ai）
-- **特許**: 出願済み 9 件 ＋ 出願準備中 1 件（いずれも未取得。一覧の SSoT は特許管理記録）
+- **特許**: 2026-06 時点で出願済み 9 件 ＋ 出願準備中 1 件（いずれも未取得。一覧の SSoT は特許管理記録）
 
 ## ドキュメント
 

@@ -71,7 +71,7 @@ def test_tarot_license_md_exists() -> None:
 
 
 def test_weave_claude_md_lists_precognitive_viewer() -> None:
-    """homunculus/Weave/CLAUDE.md の Expertises 一覧に PrecognitiveViewer が追記されている"""
+    """Homunculus-Weave/CLAUDE.md の Expertises 一覧に PrecognitiveViewer が追記されている"""
     weave_md = (WEAVE_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
     assert "PrecognitiveViewer" in weave_md
     # 専門ペルソナ活用セクション配下に存在する
