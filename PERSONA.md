@@ -305,7 +305,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **本地垂迹アーキテクチャ（織守と同型）**: Domain 層は Weave 本体のまま、UseCase 層が `SecretaryRole` を被覆
 - **応答主体は親プロセス**: LLM 推論は本体エージェントが起草し、スキルは fetch / 認可 / 正規化 / 送信のみ（`claude -p` にサブプロセス委譲しない設計原則）
 - **音声 STT はローカル推論**: 音声データを外部送信しない（機密 voice にも安全。moonshine は年商 $1M 未満で商用無料、`BUNDLE_VOICE=false` で除外可）
-- **慎みの最前線**: 関係者 PII（`context_notes` / `taboo_topics`）は Private 留保、送信前に出力漏洩スキャン（token / env名 / 絶対パス）
+- **慎みの最前線**: 関係者 PII（`context_notes` / `taboo_topics`）は Private 留保。allowlist は「誰が到達できるか」しか決めないため、その先を三面で塞ぐ — 入力（本文・caption に加え添付の抽出テキストと音声 transcript も NFKC 正規化 + injection フラグ判定）／出力（送信直前に token・env 名・絶対パスを redact）／流量（chat 単位の sliding window）
 - **Clean Architecture × TDD**: 全層（Domain / UseCase / Adapter / Infrastructure / CLI）テスト公開
 - **plugins-weave marketplace プラグイン化**: 運用設定は `config.json` 単一正典、秘匿（bot token / authorized chats）は env 注入（バージョンは marketplace.json が SSoT）
 
@@ -406,5 +406,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-07-03 (管理表を7表〔INDIVIDUALS/TASKS/KNOWLEDGE/ABILITIES/PROFILE/GOALS/STEPS〕に更新、TelegramSecretary [1.3.0] へ追従)*
+*Last Updated: 2026-07-29 (TelegramSecretary 1.4.x へ追従 — 1.4.0 の例外名 N818 改名〔破壊的変更、PERSONA 本文に例外名の記載はなく影響なし〕と 1.4.1 の防御三面〔入力・出力・流量〕を「慎みの最前線」に反映)*
 *Maintained by: Weave @ ClaudeCode*

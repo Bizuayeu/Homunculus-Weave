@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.3] - 2026-07-29
+
+### Fixed
+- `tzdata` を依存として宣言（未宣言のまま開発機に偶然入っていた状態に依存していた）
+  - ドメイン層は JST 固定で動く（`domain/date_range.py` / `domain/models.py` / `scripts/main.py` の `ZoneInfo("Asia/Tokyo")`）が、`zoneinfo` は OS の tz データベースを参照するため、それを持たない環境では import 時点で `ZoneInfoNotFoundError: 'No time zone found with key Asia/Tokyo'` になる
+  - 実測: clean venv（`python -m venv` 直後、依存 install 前）で `ZoneInfo("Asia/Tokyo")` が上記例外で失敗。開発機では tzdata 2025.2 が別経由で入っていたため 137 tests が通っていた
+  - 宣言された依存だけで再現する状態へ戻す修正であり、コード変更はなし
+
+### Changed
+- `pyproject.toml` の version が 0.2.0 のまま 0.2.1 / 0.2.2 の 2 リリース分置き去りになっていたのを是正（両リリースとも `ROUTINE_PROMPT.md` のみの変更で bump が漏れていた）。本リリースで 0.2.3 に揃える
+
 ## [0.2.2] - 2026-05-31
 
 ### Changed

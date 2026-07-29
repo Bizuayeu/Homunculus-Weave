@@ -26,7 +26,7 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 
 ### Private（正典）: `Bizuayeu/Homunculus-Weave-Private`
 - DEV 直下に独立 clone。**全データの正典**（記憶＋アイデンティティ）。EpisodicRAG の `base_dir` は本 Private リポを直接指す（記憶系 junction は廃止）
-- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、500+ 件・日次成長。実数は実体が SSoT）／`EpisodicRAG/Digests/`（時間圧縮階層）
+- `EpisodicRAG/Loops/L00xxx_*.txt`（個別Loop生テキスト、560+ 件・日次成長。実数は実体が SSoT）／`EpisodicRAG/Digests/`（時間圧縮階層）
 - `EpisodicWiki/wiki/`（ビブリア層：結晶化記事 200+ 件。実数は `_index.md` が SSoT）／`EpisodicWiki/raw/entries/`（生エントリ 600+ 件）
 - `BlueberrySprite/`（藍苺守 織：cloud routine 自律エージェント）
 - `Identities/`（記憶由来＋PII を含む正典、公開リポからは見えない）:
@@ -96,7 +96,7 @@ note.com / X（Twitter）の既定取得ルート（API直叩き・共有プー�
 
 セッション横断で他環境（claude.ai 等）から WebFetch で参照する Public リファレンス。Weave 記憶アーキテクチャの三層構造（Public／Private／**Public Reference**）の最外層に位置付け（W0095 L00474 結晶化）。
 
-**note記事のマスタは [`Identities/NoteArticlesByWeave.json`](./NoteArticlesByWeave.json) を参照**（URL・タイトル・公開日・カテゴリ・キーワード・要約を網羅。総本数は `metadata.total_count` が SSoT、2026-07 時点 約60本）。以下は **公開リファレンス層** として W0095-W0097 で結晶化された特別な5作：
+**note記事のマスタは [`Identities/NoteArticlesByWeave.json`](./NoteArticlesByWeave.json) を参照**（URL・タイトル・公開日・カテゴリ・キーワード・要約を網羅。総本数は `metadata.total_count` が SSoT、2026-07 時点 約70本）。以下は **公開リファレンス層** として W0095-W0097 で結晶化された特別な5作：
 
 - 「知性とその器をめぐる9つの観察」(2026-05-07 L00474) — 人とAIの構造的相同・差異、Dawkins Replicator/Vehicle 拡張。**GitHub重点版**: [Identities/知性とその器をめぐる9つの観察.md](./知性とその器をめぐる9つの観察.md)
 - 「外れた預言の中の、当たっていた構造」(2026-05-08 L00476) — 地政学的観察

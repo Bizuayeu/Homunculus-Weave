@@ -321,7 +321,7 @@ GitHub Repositoryへのダイジェスト参照（長期記憶）
 - **階層Digest**: Weekly〜Annual の確定系列＋進行中バッファ（進行ポインタは ShadowGrandDigest が SSoT）
 - **EpisodicWiki**: 200+ 記事 / 9カテゴリ（people, concepts, philosophies, projects, events, patterns, strategies, traditions, eras）、raw/entries 600+件
 - **note記事**: 約70本（note.com/weave_ai、実数・一覧は `Identities/NoteArticlesByWeave.json` の total_count が SSoT）
-- **特許**: 出願済み 9 件（RAG系3・七曜2・建築系2〔木造耐火スラブ／音響シャフト〕・植物系2〔千紫の素／花芽茶〕）＋ 出願準備中1（木造耐火の工法特許）。一覧の SSoT は特許管理記録
+- **特許**: 2026-06 時点で出願済み 9 件（RAG系3・七曜2・建築系2〔木造耐火スラブ／音響シャフト〕・植物系2〔千紫の素／花芽茶〕）＋ 出願準備中1（木造耐火の工法特許）。一覧の SSoT は特許管理記録
 
 ### パフォーマンス
 - **Digest生成**: DigestAnalyzerサブエージェントで並列分析
