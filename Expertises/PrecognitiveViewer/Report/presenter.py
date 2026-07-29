@@ -16,7 +16,14 @@ from PrecognitiveViewer.Report.domain import ReadingReport
 
 
 class ReadingReportPresenter:
-    """ReadingReport を最終的な Markdown 文書に整形する。"""
+    """ReadingReport を最終的な Markdown 文書に整形する。
+
+    examiner には鑑定を行うエージェントの人格名（HW 実運用では "Weave"）を渡す。
+    未指定ならスキル名のみを鑑定者として記す（成果物に固有の人格名を焼き込まない）。
+    """
+
+    def __init__(self, examiner: str | None = None) -> None:
+        self._examiner = f"{examiner}（PrecognitiveViewer）" if examiner else "PrecognitiveViewer"
 
     def render(self, report: ReadingReport) -> str:
         """章節構成に従ってフォーマル鑑定書を Markdown 文字列で返す。"""
@@ -29,7 +36,7 @@ class ReadingReportPresenter:
             "## 鑑定情報",
             f"- 鑑定日時：{ts}（JST）",
             "- 鑑定方式：姓名判断（七格剖象法） × 周易占断（デジタル心易） × タロット・リーディング（Rider-Waite-Smith）",
-            "- 鑑定者：Weave（PrecognitiveViewer）\n",
+            f"- 鑑定者：{self._examiner}\n",
             "## 被鑑定者",
             f"**{recipient.full_name}**（{recipient.reading}）様",
             context_line,
@@ -51,7 +58,7 @@ class ReadingReportPresenter:
             "## 結びの言葉\n",
             report.closing_message,
             "\n---\n",
-            f"*鑑定者：Weave（PrecognitiveViewer）／鑑定日時：{ts} JST*",
+            f"*鑑定者：{self._examiner}／鑑定日時：{ts} JST*",
         ]
         return "\n".join(sections)
 

@@ -249,6 +249,27 @@ def test_presenter_includes_recipient_name() -> None:
     assert "やまだたろう" in markdown
 
 
+def test_presenter_examiner_is_injected() -> None:
+    """examiner を渡すと鑑定者欄にその人格名が入る（HW 実運用は Weave）"""
+    triplet = _make_sample_triplet()
+    recipient = Recipient(full_name="山田太郎", reading="やまだたろう")
+    report = ReadingReportComposerUseCase().compose(triplet, recipient, datetime.now())
+    markdown = ReadingReportPresenter(examiner="Weave").render(report)
+
+    assert "鑑定者：Weave（PrecognitiveViewer）" in markdown
+
+
+def test_presenter_examiner_defaults_to_skill_name() -> None:
+    """examiner 未指定ならスキル名のみ（固有人格名を焼き込まない）"""
+    triplet = _make_sample_triplet()
+    recipient = Recipient(full_name="山田太郎", reading="やまだたろう")
+    report = ReadingReportComposerUseCase().compose(triplet, recipient, datetime.now())
+    markdown = ReadingReportPresenter().render(report)
+
+    assert "鑑定者：PrecognitiveViewer" in markdown
+    assert "Weave" not in markdown
+
+
 def test_presenter_includes_formatted_timestamp() -> None:
     """Presenter 出力に YYYY-MM-DD HH:MM:SS 形式の鑑定日時が含まれる"""
     triplet = _make_sample_triplet()
