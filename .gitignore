@@ -61,3 +61,7 @@ Expertises/PrivateLibrarian/
 # PrecognitiveViewer - 鑑定書出力は受け手プライベート、リポ非管理
 Expertises/PrecognitiveViewer/Report/outputs/
 
+# TelegramSecretary - junction 越しに plugins-weave 側の作業文書が露出するため
+Expertises/TelegramSecretary/IMPLEMENTATION_PLAN.md
+Expertises/TelegramSecretary/outsource-report-*.html
+
