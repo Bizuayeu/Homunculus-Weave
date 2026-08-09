@@ -30,6 +30,18 @@ from infrastructure.composition import build_git, build_sync
 from infrastructure.config import Config
 from infrastructure.exit_codes import EXIT_CONFIG_INVALID, EXIT_FETCH_FAILED, EXIT_OK
 from usecases.manage_registry import RegistryService
+from usecases.orientation import (
+    DEFAULT_HANDOFF_CAP,
+    DEFAULT_HANDOFF_LATEST,
+    DEFAULT_NOTES_TAIL,
+    DEFAULT_TOPIC_WIDTH,
+    OrientationService,
+)
+
+# list 出力がこの大きさを超えたら警告する（orientation_report_20260809 指定）。
+# ハーネスは巨大出力を persisted-output へ退避するため、超過した list は
+# 「exit 0 なのにデータがコンテキストに載っていない」沈黙失敗になる。
+LIST_WARNING_BYTES = 200 * 1024
 
 
 class RegistrySpec(NamedTuple):
@@ -72,7 +84,9 @@ def run_registry_command(
     svc = registry_service(config, name)
 
     if action == "list":
-        print(json.dumps(svc.list(), ensure_ascii=False, indent=2))
+        payload = json.dumps(svc.list(), ensure_ascii=False, indent=2)
+        print(payload)
+        _warn_if_oversized(name, payload)
         return EXIT_OK
 
     if action == "get":
@@ -139,6 +153,111 @@ def _sync_after_change(config: Config, name: str, message: str, sync) -> None:
         return
     path = getattr(config, REGISTRY_SPEC[name].path_attr)
     service.sync([path], message)
+
+
+def _warn_if_oversized(name: str, payload: str) -> None:
+    """list 出力が LIST_WARNING_BYTES 超なら stderr で警告する（fail-open）。
+
+    stdout も exit code も変えない——退行リスクを持ち込まず、「気づけない」だけを潰す
+    （run_registry_fetch の空表警告と同型の層3 可観測性）。警告にレコード内容は載せない
+    （PII 非出力）ので、サイズと対処だけを言う。
+    """
+    size = len(payload.encode("utf-8"))
+    if size <= LIST_WARNING_BYTES:
+        return
+    print(
+        f"WARNING: {name} list output is {size} bytes (> {LIST_WARNING_BYTES}) — "
+        "output this large can be diverted out of the agent's context while the "
+        "command still exits 0. Use `orientation` for the startup digest, or "
+        "`get --key` for a single record.",
+        file=sys.stderr,
+    )
+
+
+def _table_size(config: Config, name: str) -> int:
+    """管理表ファイルの実バイト数（不在は 0＝初回起動でも orientation は完走する）。"""
+    try:
+        return getattr(config, REGISTRY_SPEC[name].path_attr).stat().st_size
+    except OSError:
+        return 0
+
+
+def artifacts_dir(config: Config) -> Path:
+    """秘書の成果物層（DESIGN §3.10）。申し送りの handoff ブロックもこの下に住む。"""
+    return config.registry_root / "artifacts"
+
+
+def _read_handoff_blocks(config: Config) -> list[tuple[str, str]]:
+    """`artifacts/handoff/*.md` を (ファイル名, 本文) で読む。不在・空は `[]`（no-op 完走）。
+
+    中身は解釈しない（スキーマレス、DESIGN §3.10）——標準化するのは置き場と
+    「辞書順ソート可能な命名」だけで、最新 N 件の選択と丸めは UseCase が担う。
+    読めない 1 ブロックで起動オリエンテーションを止めない（fail-open）。
+    """
+    # cc-defer: handoff は分離のみ（天井）、消化=knowledge 結晶化・卒業は orientation 実測 100KB 超で次段へ
+    directory = artifacts_dir(config) / "handoff"
+    try:
+        paths = sorted(directory.glob("*.md"))
+    except OSError:
+        return []
+    blocks = []
+    for path in paths:
+        try:
+            blocks.append(
+                (path.name, path.read_text(encoding="utf-8", errors="replace"))
+            )
+        except OSError as exc:
+            print(f"handoff block unreadable ({path.name}): {exc}", file=sys.stderr)
+    return blocks
+
+
+def run_orientation(config: Config, args: Any = None) -> int:
+    """起動時オリエンテーション用の絞り込みダイジェストを stdout に一撃出力する。
+
+    一括 list（7表 1.6MB）はハーネスの出力上限で退避され、データがコンテキストに
+    載らないまま exit 0 する沈黙失敗を起こしていた。射影は UseCase の純ロジック、
+    ここは stores（REGISTRY_SPEC のキー順＝表追加に自動追従）と実ファイルサイズ・
+    handoff ブロックを注入する薄い配線に留める（read-only ゆえ git にも触れない）。
+    """
+    listers = {name: registry_service(config, name) for name in REGISTRY_SPEC}
+    sizes = {name: _table_size(config, name) for name in REGISTRY_SPEC}
+    print(
+        OrientationService(listers, sizes).build(
+            handoffs=_read_handoff_blocks(config),
+            notes_tail=getattr(args, "notes_tail", None) or DEFAULT_NOTES_TAIL,
+            topic_width=getattr(args, "topic_width", None) or DEFAULT_TOPIC_WIDTH,
+            handoff_latest=getattr(args, "handoff_latest", None)
+            or DEFAULT_HANDOFF_LATEST,
+            handoff_cap=getattr(args, "handoff_cap", None) or DEFAULT_HANDOFF_CAP,
+        )
+    )
+    return EXIT_OK
+
+
+def run_artifacts_sync(config: Config, sync=None) -> int:
+    """`artifacts/` 配下を既存 sync 経路で commit & push（新規 git コードを書かない）。
+
+    書き込み CLI は持たない——成果物の構造は秘書の判断（重要度の世界、DESIGN §3.10）。
+    ここは「置かれたものを固定ブランチへ送る」決定論だけを担う。registry_sync 無効なら
+    no-op exit 0（`_sync_after_change` と同型の後方互換）、`artifacts/` 未作成も no-op
+    （存在しない path を `git add` に渡して失敗させない）。
+    """
+    service = sync if sync is not None else build_sync(config)
+    if service is None:
+        return EXIT_OK
+    directory = artifacts_dir(config)
+    if not directory.exists():
+        print(f"artifacts-sync: nothing to sync ({directory} not found)")
+        return EXIT_OK
+    try:
+        result = service.sync([directory], "artifacts: sync")
+    except GitSyncError as exc:
+        # 申し送りブロックはここを通らないと次枠に届かない＝失敗は伝えるべき事実。
+        # スタックトレースを吐かず transient として返す（run_wal_push と同型）
+        print(f"artifacts sync failed: {exc}", file=sys.stderr)
+        return EXIT_FETCH_FAILED
+    print(f"artifacts synced: committed={result.committed} pushed={result.pushed}")
+    return EXIT_OK
 
 
 def run_role_status(config: Config) -> int:
