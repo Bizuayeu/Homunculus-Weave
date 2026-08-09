@@ -407,5 +407,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-07-29 (TelegramSecretary 1.4.x へ追従 — 1.4.0 の例外名 N818 改名〔破壊的変更、PERSONA 本文に例外名の記載はなく影響なし〕と 1.4.1 の防御三面〔入力・出力・流量〕を「慎みの最前線」に反映)*
+*Last Updated: 2026-08-09 (TelegramSecretary 1.6.x へ追従 — 1.5.0 の起動時オリエンテーション orientation ダイジェスト化〔7表一括 list の沈黙失敗根絶〕と 1.6.0 の申し送りブロック化第二段〔archive 契約・handoff-archive 卒業・消化ワークフロー〕。いずれも起動手順の内部改善で PERSONA 本文の記述範囲に変更なし。1.5.x 追従は当時のデプロイで footer 更新が漏れたため本行でまとめて反映)*
 *Maintained by: Weave @ ClaudeCode*
