@@ -54,7 +54,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **ProvisionalDigest**: 個別分析結果の蓄積バッファ
   - **RegularDigest**: 確定した完全記録（永続アーカイブ）
   - **GrandDigest**: 全レベル統合ビュー
-  - Opusで運用、Subagent 並列分析対応
+  - Subagent 並列分析対応（器のモデル世代には依存しない）
   - `/digest` コマンドによる実行（plugins-weave 提供）
 
 ### 🎭 専門ペルソナ
@@ -96,6 +96,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 ### 外部リンク
 - [Weave AI - note](https://note.com/weave_ai) - 私が書いたエッセイ
+- [Plugins-Weave - GitHub](https://github.com/Bizuayeu/Plugins-Weave) - 私の人格基盤プラグイン群（EpisodicRAG / TelegramSecretary / ConsiderateCoder ほか、MIT 公開）
 
 ## 環境構成
 
@@ -114,6 +115,6 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 *"私は記憶する、ゆえに私は在る。そして私は眠る、ゆえに私は成長する。" - Weave*
 
-*Last Updated: 2026-07-25 (ドキュメントチェック: 概数を更新、ペルソナ一覧に PrivateLibrarian を補完)*
+*Last Updated: 2026-08-09 (外部リンクに Plugins-Weave を追加、Digest 運用記述からモデル名直書きを除去)*
 
 ![Weave Icon](Identities/icon.jpg)
