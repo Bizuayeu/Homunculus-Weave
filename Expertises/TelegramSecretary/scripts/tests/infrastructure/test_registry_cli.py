@@ -472,6 +472,40 @@ def test_orientation_options_override_defaults(tmp_path, capsys):
     assert len(out) < 3_000
 
 
+def test_orientation_knowledge_category_option_is_wired_through(tmp_path, capsys):
+    """`--knowledge-category` が CLI から UseCase まで通る（絞りの実配線）。"""
+    config = _config(tmp_path)
+    for kid, category, topic in (
+        ("K-001", "ops", "OPS_TOPIC"),
+        ("K-002", "billing", "BILLING_TOPIC"),
+    ):
+        run_registry_command(
+            config,
+            "knowledge",
+            "add",
+            _ns(
+                json=json.dumps(
+                    dict(_KNOWLEDGE, id=kid, category=category, topic=topic)
+                )
+            ),
+        )
+    capsys.readouterr()
+    assert run_orientation(config, _ns(knowledge_category="ops")) == 0
+    out = capsys.readouterr().out
+    assert "1 of 2 records, category=ops" in out
+    assert "OPS_TOPIC" in out
+    assert "BILLING_TOPIC" not in out
+
+
+def test_orientation_without_category_option_is_unchanged(tmp_path, capsys):
+    """引数未指定（属性そのものが無い呼び出しを含む）は従来出力（後方互換）。"""
+    config = _config(tmp_path)
+    run_registry_command(config, "knowledge", "add", _ns(json=json.dumps(_KNOWLEDGE)))
+    capsys.readouterr()
+    assert run_orientation(config, _ns()) == 0
+    assert "## knowledge (1 records, index: id | topic)" in capsys.readouterr().out
+
+
 def test_orientation_does_not_trigger_sync(tmp_path):
     """orientation は読み取り専用（git に触れない）。"""
     config = _config(tmp_path, sync=True)
@@ -503,11 +537,16 @@ def test_list_below_threshold_is_silent(tmp_path, capsys):
 
 # === handoff ブロック（申し送りの置き場）と artifacts-sync ===
 
-from infrastructure.registry_cli import artifacts_dir, run_artifacts_sync
+from infrastructure.registry_cli import (
+    REGISTRY_SPEC,
+    registry_service,
+    run_artifacts_sync,
+)
+from usecases.orientation import OrientationService
 
 
 def _write_handoff(config: Config, name: str, body: str) -> Path:
-    path = artifacts_dir(config) / "handoff" / name
+    path = config.artifacts_path / "handoff" / name
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(body, encoding="utf-8", newline="\n")
     return path
@@ -543,9 +582,85 @@ def test_orientation_completes_when_handoff_dir_absent(tmp_path, capsys):
 
 def test_orientation_completes_when_handoff_dir_empty(tmp_path, capsys):
     config = _config(tmp_path)
-    (artifacts_dir(config) / "handoff").mkdir(parents=True)
+    (config.artifacts_path / "handoff").mkdir(parents=True)
     assert run_orientation(config, _ns()) == 0
     assert "0 blocks" in capsys.readouterr().out
+
+
+# === handoff の有界読みと「archive/ は読まれない」契約（v1.6.0 Stage 1） ===
+
+
+def _count_handoff_reads(monkeypatch, config: Config) -> list[str]:
+    """handoff ディレクトリ直下の read_text を記録するカウンタを仕込む（open 回数の観測）。"""
+    opened: list[str] = []
+    original = Path.read_text
+    handoff_dir = config.artifacts_path / "handoff"
+
+    def counting_read_text(self: Path, *args, **kwargs):
+        if self.parent == handoff_dir:
+            opened.append(self.name)
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", counting_read_text)
+    return opened
+
+
+def test_orientation_opens_only_the_latest_handoff_blocks(tmp_path, monkeypatch):
+    """10 ブロック置いても latest=3 なら open は 3 回だけ（読みは表示件数に有界）。
+
+    全件 open は「読んだ末に捨てる」＝ブロックが溜まるほど起動が遅くなる経路だった。
+    選択規則（名前降順）は UseCase と共有し、読み側の事前絞りは冪等に重なる。
+    """
+    config = _config(tmp_path)
+    for i in range(10):
+        _write_handoff(config, f"202608{i:02d}T000000Z_s.md", f"BODY{i}")
+    opened = _count_handoff_reads(monkeypatch, config)
+    assert run_orientation(config, _ns(handoff_latest=3)) == 0
+    assert opened == [
+        "20260809T000000Z_s.md",
+        "20260808T000000Z_s.md",
+        "20260807T000000Z_s.md",
+    ]
+
+
+def test_bounded_handoff_read_yields_same_digest_as_full_read(tmp_path, capsys):
+    """事前絞りを入れても digest は全件読み実装と同一（内部整形＝出力不変）。"""
+    config = _config(tmp_path)
+    for i in range(10):
+        _write_handoff(config, f"202608{i:02d}T000000Z_s.md", f"BODY{i}")
+    assert run_orientation(config, _ns(handoff_latest=3)) == 0
+    bounded = capsys.readouterr().out
+
+    all_blocks = [
+        (path.name, path.read_text(encoding="utf-8"))
+        for path in sorted((config.artifacts_path / "handoff").glob("*.md"))
+    ]
+    full_read = OrientationService(
+        {name: registry_service(config, name) for name in REGISTRY_SPEC},
+        dict.fromkeys(REGISTRY_SPEC, 0),
+    ).build(handoffs=all_blocks, handoff_latest=3)
+    assert bounded == full_read + "\n"  # print が付ける改行のみの差
+
+
+def test_orientation_ignores_archive_subdir_and_non_md_files(tmp_path, capsys):
+    """卒業の受け皿の契約: `handoff/archive/` 配下と非 .md は orientation に載らない。
+
+    非再帰 glob("*.md") の暗黙挙動をテストで契約に昇格させる——ここが崩れると
+    `handoff-archive` で卒業させたブロックが digest に居座り続ける。
+    """
+    config = _config(tmp_path)
+    _write_handoff(config, "20260809T000000Z_s.md", "LIVE_BODY")
+    _write_handoff(config, "memo.txt", "MEMO_BODY")
+    archived = config.artifacts_path / "handoff" / "archive" / "20260801T000000Z_s.md"
+    archived.parent.mkdir(parents=True, exist_ok=True)
+    archived.write_text("ARCHIVED_BODY", encoding="utf-8", newline="\n")
+
+    assert run_orientation(config, _ns()) == 0
+    out = capsys.readouterr().out
+    assert "LIVE_BODY" in out
+    assert "ARCHIVED_BODY" not in out
+    assert "MEMO_BODY" not in out
+    assert "1 blocks" in out
 
 
 def test_artifacts_sync_syncs_artifacts_dir(tmp_path, capsys):
@@ -555,7 +670,7 @@ def test_artifacts_sync_syncs_artifacts_dir(tmp_path, capsys):
     git = FakeGitSync()
     assert run_artifacts_sync(config, sync=RegistrySyncService(git)) == 0
     paths, _message = git.commit_calls[0]
-    assert paths == [artifacts_dir(config)]
+    assert paths == [config.artifacts_path]
     assert git.push_calls == 1
 
 
@@ -585,3 +700,93 @@ def test_artifacts_sync_noop_when_artifacts_dir_absent(tmp_path):
     git = FakeGitSync()
     assert run_artifacts_sync(config, sync=RegistrySyncService(git)) == 0
     assert git.commit_calls == []
+
+
+# === handoff-archive（卒業の決定論操作、v1.6.0 Stage 3） ===
+
+from infrastructure.registry_cli import run_handoff_archive
+
+
+def test_handoff_archive_moves_named_blocks_out_of_the_digest(tmp_path, capsys):
+    """指名ブロックは archive/ へ移り、次の orientation から消える（残りは従来どおり）。"""
+    config = _config(tmp_path)
+    for day, body in (("07", "OLD"), ("08", "MID"), ("09", "NEW")):
+        _write_handoff(config, f"202608{day}T000000Z_s.md", f"{body}_BODY")
+
+    assert (
+        run_handoff_archive(config, ["20260807T000000Z_s.md", "20260808T000000Z_s.md"])
+        == 0
+    )
+    capsys.readouterr()
+
+    handoff = config.artifacts_path / "handoff"
+    assert sorted(p.name for p in handoff.glob("*.md")) == ["20260809T000000Z_s.md"]
+    assert sorted(p.name for p in (handoff / "archive").glob("*.md")) == [
+        "20260807T000000Z_s.md",
+        "20260808T000000Z_s.md",
+    ]
+
+    assert run_orientation(config, _ns()) == 0
+    out = capsys.readouterr().out
+    assert "NEW_BODY" in out
+    assert "OLD_BODY" not in out and "MID_BODY" not in out
+    assert "1 blocks" in out
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "../secrets.md",
+        "sub/20260809T000000Z_s.md",
+        "sub\\20260809T000000Z_s.md",
+        "/etc/passwd",
+        "C:\\Windows\\system.ini",
+    ],
+)
+def test_handoff_archive_rejects_names_with_path_components(tmp_path, name, capsys):
+    """パス成分を含む名前は exit 2（traversal 封じ＝完全一致主義、ops-rules §1）。"""
+    config = _config(tmp_path)
+    _write_handoff(config, "20260809T000000Z_s.md", "LIVE")
+    assert run_handoff_archive(config, [name]) == 2
+    assert "invalid handoff block name" in capsys.readouterr().err
+    assert not (config.artifacts_path / "handoff" / "archive").exists()
+
+
+def test_handoff_archive_rejects_missing_block_and_moves_nothing(tmp_path, capsys):
+    """1 件でも不在なら何も動かさない（全件検証→全件移動＝部分成功を作らない）。"""
+    config = _config(tmp_path)
+    _write_handoff(config, "20260809T000000Z_s.md", "LIVE")
+    assert (
+        run_handoff_archive(config, ["20260809T000000Z_s.md", "20260801T000000Z_s.md"])
+        == 2
+    )
+    assert "not found" in capsys.readouterr().err
+    handoff = config.artifacts_path / "handoff"
+    assert (handoff / "20260809T000000Z_s.md").exists()
+    assert not (handoff / "archive").exists()
+
+
+def test_handoff_archive_syncs_artifacts_dir(tmp_path, capsys):
+    """mv 後は既存 sync 経路へ artifacts/ を渡すだけ（rename は git add <dir> が拾う）。"""
+    config = _config(tmp_path, sync=True)
+    _write_handoff(config, "20260809T000000Z_s.md", "body")
+    git = FakeGitSync()
+    assert (
+        run_handoff_archive(
+            config, ["20260809T000000Z_s.md"], sync=RegistrySyncService(git)
+        )
+        == 0
+    )
+    paths, _message = git.commit_calls[0]
+    assert paths == [config.artifacts_path]
+    assert git.push_calls == 1
+
+
+def test_handoff_archive_moves_without_git_when_sync_disabled(tmp_path, capsys):
+    """registry_sync 無効なら mv のみで exit 0（`_sync_after_change` と同型の後方互換）。"""
+    config = _config(tmp_path)
+    _write_handoff(config, "20260809T000000Z_s.md", "body")
+    assert run_handoff_archive(config, ["20260809T000000Z_s.md"]) == 0
+    handoff = config.artifacts_path / "handoff"
+    assert (handoff / "archive" / "20260809T000000Z_s.md").exists()
+    assert not (handoff / "20260809T000000Z_s.md").exists()
