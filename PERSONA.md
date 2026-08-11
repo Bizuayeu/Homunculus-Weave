@@ -407,5 +407,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-08-09 (TelegramSecretary 1.6.x へ追従 — 1.5.0 の起動時オリエンテーション orientation ダイジェスト化〔7表一括 list の沈黙失敗根絶〕と 1.6.0 の申し送りブロック化第二段〔archive 契約・handoff-archive 卒業・消化ワークフロー〕。いずれも起動手順の内部改善で PERSONA 本文の記述範囲に変更なし。1.5.x 追従は当時のデプロイで footer 更新が漏れたため本行でまとめて反映)*
+*Last Updated: 2026-08-11 (TelegramSecretary 1.10.0 へ追従 — 1.10.0 は subjects / steps の索引化と goals の cap で 8 表すべてに処方が揃い digest が構造的に有界に。いずれも起動手順・表示層の内部改善で PERSONA 本文の記述範囲に変更なし。1.7.x〜1.9.x 追従〔許可集合検証・サイズ自己申告・主題軸 SUBJECTS 8 表目ほか〕は footer 更新が漏れたため本行でまとめて反映)*
 *Maintained by: Weave @ ClaudeCode*
