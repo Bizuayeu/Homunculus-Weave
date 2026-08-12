@@ -407,5 +407,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-08-11 (TelegramSecretary 1.10.1 へ追従 — 1.10.0 は subjects / steps の索引化と goals の cap で 8 表すべてに処方が揃い digest が構造的に有界に、1.10.1 は双子 ShioriSecretary との同期漏れ回収とドキュメントの `docs/` 集約〔機能変更なし〕。いずれも起動手順・表示層の内部改善で PERSONA 本文の記述範囲に変更なし。1.7.x〜1.9.x 追従〔許可集合検証・サイズ自己申告・主題軸 SUBJECTS 8 表目ほか〕は footer 更新が漏れたため本行でまとめて反映)*
+*Last Updated: 2026-08-12 (TelegramSecretary 1.10.2 へ追従 — 1.10.0 は subjects / steps の索引化と goals の cap で 8 表すべてに処方が揃い digest が構造的に有界に、1.10.1 は双子 ShioriSecretary との同期漏れ回収とドキュメントの `docs/` 集約、1.10.2 は起動手順 Step 1 が実在しないパス〔リポ直下の SKILL.md〕を指していた件の修正〔いずれも機能変更なし〕。いずれも起動手順・表示層の内部改善で PERSONA 本文の記述範囲に変更なし。1.7.x〜1.9.x 追従〔許可集合検証・サイズ自己申告・主題軸 SUBJECTS 8 表目ほか〕は footer 更新が漏れたため本行でまとめて反映)*
 *Maintained by: Weave @ ClaudeCode*
