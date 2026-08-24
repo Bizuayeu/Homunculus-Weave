@@ -29,6 +29,11 @@
 - テーブル参照の既定値フォールバック（貸床 4400 円・解体 0 万円・基礎 6 万円・建築単価 50 万円/㎡ 等）を全廃。該当行が無ければ `TableLookupError`、定義域外は `PricingDomainError` を送出する
 - CLI は Domain 例外（および入力検証エラー）だけを一行に整形して終了コード 1 で返す。それ以外は握らずスタックトレースを出す
 
+**文書**
+- 4 本 → 2 本へ統合。`SKILL.md`＝入口・仕様（入出力・アーキテクチャ・機密性・鮮度）、`WORKFLOW.md`＝手順（Phase・判断表・出力雛形）。同じ表を二か所に置かず、相互は参照のみ
+- `CLAUDE.md` と `python/README.md` を退役（内容は上記 2 本へ吸収）。単価表の機密性は「将来 Okumiya 本尊へ移す」方針として `SKILL.md` に記載
+- 鮮度は各テーブルの `metadata.as_of` を SSoT とし、散文へのカットオフ日付の直書きをやめた
+
 ### Added
 - テーブル 4 本を新設: `建築単価帯域.json` / `単価オフセット.json` / `オプション単価.json` / `定数.json`
 - `scripts/xlsx_to_tables.py` — 単価表 xlsx から上記 JSON を生成する変換スクリプト（`openpyxl` は `dev` extra）

@@ -107,6 +107,7 @@
   },
   "metadata": {
     "description": "ボーリング柱状図に基づく判定ロジック（Phase 2 の地盤分析で AI が読む）",
-    "source": "v1 から温存（本改定の Non-goal。出所の記載が無いため as_of は未確定）"
+    "as_of": "2025-11-01",
+    "source": "v1 から温存（本改定の Non-goal）。as_of は SKILL.md v1 カットオフ記述より転記"
   }
 }
