@@ -104,5 +104,9 @@
       },
       "recommendations": "設計上の推奨事項"
     }
+  },
+  "metadata": {
+    "description": "ボーリング柱状図に基づく判定ロジック（Phase 2 の地盤分析で AI が読む）",
+    "source": "v1 から温存（本改定の Non-goal。出所の記載が無いため as_of は未確定）"
   }
 }

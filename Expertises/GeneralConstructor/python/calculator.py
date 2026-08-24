@@ -8,6 +8,7 @@ v1 の「標準建築単価 ×(1＋施工条件係数＋建物形状係数)＋�
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Tuple
 
+from .inference import road_class
 from .loader import Tables
 from .pricing import (
     OptionInput,
@@ -29,26 +30,7 @@ def _万円に丸める(金額: Decimal) -> int:
     return int(金額.quantize(_万円, rounding=ROUND_HALF_UP))
 
 
-# === 判定 ===
-
-# 道路区分の境界（2026-08-24 裁定。IMPLEMENTATION_PLAN Stage 3 の道路区分ルール）
-_道路区分の狭小上限 = Decimal("2.5")  # 以下 → 2.5m以下
-_道路区分の幹線下限 = Decimal("12")  # 超 → 幹線・バス通り
-
-
-def _road_class(前面道路幅員: Decimal) -> str:
-    """前面道路幅員 → 単価オフセットの道路区分
-
-    cc-defer: 判定を calculator に置いている。Stage 3b で inference.road_class へ移す
-    （判定ルールの集約先は計画書 Architecture の UseCase = inference.py）。
-    ここに置いたのは Testability 優先——calculate_project(input, tables) の 2 引数を保てば
-    呼び出し側に判定義務が漏れず、判定結果は出力 道路区分 としてそのまま観測できる。
-    """
-    if 前面道路幅員 <= _道路区分の狭小上限:
-        return "2.5m以下"
-    if 前面道路幅員 > _道路区分の幹線下限:
-        return "幹線・バス通り"
-    return "2.5〜8m"
+# === 表示補助 ===
 
 
 def _band_label(band: UnitPriceBandEntry) -> str:
@@ -330,7 +312,7 @@ def calculate_project(
         地盤評価, input.建物層数, tables
     )
     基礎形状 = foundation_shape(基礎種別)
-    道路区分 = _road_class(input.前面道路幅員)
+    道路区分 = road_class(input.前面道路幅員)
 
     # 2. 面積計算
     建築面積 = calculate_building_area(input.有効宅地面積, input.実効建蔽率)

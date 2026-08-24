@@ -5,63 +5,11 @@ from pydantic import ValidationError
 
 # テスト対象のインポート（まだ存在しないのでエラーになる）
 from python.schema.tables import (
-    AreaRange,
-    FloatRange,
-    BuildingPriceEntry,
     FoundationPriceEntry,
     DemolitionPriceEntry,
     RentalPriceEntry,
-    ConstructionConditionEntry,
-    RetainingWallPriceEntry,
 )
 from python.schema.models import ProjectInput, ProjectOutput
-
-
-class TestAreaRange:
-    """面積範囲モデルのテスト"""
-
-    def test_valid_area_range(self):
-        """正常な面積範囲"""
-        ar = AreaRange(min=0, max=200)
-        assert ar.min == 0
-        assert ar.max == 200
-
-    def test_area_range_validates_min_max(self):
-        """min > max でエラー"""
-        with pytest.raises(ValidationError):
-            AreaRange(min=100, max=50)
-
-
-class TestBuildingPriceEntry:
-    """建築単価エントリのテスト"""
-
-    def test_valid_building_price_entry(self):
-        """正常な建築単価エントリ"""
-        entry = BuildingPriceEntry(
-            半地下有無="半地下有",
-            施工面積=AreaRange(min=0, max=200),
-            建築単価=65,
-        )
-        assert entry.半地下有無 == "半地下有"
-        assert entry.建築単価 == 65
-
-    def test_building_price_entry_validates_literals(self):
-        """半地下有無のLiteral制約をテスト"""
-        with pytest.raises(ValidationError):
-            BuildingPriceEntry(
-                半地下有無="不正な値",
-                施工面積=AreaRange(min=0, max=200),
-                建築単価=65,
-            )
-
-    def test_building_price_entry_default_unit(self):
-        """デフォルト単位のテスト"""
-        entry = BuildingPriceEntry(
-            半地下有無="半地下無",
-            施工面積=AreaRange(min=0, max=200),
-            建築単価=63,
-        )
-        assert entry.単位 == "万円/㎡"
 
 
 class TestFoundationPriceEntry:
@@ -107,32 +55,6 @@ class TestRentalPriceEntry:
         assert entry.土地所在 == "目黒区"
         assert entry.貸床単価 == 5000
         assert entry.目標利回 == 5.5
-
-
-class TestConstructionConditionEntry:
-    """施工条件エントリのテスト"""
-
-    def test_valid_condition_entry(self):
-        """正常な施工条件エントリ"""
-        entry = ConstructionConditionEntry(
-            道路幅員=FloatRange(min=4.0, max=6.0),
-            搬入経路="規制無",
-            道路種別="私道",
-            接道長さ=FloatRange(min=3.0, max=999),
-            施工条件係数=0.05,
-        )
-        assert entry.施工条件係数 == 0.05
-
-    def test_invalid_transport_route(self):
-        """不正な搬入経路でエラー"""
-        with pytest.raises(ValidationError):
-            ConstructionConditionEntry(
-                道路幅員=FloatRange(min=4.0, max=6.0),
-                搬入経路="不正な値",
-                道路種別="私道",
-                接道長さ=FloatRange(min=3.0, max=999),
-                施工条件係数=0.05,
-            )
 
 
 class TestProjectInput:

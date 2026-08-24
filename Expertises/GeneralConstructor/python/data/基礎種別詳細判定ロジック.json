@@ -33,7 +33,11 @@
           "and": {
             "ground_evaluation": {
               "operator": "in",
-              "values": ["硬質地盤", "中間地盤①", "中間地盤②"]
+              "values": [
+                "硬質地盤",
+                "中間地盤①",
+                "中間地盤②"
+              ]
             }
           }
         },
@@ -57,7 +61,10 @@
           "and": {
             "ground_evaluation": {
               "operator": "in",
-              "values": ["硬質地盤", "中間地盤①"]
+              "values": [
+                "硬質地盤",
+                "中間地盤①"
+              ]
             }
           }
         },
@@ -169,5 +176,9 @@
         "additional_tests": "追加で必要な土質試験"
       }
     }
+  },
+  "metadata": {
+    "description": "ボーリング柱状図に基づく判定ロジック（Phase 2 の地盤分析で AI が読む）",
+    "source": "v1 から温存（本改定の Non-goal。出所の記載が無いため as_of は未確定）"
   }
 }
