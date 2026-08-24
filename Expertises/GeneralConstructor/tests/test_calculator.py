@@ -1,36 +1,38 @@
-"""Phase 3: 計算ロジックのテスト（TDD Red Phase）"""
+"""Stage 2: 計算パイプライン v2 のテスト"""
 import json
-import pytest
 from decimal import Decimal
 from pathlib import Path
 
-# テスト対象のインポート（まだ存在しないのでエラーになる）
+import pytest
+
 from python.calculator import (
-    calculate_building_area,
-    calculate_common_area,
+    calculate_annual_income,
     calculate_basement_relaxation_area,
-    calculate_max_construction_area,
-    calculate_construction_area,
-    calculate_foundation_cost,
-    calculate_retaining_wall_cost,
-    calculate_ground_cost,
-    calculate_adjusted_building_price,
+    calculate_building_area,
     calculate_building_cost,
+    calculate_common_area,
+    calculate_construction_area,
     calculate_construction_expense,
+    calculate_demolition_cost,
+    calculate_floor_common_area,
+    calculate_max_construction_area,
+    calculate_pile_cost,
+    calculate_project,
     calculate_project_total,
     calculate_rental_floor_area,
-    calculate_annual_income,
     calculate_surface_yield,
-    calculate_project,
+    lookup_constant,
+    lookup_rental_price,
+    lookup_standard_units,
 )
 from python.loader import load_tables
-from python.schema.models import ProjectInput, ProjectOutput
+from python.pricing import TableLookupError
+from python.schema.models import ProjectInput, normalize_ground_evaluation
 
 
-# フィクスチャ読み込み
 @pytest.fixture
 def case_001():
-    """板橋区前野町の事例データ"""
+    """板橋区前野町の事例データ（v2 期待値。手計算の過程は fixture の notes）"""
     fixture_path = Path(__file__).parent / "fixtures" / "case_001_itabashi.json"
     with open(fixture_path, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -60,33 +62,39 @@ class TestBuildingArea:
             有効宅地面積=Decimal("100"),
             実効建蔽率=Decimal("80"),
         )
-        # 80%でも70%上限が適用される（ビジネスルール）
-        # ただし手入力で70%超を許容する場合もあるので、この挙動は要確認
         assert result == Decimal("70")
 
 
 class TestCommonArea:
-    """共用部面積計算のテスト"""
+    """共用部面積計算のテスト（EV は 4 値。無 以外で EV面積が乗る）"""
 
-    def test_calculate_common_area_without_ev(self):
-        """共用部面積（EV無し）= 建物層数 × 8"""
-        result = calculate_common_area(建物層数=4, EV有無="EV無")
-        assert result == Decimal("32")
+    def test_floor_common_area_without_ev(self):
+        result = calculate_floor_common_area(
+            EV="無", 共用部面積_層あたり=Decimal("8"), EV面積=Decimal("2")
+        )
+        assert result == Decimal("8")
 
-    def test_calculate_common_area_with_ev(self):
-        """共用部面積（EV有り）= 建物層数 × (8 + 2)"""
-        result = calculate_common_area(建物層数=5, EV有無="EV有")
-        assert result == Decimal("50")
+    def test_floor_common_area_with_ev(self):
+        result = calculate_floor_common_area(
+            EV="6人乗り", 共用部面積_層あたり=Decimal("8"), EV面積=Decimal("2")
+        )
+        assert result == Decimal("10")
+
+    def test_calculate_common_area(self):
+        """共用部面積 = 建物層数 × 層あたり共用部面積"""
+        assert calculate_common_area(4, Decimal("8")) == Decimal("32")
+        assert calculate_common_area(5, Decimal("10")) == Decimal("50")
 
 
 class TestBasementRelaxationArea:
     """地下緩和面積計算のテスト"""
 
     def test_calculate_basement_relaxation_with_basement(self):
-        """地下緩和面積（半地下有）= 建築面積 - 8"""
+        """地下緩和面積（半地下有）= 建築面積 - 層あたり共用部面積"""
         result = calculate_basement_relaxation_area(
             建築面積=Decimal("76.58"),
             半地下有無="半地下有",
+            層あたり共用部面積=Decimal("8"),
         )
         assert result == Decimal("68.58")
 
@@ -95,8 +103,34 @@ class TestBasementRelaxationArea:
         result = calculate_basement_relaxation_area(
             建築面積=Decimal("76.58"),
             半地下有無="半地下無",
+            層あたり共用部面積=Decimal("8"),
         )
         assert result == Decimal("0")
+
+    def test_basement_relaxation_counts_ev(self, tables):
+        """EV 有・半地下有 の緩和は 建築面積 − 10（v1 は EV 分を数えず 8 固定だった）"""
+        層あたり共用部面積 = calculate_floor_common_area(
+            EV="6人乗り",
+            共用部面積_層あたり=lookup_constant("共用部面積_層あたり", tables),
+            EV面積=lookup_constant("EV面積", tables),
+        )
+        assert 層あたり共用部面積 == Decimal("10")
+
+        result = calculate_basement_relaxation_area(
+            建築面積=Decimal("76.58"),
+            半地下有無="半地下有",
+            層あたり共用部面積=層あたり共用部面積,
+        )
+        assert result == Decimal("66.58")
+
+    def test_basement_relaxation_for_full_basement(self):
+        """全地下は半地下有と同式（緩和あり）。2026-08-24 裁定で確定"""
+        result = calculate_basement_relaxation_area(
+            建築面積=Decimal("76.58"),
+            半地下有無="全地下",
+            層あたり共用部面積=Decimal("8"),
+        )
+        assert result == Decimal("68.58")
 
 
 class TestMaxConstructionArea:
@@ -124,7 +158,6 @@ class TestConstructionArea:
             建物層数=4,
             最大施工面積=Decimal("319.38"),
         )
-        # 76.58 × 4 = 306.32 < 319.38
         assert result == Decimal("306.32")
 
     def test_calculate_construction_area_limited_by_max(self):
@@ -134,100 +167,63 @@ class TestConstructionArea:
             建物層数=4,
             最大施工面積=Decimal("350"),
         )
-        # 100 × 4 = 400 > 350 → 350が採用
         assert result == Decimal("350")
 
 
-class TestFoundationCost:
-    """基礎費用計算のテスト"""
+class TestPileCost:
+    """杭費用計算のテスト（べた基礎はベース単価に内包＝別建てしない）"""
 
-    def test_calculate_foundation_cost(self):
-        """基礎費用 = 建築面積 × 基礎単価 × (1 + 施工条件係数)"""
-        result = calculate_foundation_cost(
-            建築面積=Decimal("76.58"),
-            基礎単価=Decimal("6"),
-            施工条件係数=Decimal("0"),
-        )
-        # 76.58 × 6 × 1.00 = 459.48 → 四捨五入で459
-        assert result == 459
+    def test_pile_cost_only_for_pile_foundation(self, tables):
+        """べた → 0、30m杭 → 建築面積 × 12"""
+        assert calculate_pile_cost(Decimal("76.58"), "礎ベタ基礎", tables) == 0
+        assert calculate_pile_cost(Decimal("76.58"), "刃ベタ基礎", tables) == 0
+        # 76.58 × 12 = 918.96 → 919
+        assert calculate_pile_cost(Decimal("76.58"), "30m杭基礎", tables) == 919
 
-    def test_calculate_foundation_cost_with_coefficient(self):
-        """施工条件係数がある場合"""
-        result = calculate_foundation_cost(
-            建築面積=Decimal("100"),
-            基礎単価=Decimal("6"),
-            施工条件係数=Decimal("0.05"),
-        )
-        # 100 × 6 × 1.05 = 630
-        assert result == 630
+    def test_pile_cost_unknown_foundation_raises(self, tables):
+        """未知の基礎種別は 杭 へ落とさず例外"""
+        with pytest.raises(TableLookupError):
+            calculate_pile_cost(Decimal("100"), "未知基礎", tables)
 
 
-class TestRetainingWallCost:
-    """山留費用計算のテスト"""
+class TestDemolitionCost:
+    """解体費用計算のテスト（v2 は施工条件係数を掛けない）"""
 
-    def test_calculate_retaining_wall_cost(self):
-        """山留費用 = 建築面積 × 山留単価 × (1 + 施工条件係数)"""
-        result = calculate_retaining_wall_cost(
-            建築面積=Decimal("76.58"),
-            山留単価=Decimal("1"),
-            施工条件係数=Decimal("0"),
-        )
-        # 76.58 × 1 × 1.00 = 76.58 → 四捨五入で77
-        assert result == 77
+    def test_calculate_demolition_cost(self):
+        # 150 × 8 = 1200
+        assert calculate_demolition_cost(Decimal("150"), Decimal("8")) == 1200
 
-
-class TestGroundCost:
-    """地盤費用計算のテスト"""
-
-    def test_calculate_ground_cost(self):
-        """地盤費用 = 基礎費用 + 山留費用"""
-        result = calculate_ground_cost(基礎費用=459, 山留費用=77)
-        assert result == 536
+    def test_calculate_demolition_cost_zero_area(self):
+        assert calculate_demolition_cost(Decimal("0"), Decimal("0")) == 0
 
 
 class TestBuildingCost:
     """建物価格計算のテスト"""
 
-    def test_calculate_adjusted_building_price(self):
-        """補正建築単価 = 標準単価 × (1 + 施工条件係数 + 建物形状係数)"""
-        result = calculate_adjusted_building_price(
-            標準建築単価=50,
-            施工条件係数=Decimal("0"),
-            建物形状係数=Decimal("0.04"),
-        )
-        # 50 × (1 + 0 + 0.04) = 52
-        assert result == Decimal("52")
-
     def test_calculate_building_cost(self):
-        """建物価格 = 施工面積 × 補正建築単価"""
-        result = calculate_building_cost(
-            施工面積=Decimal("306.32"),
-            補正建築単価=Decimal("52"),
-        )
-        # 306.32 × 52 = 15928.64 → 四捨五入で15929
-        assert result == 15929
+        """建物価格 = 施工面積 × 最終単価"""
+        # 306.32 × 57.05 = 17475.556 → 17476
+        assert calculate_building_cost(Decimal("306.32"), Decimal("57.05")) == 17476
 
 
 class TestProjectTotal:
     """PJ総額計算のテスト"""
 
-    def test_calculate_construction_expense(self):
-        """建設経費 = 工事代金 × 5%"""
-        # 工事代金 = 建物価格 + 基礎費用 + 山留費用 + 解体費用
-        工事代金 = 15929 + 459 + 77 + 0
-        result = calculate_construction_expense(工事代金=工事代金)
-        # 16465 × 0.05 = 823.25 → 823
-        assert result == 823
+    def test_calculate_construction_expense(self, tables):
+        """建設経費 = 工事代金 × 建設経費率（定数.json が SSoT。v1 の 5% リテラルは退役）"""
+        率 = lookup_constant("建設経費率", tables)
+        assert 率 == Decimal("0.08")
+        # 17476 × 0.08 = 1398.08 → 1398
+        assert calculate_construction_expense(工事代金=17476, 建設経費率=率) == 1398
 
     def test_calculate_project_total(self):
-        """PJ総額 = 土地価格 + 工事代金 + 建設経費"""
+        """PJ総額 = 土地価格 + 工事代金 + 建設経費（単価表が税込なので ×1.1 はしない）"""
         result = calculate_project_total(
             土地価格=6980,
-            工事代金=16465,
-            建設経費=823,
+            工事代金=17476,
+            建設経費=1398,
         )
-        # 6980 + 16465 + 823 = 24268
-        assert result == 24268
+        assert result == 25854
 
 
 class TestRentalCalculation:
@@ -251,53 +247,93 @@ class TestRentalCalculation:
         assert result == 1448
 
     def test_calculate_surface_yield(self):
-        """表面利回 = 年間売上 / PJ総額 × 100"""
-        result = calculate_surface_yield(
-            年間売上=1448,
-            PJ総額=24268,
-        )
-        # 1448 / 24268 × 100 = 5.966... ≈ 5.97
-        assert abs(result - Decimal("5.97")) < Decimal("0.01")
+        """表面利回 = 年間売上 / PJ総額 × 100（PJ総額ベース）"""
+        result = calculate_surface_yield(年間売上=1448, PJ総額=25854)
+        assert result == Decimal("5.60")
+
+
+class TestTableLookups:
+    """テーブル参照の fail-fast（v1 の silent default は全廃）"""
+
+    def test_lookup_failure_raises(self, tables):
+        """貸床単価テーブルに無い所在は例外（v1 は 4400円/6.0% へ黙って落ちていた）"""
+        with pytest.raises(TableLookupError) as e:
+            lookup_rental_price("足立区", tables)
+        assert "足立区" in str(e.value)
+
+    def test_lookup_rental_price_qualified_name(self, tables):
+        """エリア括弧付きの正式名は引ける（上の失敗が誤検知でないことの対）"""
+        単価, 利回 = lookup_rental_price("足立区（千住エリア内）", tables)
+        assert 単価 > 0 and 利回 > 0
+
+    def test_lookup_constant_unknown_raises(self, tables):
+        with pytest.raises(TableLookupError):
+            lookup_constant("存在しない定数", tables)
+
+    def test_lookup_standard_units(self, tables):
+        """基準戸数は 定数.json が SSoT（コードにリテラルで持たない）"""
+        assert lookup_standard_units("共同住宅", tables) == 10
+        assert lookup_standard_units("長屋", tables) == 9
+
+
+class TestGroundEvaluationNormalization:
+    """中間地盤①/② の明示写像（v1 は未知として既定値へ落ちていた）"""
+
+    def test_normalize_intermediate_grades(self):
+        assert normalize_ground_evaluation("中間地盤①") == "中間地盤"
+        assert normalize_ground_evaluation("中間地盤②") == "中間地盤"
+
+    def test_normalize_passthrough(self):
+        assert normalize_ground_evaluation("軟弱地盤") == "軟弱地盤"
 
 
 class TestFullCalculation:
     """フルパイプラインのテスト"""
 
-    def test_calculate_project_case_001(self, case_001, tables):
-        """Case001: 板橋区前野町の事例でフル計算"""
-        input_data = case_001["input"]
+    def test_case_001_v2_full_pipeline(self, case_001, tables):
+        """Case001: 板橋区前野町を v2 モデルで再基線化
+
+        期待値はコードを走らせる前に手計算で置いた（fixture の notes に連鎖を保存）。
+        """
+        project_input = ProjectInput.model_validate(case_001["input"])
         expected = case_001["expected_output"]
 
-        # ProjectInputを作成
-        project_input = ProjectInput(
-            土地価格=input_data["土地価格"],
-            土地所在=input_data["土地所在"],
-            有効宅地面積=Decimal(input_data["有効宅地面積"]),
-            前面道路幅員=Decimal(input_data["前面道路幅員"]),
-            搬入経路=input_data["搬入経路"],
-            道路種別=input_data["道路種別"],
-            接道長さ=Decimal(input_data["接道長さ"]),
-            古家構造=input_data["古家構造"],
-            解体面積=Decimal(input_data["解体面積"]),
-            実効建蔽率=Decimal(input_data["実効建蔽率"]),
-            用途地域=input_data["用途地域"],
-            最大容積率=Decimal(input_data["最大容積率"]),
-            住宅種別=input_data["住宅種別"],
-            建物層数=input_data["建物層数"],
-            半地下有無=input_data["半地下有無"],
-            EV有無=input_data["EV有無"],
-            壁率=input_data["壁率"],
-            設備率=input_data["設備率"],
-            グレード=input_data["グレード"],
-            地盤評価=input_data["地盤評価"],
-        )
-
-        # 計算実行
         result = calculate_project(project_input, tables)
 
-        # 主要項目を検証
-        assert result.PJ総額 == int(expected["PJ総額"])
-        assert abs(result.表面利回 - Decimal(expected["表面利回"])) < Decimal("0.01")
+        # 単価の連鎖
+        assert result.道路区分 == expected["道路区分"]
+        assert result.帯域 == expected["帯域"]
+        assert result.ベース単価 == Decimal(expected["ベース単価"])
+        assert result.オプション内訳 == {
+            名称: Decimal(額) for 名称, 額 in expected["オプション内訳"].items()
+        }
+        assert result.最終単価 == Decimal(expected["最終単価"])
+
+        # 面積
+        assert result.建築面積 == Decimal(expected["建築面積"])
+        assert result.共用部面積 == Decimal(expected["共用部面積"])
+        assert result.地下緩和面積 == Decimal(expected["地下緩和面積"])
+        assert result.最大施工面積 == Decimal(expected["最大施工面積"])
         assert result.施工面積 == Decimal(expected["施工面積"])
         assert result.基礎種別 == expected["基礎種別"]
-        assert result.山留工法 == expected["山留工法"]
+
+        # 費用（Success Criteria の 4 項目を含む）
+        assert result.建物価格 == expected["建物価格"]
+        assert result.杭費用 == expected["杭費用"]
+        assert result.解体費用 == expected["解体費用"]
+        assert result.工事代金 == expected["工事代金"]
+        assert result.建設経費 == expected["建設経費"]
+        assert result.PJ総額 == expected["PJ総額"]
+
+        # 収支
+        assert result.貸床面積 == Decimal(expected["貸床面積"])
+        assert result.年間売上 == expected["年間売上"]
+        assert result.表面利回 == Decimal(expected["表面利回"])
+        assert result.目標利回 == Decimal(expected["目標利回"])
+
+    def test_case_001_construction_cost_is_sum_of_parts(self, case_001, tables):
+        """工事代金 = 建物価格 + 杭費用 + 解体費用（v1 の基礎・山留別建ては退役）"""
+        result = calculate_project(
+            ProjectInput.model_validate(case_001["input"]), tables
+        )
+        assert result.工事代金 == result.建物価格 + result.杭費用 + result.解体費用
