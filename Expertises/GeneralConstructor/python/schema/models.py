@@ -103,12 +103,11 @@ class ProjectOutput(BaseModel):
     建物価格: int
     工事代金: int
     建設経費: int
-    PJ総額: int  # 税抜
-    PJ総額_税込: int
+    PJ総額: int  # 万円（税込。単価表が税込なので ×1.1 はしない）
 
     # === 収支 ===
     貸床面積: Decimal
     貸床単価: int  # 円/㎡
     年間売上: int  # 万円
-    表面利回: Decimal  # %（税抜 PJ総額ベース）
+    表面利回: Decimal  # %（PJ総額ベース）
     目標利回: Decimal  # %

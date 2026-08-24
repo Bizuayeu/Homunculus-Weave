@@ -175,6 +175,8 @@ def _数量(数量基準: str, 入力: OptionInput, 基準戸数: int) -> Decima
     """オプション単価.json の 数量基準 を数量へ写す"""
     if 数量基準 == "施工床":
         return 入力.施工床面積
+    if 数量基準 == "敷地":
+        return 入力.有効宅地面積
     if 数量基準 == "戸数":
         return Decimal(入力.戸数)
     if 数量基準 == "室数":

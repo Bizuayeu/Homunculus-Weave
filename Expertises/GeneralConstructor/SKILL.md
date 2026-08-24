@@ -1,6 +1,6 @@
 ---
 name: general-constructor
-description: Create feasibility studies (mokuromi) for rental RC apartment construction projects in Tokyo's 23 wards. Extracts land data from property listings (maisoku), derives the deterministic conditions (road class, foundation shape, unit count) from it, prices construction from banded per-square-metre tables plus option add-ons, and reports the project total both excluding and including consumption tax together with the surface yield. Use when users need to evaluate real estate development opportunities or estimate construction project economics.
+description: Create feasibility studies (mokuromi) for rental RC apartment construction projects in Tokyo's 23 wards. Extracts land data from property listings (maisoku), derives the deterministic conditions (road class, foundation shape, unit count) from it, prices construction from banded per-square-metre tables plus option add-ons, and reports the tax-inclusive project total together with the surface yield. Use when users need to evaluate real estate development opportunities or estimate construction project economics.
 ---
 
 # General Constructor - 建設プロジェクト目論見作成
@@ -36,10 +36,11 @@ description: Create feasibility studies (mokuromi) for rental RC apartment const
 最終㎡単価   = (ベース㎡単価 × 施工床面積 + オプション合計) ÷ 施工床面積
 工事代金     = 建物価格（施工床面積 × 最終㎡単価） + 杭費用 + 解体費用
 建設経費     = 工事代金 × 建設経費率
-PJ総額       = 土地価格 + 工事代金 + 建設経費                    （税抜）
-PJ総額_税込  = 土地価格 + (工事代金 + 建設経費) × (1 + 消費税率)  （土地は非課税）
-表面利回     = 年間売上 ÷ PJ総額（税抜ベース。目標利回テーブルと同じ基準）
+PJ総額       = 土地価格 + 工事代金 + 建設経費
+表面利回     = 年間売上 ÷ PJ総額（目標利回テーブルと同じ基準）
 ```
+
+**単価表の数字は税込**です（2026-08-24 裁定）。金額は全て税込で通し、`×1.1` の税込併記は行いません。
 
 条件は単価そのものに焼き込まれており、**乗算係数を持ちません**（旧モデルの補正係数による乗算は退役。経緯は `CHANGELOG.md`）。基礎・山留は㎡別建てをやめてベース単価へ内包し、杭のみ `杭費用` として別建てします。率・面積の定数は `python/data/定数.json` が SSoT で、コードにも本書にも実数を持ちません。
 
@@ -126,12 +127,11 @@ python/
 | オプション内訳 | dict | 名称 → 万円（万円未満を保持。適用外・数量 0 の行は含まない） |
 | 最終単価 | Decimal | 万円/㎡（ROUND_HALF_UP 小数 2 桁） |
 | 解体費用 / 杭費用 / 建物価格 / 工事代金 / 建設経費 | int | 万円 |
-| PJ総額 | int | 万円（税抜） |
-| PJ総額_税込 | int | 万円 |
+| PJ総額 | int | 万円（税込。単価表が税込なので ×1.1 はしない） |
 | 貸床面積 | Decimal | ㎡ |
 | 貸床単価 | int | 円/㎡ |
 | 年間売上 | int | 万円 |
-| 表面利回 / 目標利回 | Decimal | %（表面利回は税抜 PJ総額ベース） |
+| 表面利回 / 目標利回 | Decimal | %（表面利回は PJ総額ベース） |
 
 ## 使用方法
 
@@ -161,7 +161,7 @@ result = run_calculation({
 })
 
 print(f"最終単価: {result['最終単価']}万円/㎡")
-print(f"PJ総額: {result['PJ総額']}万円（税込 {result['PJ総額_税込']}万円）")
+print(f"PJ総額: {result['PJ総額']}万円（税込）")
 print(f"表面利回: {result['表面利回']}%")
 ```
 

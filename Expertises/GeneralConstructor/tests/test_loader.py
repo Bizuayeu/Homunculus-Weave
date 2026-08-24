@@ -75,7 +75,9 @@ class TestLoadTables:
         assert [e.区分 for e in tables.単価オフセット.基礎形状] == ["べた", "杭"]
         assert [e.区分 for e in tables.単価オフセット.種別] == ["共同住宅", "長屋"]
         assert len(tables.オプション単価) > 0
-        assert {"建設経費率", "消費税率", "基準戸数", "標準住戸面積"} <= set(tables.定数)
+        assert {"建設経費率", "基準戸数", "標準住戸面積"} <= set(tables.定数)
+        # 単価表が税込につき ×1.1 をしない（2026-08-24 裁定）。消費税率は退役した
+        assert "消費税率" not in tables.定数
 
         for name in ("建築単価帯域", "単価オフセット", "オプション単価", "定数"):
             assert _read(data_path / f"{name}.json")["metadata"]["as_of"] == "2026-08-04"

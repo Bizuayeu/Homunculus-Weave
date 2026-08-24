@@ -19,7 +19,6 @@ from python.calculator import (
     calculate_pile_cost,
     calculate_project,
     calculate_project_total,
-    calculate_project_total_with_tax,
     calculate_rental_floor_area,
     calculate_surface_yield,
     lookup_constant,
@@ -125,7 +124,7 @@ class TestBasementRelaxationArea:
         assert result == Decimal("66.58")
 
     def test_basement_relaxation_for_full_basement(self):
-        """全地下は半地下有と同じ扱い（緩和あり）。calculator の cc-defer と対"""
+        """全地下は半地下有と同式（緩和あり）。2026-08-24 裁定で確定"""
         result = calculate_basement_relaxation_area(
             建築面積=Decimal("76.58"),
             半地下有無="全地下",
@@ -218,26 +217,13 @@ class TestProjectTotal:
         assert calculate_construction_expense(工事代金=17476, 建設経費率=率) == 1398
 
     def test_calculate_project_total(self):
-        """PJ総額 = 土地価格 + 工事代金 + 建設経費"""
+        """PJ総額 = 土地価格 + 工事代金 + 建設経費（単価表が税込なので ×1.1 はしない）"""
         result = calculate_project_total(
             土地価格=6980,
             工事代金=17476,
             建設経費=1398,
         )
         assert result == 25854
-
-    def test_calculate_project_total_with_tax(self, tables):
-        """PJ総額_税込 = 土地 + (工事代金 + 建設経費) × (1 + 消費税率)。土地は非課税"""
-        税率 = lookup_constant("消費税率", tables)
-        assert 税率 == Decimal("0.1")
-        # 6980 + 18874 × 1.1 = 6980 + 20761.4 → 6980 + 20761 = 27741
-        result = calculate_project_total_with_tax(
-            土地価格=6980,
-            工事代金=17476,
-            建設経費=1398,
-            消費税率=税率,
-        )
-        assert result == 27741
 
 
 class TestRentalCalculation:
@@ -261,7 +247,7 @@ class TestRentalCalculation:
         assert result == 1448
 
     def test_calculate_surface_yield(self):
-        """表面利回 = 年間売上 / PJ総額 × 100（税抜ベース）"""
+        """表面利回 = 年間売上 / PJ総額 × 100（PJ総額ベース）"""
         result = calculate_surface_yield(年間売上=1448, PJ総額=25854)
         assert result == Decimal("5.60")
 
@@ -338,7 +324,6 @@ class TestFullCalculation:
         assert result.工事代金 == expected["工事代金"]
         assert result.建設経費 == expected["建設経費"]
         assert result.PJ総額 == expected["PJ総額"]
-        assert result.PJ総額_税込 == expected["PJ総額_税込"]
 
         # 収支
         assert result.貸床面積 == Decimal(expected["貸床面積"])

@@ -40,7 +40,6 @@ class TestFullPipeline:
 
         assert isinstance(result, ProjectOutput)
         assert result.PJ総額 == expected["PJ総額"]
-        assert result.PJ総額_税込 == expected["PJ総額_税込"]
         assert result.表面利回 == Decimal(expected["表面利回"])
         assert result.施工面積 == Decimal(expected["施工面積"])
         assert result.建物価格 == expected["建物価格"]
@@ -172,7 +171,6 @@ class TestEdgeCases:
         assert "EV（9人乗り）" in result.オプション内訳
         assert "6層" in result.オプション内訳
         assert result.道路区分 == "2.5〜8m"  # 3.5m は狭小（≦2.5）ではない
-        assert result.PJ総額_税込 > result.PJ総額
 
     def test_narrow_road_raises_unit_price(self, tables):
         """前面道路 2.5m 以下は道路区分オフセット +2 万円/㎡"""

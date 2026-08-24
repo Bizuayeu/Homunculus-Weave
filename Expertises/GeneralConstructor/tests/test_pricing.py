@@ -96,8 +96,8 @@ class TestBaseUnitPrice:
         )
         # 300-320 帯の基準値 58 + 2
         assert base_unit_price(施工床面積=Decimal("300"), **共通) == Decimal("60")
-        # 500〜（上限開放）帯の基準値 51 + 2
-        assert base_unit_price(施工床面積=Decimal("600"), **共通) == Decimal("53")
+        # 500〜（上限開放）帯の基準値 52（2026-08-24 大環主裁定の override）+ 2
+        assert base_unit_price(施工床面積=Decimal("600"), **共通) == Decimal("54")
 
     def test_under_200_raises(self, 帯域):
         """施工床 200㎡ 未満は定義域外（フォールバックしない）"""
@@ -182,6 +182,48 @@ class TestExcelSample:
             "1層2戸共同住宅",
         ]
         assert final_unit_price(Decimal("55"), Decimal("372.79"), 内訳) == Decimal("55.87")
+
+
+class TestSiteBasedOptions:
+    """敷地系 3 行は 敷地面積（有効宅地面積）× 単価（2026-08-24 大環主裁定）
+
+    施工床 300㎡ に対し敷地は 150㎡ 前後を渡す。数量基準が 施工床 へ退行すると
+    金額が 300 側に振れて落ちる。
+    """
+
+    def _入力(self, 有効宅地: str, 幅員: str) -> OptionInput:
+        return OptionInput(
+            施工床面積=Decimal("300"),
+            基礎形状="べた",
+            半地下有無="半地下有",
+            戸数=10,  # 基準戸数と同じ＝戸数増減を立てない
+            建物層数=4,
+            有効宅地面積=Decimal(有効宅地),
+            前面道路幅員=Decimal(幅員),
+            調査費=False,
+        )
+
+    @pytest.mark.parametrize(
+        "有効宅地,幅員,期待",
+        [
+            ("149.99", "3.99", {}),
+            ("149.99", "4.00", {}),
+            ("150.00", "3.99", {"敷地面積150㎡以上で立米車": "150.00"}),
+            ("150.00", "4.00", {"敷地面積150㎡以上で中型車": "-150.00"}),
+            ("80.01", "3.99", {}),
+            ("80.01", "4.00", {}),
+            ("80.00", "3.99", {"敷地小規模（敷地面積80㎡以下）": "80.00"}),
+            ("80.00", "4.00", {"敷地小規模（敷地面積80㎡以下）": "80.00"}),
+        ],
+    )
+    def test_site_options_boundaries(
+        self, 有効宅地, 幅員, 期待, オプション単価, 基準戸数
+    ):
+        """適用可否と金額（＝敷地面積 × 単価）の両方を見る"""
+        内訳 = option_costs(
+            self._入力(有効宅地, 幅員), オプション単価, 基準戸数["共同住宅"]
+        )
+        assert 内訳 == {名称: Decimal(額) for 名称, 額 in 期待.items()}
 
 
 class TestOptionDomainErrors:

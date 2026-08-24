@@ -55,8 +55,10 @@ class TestCliRoundtrip:
 
         assert proc.returncode == 0, proc.stderr
         result = json.loads(proc.stdout)
-        assert result["PJ総額_税込"] == 27741
+        assert result["PJ総額"] == 25854
         assert result["オプション内訳"]["地盤調査"] == 55
+        # 単価表が税込につき PJ総額 がそのまま税込。税込フィールドは持たない
+        assert "PJ総額_税込" not in result
 
 
 class TestCliDomainError:

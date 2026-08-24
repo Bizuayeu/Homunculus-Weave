@@ -11,7 +11,8 @@ usage: python scripts/xlsx_to_tables.py <xlsx> <out_dir>
 
 `参照用` 78 行は「帯域基準値 + 道路 + 基礎形状 + 種別」に分解できる（2026-08-24 検証）。
 分解が破れる行が 1 つでもあれば、その行を stderr に出して非ゼロ終了する
-（岡田氏の将来更新で規則が崩れたら気付くための番人）。
+（岡田氏の将来更新で規則が崩れたら気付くための番人）。番人を通した後、`BAND_OVERRIDES`
+の裁定分を帯域と写しの双方へ載せる（xlsx を直に書き換えず、乖離を一箇所に集める）。
 オプション単価・定数は `岡田お試し3` から読まず手起こしで管理する（適用条件が数式に
 現れないため。出所は各 JSON の metadata）。
 
@@ -54,6 +55,12 @@ FOUNDATION_LABELS = {"べた基礎": "べた", "杭基礎": "杭"}
 ROAD_OFFSET = {"2.5m以下": 2, "2.5〜8m": 0, "幹線・バス通り": 1}
 FOUNDATION_OFFSET = {"べた": 0, "杭": 2}
 HOUSING_OFFSET = {"共同住宅": 0, "長屋": 2}
+
+# 裁定 override（帯の下限 → 基準値）。xlsx の値を大環主の裁定で上書きする。
+# 500〜 帯: xlsx は 51 のまま。岡田氏が xlsx を直すまで乖離は意図的に残す
+# （出所: 2026-08-24 大環主裁定）。
+BAND_OVERRIDES = {500: 52}
+OVERRIDE_NOTE = "2026-08-24 大環主裁定 500〜帯 51→52（xlsx 未反映）"
 
 
 class ConversionError(Exception):
@@ -148,13 +155,35 @@ def verify(rows: list[dict], bands: list[dict]) -> list[str]:
     return 破れ
 
 
-def _metadata(description: str) -> dict:
-    return {
+def apply_overrides(rows: list[dict], bands: list[dict]) -> None:
+    """裁定 override を帯域基準値と『参照用』の写しの両方へ効かせる（破壊的更新）
+
+    verify（分解規則の番人）が生の xlsx 値で走り終えた後に呼ぶ。先に上書きすると
+    番人が裁定分の差を「規則の破れ」と読んでしまう。
+    """
+    for band in bands:
+        新基準値 = BAND_OVERRIDES.get(int(band["下限"]))
+        if 新基準値 is None:
+            continue
+        差 = 新基準値 - band["基準値"]
+        band["基準値"] = 新基準値
+        for row in rows:
+            if row["施工面積帯"]["下限"] == band["下限"]:
+                row["ベース㎡単価"] += 差
+                row["override"] = OVERRIDE_NOTE
+
+
+def _metadata(description: str, *, override: bool = False) -> dict:
+    """生成物の metadata（override＝裁定で xlsx の値を上書きした表だけ真）"""
+    meta = {
         "description": description,
         "as_of": AS_OF,
         "source": SOURCE,
         "generated_by": GENERATED_BY,
     }
+    if override:
+        meta["override"] = OVERRIDE_NOTE
+    return meta
 
 
 def build_offsets() -> dict:
@@ -221,6 +250,8 @@ def main(argv: list[str]) -> int:
             print(f"  {line}", file=sys.stderr)
         return 1
 
+    apply_overrides(rows, bands)  # 番人（verify）の後に裁定分を載せる
+
     帯域 = out_dir / "python" / "data" / "建築単価帯域.json"
     オフセット = out_dir / "python" / "data" / "単価オフセット.json"
     golden = out_dir / "tests" / "fixtures" / "unit_price_golden.json"
@@ -230,7 +261,8 @@ def main(argv: list[str]) -> int:
         {
             "建築単価帯域": bands,
             "metadata": _metadata(
-                "施工面積帯ごとのベース㎡単価の基準値（共同住宅・道路区分 2.5〜8m・べた基礎。上限 null は開放）"
+                "施工面積帯ごとのベース㎡単価の基準値（共同住宅・道路区分 2.5〜8m・べた基礎。上限 null は開放）",
+                override=True,
             ),
         },
     )
@@ -241,6 +273,8 @@ def main(argv: list[str]) -> int:
             "unit_price_golden": rows,
             "metadata": _metadata(
                 "『参照用』78 行（共同 72＋長屋 6）のフラット写し。分解規則の回帰テスト用"
+                "（override 印のある行は裁定で xlsx の値を上書きしている）",
+                override=True,
             ),
         },
     )
