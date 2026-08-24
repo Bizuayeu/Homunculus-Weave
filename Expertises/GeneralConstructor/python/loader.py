@@ -2,12 +2,14 @@
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from .schema.tables import (
     BuildingPriceTable,
     BuildingPriceEntry,
+    ConstantsEntry,
     FoundationPriceEntry,
+    OptionPriceEntry,
     RetainingWallPriceEntry,
     DemolitionPriceEntry,
     RentalPriceEntry,
@@ -16,7 +18,13 @@ from .schema.tables import (
     GroundEvaluationEntry,
     FoundationTypeEntry,
     RetainingMethodEntry,
+    UnitPriceBandEntry,
+    UnitPriceOffsets,
 )
+
+
+def _空のオフセット() -> UnitPriceOffsets:
+    return UnitPriceOffsets(道路区分=[], 基礎形状=[], 種別=[])
 
 
 @dataclass
@@ -33,6 +41,14 @@ class Tables:
     地盤評価: List[GroundEvaluationEntry] = field(default_factory=list)
     基礎種別: List[FoundationTypeEntry] = field(default_factory=list)
     山留工法: List[RetainingMethodEntry] = field(default_factory=list)
+
+    # === v2: めぐる標準単価表・修正版（as_of 2026-08-04）===
+    # cc-defer: 上の退役テーブル（建築単価/山留単価/施工条件/建物形状/山留工法）は
+    # Stage 3b で除去する。v2 の計算経路はもう参照していない
+    建築単価帯域: List[UnitPriceBandEntry] = field(default_factory=list)
+    単価オフセット: UnitPriceOffsets = field(default_factory=_空のオフセット)
+    オプション単価: List[OptionPriceEntry] = field(default_factory=list)
+    定数: Dict[str, ConstantsEntry] = field(default_factory=dict)
 
 
 def _read_table(data_path: Path, name: str) -> dict:
@@ -79,4 +95,13 @@ def load_tables(data_path: Path | str) -> Tables:
         地盤評価=rows("地盤評価テーブル", GroundEvaluationEntry),
         基礎種別=rows("基礎種別テーブル", FoundationTypeEntry),
         山留工法=rows("山留工法テーブル", RetainingMethodEntry),
+        建築単価帯域=rows("建築単価帯域", UnitPriceBandEntry),
+        単価オフセット=UnitPriceOffsets.model_validate(
+            _read_table(data_path, "単価オフセット")["単価オフセット"]
+        ),
+        オプション単価=rows("オプション単価", OptionPriceEntry),
+        定数={
+            名称: ConstantsEntry.model_validate(値)
+            for 名称, 値 in _read_table(data_path, "定数")["定数"].items()
+        },
     )

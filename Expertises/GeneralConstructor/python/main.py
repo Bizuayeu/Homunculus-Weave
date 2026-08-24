@@ -23,40 +23,26 @@ from .schema.models import ProjectInput, ProjectOutput
 
 
 def dict_to_project_input(input_dict: dict[str, Any]) -> ProjectInput:
-    """辞書からProjectInputを作成"""
-    return ProjectInput(
-        土地価格=int(input_dict["土地価格"]),
-        土地所在=input_dict["土地所在"],
-        有効宅地面積=Decimal(str(input_dict["有効宅地面積"])),
-        前面道路幅員=Decimal(str(input_dict["前面道路幅員"])),
-        搬入経路=input_dict.get("搬入経路", "規制無"),
-        道路種別=input_dict.get("道路種別", "私道"),
-        接道長さ=Decimal(str(input_dict["接道長さ"])),
-        古家構造=input_dict["古家構造"],
-        解体面積=Decimal(str(input_dict.get("解体面積", "0"))),
-        実効建蔽率=Decimal(str(input_dict["実効建蔽率"])),
-        用途地域=input_dict["用途地域"],
-        高度地区=input_dict.get("高度地区"),
-        最大容積率=Decimal(str(input_dict["最大容積率"])),
-        住宅種別=input_dict["住宅種別"],
-        建物層数=int(input_dict["建物層数"]),
-        半地下有無=input_dict["半地下有無"],
-        EV有無=input_dict["EV有無"],
-        壁率=input_dict["壁率"],
-        設備率=input_dict["設備率"],
-        グレード=input_dict.get("グレード", "やや高い"),
-        地盤評価=input_dict["地盤評価"],
-    )
+    """辞書から ProjectInput を作成
+
+    v2 でフィールドの写しをやめた。ProjectInput が extra="forbid" と Literal で
+    検証を全て持つので、ここで項目を並べ直すと二重管理になり、退役キーの取りこぼしが起きる。
+    """
+    return ProjectInput.model_validate(input_dict)
 
 
 def project_output_to_dict(output: ProjectOutput) -> dict[str, Any]:
     """ProjectOutputを辞書に変換（Decimalは文字列化）"""
     result = output.model_dump()
-    # DecimalをFloatに変換してJSON互換にする
-    for key, value in result.items():
+
+    def to_json_value(value: Any) -> Any:
         if isinstance(value, Decimal):
-            result[key] = float(value)
-    return result
+            return float(value)
+        if isinstance(value, dict):  # オプション内訳（名称 → 万円）
+            return {k: to_json_value(v) for k, v in value.items()}
+        return value
+
+    return {key: to_json_value(value) for key, value in result.items()}
 
 
 def run_calculation(

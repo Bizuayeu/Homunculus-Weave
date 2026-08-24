@@ -24,10 +24,13 @@ class TestLoadTables:
         assert len(tables.建築単価.建築単価テーブル) == 30
 
     def test_load_foundation_price_table(self, data_path):
-        """基礎単価テーブルJSONの読み込み"""
+        """基礎単価テーブルJSONの読み込み（杭 3 行へ縮小済み）"""
         tables = load_tables(data_path)
-        # 5種類の基礎
-        assert len(tables.基礎単価) >= 5
+        assert [e.基礎種別 for e in tables.基礎単価] == [
+            "20m杭基礎",
+            "30m杭基礎",
+            "40m杭基礎",
+        ]
 
     def test_load_demolition_price_table(self, data_path):
         """解体単価テーブルJSONの読み込み"""
@@ -73,6 +76,16 @@ class TestLoadTables:
         """山留工法テーブルJSONの読み込み"""
         tables = load_tables(data_path)
         assert len(tables.山留工法) > 0
+
+    def test_load_v2_unit_price_tables(self, data_path):
+        """v2 の単価モデル 4 テーブルを読み込む（鮮度検査は Stage 3b）"""
+        tables = load_tables(data_path)
+        assert len(tables.建築単価帯域) == 12
+        assert [e.区分 for e in tables.単価オフセット.基礎形状] == ["べた", "杭"]
+        assert [e.区分 for e in tables.単価オフセット.種別] == ["共同住宅", "長屋"]
+        assert len(tables.単価オフセット.道路区分) == 3
+        assert len(tables.オプション単価) > 0
+        assert {"建設経費率", "消費税率", "基準戸数"} <= set(tables.定数)
 
 
 class TestLoadTablesErrors:
@@ -121,3 +134,7 @@ class TestLoadTablesErrors:
         assert hasattr(tables, "基礎種別")
         assert hasattr(tables, "山留単価")
         assert hasattr(tables, "山留工法")
+        assert hasattr(tables, "建築単価帯域")
+        assert hasattr(tables, "単価オフセット")
+        assert hasattr(tables, "オプション単価")
+        assert hasattr(tables, "定数")

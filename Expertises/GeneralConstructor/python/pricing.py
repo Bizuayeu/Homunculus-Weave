@@ -28,6 +28,14 @@ class PricingDomainError(ValueError):
     """
 
 
+class TableLookupError(PricingDomainError):
+    """テーブルに該当行が無い
+
+    v1 は各 lookup が既定値（貸床 4400 円・解体 0 万円・基礎 6 万円…）へ落ちていた。
+    未知の所在や構造が、もっともらしい数字のまま採算判断に紛れ込む。参照の時点で落とす。
+    """
+
+
 # 適用条件の閾値。出所は python/data/オプション単価.json 各行の 適用条件
 _戸数増減の面積境界 = Decimal("300")  # 戸数増は 300㎡ 未満、戸数減は 300㎡ 以上
 _敷地小規模の上限 = Decimal("80")  # 2026-08-24 裁定で Excel の 70㎡ から変更
@@ -124,6 +132,30 @@ _適用条件 = {
 }
 
 
+# 基礎種別（基礎種別テーブルの語彙）→ 基礎形状（単価オフセットの軸）の写像。
+# 単価表は べた/杭 の 2 値しか区別しない。刃ベタ・礎ベタの単価差はベースへ内包済み。
+_基礎形状 = {
+    "刃ベタ基礎": "べた",
+    "礎ベタ基礎": "べた",
+    "20m杭基礎": "杭",
+    "30m杭基礎": "杭",
+    "40m杭基礎": "杭",
+}
+
+
+def foundation_shape(基礎種別: str) -> str:
+    """基礎種別を単価オフセットの軸（べた／杭）へ写す
+
+    未知の種別を 杭 へ落とすと、+2 万円/㎡ と杭費用が黙って乗る。写像表で明示する。
+    """
+    try:
+        return _基礎形状[基礎種別]
+    except KeyError:
+        raise TableLookupError(
+            f"基礎種別 '{基礎種別}' の基礎形状が未定義です（既知: {sorted(_基礎形状)}）"
+        ) from None
+
+
 def _lookup_offset(
     区分: str,
     entries: List[UnitPriceOffsetEntry],
@@ -133,7 +165,7 @@ def _lookup_offset(
     for entry in entries:
         if entry.区分 == 区分:
             return entry.オフセット
-    raise PricingDomainError(
+    raise TableLookupError(
         f"{軸} '{区分}' は単価オフセットテーブルにありません"
         f"（既知: {[e.区分 for e in entries]}）"
     )
