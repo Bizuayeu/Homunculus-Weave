@@ -41,6 +41,7 @@
 
 ### Removed
 - 退役テーブル 4 本を削除: `施工条件テーブル.json` / `建物形状テーブル.json` / `山留単価テーブル.json` / `山留工法テーブル.json`
+- v0.1.0 の `python/data/建築単価テーブル.json` を削除（loader 非参照の孤児。半地下有無の差分は `オプション単価.json` の「半地下無」へ移管済み）
 
 ### Verification
 - 板橋 case_001 を再基線化: PJ総額 24268 → 25854 万円（税抜）、表面利回 5.97% → 5.60%。期待値はコードを走らせる前に手計算で置き、Excel Q45 の式による独立検算と一致（根拠は `tests/fixtures/case_001_itabashi.json` の `notes`）
