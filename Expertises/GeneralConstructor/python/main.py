@@ -17,8 +17,11 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from pydantic import ValidationError
+
 from .loader import load_tables
 from .calculator import calculate_project
+from .pricing import PricingDomainError
 from .schema.models import ProjectInput, ProjectOutput
 
 
@@ -119,10 +122,21 @@ def main():
         input_dict = input_dict["input"]
 
     # 計算実行
+    #
+    # 握るのは Domain の「入力がおかしい」だけ——入力検証（退役キー・未知の区分・
+    # 必須の欠落）と定義域外（帯域外・テーブル未収録）は利用者が直せるので一行で返す。
+    # それ以外（テーブル JSON の破損、実装のバグ）は握らず traceback を出す。
     try:
         result = run_calculation(input_dict, args.data_path)
-    except Exception as e:
-        print(f"Error: Calculation failed: {e}", file=sys.stderr)
+    except ValidationError as e:
+        欠陥 = "; ".join(
+            f"{'.'.join(str(部位) for 部位 in 詳細['loc'])}: {詳細['msg']}"
+            for 詳細 in e.errors()
+        )
+        print(f"Error: 入力が不正です: {欠陥}", file=sys.stderr)
+        sys.exit(1)
+    except PricingDomainError as e:
+        print(f"Error: {type(e).__name__}: {e}", file=sys.stderr)
         sys.exit(1)
 
     # 出力
