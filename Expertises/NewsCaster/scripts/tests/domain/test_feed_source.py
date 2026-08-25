@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import FrozenInstanceError
+
 import pytest
 
 from domain.exceptions import ValidationError
@@ -56,7 +58,7 @@ class TestFeedSource:
             url="https://x.example/",
             policy=FeedPolicy.WEAVE_COMPACT,
         )
-        with pytest.raises(Exception):
+        with pytest.raises(FrozenInstanceError):
             fs.name = "mutated"  # type: ignore[misc]
 
     def test_equality_by_value(self):

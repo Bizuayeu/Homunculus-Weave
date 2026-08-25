@@ -4,7 +4,7 @@ import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
-from typing import Callable
+from collections.abc import Callable
 
 from domain.exceptions import RssFetchError, ValidationError
 from domain.models import NewsItem

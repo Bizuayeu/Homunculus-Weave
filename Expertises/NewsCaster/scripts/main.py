@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -12,10 +13,8 @@ if str(SCRIPTS_DIR) not in sys.path:
 
 for stream in (sys.stdout, sys.stderr):
     if hasattr(stream, "reconfigure"):
-        try:
+        with contextlib.suppress(AttributeError, ValueError):
             stream.reconfigure(encoding="utf-8")
-        except (AttributeError, ValueError):
-            pass
 
 from adapters.mail.gmail_api_mail_gateway import GmailApiMailGateway
 from adapters.rss.rss_xml_gateway import RssXmlGateway
@@ -202,6 +201,9 @@ def _cmd_send_rendered(
         return EXIT_CONFIG
 
     if body is None:
+        # body が無いときは body_file がある——argparse 側の相互排他グループが
+        # required=True で担保している (`_build_parser` の body_grp)。
+        assert body_file is not None
         try:
             body = Path(body_file).read_text(encoding="utf-8")
         except OSError as e:

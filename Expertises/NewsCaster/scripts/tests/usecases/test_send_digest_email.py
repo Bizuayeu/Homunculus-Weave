@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -120,9 +121,7 @@ def test_does_not_mark_sent_when_mail_fails():
         recipient="to@example.com",
     )
 
-    try:
+    with contextlib.suppress(RuntimeError):
         uc.execute(digest=_digest())
-    except RuntimeError:
-        pass
 
     assert state.mark_called == []

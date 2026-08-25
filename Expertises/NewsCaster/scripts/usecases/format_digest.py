@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Iterable, Sequence
+from collections.abc import Iterable, Sequence
 
 from domain.digest import DailyDigest
 from domain.feed_policy import FeedPolicy
 from domain.feed_source import FeedSource
 from domain.models import NewsItem
-
 
 WEAVE_COMPACT_PLACEHOLDER = "{{WEAVE_COMPACT:%s}}"
 

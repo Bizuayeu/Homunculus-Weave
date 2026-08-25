@@ -37,7 +37,7 @@ class GmailApiMailGateway:
         self._token_json = oauth_token_json
         self._retry_count = max(1, retry_count)
         linux_ca = "/etc/ssl/certs/ca-certificates.crt"
-        if os.environ.get("HTTPLIB2_CA_CERTS") is None and os.path.exists(linux_ca):
+        if os.environ.get("HTTPLIB2_CA_CERTS") is None and Path(linux_ca).exists():
             os.environ["HTTPLIB2_CA_CERTS"] = linux_ca
 
     def send(self, *, sender: str, to: str, subject: str, body: str) -> None:

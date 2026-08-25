@@ -39,7 +39,7 @@ class NewsItem:
             raise ValidationError("source_name is required")
 
     @classmethod
-    def from_rss_dict(cls, d: dict[str, Any], *, source_name: str) -> "NewsItem":
+    def from_rss_dict(cls, d: dict[str, Any], *, source_name: str) -> NewsItem:
         title = (d.get("title") or "").strip()
         link = (d.get("link") or "").strip()
         guid = (d.get("guid") or link).strip()

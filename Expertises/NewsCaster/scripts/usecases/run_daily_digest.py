@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Sequence
 
 from domain.date_range import DateRangeJST
 from domain.digest import DailyDigest

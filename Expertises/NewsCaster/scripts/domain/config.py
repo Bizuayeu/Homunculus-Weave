@@ -34,10 +34,10 @@ class DigestConfig:
     feeds: tuple[FeedSource, ...]
     feeds_parse_error: str | None
 
-    _instance: ClassVar["DigestConfig | None"] = None
+    _instance: ClassVar[DigestConfig | None] = None
 
     @classmethod
-    def load(cls, env_file: Path | None = None) -> "DigestConfig":
+    def load(cls, env_file: Path | None = None) -> DigestConfig:
         if cls._instance is not None:
             return cls._instance
 

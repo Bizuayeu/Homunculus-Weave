@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import FrozenInstanceError
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -88,7 +89,7 @@ class TestNewsItemFromRssDict:
 
     def test_frozen_dataclass_immutable(self):
         item = NewsItem.from_rss_dict(_rss_dict(), source_name=DEFAULT_SOURCE_NAME)
-        with pytest.raises(Exception):
+        with pytest.raises(FrozenInstanceError):
             item.title = "mutated"  # type: ignore[misc]
 
 

@@ -1,11 +1,10 @@
 from __future__ import annotations
 
+from datetime import datetime
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 
 import pytest
-
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from domain.config import DigestConfig
 from domain.digest import DailyDigest

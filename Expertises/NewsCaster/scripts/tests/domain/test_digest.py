@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import FrozenInstanceError
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -86,5 +87,5 @@ class TestDailyDigest:
             formatted_subject="s",
             formatted_body="b",
         )
-        with pytest.raises(Exception):
+        with pytest.raises(FrozenInstanceError):
             d.target_date = "x"  # type: ignore[misc]

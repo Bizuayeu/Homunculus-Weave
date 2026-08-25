@@ -18,7 +18,42 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "pytest-cov>=6.0",
+    # 版に上限を切る。CI がローカルより新しい版を引くと「手元 green / CI 赤」になり、
+    # 自分の変更と無関係な赤を次に push する人が踏む。表記は `~=` でワークスペースの
+    # 他プロジェクト (BlueberrySprite / TelegramSecretary / BusinessCurator) と揃える。
+    "ruff~=0.16.0",
+    "mypy~=2.3.0",
 ]
+
+[tool.ruff]
+src = ["scripts"]
+
+[tool.ruff.lint]
+# 選択ルールは明示する。ruff の default 選択は版が上がるたび広がるので、既定に依存すると
+# ruff 側の既定拡張だけで CI が赤くなる。集合はワークスペース共通の 10 個
+# (BlueberrySprite / TelegramSecretary / ShioriSecretary と同一)。到達点は「同水準」で
+# あって「最大」ではないので `select = ["ALL"]` は採らない。
+select = ["E4", "E7", "E9", "F", "I", "UP", "N", "B", "SIM", "PTH"]
+
+[tool.ruff.lint.per-file-ignores]
+# sys.path へ scripts/ を差し込んでから adapters/ 等を import する起動時ブートストラップ
+# を持つ。import を先頭へ集めると解決に失敗する。
+"scripts/main.py" = ["E402"]
+
+[tool.mypy]
+# scripts/ を import root にする。explicit_package_bases なしだと同じファイルが
+# scripts.domain.x と domain.x の二重名で衝突する。
+mypy_path = "scripts"
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+# 型スタブを持たないサードパーティ。グローバルに ignore_missing_imports すると
+# 自前モジュールの解決漏れまで黙って通るので、当該モジュールだけに限定する。
+module = [
+    "googleapiclient.*",
+    "google_auth_oauthlib.*",
+]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["scripts/tests"]

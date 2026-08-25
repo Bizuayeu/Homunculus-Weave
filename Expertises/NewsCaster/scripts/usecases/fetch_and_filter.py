@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Sequence
+from collections.abc import Sequence
 
 from domain.date_range import DateRangeJST
 from domain.exceptions import RssFetchError

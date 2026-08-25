@@ -8,7 +8,7 @@ class FeedPolicy(str, Enum):
     WEAVE_COMPACT = "weave_compact"
 
     @classmethod
-    def from_string(cls, value: str) -> "FeedPolicy":
+    def from_string(cls, value: str) -> FeedPolicy:
         for member in cls:
             if member.value == value:
                 return member

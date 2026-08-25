@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -32,7 +33,7 @@ def _make_gateway(
     source_name: str = DEFAULT_SOURCE_NAME,
     time_provider=None,
 ) -> RssXmlGateway:
-    kwargs = {
+    kwargs: dict[str, Any] = {
         "rss_url": rss_url,
         "user_agent": user_agent,
         "source_name": source_name,

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextlib
+
 from usecases.send_rendered import SendRenderedResult, SendRenderedUseCase
 
 
@@ -76,10 +78,8 @@ def test_does_not_mark_when_send_fails():
         sender="from@example.com",
         recipient="to@example.com",
     )
-    try:
+    with contextlib.suppress(RuntimeError):
         uc.execute(target_date="2026-05-11", subject="件名", body="本文")
-    except RuntimeError:
-        pass
     assert state.mark_called == []
 
 

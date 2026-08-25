@@ -27,7 +27,7 @@ class DateRangeJST:
             raise ValidationError("start_jst must be <= end_jst")
 
     @classmethod
-    def from_yesterday(cls, now: datetime) -> "DateRangeJST":
+    def from_yesterday(cls, now: datetime) -> DateRangeJST:
         if not isinstance(now, datetime) or now.tzinfo is None:
             raise ValidationError("now must be timezone-aware datetime")
         now_jst = now.astimezone(JST)
