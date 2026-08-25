@@ -52,6 +52,24 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e "Expertises/NewsCaster[dev]"
 
+      # ルール・除外の SSoT は Expertises/NewsCaster/pyproject.toml の
+      # [tool.ruff] / [tool.mypy]。ここでは呼ぶだけで、select や ignore を YAML に
+      # 直書きしない。pytest より前に置くのは数秒で落ちるからで、落ちる理由が
+      # 最も早く分かる順序にしてある。
+      - name: Lint (ruff)
+        working-directory: Expertises/NewsCaster
+        run: python -m ruff check .
+
+      # `--check` は書き換えず差分の有無だけを見る（CI が勝手にコードを直して
+      # green にする経路は作らない）。
+      - name: Format check (ruff)
+        working-directory: Expertises/NewsCaster
+        run: python -m ruff format --check .
+
+      - name: Type check (mypy)
+        working-directory: Expertises/NewsCaster
+        run: python -m mypy scripts
+
       # 閾値は pyproject.toml [tool.coverage.report] fail_under = 70 が SSoT。
       - name: Run tests with coverage
         working-directory: Expertises/NewsCaster
