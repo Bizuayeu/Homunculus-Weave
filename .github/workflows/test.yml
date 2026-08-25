@@ -3,15 +3,18 @@ name: CI
 # Expertises 配下の Python スイートを検査する。paths を絞るのは、本リポの commit の
 # 大半が Identities / ドキュメントであり、それらでテストを回す意味が無いため。
 #
-# 対象外: Expertises/{BlueberrySprite,ConsiderateCoder,TelegramSecretary} は junction。
-# BlueberrySprite は本リポに未追跡（正典は Homunculus-Weave-Private 側の CI）、
+# 対象外: Expertises/{BlueberrySprite,ConsiderateCoder,GeneralConstructor,TelegramSecretary}
+# は junction。BlueberrySprite は本リポに未追跡（正典は Homunculus-Weave-Private 側の CI）、
 # ConsiderateCoder / TelegramSecretary は実体が commit されるが正典は plugins-weave 側で
 # 検査済み。ここで二重に回さない。
+#
+# GeneralConstructor は 2026-08-25 の本尊化で junction 先が
+# Homunculus-Weave-Private/GeneralConstructor/Public（拝殿）へ移り、pyproject も
+# python/ も tests/ も本リポから見えなくなった。ジョブは Private 側の CI へ移設済み。
 on:
   push:
     branches: [main]
     paths:
-      - 'Expertises/GeneralConstructor/**'
       - 'Expertises/NewsCaster/**'
       - 'Expertises/PrecognitiveViewer/**'
       - 'Expertises/CorporateStrategist/ForesightReader/**'
@@ -19,7 +22,6 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'Expertises/GeneralConstructor/**'
       - 'Expertises/NewsCaster/**'
       - 'Expertises/PrecognitiveViewer/**'
       - 'Expertises/CorporateStrategist/ForesightReader/**'
@@ -27,34 +29,6 @@ on:
   workflow_dispatch:  # Manual trigger from GitHub UI
 
 jobs:
-  # =============================================================================
-  # GeneralConstructor
-  # =============================================================================
-
-  test-generalconstructor:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.10', '3.11', '3.12']
-
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v7
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      # pydantic は runtime 依存（採算計算のモデル定義）。未導入だと import 時に落ちる。
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e "Expertises/GeneralConstructor[dev]"
-
-      - name: Run tests
-        working-directory: Expertises/GeneralConstructor
-        run: python -m pytest -v
-
   # =============================================================================
   # NewsCaster
   # =============================================================================
