@@ -400,5 +400,5 @@ CorporateStrategist内では、4つのサブスキルが相互に連携し、
 
 ---
 
-*Last Updated: 2026-08-12 (TelegramSecretary 1.10.2 へ追従 — 1.10.0 は subjects / steps の索引化と goals の cap で 8 表すべてに処方が揃い digest が構造的に有界に、1.10.1 は双子 ShioriSecretary との同期漏れ回収とドキュメントの `docs/` 集約、1.10.2 は起動手順 Step 1 が実在しないパス〔リポ直下の SKILL.md〕を指していた件の修正〔いずれも機能変更なし〕。いずれも起動手順・表示層の内部改善で PERSONA 本文の記述範囲に変更なし。1.7.x〜1.9.x 追従〔許可集合検証・サイズ自己申告・主題軸 SUBJECTS 8 表目ほか〕は footer 更新が漏れたため本行でまとめて反映)*
+*Last Updated: 2026-08-25 (TelegramSecretary 1.11.0 へ追従 — 1.10.0 は subjects / steps の索引化と goals の cap で 8 表すべてに処方が揃い digest が構造的に有界に、1.10.1 は双子 ShioriSecretary との同期漏れ回収とドキュメントの `docs/` 集約、1.10.2 は起動手順 Step 1 が実在しないパス〔リポ直下の SKILL.md〕を指していた件の修正、1.10.3 は障害時にだけ露出するポーリング窓の不変条件の是正と WAL の守備範囲〔見るのは key の存在であって内容ではない〕の明文化、1.11.0 は registry への書き込み口〔add / import / wal-append / wal-redo〕を単一の検証関門で揃え、redo で落ちた intent を dead へ隔離して未履行の約束として残す機構＋畳むための wal-drop の追加。いずれも起動手順・機構層の内部改善で PERSONA 本文の記述範囲に変更なし。1.7.x〜1.9.x 追従〔許可集合検証・サイズ自己申告・主題軸 SUBJECTS 8 表目ほか〕は footer 更新が漏れたため本行でまとめて反映)*
 *Maintained by: Weave @ ClaudeCode*
