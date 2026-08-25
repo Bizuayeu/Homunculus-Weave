@@ -89,9 +89,7 @@ def test_skips_email_when_zero_items_yesterday():
 
 
 def test_skips_when_already_sent_today():
-    uc, mail, state = _build_uc(
-        [_item(11, 12, "y")], already_sent={"2026-05-11"}
-    )
+    uc, mail, state = _build_uc([_item(11, 12, "y")], already_sent={"2026-05-11"})
     result = uc.execute(now=datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST))
     assert result.result == RunResult.ALREADY_SENT
     assert mail.sent == []
@@ -108,9 +106,7 @@ def test_target_date_override_via_now():
 
 def test_dry_run_skips_send_and_state_mark():
     uc, mail, state = _build_uc([_item(11, 12, "y")])
-    result = uc.execute(
-        now=datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST), dry_run=True
-    )
+    result = uc.execute(now=datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST), dry_run=True)
     assert result.result == RunResult.DRY_RUN
     assert result.digest is not None
     assert mail.sent == []

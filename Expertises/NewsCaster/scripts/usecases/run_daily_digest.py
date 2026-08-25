@@ -49,9 +49,7 @@ class RunDailyDigestUseCase:
         )
         self._state = state_store
 
-    def execute(
-        self, *, now: datetime, dry_run: bool = False
-    ) -> RunOutcome:
+    def execute(self, *, now: datetime, dry_run: bool = False) -> RunOutcome:
         date_range = DateRangeJST.from_yesterday(now)
         target_date = date_range.target_date_iso()
 

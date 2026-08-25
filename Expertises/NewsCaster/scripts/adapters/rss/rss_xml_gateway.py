@@ -87,9 +87,7 @@ class RssXmlGateway:
                 ),
             }
             try:
-                items.append(
-                    NewsItem.from_rss_dict(d, source_name=self._source_name)
-                )
+                items.append(NewsItem.from_rss_dict(d, source_name=self._source_name))
             except ValidationError:
                 # 個別 item の不正は黙ってスキップ（フィード全体は維持）
                 continue

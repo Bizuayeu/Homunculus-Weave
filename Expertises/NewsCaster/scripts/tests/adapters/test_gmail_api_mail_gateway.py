@@ -45,11 +45,15 @@ def _patched_gateway(mock_creds, mock_service, retry_count: int = 3):
 
 
 def test_send_invokes_messages_send_once(mock_creds, mock_service):
-    with patch(
-        "adapters.mail.gmail_api_mail_gateway.load_credentials",
-        return_value=mock_creds,
-    ), patch(
-        "adapters.mail.gmail_api_mail_gateway.build_service", return_value=mock_service
+    with (
+        patch(
+            "adapters.mail.gmail_api_mail_gateway.load_credentials",
+            return_value=mock_creds,
+        ),
+        patch(
+            "adapters.mail.gmail_api_mail_gateway.build_service",
+            return_value=mock_service,
+        ),
     ):
         gw = _patched_gateway(mock_creds, mock_service)
         gw.send(
@@ -87,12 +91,15 @@ def test_auth_failure_raises_auth_error(mock_creds):
 
     failing_service.users().messages().send().execute.side_effect = FakeApiError()
 
-    with patch(
-        "adapters.mail.gmail_api_mail_gateway.load_credentials",
-        return_value=mock_creds,
-    ), patch(
-        "adapters.mail.gmail_api_mail_gateway.build_service",
-        return_value=failing_service,
+    with (
+        patch(
+            "adapters.mail.gmail_api_mail_gateway.load_credentials",
+            return_value=mock_creds,
+        ),
+        patch(
+            "adapters.mail.gmail_api_mail_gateway.build_service",
+            return_value=failing_service,
+        ),
     ):
         gw = GmailApiMailGateway(
             oauth_token_path=None,
@@ -121,12 +128,14 @@ def test_retryable_500_then_success(mock_creds):
         {"id": "msg_id"},
     ]
 
-    with patch(
-        "adapters.mail.gmail_api_mail_gateway.load_credentials",
-        return_value=mock_creds,
-    ), patch(
-        "adapters.mail.gmail_api_mail_gateway.build_service", return_value=svc
-    ), patch("adapters.mail.gmail_api_mail_gateway.time.sleep"):
+    with (
+        patch(
+            "adapters.mail.gmail_api_mail_gateway.load_credentials",
+            return_value=mock_creds,
+        ),
+        patch("adapters.mail.gmail_api_mail_gateway.build_service", return_value=svc),
+        patch("adapters.mail.gmail_api_mail_gateway.time.sleep"),
+    ):
         gw = GmailApiMailGateway(
             oauth_token_path=None,
             oauth_token_json='{"refresh_token": "fake"}',
@@ -150,11 +159,12 @@ def test_non_retryable_400_raises_mail_send_error(mock_creds):
 
     svc.users().messages().send().execute.side_effect = FakeApiError()
 
-    with patch(
-        "adapters.mail.gmail_api_mail_gateway.load_credentials",
-        return_value=mock_creds,
-    ), patch(
-        "adapters.mail.gmail_api_mail_gateway.build_service", return_value=svc
+    with (
+        patch(
+            "adapters.mail.gmail_api_mail_gateway.load_credentials",
+            return_value=mock_creds,
+        ),
+        patch("adapters.mail.gmail_api_mail_gateway.build_service", return_value=svc),
     ):
         gw = GmailApiMailGateway(
             oauth_token_path=None,

@@ -59,7 +59,10 @@ def test_body_contains_each_item_title_and_link():
     uc = FormatDigestUseCase()
     digest = uc.execute(
         target_date="2026-05-11",
-        items=[_item(10, "TitleAlpha", "Body alpha"), _item(12, "TitleBeta", "Body beta")],
+        items=[
+            _item(10, "TitleAlpha", "Body alpha"),
+            _item(12, "TitleBeta", "Body beta"),
+        ],
         feed_sources=(NARUEBI,),
     )
     assert "TitleAlpha" in digest.formatted_body

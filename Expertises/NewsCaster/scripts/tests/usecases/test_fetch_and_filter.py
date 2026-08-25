@@ -136,9 +136,7 @@ def test_skips_failing_feed_and_continues(capsys):
             (NARUEBI, FakeRssGateway(naruebi_items)),
             (
                 WIRELESS,
-                FailingRssGateway(
-                    RssFetchError("403 Forbidden", status_code=403)
-                ),
+                FailingRssGateway(RssFetchError("403 Forbidden", status_code=403)),
             ),
         ]
     )

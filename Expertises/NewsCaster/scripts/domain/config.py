@@ -59,9 +59,7 @@ class DigestConfig:
         ).strip()
         state_dir_raw = os.environ.get("NEWSCASTER_STATE_DIR", "").strip()
 
-        rss_url = (
-            os.environ.get("NEWSCASTER_RSS_URL", "").strip() or DEFAULT_RSS_URL
-        )
+        rss_url = os.environ.get("NEWSCASTER_RSS_URL", "").strip() or DEFAULT_RSS_URL
         feeds, feeds_parse_error = cls._resolve_feeds(rss_url=rss_url)
 
         cls._instance = cls(
@@ -117,9 +115,7 @@ class DigestConfig:
                 except ValueError as e:
                     return ((), f"NEWSCASTER_FEEDS[{i}] invalid policy: {e}")
                 try:
-                    parsed.append(
-                        FeedSource(name=name, url=url, policy=policy)
-                    )
+                    parsed.append(FeedSource(name=name, url=url, policy=policy))
                 except ValidationError as e:
                     return ((), f"NEWSCASTER_FEEDS[{i}] {e}")
             if not parsed:

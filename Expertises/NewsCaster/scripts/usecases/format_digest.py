@@ -32,9 +32,7 @@ class FormatDigestUseCase:
         items_by_source: dict[str, list[NewsItem]] = defaultdict(list)
         for item in items_tuple:
             items_by_source[item.source_name].append(item)
-        source_count = sum(
-            1 for fs in feed_sources if items_by_source.get(fs.name)
-        )
+        source_count = sum(1 for fs in feed_sources if items_by_source.get(fs.name))
 
         subject = (
             f"[NewsCaster] {target_date} のダイジェスト "

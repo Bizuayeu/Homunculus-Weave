@@ -10,9 +10,7 @@ class FakeMailGateway:
         self.sent: list[dict] = []
 
     def send(self, *, sender: str, to: str, subject: str, body: str) -> None:
-        self.sent.append(
-            {"sender": sender, "to": to, "subject": subject, "body": body}
-        )
+        self.sent.append({"sender": sender, "to": to, "subject": subject, "body": body})
 
 
 class FakeStateStore:

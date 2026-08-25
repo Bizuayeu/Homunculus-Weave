@@ -150,6 +150,7 @@ def test_malformed_xml_raises_rss_fetch_error():
 
 # ----- Stage 1: cache-buster URL -----
 
+
 def test_appends_cache_buster_query_when_no_existing_query():
     captured = {}
 
@@ -200,6 +201,7 @@ def test_cache_buster_changes_per_call():
 
 # ----- Stage 2: no-cache HTTP headers -----
 
+
 def _captured_headers_lower(request) -> dict[str, str]:
     return {key.lower(): val for key, val in request.header_items()}
 
@@ -248,6 +250,7 @@ def test_preserves_user_agent_and_accept_headers():
 
 
 # ----- Stage 3: integration & error-path original-URL preservation -----
+
 
 def test_http_error_still_carries_original_url_in_message():
     import urllib.error
@@ -305,9 +308,7 @@ def test_parses_multiple_category_elements_into_tuple():
         )
         items = gw.fetch_all()
 
-    target = [
-        i for i in items if i.title == "科学技術芸術と社会の交差点"
-    ][0]
+    target = [i for i in items if i.title == "科学技術芸術と社会の交差点"][0]
     assert target.categories == (
         "科学技術芸術と社会",
         "働き方と人材",

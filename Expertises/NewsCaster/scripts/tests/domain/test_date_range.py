@@ -16,9 +16,7 @@ class TestFromYesterday:
         now = datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST)
         r = DateRangeJST.from_yesterday(now)
         assert r.start_jst == datetime(2026, 5, 11, 0, 0, 0, tzinfo=JST)
-        assert r.end_jst == datetime(
-            2026, 5, 11, 23, 59, 59, 999999, tzinfo=JST
-        )
+        assert r.end_jst == datetime(2026, 5, 11, 23, 59, 59, 999999, tzinfo=JST)
 
     def test_at_noon_returns_previous_day_too(self):
         now = datetime(2026, 5, 12, 12, 0, 0, tzinfo=JST)
@@ -62,30 +60,22 @@ class TestContains:
     def test_pubdate_gmt_at_jst_midnight_inclusive(self):
         # 2026-05-10 15:00 UTC = 2026-05-11 00:00 JST → 5/11 range の境界inclusive
         pub = datetime(2026, 5, 10, 15, 0, 0, tzinfo=timezone.utc)
-        r = DateRangeJST.from_yesterday(
-            datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST)
-        )
+        r = DateRangeJST.from_yesterday(datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST))
         assert r.contains(pub) is True
 
     def test_pubdate_just_before_jst_midnight_excluded(self):
         # 2026-05-10 14:59:59 UTC = 2026-05-10 23:59:59 JST → 5/11 range の外
         pub = datetime(2026, 5, 10, 14, 59, 59, tzinfo=timezone.utc)
-        r = DateRangeJST.from_yesterday(
-            datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST)
-        )
+        r = DateRangeJST.from_yesterday(datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST))
         assert r.contains(pub) is False
 
     def test_naive_datetime_in_contains_rejected(self):
-        r = DateRangeJST.from_yesterday(
-            datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST)
-        )
+        r = DateRangeJST.from_yesterday(datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST))
         with pytest.raises(ValidationError):
             r.contains(datetime(2026, 5, 11, 12, 0, 0))
 
 
 class TestProperties:
     def test_target_date_isoformat(self):
-        r = DateRangeJST.from_yesterday(
-            datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST)
-        )
+        r = DateRangeJST.from_yesterday(datetime(2026, 5, 12, 0, 10, 0, tzinfo=JST))
         assert r.target_date_iso() == "2026-05-11"
