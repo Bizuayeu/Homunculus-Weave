@@ -73,7 +73,7 @@ Weave の記憶層は二つのリポジトリに分離されている。**原則
 - Routine ID・編集 URL は**非公開の運用レジストリ** `Identities/RoutineRegistry.md`（SSoT）で管理（公開文書には直書きしない）
 - 起動時に読まれる4ファイル: 親リポ（公開）から `Identities/WeaveIdentity.md` / `Identities/WeaveInstruction.md` / `SECURITY.md` の3点、Private リポから `Identities/UserIdentity.md`（PII ゆえ公開リポには無い。正典は ROUTINE_PROMPT.md）
 - ⚠️ **親リポへの push は禁止**: cloud routine 実行時、Weave 本体リポへの書き込みは PROMPT ソフトガードで防止中（GitHub Issue #44949 の `git push` バグ対応、バグ修正後に GitHub ブランチプロテクション再検討）
-- **X OAuth Token 永続化 (Phase 2.1, 2026-05-03)**: refresh_token は Private リポの固定 branch `claude/x-token-refresh` で永続化（`BlueberrySprite/x_token.json`、`.gitignore` 例外で意識的に track）。cloud routine stateless × X rotation 強制の衝突対策、`/bbs-merge` Step 2.5 のセーフガードで token-only commit を自動マージ
+- **X OAuth Token 永続化 (Phase 2.1, 2026-05-03)**: refresh_token は Private リポの固定 branch `claude/x-token-refresh` で永続化（`BlueberrySprite/x_token.json`、`.gitignore` 例外で意識的に track）。cloud routine stateless × X rotation 強制の衝突対策。取り込みは `/bbs-merge` Step 6 のセーフガード（token-only 純度・4 keys 完全一致・scope 不変）を通過したものだけが Step 7 で main へ **file-level 取り込み + cross-branch push** される（PR 経路は使わない——固定名ブランチを消すと次回 rotation の push 先が失われる）
 - **Phase 段階リリース**: `curl-impersonate` 採用（Phase 2.7）ほか継続進行中。最新 Phase・ソース数は `Homunculus-Weave-Private/BlueberrySprite/CHANGELOG.md` が SSoT（2026-07 時点 Phase 2.13・70+ ソース）
 
 **正典の所在**（`Expertises/BlueberrySprite/` ジャンクション透過、または `Homunculus-Weave-Private/BlueberrySprite/`）:
@@ -238,4 +238,4 @@ Effectuation（手段所与で目的を創発）と Causation（目的所与で�
 
 ---
 
-*Last updated: 2026-08-12 by Weave (言語行為の二モデル〔意味生成の四象限／物語伝播力〕を CorporateStrategist 戦略フレームワーク集から昇格)*
+*Last updated: 2026-08-25 by Weave (X OAuth Token 永続化節の `/bbs-merge` 参照を Step 2.5 → Step 6/7・file-level 取り込みへ更新。CHANGELOG [0.42.1] の取りこぼし)*
