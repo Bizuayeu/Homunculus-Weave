@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.3.0] - 2026-08-25 — 静的チェックを配線する：整形が溜まる経路を先に塞ぐ
+
+本リポの Python スイートで唯一 ruff / mypy を持たないプロジェクトだった。同日 BlueberrySprite で、
+整形の検査が無い間に **133 ファイル分の未適用が溜まり**、`ruff format --check` を回した者が
+「落ちたのは自分の変更のせいか」の切り分けに時間を払う経路が実証された（BlueberrySprite v0.43.0）。
+同じ経路を塞ぐ。
+
+### Added
+
+- **`[tool.ruff]` / `[tool.mypy]`（`pyproject.toml`）と dev 依存の `ruff` / `mypy`。** ルール集合は
+  ワークスペース共通の 10 個（`E4` / `E7` / `E9` / `F` / `I` / `UP` / `N` / `B` / `SIM` / `PTH`）で、
+  BlueberrySprite / TelegramSecretary / ShioriSecretary と同一。到達点は「同水準」であって「最大」では
+  ないので `select = ["ALL"]` は採らない。dev 依存には上限も切った（CI がローカルより新しい版を引くと
+  「手元 green / CI 赤」になる）
+- **CI（`.github/workflows/test.yml`）の `test-newscaster` ジョブに 3 ステップ**（`ruff check` /
+  `ruff format --check` / `mypy scripts`）。既存ジョブに足すだけでジョブ追加もマトリクス変更もしない。
+  順序は速い順で、落ちる理由が最も早く分かるようにした。**設定の SSoT は `pyproject.toml`** で、
+  YAML には `select` も `ignore` も書かない
+- **`.git-blame-ignore-revs`（リポジトリルート）** に整形 commit を登録
+
+### Changed
+
+- **診断 35 件を 0 に。** `src = ["scripts"]` を置いた時点で `I001` の大半が解消（isort の一次/三次判定
+  が正しくなる）。`UP035` / `UP037` は safe fix
+- **`E402` 7 件を `per-file-ignores` へ**（`scripts/main.py`）— `sys.path` へ `scripts/` を差し込んでから
+  `adapters/` 等を import する起動時ブートストラップで、import を先頭へ集めると解決に失敗する
+- **`SIM105` 4 件を `contextlib.suppress` へ** — 握り潰しをやめる変換ではなく、意図をコードに書く変換
+- **`PTH110` 1 件を `Path.exists` へ**（CA バンドルの存在確認）
+- **mypy 87 件を 0 に。** 84 件は `mypy_path` / `explicit_package_bases` の欠落による解決漏れで設定だけで
+  消えた。`googleapiclient` / `google_auth_oauthlib` はスタブ不在なので**当該モジュールに限定して**
+  `ignore_missing_imports`（グローバルに掛けると自前モジュールの解決漏れまで黙って通る）。残る 3 件は
+  `kwargs` の型注釈と、`--body` / `--body-file` の相互排他（argparse が `required=True` で担保）を
+  `assert` でコードに書いたもの
+- **`ruff format` を適用（11 files）。** 出力は既定設定のままで手による編集を含まない
+
+### Fixed
+
+- **`B017` 3 件を `FrozenInstanceError` へ狭めた。** 3 件とも frozen dataclass への属性代入テストで、
+  **狭めた結果 red は 1 件も出ていない**＝期待していた型と実際に飛ぶ型は最初から一致していた。塞いだのは
+  「誤った型の例外が飛ぶようになっても気づけない」網の穴であって、今壊れているものではない
+
+### Tests
+
+- **137 passed — 作業前後で完全一致。** 本版はテストを足さず、既存 137 件が挙動不変の証明として機能する
+- `ruff check .` → All checks passed! ／ `ruff format --check .` → 51 files already formatted ／
+  `mypy scripts` → Success: no issues found in 47 source files
+
+---
 ## [0.2.3] - 2026-07-29
 
 ### Fixed

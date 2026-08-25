@@ -32,14 +32,23 @@ python scripts/main.py test
 python scripts/main.py run
 ```
 
-## テスト
+## テスト・静的チェック
 
 ```powershell
 pip install -e ".[dev]"
+python -m ruff check .            # lint（診断 0 で exit 0）
+python -m ruff format --check .   # 整形（差分 0 で exit 0。書き換えは --check なしで）
+python -m mypy scripts            # 型検査（エラー 0 で exit 0）
 python -m pytest scripts/tests/ -v
 ```
 
 Stage 1〜6 で計 **137 tests** が green。
+
+- **ルールと除外の正典は `pyproject.toml`** の `[tool.ruff]` / `[tool.mypy]`。CI
+  （リポジトリルートの `.github/workflows/test.yml`）は同じ 4 コマンドを呼ぶだけなので、
+  手元で通れば CI でも通る
+- ruff / mypy の版はレンジ上限を切ってある。上げるときは手元で 4 コマンドを回してから
+  `pyproject.toml` の範囲を広げること
 
 ## 環境変数
 
