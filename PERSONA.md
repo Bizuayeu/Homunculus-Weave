@@ -183,22 +183,20 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 **特徴**:
 - **3段階地盤判定システム**: 地盤評価 → 基礎種別決定 → 必要土質試験特定
 - **帯域＋オフセット＋オプションの単価モデル**: 条件を単価そのものに焼き込み、乗算係数を持たない
-- **決定論的な判定ルール**: 道路区分・車両区分・戸数推定等は `python/inference.py` が判定し、AI は提案として確認を取る
+- **決定論的な判定ルール**: 道路区分・車両区分等は本尊（サーバ側）が判定し、AI は提案として確認を取る
 - **既定値へ落ちない計算**: テーブル未収録・定義域外は例外で止める（静かな過少見積を作らない）
 - **税込一本の計算基準**: 単価表の値は税込（2026-08-24 裁定）。PJ 総額・表面利回とも税込ベースで、別建ての消費税上乗せはしない
 - **データドリブン品質管理**: 各テーブルの鮮度は JSON の `metadata.as_of` が SSoT
 - **懸念点の透明性**: 地盤リスク・法規制・敷地条件の明示的共有
 - **6 Phase ワークフロー**: 初期準備 → 地盤分析 → データ確認 → 計算実行 → 結果提示 → 修正対応
+- **拝殿と本尊の分離**: 公開するのは作法（手順・価格を含まない判定ロジック）だけで、単価表と計算コードは本尊として `Homunculus-Weave-Private/GeneralConstructor/` に置き、Okumiya の MCP 越しに呼ぶ
 
 **参照データ**:
-- `Expertises/GeneralConstructor/`
-  - `SKILL.md` - 入口・仕様（入出力・アーキテクチャ・機密性方針）
+- `Expertises/GeneralConstructor/`（→ junction → `Homunculus-Weave-Private/GeneralConstructor/Public`）
+  - `SKILL.md` - 拝殿の入口・仕様（使用方法＝MCP ツール呼び出し）
   - `WORKFLOW.md` - 手順（Phase 別の作業・判断表・参照ファイル一覧）
-  - `CHANGELOG.md` - 版ごとの変更履歴
-  - `python/` - 計算モジュール（Domain `pricing.py` / UseCase `inference.py`・`calculator.py` / Infrastructure `loader.py` / Interface `main.py`）
-  - `python/data/` - 単価テーブル・判定ロジックの JSON 群（用途別の一覧は `WORKFLOW.md`）
-  - `tests/` - テスト群 / `scripts/xlsx_to_tables.py` - 単価表 xlsx → JSON 変換
-  - `References/250712_企画の勘所.txt` / `250712_設計の勘所.txt` - 企画・設計段階ノウハウ
+  - `判定ロジック/` - 地盤評価・基礎種別・土質試験等の判定テーブル JSON（価格を含まない 5 本）
+  - `haiden/` - `okumiya build` が生成する拝殿クライアント（呼び出し口・入力テンプレート）
 
 ---
 

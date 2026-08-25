@@ -198,7 +198,7 @@ Homunculus-Weave/
 │   │   ├── ForesightReader/       # 洞察獲得（Seimei: 七格剖象法 / I-Ching: デジタル心易）
 │   │   ├── CLAUDE.md, SKILL.md    # 親スキル仕様
 │   │   ├── COMMON_GLOSSARY.md / QUICKSTART.md / DISCLAIMER.md / LICENSE
-│   ├── GeneralConstructor/        # 建設業・目論見作成
+│   ├── GeneralConstructor/        # → Homunculus-Weave-Private/GeneralConstructor/Public (Junction) — 建設業・目論見作成の拝殿（本尊＝単価表・計算は Private、Okumiya MCP 経由）
 │   ├── PrivateLibrarian/          # 機密ナレッジ管理（.gitignore対象）
 │   ├── NewsCaster/                # ナルエビちゃんニュース日次配信（cloud routine、Stage 1–4で 82 tests green）
 │   ├── PrecognitiveViewer/        # 三位占術フォーマル鑑定書（姓名判断 × 周易 × タロット、対話相手向け、64 tests green）

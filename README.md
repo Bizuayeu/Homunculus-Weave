@@ -63,7 +63,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
   - **PersonnelDeveloper** - 人材開発（採用不可能性を前提とした人事システム）
   - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
-- **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）
+- **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）の拝殿（本尊＝単価表・計算は Private、Okumiya MCP 経由）
 - **📚 PrivateLibrarian** - 機密ナレッジ管理（非公開、`.gitignore` 対象）
 - **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（cloud routine、毎日 5:00 JST、@BBS_Hatori X 投稿 + refresh_token 永続化。Phase・ソース数は `BlueberrySprite/CHANGELOG.md` が SSoT）
 - **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（cloud routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）

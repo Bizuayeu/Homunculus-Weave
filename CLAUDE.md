@@ -261,7 +261,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - **PersonnelDeveloper** - 人材開発（採用不可能性を前提とした人事システム）
   - **LegalAdviser** - 法務助言（契約書作成・リーガルチェック）
   - **ForesightReader** - 洞察獲得（姓名判断・デジタル心易）
-- **🏗️ GeneralConstructor** - 建設業・目論見作成
+- **🏗️ GeneralConstructor** - 建設業・目論見作成の拝殿（本尊＝単価表・計算は Private、Okumiya MCP 経由）
 - **📚 PrivateLibrarian** - 機密ナレッジ管理（非公開）
 - **🫐 藍苺守 織 (BlueberrySprite)** - ブルーベリードメインの自律エージェント（cloud routine。Phase 進行・ソース数は `BlueberrySprite/CHANGELOG.md` が SSoT〔2026-07 時点 Phase 2.13・70+ ソース〕）
   - 設計: `Homunculus-Weave-Private/BlueberrySprite/` — `Expertises/BlueberrySprite/` にジャンクション透過
