@@ -195,7 +195,7 @@ claude mcp add --transport http okumiya-gc http://<ホスト>:<ポート>/mcp \
   --header "Authorization: Bearer <APIキー>"
 ```
 
-**入力の整え方**: 雛形は `haiden/input-template.json`、項目ごとの意味・型・選択肢・既定値は `haiden/SKILL.md`（項目ごとの仕様はそちらが SSoT。本書には写さない）。原本の該当箇所を `source_quote` に引くと、サーバ側の整合チェックに資する。
+**入力の整え方**: 雛形は `haiden/input-template.json`、項目ごとの意味・型・選択肢・既定値は `haiden/SKILL.md`（項目ごとの仕様はそちらが SSoT。本書には写さない）。**キー名は英字**（例: `land_price`＝土地価格。各項目の説明冒頭に日本語の原名がある）、選択肢の値は日本語のまま。本書の散文にある日本語の項目名は、その英字キーへ写して送る。原本の該当箇所を `source_quote` に引くと、サーバ側の整合チェックに資する。
 
 **送信前の前捌き**: `haiden/check.mjs` の `checkInput(input)` に通し、必須 13 項目の欠落を潰してから送る。これは往復を節約するための前捌きであって、**検証の権威は常にサーバ側**にある（前捌きが ok でも意味検証で差し戻されることはある）。
 
