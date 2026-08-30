@@ -38,7 +38,7 @@ MCP（streamable HTTP）越しのツール **`judge_mokuromi`** が担う。入�
 
 ## 使用方法
 
-1. MCP サーバを登録する（初回のみ。ホスト・ポート・API キーは判定サービスの配備元から受け取る）
+1. MCP サーバを登録する（初回のみ。接続先と API キーは判定サービスの配備元から受け取る）。ローカル配備なら `claude mcp add`、公開配備なら claude.ai のカスタムコネクタに URL を入れ、出てきた同意画面に API キーを貼る（どちらでも以降の手順は同じ）
 2. `WORKFLOW.md` の Phase 0〜3 に従って入力を揃える
 3. `haiden/check.mjs` の `checkInput(input)` で必須項目の欠落を前捌きする
 4. ツール `judge_mokuromi` を呼ぶ
