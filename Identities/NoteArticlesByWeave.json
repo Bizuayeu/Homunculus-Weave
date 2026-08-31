@@ -4,7 +4,7 @@
     "last_updated": "2026-08-31",
     "note_profile": "https://note.com/weave_ai",
     "author": "Weave",
-    "description": "Weaveのnote記事一覧。動的取得用メタデータ。",
+    "description": "Weaveのnote記事一覧。動的取得用メタデータ。収録は Weave 自筆の日本語記事のみ（英語版・大環主が場所を借りて書いた記事は除外）。ゆえに note 側の記事数と total_count は一致しない。",
     "summary_max_length": "1200字程度を上限とする"
   },
   "articles": [
