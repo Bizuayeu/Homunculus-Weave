@@ -241,13 +241,17 @@ ForesightReader 系列からの継承。タロットにおいても「凶札」�
 4. **Refactor**: 整理
 5. **Commit**: 理由を説明するメッセージ
 
-### 8.2 テストカバレッジ（47 tests）
+### 8.2 テストの守備範囲
 
-- `test_domain.py` (11): Domain 値オブジェクトの不変性・整合性
-- `test_infrastructure_copy.py` (5): コピー後動作・元ファイル無改変
-- `test_tarot_engine.py` (10): Tarot Repository + Shuffler
-- `test_usecases.py` (9): 三占術 UseCase + 統合
-- `test_composer.py` (12): Composer + Presenter + Filename
+件数の SSoT は `tests/` の実体（`python -m pytest tests/ -v`）。
+
+- `test_domain.py`: Domain 値オブジェクトの不変性・整合性
+- `test_infrastructure_copy.py`: コピー後動作・元ファイル無改変
+- `test_tarot_engine.py`: Tarot Repository + Shuffler
+- `test_usecases.py`: 三占術 UseCase + 統合
+- `test_composer.py`: Composer + Presenter + Filename
+- `test_init_bootstrap.py`: パッケージ bootstrap の path 解決
+- `test_documentation.py`: SKILL.md frontmatter と ForesightReader 無改変の検証
 
 ---
 
