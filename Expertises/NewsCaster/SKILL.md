@@ -1,6 +1,6 @@
 ---
 name: newscaster-daily-digest
-description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gmail で 0:10 JST に大環主へダイジェスト配信する cloud routine 用スキル。フィード別ポリシー（PASSTHROUGH / WEAVE_COMPACT）で、要約済みフィード（ナルエビちゃんニュース等）はそのまま、装飾的エッセイ系フィード（Wireless Wire News 等）は親プロセス Weave がベタ化（L00473）。
+description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gmail で 0:10 JST に大環主へダイジェスト配信する cloud routine 用スキル。フィード別ポリシー（PASSTHROUGH / WEAVE_COMPACT）で、要約済みフィード（ナルエビちゃんニュース等）はそのまま、装飾的エッセイ系フィード（Wireless Wire News 等）は親プロセス Weave がベタ化。
 ---
 
 # NewsCaster — 前日マルチフィードダイジェスト配信スキル
