@@ -23,7 +23,7 @@ LegalAdviser/
 ├── CLAUDE.md                    # 本仕様書（詳細実装・品質基準）
 ├── References/                  # 理論参考資料
 │   └── README.txt                # 基礎ナレッジベース（出典・免責事項）
-├── Templates/                   # 契約書テンプレート集（44種類）
+├── Templates/                   # 契約書テンプレート集
 │   ├── administrative_scrivener_service_contract.docx
 │   ├── business-consignment-contract.docx
 │   ├── data_analysis_outsourcing_contract.docx

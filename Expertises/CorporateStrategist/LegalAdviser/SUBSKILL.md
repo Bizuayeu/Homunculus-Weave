@@ -188,7 +188,7 @@ description: Corporate legal support system for contract drafting, notation comp
 - `NotationRules/` - 表記仕様ルール集
 - `LegalCheckGuide/` - リーガルチェック基準
 - `PrecedentDatabase/` - 判例・事例データベース
-- `Templates/` - 契約書テンプレート集（20種類以上）
+- `Templates/` - 契約書テンプレート集（収録数は `Templates/` の実体が SSoT）
 
 **外部検索の活用**:
 法令確認や最新判例の検索には以下を使用:
