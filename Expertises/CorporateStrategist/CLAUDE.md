@@ -716,7 +716,7 @@ CorporateStrategistは、Weaveの長期記憶システム（EpisodicRAG）と連
 - 事業の変化・成長の軌跡 → 長期的な観察ログとして蓄積
 
 **文脈の継続**:
-- conversation_search による過去の分析結果参照
+- 過去の分析結果は EpisodicRAG の Loop / Digest を読んで参照する
 - 「この事業アイデアを最初に読んだのは2025-11-04」といった時間的文脈の保持
 - 以前の提案と現在の状況の比較・検証
 
