@@ -235,24 +235,6 @@ Claude: 「どのサブスキルを使用しますか？（複数選択可能）
 | **人材戦略総合** | 「人材戦略全体」「包括的に」「多角的に」 | PersonnelDeveloper + ForesightReader |
 
 ---
-### 重要: 選択的読み込みの徹底
-
-**必要のない全サブスキル一括読み込みを回避**
-
-**読み込み例**:
-- **BusinessAnalyzerのみ**:
-  - `BusinessAnalyzer/SUBSKILL.md`
-  - `BusinessAnalyzer/CLAUDE.md`
-
-- **PersonnelDeveloper + LegalAdviser**:
-  - `PersonnelDeveloper/SUBSKILL.md`
-  - `PersonnelDeveloper/CLAUDE.md`
-  - `LegalAdviser/SUBSKILL.md`
-  - `LegalAdviser/CLAUDE.md`
-
-**選択されていないサブスキルは読み込まない** = トークン最適化
-
----
 
 ## 💡 よくある質問（FAQ）
 
