@@ -9,9 +9,6 @@ description: Integrated corporate strategy system combining 4 specialized sub-sk
 
 **詳細な理論・実装方法は `CLAUDE.md` を参照してください。**
 
-**最終更新**: 2025-11-03
-**バージョン**: 1.0
-
 ---
 
 ## ⚠️ 免責事項
