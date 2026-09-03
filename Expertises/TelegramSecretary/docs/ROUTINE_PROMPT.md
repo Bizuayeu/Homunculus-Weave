@@ -94,7 +94,7 @@ source /tmp/telegram-secretary.env.sh && \
      --tasks-latest 9 --steps-latest 10)
 ```
 
-   （10 の幅は **ローカル実測で校正した採用値**〔v1.10.0〕——バックアップ registry の複製〔knowledge 211 件 / tasks 11 件〔active 6 / done 5〕/ subjects 9 件 / individuals 1 件 / abilities 1 件 / profile 4 件 / goals 0 件 / steps 0 件 / handoff 4 ブロック〕に対する実測で **23,583 バイト**、目標の警告閾値 **25,600 バイト**〔`ORIENTATION_WARNING_BYTES`。これ自体が実測境界の安全側下限〕に対し**余裕 2,017 バイト**。同じデータ・同じ 6 値で v1.9.0 コードなら **25,267 バイト**〔余裕 333〕だったので、subjects / steps の索引化が **1,387 バイト**を回収し、残りを未投入だった `--individuals-cap` / `--tasks-latest` と新ノブが埋めている。**`--steps-latest 10` だけは仮置き**〔steps 0 件ゆえ実測から導けない。body 再登録が不可逆・一度きりの経路なので、steps が埋まってから 2 度目の登録を要する事態を避けて先に焼いた〕——**昇格トリガー＝steps に実データが入った枠で実測校正する**。実測表は CHANGELOG v1.10.0。**digest のサイズは毎回 stderr に `orientation digest: N bytes` として出る**ので、データが育って閾値を越えたらその枠で分かる——越えたら幅を下げるか、この行そのものを校正する。余裕 2,017 バイトは active タスク約 3 件分〔実測 1 件≈616 バイト、done 1 件≈90 バイト〕）
+   （10 の幅は **ローカル実測で校正した採用値**——実測時 **23,583 バイト**で、警告閾値 **25,600 バイト**〔`ORIENTATION_WARNING_BYTES`〕に対し**余裕 2,017 バイト**＝active タスク約 3 件分〔実測 1 件≈616 バイト〕。母集団と項目別の実測表は CHANGELOG v1.10.0。**`--steps-latest 10` だけは仮置き**〔steps 0 件ゆえ実測から導けず、body 再登録が不可逆・一度きりの経路なので先に焼いた〕——**昇格トリガー＝steps に実データが入った枠で実測校正する**。**digest のサイズは毎回 stderr に `orientation digest: N bytes` として出る**ので、データが育って閾値を越えたらその枠で分かる——越えたら幅を下げるか、この行そのものを校正する）
 
    （絞った分は**消えるのではなく読み筋が変わる**: knowledge 索引は見出しの `latest 30 of M` が母数を開示し、落ちた分は `--knowledge-category` / `--knowledge-subject` か `knowledge get --key` で引く。cap で丸めた profile / abilities / individuals / goals の全文は `profile get --key` / `abilities get --key` / `individuals get --key` / `goals get --key`（見出しの `cap N bytes` と切り取りマーカー `…` が「ここで切れている」ことを開示する）。tasks の notes 全文は `tasks get --key`（要約から落ちた行も同じ）。subjects と steps は索引なので**行に載らない項目**〔subjects の timestamps、steps の notes〕は `subjects get --key` / `steps get --key` で引き、steps は `latest N of M` が母数を開示する。handoff は**頭から**丸められるので末尾〔「★次枠がまずやること★」等〕が切れうる——切れた印 `…` が出たら見出しのファイル名を `Read` で原本ごと読む）
 
@@ -172,7 +172,7 @@ source /tmp/telegram-secretary.env.sh && \
 ```
 
 - **timeout 限定適用の運用規律**: 長い `timeout` を渡すのは **このポーリング call だけ**。lease 操作・send-reply・残り窓計算・git・pytest 等は `timeout` を明示しない（既定 2分=`BASH_DEFAULT_TIMEOUT_MS`）。`{private_dir}/.claude/settings.json` の `BASH_MAX_TIMEOUT_MS=600000` は上限の許可であって既定値は変えない
-- **不変条件 `max_duration + (retry_count+1) × request_timeout + 後処理余裕 <= bash_timeout/1000`**: watch は最終サイクルの long-poll を残り窓へ丸めるが、丸まるのは long-poll の `--timeout` **だけ**で、その内側で走る HTTP 層の再試行予算（`api_gateway` の `retry_count=2` / `request_timeout=40.0`、5xx は sleep せず即再試行）は窓を知らない。**オーバーランを決めるのは `--timeout` ではなくこの再試行予算のほう**（`450 + 3×40 + 30 = 600`）。窓の既定値は bootstrap.sh が持ち、値の突合は `test_poll_window_invariant.py` が張る（旧記述は最悪滞留を `--timeout` の 30s と見積もっており、502 が続いた枠が SIGTERM した＝2026-08-15）
+- **不変条件 `max_duration + (retry_count+1) × request_timeout + 後処理余裕 <= bash_timeout/1000`**: watch は最終サイクルの long-poll を残り窓へ丸めるが、丸まるのは long-poll の `--timeout` **だけ**で、その内側で走る HTTP 層の再試行予算（`api_gateway` の `retry_count=2` / `request_timeout=40.0`、5xx は sleep せず即再試行）は窓を知らない。**オーバーランを決めるのは `--timeout` ではなくこの再試行予算のほう**（`450 + 3×40 + 30 = 600`）。窓の既定値は bootstrap.sh が持ち、値の突合は `test_poll_window_invariant.py` が張る
 - watch は **(a) 認可済みメッセージを受けたサイクル**（`--exit-on-message`）または **(b) 窓満了**（`--max-duration`）で exit 0 する。**(a) なら即返信→再起動で即応（遅延は long-poll の最大 30秒）、(b) なら素通りで再起動し warm 継続**
 - watch が exit 4（lease 奪取を検出）で返ったら即終了（次 cron が拾い直す、自己治癒）
 
@@ -388,7 +388,7 @@ python scripts/main.py init-config --session-duration-sec <秒> --agent-name <�
    - `job_config.ccr.environment_id`: 上記で控えた id
    - `job_config.ccr.events[0].data.message.content`: **この ROUTINE_PROMPT.md の「## あなたへ」〜「## Failure modes」までの本文**（本ライフサイクル管理節は含めない）。送信前に本文中の **`<INSTALL_DIR>` を skill の実配置パス**（cwd＝2リポ親起点での本スキルへの相対パス。例 `my-config-repo/TelegramSecretary`）、**`<BASE_REPO>` を `sources` の基本設定リポ名**（例 `my-config-repo`）、**`<PRIVATE_DIR>` を config の `private_dir`**（例 `my-private-repo/TelegramSecretary`）へ**置換**する（cwd＝2リポ親起点で bootstrap 前の Read/source 行を解決可能にする。bootstrap 後は env 解決ゆえ置換対象外）
    - `job_config.ccr.session_context.sources`: 本体リポ＋ Private リポの git URL
-   - `job_config.ccr.session_context.outcomes`: **registry の push に `registry_branch` の名指し宣言は不要**（2026-06-05 worktree 移行後）。管理表は `registry_dir`（独立 worktree）から `registry_cli` が固定ブランチ `claude/ts-registry` へ直接 push する方式ゆえ（`bootstrap.sh` 層1 provisioning ＋ `GitCliAdapter.push`、**DESIGN §3.6 が SSoT**）、harness の `outcomes` 配線（session 末の作業ブランチ push）には依存しない。outcomes は自動採番ブランチのままでよい。body スキーマ形式は `schedule` skill / `MEMORY: reference_remote_trigger_update` を正典参照
+   - `job_config.ccr.session_context.outcomes`: **registry の push に `registry_branch` の名指し宣言は不要**。管理表は `registry_dir`（独立 worktree）から `registry_cli` が固定ブランチ `claude/ts-registry` へ直接 push する方式ゆえ（`bootstrap.sh` 層1 provisioning ＋ `GitCliAdapter.push`、**DESIGN §3.6 が SSoT**）、harness の `outcomes` 配線（session 末の作業ブランチ push）には依存しない。outcomes は自動採番ブランチのままでよい。body スキーマ形式は `schedule` skill / `MEMORY: reference_remote_trigger_update` を正典参照
    - `job_config.ccr.session_context.allowed_tools`: `["Bash","Read","Write","Edit","Glob","Grep","WebFetch","WebSearch"]`（秘書の依頼対応での調べ物に `WebFetch`/`WebSearch` を許可）
    - `job_config.ccr.session_context.model`: 上表 Model
 
