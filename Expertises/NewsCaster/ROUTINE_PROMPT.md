@@ -131,7 +131,7 @@ dry-run の出力形式：
 
 ## Fallback: 単一 PASSTHROUGH フィードのみの場合
 
-`NEWSCASTER_FEEDS` が未設定（→ ナルエビフィード単独）または PASSTHROUGH のみの構成なら、プレースホルダが出現しないので Step 4-6 を以下の一発実行で代替可能（Stage 4 互換）：
+`NEWSCASTER_FEEDS` が未設定（→ ナルエビフィード単独）または PASSTHROUGH のみの構成なら、プレースホルダが出現しないので Step 4-6 を以下の一発実行で代替できる：
 
 ```bash
 (cd Expertises/NewsCaster && \

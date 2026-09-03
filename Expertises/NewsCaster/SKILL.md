@@ -26,7 +26,7 @@ description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gm
 4. send-rendered で書き換え済み subject/body を直接送信し state mark
 ```
 
-PASSTHROUGH のみのフィード構成なら、`run` サブコマンド一発で完結（Stage 4 互換）。
+PASSTHROUGH のみのフィード構成なら、`run` サブコマンド一発で完結。
 
 詳細フローは [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md) を参照。
 
