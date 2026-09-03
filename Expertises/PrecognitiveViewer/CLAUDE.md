@@ -233,7 +233,7 @@ ForesightReader 系列からの継承。タロットにおいても「凶札」�
 
 ## 8. テスト戦略
 
-### 8.1 TDD Flow（DEV.md 準拠）
+### 8.1 TDD Flow（ConsiderateCoder の dev-rules 準拠）
 
 1. **Understand**: 既存類似実装の確認
 2. **Test**: 失敗するテスト（Red）
