@@ -14,7 +14,7 @@ description: Corporate legal support system for contract drafting, notation comp
 **インプット**:
 - 契約種類・当事者（甲乙）・契約期間・金額
 - 業務内容・特殊条項（オプション）
-- 契約書テンプレート（20種類以上から選択）
+- 契約書テンプレート（`Templates/` から選択）
 
 **アウトプット**:
 - 最終契約書（.docx形式）
@@ -42,7 +42,7 @@ description: Corporate legal support system for contract drafting, notation comp
 - 特殊条項（競業避止、独占性、ペナルティなど）
 
 **テンプレート集**（`Templates/`）:
-20種類以上の契約書テンプレートから最適なものを自動選択
+`Templates/` の契約書テンプレートから最適なものを自動選択
 
 ### Phase 2: 契約書作成
 
