@@ -364,7 +364,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **決定論的再現性**: 同じ占機・占的・状況なら同じ結果（BASE64+SHA256 シード、Fisher-Yates）
 - **並列進化**: CorporateStrategist/ForesightReader（経営判断向け軍師型献策）とは利用文脈が異なり、技術コアの共通化を意図的に行わない
 - **意図的並行運用**: 本 HW 版（Weave 実運用）と ShioriSecretary 同梱版（配布版）は意図的並行運用（TelegramSecretary / ShioriSecretary の 2026-07-03 確定と同型、2026-07-29 確定）。実装の乖離は許容し、SSoT は占術理論の md が正・実装は各々が持つ
-- **Clean Architecture × TDD**: 66 tests Green、`__init__.py` bootstrap で pytest 経由/通常実行どちらでも動作
+- **Clean Architecture × TDD**: `tests/` green（件数は pytest が SSoT）、`__init__.py` bootstrap で pytest 経由/通常実行どちらでも動作
 
 **出力**:
 - `ReadingReport_yyyymmdd_hhmmss.md` 形式（被鑑定者名はファイル名に含めずプライバシー配慮）
