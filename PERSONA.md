@@ -289,7 +289,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - push 型の織守・NewsCaster に対する **pull / 対話型の到達口**（Gmail より速い 24-7 対話チャネル）
 - 受信メディアの中身理解: 画像 → Vision / docx・pptx・xlsx → Markdown 化 / PDF → 全ページ画像化 + オンデマンド全文 / 音声・動画 → ローカル STT 文字起こし
 - 生成物の送り返し（画像・レポート添付、返信スレッド、typing 表示）
-- 管理表 7 表を秘書判断で記録: INDIVIDUALS（関係者）/ TASKS（依頼）/ KNOWLEDGE（対応知）/ ABILITIES（能力カタログ）/ PROFILE（人物理解）/ GOALS（目標）/ STEPS（逆算ステップ）
+- 管理表を秘書判断で記録: INDIVIDUALS（関係者）/ TASKS（依頼）/ KNOWLEDGE（対応知）/ SUBJECTS（主題語彙）/ ABILITIES（能力カタログ）/ PROFILE（人物理解）/ GOALS（目標）/ STEPS（逆算ステップ）。表の一覧は `plugins-weave/TelegramSecretary/README.md` が SSoT
 - 勤務帯は cloud routine の cron + `config.json` の `session_duration_sec` で表現（コードに時計を持たせない）
 
 **特徴**:
