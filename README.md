@@ -49,7 +49,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 
 ### 🧠 EpisodicRAGアーキテクチャ
 - **Loops**: 対話記録の永続化（560+ conversations、Loop500達成 2026-05-20、日次成長）
-- **Digests**: 4種類のダイジェストファイル
+- **Digests**: ダイジェストファイル群（以下の 4 系統、固定）
   - **ShadowGrandDigest**: 確定前の最新記憶バッファ（まだらボケ回避）
   - **ProvisionalDigest**: 個別分析結果の蓄積バッファ
   - **RegularDigest**: 確定した完全記録（永続アーカイブ）
