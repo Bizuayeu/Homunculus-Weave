@@ -162,7 +162,9 @@ PrecognitiveViewer/
     ├── test_infrastructure_copy.py
     ├── test_tarot_engine.py
     ├── test_usecases.py
-    └── test_composer.py
+    ├── test_composer.py
+    ├── test_init_bootstrap.py
+    └── test_documentation.py
 ```
 
 ---

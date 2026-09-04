@@ -72,6 +72,7 @@ Conduct iterative rounds of deep questioning using AskUserQuestion tool.
 - Avoid open-ended questions -- provide specific choices
 - "Other" option is auto-added -- don't include it
 - Align options with existing patterns from CLAUDE.md (if available)
+- Use multiSelect sparingly (default: false)
 </rules>
 
 <question_categories>
@@ -94,7 +95,7 @@ After each answer round:
 1. Analyze the answer for NEW assumptions it reveals
 2. Follow up on the most interesting thread before moving to a new topic
 3. Go at least **2 levels deep** on each major topic before moving on
-4. Track which assumption categories remain unexplored
+4. Track which assumption categories remain unexplored (TodoWrite)
 </digging_strategy>
 
 ### Phase 4: Apply & Integrate
@@ -139,8 +140,8 @@ Check each criterion:
 - [ ] The plan file reflects all decisions made
 </completeness_checklist>
 
-**If ANY checkbox is unchecked**: Return to Phase 3 with the remaining items.
-**If ALL checkboxes are checked**: Proceed to generate the final summary.
+Return to Phase 3 while high-risk assumptions remain unaddressed and rounds keep surfacing new decisions.
+When a round yields nothing new, write the final summary and state any criterion left unmet and why.
 
 ### Final Summary
 
@@ -175,61 +176,3 @@ When the investigation is complete, output:
    - Details...
 ```
 
-## Example
-
-<example>
-Context: User has a plan to "Add a notification system to the app"
-
-**Phase 1 findings:**
-- Plan mentions "notifications" but doesn't specify push vs in-app vs email
-- Assumes real-time delivery but doesn't discuss failure handling
-- No mention of notification preferences or opt-out
-
-**Phase 2 assumption map:**
-- Feasibility: "Push notifications work reliably" (HIGH RISK)
-- User: "Users want to be notified about everything" (MEDIUM RISK)
-- Architecture: "Current server can handle WebSocket connections" (HIGH RISK)
-
-**Phase 3 question example (Round 1):**
-
-Question 1: "The plan assumes real-time push notifications. Your current
-architecture is a stateless REST API. How should we handle the real-time
-requirement?"
-- Option A: Add WebSocket server alongside REST API
-  - Pros: True real-time, proven pattern
-  - Cons: New infrastructure, connection management complexity
-- Option B: Server-Sent Events (SSE) from existing server
-  - Pros: Simpler, works with existing HTTP infrastructure
-  - Cons: One-directional, limited browser support for reconnection
-- Option C: Polling with short intervals
-  - Pros: No infrastructure changes, simplest to implement
-  - Cons: Not truly real-time, increases server load
-
-Question 2: "What happens when a notification fails to deliver?"
-- Option A: Retry 3 times with exponential backoff, then mark as failed
-  - Pros: Reliable delivery, standard pattern
-  - Cons: Complexity, potential notification storms
-- Option B: Best-effort delivery, no retries
-  - Pros: Simple, low operational burden
-  - Cons: Users may miss important notifications
-
-**Phase 3 follow-up (Round 2 -- digging deeper into Round 1 answers):**
-
-Question 3: "You chose WebSocket. Your app currently has 3 stateless API
-replicas behind a load balancer. How will you handle WebSocket session
-affinity?"
-(This question was DISCOVERED by digging into the Round 1 answer)
-</example>
-
-## Important Notes
-
-- **Must use AskUserQuestion tool** - Never use conversational questions
-- Each option must include **pros/cons**
-- Use multiSelect sparingly (default: false)
-- Read CLAUDE.md before generating questions to align with project patterns
-- **Depth first** - Go 2+ levels deep on a topic before switching to a new one
-- **Challenge, don't just clarify** - If an assumption seems reasonable, still question it
-- **Track your progress** - Use TodoWrite to track which assumption categories have been explored
-- **Don't ask obvious questions** - Focus on the hard parts the user might not have considered
-- **Write discoveries to the plan** - Every decision must be reflected in the plan file, not just reported
-- **Know when to stop** - Complete the Phase 5 checklist honestly; don't loop indefinitely

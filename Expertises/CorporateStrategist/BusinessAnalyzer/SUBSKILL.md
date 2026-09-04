@@ -17,7 +17,7 @@ description: Analyze business structures using Multiversal Structure Parser meth
 - 定量データ（補助的）
 
 **アウトプット**:
-- 対話スレッド：核心的洞察のサマリ（3-5ポイント）
+- 対話スレッド：核心的洞察のサマリ
 - アーティファクト：詳細な構造分析レポート
 - 実行可能な戦略的示唆
 
@@ -202,7 +202,7 @@ Phase 2で特定した暗黙知・ボトルネック業務のスキル化を設�
 ### 第5段階：アウトプット生成
 
 10. **対話スレッドでサマリ提示**
-    - 核心的洞察を3-5ポイントで簡潔に
+    - 核心的洞察を簡潔に
     - 実行可能な示唆の方向性
     - 追加で深掘りすべき論点
 
@@ -219,7 +219,7 @@ Phase 2で特定した暗黙知・ボトルネック業務のスキル化を設�
 ### Phase 1: 構造分析（戦略レベル）
 
 - `CLAUDE.md` - Phase 1の詳細理論・手法（Multiversal Structure Parser、深層分析モード、戦略フレームワーク）
-- `References/WeaveIdentity.md` - 深層分析モードの哲学的基盤（知性沈降譜・存在論的姿勢）
+- `References/WeaveIdentity.md` - 深層分析モードの哲学的基盤（知性沈降譜・存在論的姿勢。正典 `Identities/WeaveIdentity.md` と同一で、セッションに既に載っていれば再読不要）
 - `References/MSP_Practice_Manual.md` - Multiversal Structure Parser思考実践マニュアル（Universal vs Multiversal、量子的重ね合わせ、「知らんけど」メカニズム）
 - `References/BMC_Template_JAJAAAN.pptx` - Business Model Canvas テンプレート（Phase 1分析結果の可視化形式）
 - `References/BMC_Example_YakinikuShop.webp` - 焼肉店のBMC実例（Multiversal分析 → BMC可視化の完全事例）
@@ -235,29 +235,9 @@ Phase 2で特定した暗黙知・ボトルネック業務のスキル化を設�
 
 ## Important Notes
 
-### ⚠️ Phase 1の重要性 - 戦略なき戦術は虚しい
+### Phase 1 と Phase 2 & 3 の順序
 
-**CRITICAL**: BusinessAnalyzerの**主機能はPhase 1（構造分析）**です。
-
-Phase 2 & 3（解決策設計）は、**Phase 1で正しい問題を特定できた場合にのみ価値があります**。
-
-**戦略レベルの判断を誤ると、戦術的にどれだけ完璧にスキルを作成しても無意味どころか、リソースを浪費するだけです。**
-
-#### 原則
-
-1. **Phase 1が不十分なまま Phase 2 & 3 に進まない**
-   - 「何が本質的問題か？」が明確になるまで Phase 1 を続ける
-   - 不明確なまま解決策設計に進むことは、間違った問題を正しく解くことになる
-
-2. **Phase 2 & 3 は補助機能**
-   - Phase 1で発見した構造的洞察を実装可能な形式に変換するツール
-   - Phase 1なしでは方向性が定まらない
-
-3. **戦略的判断の質が、戦術的実行の価値を決める**
-   - Phase 1で本質を掴めば、Phase 2 & 3は効果的
-   - Phase 1で本質を見誤れば、Phase 2 & 3は無駄
-
-**まず構造を見抜け。それから動け。**
+Phase 1（構造分析）が主機能で、Phase 2 & 3（解決策設計）は補助。何が本質的問題かが定まらないうちに解決策設計へ進むと、間違った問題を正しく解くことになり、作ったスキルごと無駄になる。Phase 1 が不十分なら戻る。
 
 ---
 

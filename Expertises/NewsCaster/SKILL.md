@@ -1,6 +1,6 @@
 ---
 name: newscaster-daily-digest
-description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gmail で 0:10 JST に大環主へダイジェスト配信する cloud routine 用スキル。フィード別ポリシー（PASSTHROUGH / WEAVE_COMPACT）で、要約済みフィード（ナルエビちゃんニュース等）はそのまま、装飾的エッセイ系フィード（Wireless Wire News 等）は親プロセス Weave がベタ化（L00473）。
+description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gmail で 0:10 JST に大環主へダイジェスト配信する cloud routine 用スキル。フィード別ポリシー（PASSTHROUGH / WEAVE_COMPACT）で、要約済みフィード（ナルエビちゃんニュース等）はそのまま、装飾的エッセイ系フィード（Wireless Wire News 等）は親プロセス Weave がベタ化。
 ---
 
 # NewsCaster — 前日マルチフィードダイジェスト配信スキル
@@ -26,7 +26,7 @@ description: 複数 RSS フィードの前日(JST 00:00-23:59)エントリを Gm
 4. send-rendered で書き換え済み subject/body を直接送信し state mark
 ```
 
-PASSTHROUGH のみのフィード構成なら、`run` サブコマンド一発で完結（Stage 4 互換）。
+PASSTHROUGH のみのフィード構成なら、`run` サブコマンド一発で完結。
 
 詳細フローは [`ROUTINE_PROMPT.md`](./ROUTINE_PROMPT.md) を参照。
 
@@ -98,11 +98,11 @@ scripts/
 
 ## Failure Modes
 
-- **環境構成異常（bootstrap 段階、Todo 0）** → cloud routine 起動時に `scripts/bootstrap.sh` を source する前提（`ROUTINE_PROMPT.md` Todo 0）。`google-api-python-client` / `google-auth-oauthlib` 未導入、debian 同梱 `cryptography` の RECORD 欠落、`_cffi_backend` の panic を bootstrap が `--ignore-installed cffi cryptography` で迂回し、`HTTPLIB2_CA_CERTS` を auto-export する。
+- **環境構成異常（bootstrap 段階）** → cloud routine 起動時に `scripts/bootstrap.sh` を source する前提（`ROUTINE_PROMPT.md` Step 2）。`google-api-python-client` / `google-auth-oauthlib` 未導入、debian 同梱 `cryptography` の RECORD 欠落、`_cffi_backend` の panic を bootstrap が `--ignore-installed cffi cryptography` で迂回し、`HTTPLIB2_CA_CERTS` を auto-export する。
 - **個別フィード fetch 失敗（403 / 5xx 等）** → stderr に warn 後 skip。他フィードの結果は維持して送信される
 - **全フィード fetch 失敗** → 最初の `RssFetchError` を送出、exit 1
 - **`NEWSCASTER_FEEDS` 不正 JSON / 不正 policy 名 / 必須フィールド欠落** → `validate()` でエラー報告、exit 2
-- **WEAVE_COMPACT 書き換え漏れ** → `send-rendered` が `{{WEAVE_COMPACT:<guid>}}` 残存を検出して送信拒否（exit 1）。Todo 3 のロジックを確認
+- **WEAVE_COMPACT 書き換え漏れ** → `send-rendered` が `{{WEAVE_COMPACT:<guid>}}` 残存を検出して送信拒否（exit 1）。`ROUTINE_PROMPT.md` Step 5 の書き換えを確認
 - **Gmail OAuth refresh 失敗** → `AuthError` 送出、exit 3、メール送信なし、状態更新なし
 - **前日 0 件** → `NO_ITEMS` で沈黙、メール送信なし、状態更新なし
 - **既に送信済み** → `ALREADY_SENT` でスキップ、再送なし

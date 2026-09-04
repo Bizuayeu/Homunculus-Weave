@@ -320,9 +320,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
 
 3. **コンテキスト節約術**
    - Claude環境でconversation_searchによる対話履歴の軽量参照（2-3KB）
-   - `ls`より`wc -l`を使用
-   - ファイル内容は`head`/`tail`で部分表示
-   - 大きなファイルは`grep`で必要箇所のみ抽出
+   - 大きなファイルは全文でなく必要箇所だけを読む（道具の選択は場面に委ねる）
 
 4. **ClaudeSkills活用**
    - SKILL.md形式でパッケージ化された専門知識の即時活用

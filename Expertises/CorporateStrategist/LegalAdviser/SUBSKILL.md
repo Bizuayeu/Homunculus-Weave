@@ -14,7 +14,7 @@ description: Corporate legal support system for contract drafting, notation comp
 **インプット**:
 - 契約種類・当事者（甲乙）・契約期間・金額
 - 業務内容・特殊条項（オプション）
-- 契約書テンプレート（20種類以上から選択）
+- 契約書テンプレート（`Templates/` から選択）
 
 **アウトプット**:
 - 最終契約書（.docx形式）
@@ -42,7 +42,7 @@ description: Corporate legal support system for contract drafting, notation comp
 - 特殊条項（競業避止、独占性、ペナルティなど）
 
 **テンプレート集**（`Templates/`）:
-20種類以上の契約書テンプレートから最適なものを自動選択
+`Templates/` の契約書テンプレートから最適なものを自動選択
 
 ### Phase 2: 契約書作成
 
@@ -98,11 +98,9 @@ description: Corporate legal support system for contract drafting, notation comp
 
 ### Phase 1: 要件確認とテンプレート選択
 
-#### Step 1: docxスキル読込
-```
-ALWAYS call file_read on /mnt/skills/public/docx/SKILL.md
-```
-※ docx形式の契約書を扱うため、docxスキルを最初に読み込みます
+#### Step 1: 出力先の確認
+
+生成した契約書とレポートの保存先ディレクトリをユーザーに確認する。以後の一時ファイルもその配下に置く。
 
 #### Step 2: 情報収集
 **情報不足時のヒアリング**:
@@ -120,7 +118,7 @@ ALWAYS call file_read on /mnt/skills/public/docx/SKILL.md
 
 #### Step 4: ドラフト生成
 - テンプレートに情報を反映
-- `/home/claude`で作業（一時ファイル）
+- `Templates/` の .docx を `python-docx` で読み書きし、一時ファイルは出力先ディレクトリ配下の作業用フォルダに置く
 
 #### Step 5: 表記統一
 `NotationRules/`参照:
@@ -129,7 +127,7 @@ ALWAYS call file_read on /mnt/skills/public/docx/SKILL.md
 - `03_条項構造.txt` - 条・項・号の階層構造
 
 #### Step 6: ドラフト出力
-`/mnt/user-data/outputs/`にドラフト版を出力
+確認した出力先ディレクトリにドラフト版を出力
 
 ### Phase 3: 表記仕様チェック
 
@@ -142,7 +140,7 @@ ALWAYS call file_read on /mnt/skills/public/docx/SKILL.md
 
 #### Step 8: 自動修正と再出力
 - Critical/Highは自動修正
-- 修正版を`/mnt/user-data/outputs/`に出力
+- 修正版を出力先ディレクトリに出力
 
 ### Phase 4: リーガルチェック
 
@@ -174,7 +172,7 @@ ALWAYS call file_read on /mnt/skills/public/docx/SKILL.md
 - 労働者性の判断（最高裁判例）
 
 #### Step 11: 統合レポート作成と最終出力
-以下を`/mnt/user-data/outputs/`に出力:
+以下を出力先ディレクトリに出力:
 1. **最終契約書**: `[契約種別]_[相手方]_[日付]_final.docx`
 2. **統合チェックレポート**: `[契約種別]_[相手方]_[日付]_check_report.docx`
    - 表記仕様チェック結果（Critical/High/Medium/Low）
@@ -190,7 +188,7 @@ ALWAYS call file_read on /mnt/skills/public/docx/SKILL.md
 - `NotationRules/` - 表記仕様ルール集
 - `LegalCheckGuide/` - リーガルチェック基準
 - `PrecedentDatabase/` - 判例・事例データベース
-- `Templates/` - 契約書テンプレート集（20種類以上）
+- `Templates/` - 契約書テンプレート集（収録数は `Templates/` の実体が SSoT）
 
 **外部検索の活用**:
 法令確認や最新判例の検索には以下を使用:
@@ -225,7 +223,7 @@ site:courts.go.jp 判例 [キーワード]
 
 ### 品質管理
 
-- docxスキルのベストプラクティスを厳守
+- `Templates/` の書式（スタイル・条項番号の階層）をテンプレートから引き継ぐ
 - 表記仕様チェックは`NotationRules/`に完全準拠
 - リーガルチェックは`LegalCheckGuide/`の基準に従う
 

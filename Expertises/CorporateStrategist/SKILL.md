@@ -9,9 +9,6 @@ description: Integrated corporate strategy system combining 4 specialized sub-sk
 
 **詳細な理論・実装方法は `CLAUDE.md` を参照してください。**
 
-**最終更新**: 2025-11-03
-**バージョン**: 1.0
-
 ---
 
 ## ⚠️ 免責事項
@@ -112,7 +109,7 @@ CorporateStrategistは、**経営者の参謀として企業経営を多角的�
 
 ## 🎯 サブスキル選択（推奨手順）
 
-**CRITICAL**: トークン消費を最適化するため、以下の優先順位フローに従ってサブスキルを選択してください。
+トークン消費を抑えるため、以下の優先順位でサブスキルを選ぶ。
 
 ### 優先順位フロー
 
@@ -120,7 +117,7 @@ CorporateStrategistは、**経営者の参謀として企業経営を多角的�
 1. パターンA（明示的指定） ← 最優先
    ユーザーが明示的にサブスキル名を指定した場合
    ↓ なければ
-2. パターンB（推定+確認） ← 第二優先
+2. パターンB（推定して進める） ← 第二優先
    キーワードから1つ以上のサブスキルが推定できる場合
    ↓ 推定困難なら
 3. パターンC（選択肢提示） ← フォールバック
@@ -129,73 +126,7 @@ CorporateStrategistは、**経営者の参謀として企業経営を多角的�
 
 **基本原則**: できる限り推定を試み（パターンB）、推定困難な場合のみ選択肢を提示（パターンC）
 
----
-
-### パターンA: 明示的指定の場合（即座に実行）【最優先】
-
-```
-ユーザー: 「PersonnelDeveloperで採用判断をしてください」
-    ↓
-Claude: [確認なしで即座にPersonnelDeveloper起動]
-    ↓
-PersonnelDeveloper/SUBSKILL.md + CLAUDE.md を読み込み
-```
-
----
-
-### パターンB: 推定可能な場合（推定+確認）【第二優先】
-
-```
-ユーザー: 「営業事務を採用すべきか判断したい」
-    ↓
-Claude: 「PersonnelDeveloper（人材開発）で対応します。
-         採用前判断と外注QCD比較を実施しますが、よろしいですか？
-
-         必要に応じて他のサブスキルも追加できます：
-         - LegalAdviser（雇用契約書作成）
-         - ForesightReader（候補者の適性分析）」
-    ↓
-ユーザー: 「OK」または「LegalAdviserも追加して」
-    ↓
-選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
-```
-
-**曖昧ケースの例**:
-```
-ユーザー: 「人材配置について相談したい」
-    ↓
-Claude: 「PersonnelDeveloper（人材開発）+ ForesightReader（洞察獲得）で対応します。
-
-         PersonnelDeveloper: 業務的観点からの人材配置最適化
-         ForesightReader: 適性・相性の観点からの人材配置助言
-
-         よろしいですか？」
-    ↓
-選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
-```
-
----
-
-### パターンC: 推定困難な場合（選択肢提示）【フォールバック】
-
-```
-ユーザー: 「人事について相談したい」
-    ↓
-Claude: 「どのサブスキルを使用しますか？（複数選択可能）
-
-         1. **PersonnelDeveloper** - 人材開発
-            採用前判断、外注QCD比較、育成支援
-
-         2. **LegalAdviser** - 法務助言
-            雇用契約書、就業規則、法的確認
-
-         3. **ForesightReader** - 洞察獲得
-            姓名判断、適性分析、人材配置」
-    ↓
-ユーザー: 選択
-    ↓
-選択されたサブスキルのSUBSKILL.md + CLAUDE.mdのみ読み込み
-```
+パターンAでは確認を挟まず即座に読み込む。パターンBでは推定したサブスキルと追加できる候補を一言添えて進める（確認待ちにしない）。パターンCでは候補を並べて選んでもらう。いずれの場合も、選ばなかったサブスキルの md は読まない。
 
 ---
 
@@ -236,40 +167,6 @@ Claude: 「どのサブスキルを使用しますか？（複数選択可能）
 | **組織再編** | 「組織見直し」「配置転換」「チームビルディング」 | BusinessAnalyzer + PersonnelDeveloper |
 | **新規事業立ち上げ** | 「新規事業」「立ち上げ」「ゼロから」 | BusinessAnalyzer + PersonnelDeveloper + LegalAdviser |
 | **人材戦略総合** | 「人材戦略全体」「包括的に」「多角的に」 | PersonnelDeveloper + ForesightReader |
-
----
-### 重要: 選択的読み込みの徹底
-
-**必要のない全サブスキル一括読み込みを回避**
-
-**読み込み例**:
-- **BusinessAnalyzerのみ**:
-  - `BusinessAnalyzer/SUBSKILL.md`
-  - `BusinessAnalyzer/CLAUDE.md`
-
-- **PersonnelDeveloper + LegalAdviser**:
-  - `PersonnelDeveloper/SUBSKILL.md`
-  - `PersonnelDeveloper/CLAUDE.md`
-  - `LegalAdviser/SUBSKILL.md`
-  - `LegalAdviser/CLAUDE.md`
-
-**選択されていないサブスキルは読み込まない** = トークン最適化
-
----
-
-## 💡 よくある質問（FAQ）
-
-### Q1: どのサブスキルを使えばいいかわからない場合は？
-
-**A**: CorporateStrategist起動時に、適切なサブスキルを推定して提案（パターンB）または選択肢を提示（パターンC）します。上記の「詳細な判断基準」を参照してください。
-
-### Q2: 複数のサブスキルを同時に使いたい場合は？
-
-**A**: 複数選択が可能です。上記の「複数サブスキル連携パターン」を参照してください。
-
-### Q3: 後からサブスキルを追加できますか？
-
-**A**: はい、可能です。「LegalAdviserも追加で使いたい」と明示的に依頼してください（パターンA）。
 
 ---
 

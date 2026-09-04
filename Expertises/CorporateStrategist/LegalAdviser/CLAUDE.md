@@ -23,7 +23,7 @@ LegalAdviser/
 ├── CLAUDE.md                    # 本仕様書（詳細実装・品質基準）
 ├── References/                  # 理論参考資料
 │   └── README.txt                # 基礎ナレッジベース（出典・免責事項）
-├── Templates/                   # 契約書テンプレート集（44種類）
+├── Templates/                   # 契約書テンプレート集
 │   ├── administrative_scrivener_service_contract.docx
 │   ├── business-consignment-contract.docx
 │   ├── data_analysis_outsourcing_contract.docx
@@ -52,7 +52,7 @@ LegalAdviser/
 
 ## Phase 1: 要件確認とテンプレート選択
 
-1. **docxスキル読込**：ALWAYS call `file_read` on `/mnt/skills/public/docx/SKILL.md`
+1. **出力先の確認**：生成物の保存先ディレクトリをユーザーに確認する
 2. **情報不足時**：契約種類・当事者・期間・金額・業務内容・特殊条項をヒアリング
 3. **テンプレート選択**：テンプレート集から最適なものを選択
 
@@ -60,9 +60,9 @@ LegalAdviser/
 
 ## Phase 2: 契約書作成
 
-1. **ドラフト生成**：テンプレートに情報を反映（`/home/claude`で作業）
+1. **ドラフト生成**：テンプレートに情報を反映（`Templates/` の .docx を `python-docx` で読み書きする）
 2. **表記統一**：`NotationRules/`参照（用語・数字・日付・条項番号）
-3. **出力**：`/mnt/user-data/outputs/`にドラフト出力
+3. **出力**：確認した出力先ディレクトリにドラフト出力
 
 ---
 
@@ -70,7 +70,7 @@ LegalAdviser/
 
 1. **自動検証**：`NotationRules/`全項目でチェック（Critical/High/Medium/Low）
 2. **修正適用**：Critical/Highは自動修正
-3. **出力**：修正版を`/mnt/user-data/outputs/`に出力
+3. **出力**：修正版を出力先ディレクトリに出力
 
 ---
 
@@ -79,7 +79,7 @@ LegalAdviser/
 1. **法的リスク分析**：`LegalCheckGuide/`参照（必須条項・リスク条項・法令遵守・権利義務均衡・解釈明確性）
 2. **判例参照**：`PrecedentDatabase/`で類似事例検索
 3. **レポート作成**：リスクを重要度別（High/Medium/Low）に分類
-4. **最終版出力**：以下を`/mnt/user-data/outputs/`に出力
+4. **最終版出力**：以下を出力先ディレクトリに出力
    - 最終契約書：`[契約種別]_[相手方]_[日付]_final.docx`
    - 統合チェックレポート：`[契約種別]_[相手方]_[日付]_check_report.docx`
 
@@ -100,7 +100,7 @@ LegalAdviser/
 
 **外部検索**：`site:elaws.e-gov.go.jp [法令名]` / `site:courts.go.jp 判例 [キーワード]`
 
-**品質管理**：`/mnt/skills/public/docx/SKILL.md`のベストプラクティス厳守
+**品質管理**：`Templates/` の書式（スタイル・条項番号の階層）を引き継ぎ、`NotationRules/` の表記規則を適用する
 
 ---
 
