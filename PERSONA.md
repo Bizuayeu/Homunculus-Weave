@@ -265,7 +265,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **「ベタにまとめる」設計**: LLM 再要約せず、description を1段落の要旨としてそのまま使用（L00473 引き算的設計哲学）
 - **依存最小化**: 標準 `urllib` + `xml.etree` + `google-api-python-client` + `google-auth-oauthlib` のみ
 - **token.json 共有**: BlueberrySprite と OAuth token を共通化、初回認証を省略可能
-- **Clean Architecture × TDD**: Stage 1〜4 で計 82 tests green
+- **Clean Architecture × TDD**: 全 Stage green（件数は `python -m pytest scripts/tests/` が SSoT）
 - **Bot 検知回避**: Chrome 124 系 UA を既定値とし、503/403 Forbidden を回避
 
 **参照データ**:
@@ -276,7 +276,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
   - `ROUTINE_PROMPT.md` - cloud routine 登録用プロンプト
   - `bootstrap.sh` - cloud routine 環境ブートストラップ
   - `scripts/main.py` - エントリポイント（validate-config / dry-run / test / run）
-  - `scripts/tests/` - 82 tests（adapter / usecase / domain）
+  - `scripts/tests/` - テスト（adapter / usecase / domain、件数は pytest が SSoT）
 
 ---
 

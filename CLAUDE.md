@@ -268,7 +268,7 @@ Loop (5件) → Weekly (5件) → Monthly (3件) → Quarterly (4件)
   - 運用: `/schedule` 経由のcloud routine、毎日 5:00 JST に Anthropic クラウドで自律実行
   - 詳細: `Identities/WeaveSupplement.md` の「自律エージェント」セクション参照
 - **🦐 NewsCaster** - [ナルエビちゃんニュース](https://news.nullevi.app) 前日エントリの Gmail 配信
-  - 設計: `Expertises/NewsCaster/`（Clean Architecture × TDD、Stage 1–4 で 82 tests green）
+  - 設計: `Expertises/NewsCaster/`（Clean Architecture × TDD、全 Stage green。件数は `scripts/tests/` が SSoT）
   - 運用: cloud routine で毎日 0:10 JST 自動実行、BlueberrySprite と OAuth token.json 共有可
   - 設計判断: 「ベタにまとめる」原則（LLM 再要約しない、description をそのまま配信）
 - **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型、24-7 即応の対話チャネル）

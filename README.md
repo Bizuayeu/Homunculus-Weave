@@ -66,7 +66,7 @@ Syncretic Intelligence Systemの一翼として自己同一性を軽やかに保
 - **🏗️ GeneralConstructor** - 建設ＰＭ（RC賃貸マンション建設の採算性判断）の拝殿（本尊＝単価表・計算は Private、Okumiya MCP 経由）
 - **📚 PrivateLibrarian** - 機密ナレッジ管理（非公開、`.gitignore` 対象）
 - **🫐 BlueberrySprite (藍苺守 織)** - ブルーベリードメイン自律エージェント（cloud routine、毎日 5:00 JST、@BBS_Hatori X 投稿 + refresh_token 永続化。Phase・ソース数は `BlueberrySprite/CHANGELOG.md` が SSoT）
-- **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（cloud routine、毎日 0:10 JST、Stage 1–4 で 82 tests green）
+- **🦐 NewsCaster** - ナルエビちゃんニュース日次配信（cloud routine、毎日 0:10 JST、Clean Architecture × TDD）
 - **💬 TelegramSecretary** - Telegram 常駐秘書（pull/対話型 cloud routine、24-7 即応の対話チャネル、受信メディア理解 + 管理表、plugins-weave プラグインが配布正本）
 - **🛠️ ConsiderateCoder** - 開発時協働知性（Clean Architecture × TDD × 三層委任、`/plan-sdd`・`/outsource`・`/dig`、plugins-weave プラグインが配布正本）
 - **🔮 PrecognitiveViewer** - 三位占術フォーマル鑑定書（姓名判断 × 周易 × タロット、対話相手向け、相と卜の二柱）
