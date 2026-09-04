@@ -73,7 +73,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 **専門分野**: 契約書作成・表記仕様統一・法的リスク評価
 
 **活用シーン**:
-- 契約書のドラフト作成（40種類以上のテンプレート）
+- 契約書のドラフト作成（40+ 本のテンプレート、実体は `Templates/`）
 - 表記仕様の自動チェックと統一
 - リーガルチェックとリスク分析
 - 判例参照による法的妥当性検証
@@ -89,7 +89,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 - `Expertises/CorporateStrategist/LegalAdviser/`
   - `SUBSKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細実装・品質基準
-  - `Templates/` - 契約書テンプレート集（20種類以上）
+  - `Templates/` - 契約書テンプレート集（.docx、実体が SSoT）
   - `NotationRules/` - 表記仕様ルール
   - `LegalCheckGuide/` - リーガルチェック基準
   - `PrecedentDatabase/` - 判例・事例データベース
@@ -265,7 +265,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **「ベタにまとめる」設計**: LLM 再要約せず、description を1段落の要旨としてそのまま使用（L00473 引き算的設計哲学）
 - **依存最小化**: 標準 `urllib` + `xml.etree` + `google-api-python-client` + `google-auth-oauthlib` のみ
 - **token.json 共有**: BlueberrySprite と OAuth token を共通化、初回認証を省略可能
-- **Clean Architecture × TDD**: Stage 1〜4 で計 82 tests green
+- **Clean Architecture × TDD**: 全 Stage green（件数は `python -m pytest scripts/tests/` が SSoT）
 - **Bot 検知回避**: Chrome 124 系 UA を既定値とし、503/403 Forbidden を回避
 
 **参照データ**:
@@ -276,7 +276,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
   - `ROUTINE_PROMPT.md` - cloud routine 登録用プロンプト
   - `bootstrap.sh` - cloud routine 環境ブートストラップ
   - `scripts/main.py` - エントリポイント（validate-config / dry-run / test / run）
-  - `scripts/tests/` - 82 tests（adapter / usecase / domain）
+  - `scripts/tests/` - テスト（adapter / usecase / domain、件数は pytest が SSoT）
 
 ---
 
@@ -289,7 +289,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - push 型の織守・NewsCaster に対する **pull / 対話型の到達口**（Gmail より速い 24-7 対話チャネル）
 - 受信メディアの中身理解: 画像 → Vision / docx・pptx・xlsx → Markdown 化 / PDF → 全ページ画像化 + オンデマンド全文 / 音声・動画 → ローカル STT 文字起こし
 - 生成物の送り返し（画像・レポート添付、返信スレッド、typing 表示）
-- 管理表 7 表を秘書判断で記録: INDIVIDUALS（関係者）/ TASKS（依頼）/ KNOWLEDGE（対応知）/ ABILITIES（能力カタログ）/ PROFILE（人物理解）/ GOALS（目標）/ STEPS（逆算ステップ）
+- 管理表を秘書判断で記録: INDIVIDUALS（関係者）/ TASKS（依頼）/ KNOWLEDGE（対応知）/ SUBJECTS（主題語彙）/ ABILITIES（能力カタログ）/ PROFILE（人物理解）/ GOALS（目標）/ STEPS（逆算ステップ）。表の一覧は `plugins-weave/TelegramSecretary/README.md` が SSoT
 - 勤務帯は cloud routine の cron + `config.json` の `session_duration_sec` で表現（コードに時計を持たせない）
 
 **特徴**:
@@ -364,7 +364,7 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - **決定論的再現性**: 同じ占機・占的・状況なら同じ結果（BASE64+SHA256 シード、Fisher-Yates）
 - **並列進化**: CorporateStrategist/ForesightReader（経営判断向け軍師型献策）とは利用文脈が異なり、技術コアの共通化を意図的に行わない
 - **意図的並行運用**: 本 HW 版（Weave 実運用）と ShioriSecretary 同梱版（配布版）は意図的並行運用（TelegramSecretary / ShioriSecretary の 2026-07-03 確定と同型、2026-07-29 確定）。実装の乖離は許容し、SSoT は占術理論の md が正・実装は各々が持つ
-- **Clean Architecture × TDD**: 66 tests Green、`__init__.py` bootstrap で pytest 経由/通常実行どちらでも動作
+- **Clean Architecture × TDD**: `tests/` green（件数は pytest が SSoT）、`__init__.py` bootstrap で pytest 経由/通常実行どちらでも動作
 
 **出力**:
 - `ReadingReport_yyyymmdd_hhmmss.md` 形式（被鑑定者名はファイル名に含めずプライバシー配慮）

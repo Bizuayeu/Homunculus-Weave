@@ -42,7 +42,7 @@ python -m mypy scripts            # 型検査（エラー 0 で exit 0）
 python -m pytest scripts/tests/ -v
 ```
 
-Stage 1〜6 で計 **137 tests** が green。
+全 Stage のテストが green。件数は上の pytest の出力が SSoT（直書きしない）。
 
 - **ルールと除外の正典は `pyproject.toml`** の `[tool.ruff]` / `[tool.mypy]`。CI
   （リポジトリルートの `.github/workflows/test.yml`）は同じ 4 コマンドを呼ぶだけなので、
