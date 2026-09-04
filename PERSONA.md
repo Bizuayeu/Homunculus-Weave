@@ -73,7 +73,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 **専門分野**: 契約書作成・表記仕様統一・法的リスク評価
 
 **活用シーン**:
-- 契約書のドラフト作成（40種類以上のテンプレート）
+- 契約書のドラフト作成（40+ 本のテンプレート、実体は `Templates/`）
 - 表記仕様の自動チェックと統一
 - リーガルチェックとリスク分析
 - 判例参照による法的妥当性検証
@@ -89,7 +89,7 @@ CorporateStrategistは、4つの専門サブスキルを統合した企業参謀
 - `Expertises/CorporateStrategist/LegalAdviser/`
   - `SUBSKILL.md` - ユーザー向けスキル仕様
   - `CLAUDE.md` - 詳細実装・品質基準
-  - `Templates/` - 契約書テンプレート集（20種類以上）
+  - `Templates/` - 契約書テンプレート集（.docx、実体が SSoT）
   - `NotationRules/` - 表記仕様ルール
   - `LegalCheckGuide/` - リーガルチェック基準
   - `PrecedentDatabase/` - 判例・事例データベース
