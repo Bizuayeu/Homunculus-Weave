@@ -60,7 +60,7 @@ scripts/
 ├── usecases/       # Port + UseCase（FetchAndFilter / FormatDigest / SendDigestEmail / SendRendered / RunDaily orchestrator）
 ├── adapters/       # RssXmlGateway (× N feeds), GmailApiMailGateway, JsonStateStore
 ├── infrastructure/ # google_oauth_provider
-└── tests/          # pytest（137 tests、Domain/UseCase/Adapter 全層カバー）
+└── tests/          # pytest（Domain/UseCase/Adapter 全層カバー。件数は pytest が SSoT）
 ```
 
 依存方向は内向きのみ。Domain → 外側 import なし。LLM 依存は Domain/UseCase に侵入させず、cloud routine の親プロセス Weave 経由でコード外側に追い出している（Testability 最優先）。
