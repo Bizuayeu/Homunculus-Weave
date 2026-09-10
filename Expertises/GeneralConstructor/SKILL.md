@@ -38,9 +38,9 @@ MCP（streamable HTTP）越しのツール **`judge_mokuromi`** が担う。入�
 
 ## 使用方法
 
-1. MCP サーバを登録する（初回のみ。接続先と API キーは判定サービスの配備元から受け取る）。ローカル配備なら `claude mcp add`、公開配備なら claude.ai のカスタムコネクタに URL を入れ、出てきた同意画面に API キーを貼る（どちらでも以降の手順は同じ）
+1. MCP サーバを登録する（初回のみ。接続先と API キーは判定サービスの配備元から受け取る）。ローカル配備なら `claude mcp add`、公開配備なら claude.ai のカスタムコネクタに URL を入れ、出てきた同意画面に API キーを貼る（どちらでも以降の手順は同じ）。**claude.ai の Project には本書だけでなく `WORKFLOW.md` と `haiden/` の 3 ファイルも一緒に載せる**——本書単体では手順書も前捌きも手元に無く、作法を飛ばして送ることになる
 2. `WORKFLOW.md` の Phase 0〜3 に従って入力を揃える
-3. `haiden/check.mjs` の `checkInput(input)` で必須項目の欠落を前捌きする
+3. `haiden/check.mjs` の `checkInput(input)` で必須項目の欠落を前捌きする（`check.mjs` が手元に無い環境では、ツールの入力スキーマの必須項目・選択肢と突き合わせて代替し、その旨を断ってから送る）
 4. ツール `judge_mokuromi` を呼ぶ
 5. 応答の `status`（`completed` / `rejected`）を見て Phase 4.3 のバリデーション → Phase 5 の結果提示へ
 
