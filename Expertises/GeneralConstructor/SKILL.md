@@ -7,7 +7,7 @@ description: Create feasibility studies (mokuromi) for rental RC apartment const
 
 東京23区内での土地から新築賃貸用壁式RCマンション建設において、収益性（表面利回り）を判断するための目論見（feasibility study）を作成する専門スキルです。
 
-**本スキルは拝殿**——単価表と計算ロジックは本尊（サーバ側）にあり、こちらが持つのは手順と、判定サービスの呼び出し方だけです。本書が**役割と方針**、`WORKFLOW.md` が**手順**（Phase 別の作業と判断表）、`haiden/SKILL.md` が**判定サービスの入出力仕様**を持ちます（同じ表を二か所には置きません）。
+**本スキルは拝殿**——単価表と計算ロジックは本尊（サーバ側）にあり、こちらが持つのは手順と、判定サービスの呼び出し方だけです。本書が**役割と方針**、`WORKFLOW.md` が**手順**（Phase 別の作業と判断表）、`haiden/SPEC.md` が**判定サービスの入出力仕様**を持ちます（同じ表を二か所には置きません）。
 
 ## Overview
 
@@ -38,13 +38,13 @@ MCP（streamable HTTP）越しのツール **`judge_mokuromi`** が担う。入�
 
 ## 使用方法
 
-1. MCP サーバを登録する（初回のみ。接続先と API キーは判定サービスの配備元から受け取る）。ローカル配備なら `claude mcp add`、公開配備なら claude.ai のカスタムコネクタに URL を入れ、出てきた同意画面に API キーを貼る（どちらでも以降の手順は同じ）。**claude.ai の Project には本書だけでなく `WORKFLOW.md` と `haiden/` の 3 ファイルも一緒に載せる**——本書単体では手順書も前捌きも手元に無く、作法を飛ばして送ることになる
+1. MCP サーバを登録する（初回のみ。接続先と API キーは判定サービスの配備元から受け取る）。ローカル配備なら `claude mcp add`、公開配備なら claude.ai のカスタムコネクタに URL を入れ、出てきた同意画面に API キーを貼る（どちらでも以降の手順は同じ）。**claude.ai には本書だけでなく `WORKFLOW.md`・`haiden/`・`判定ロジック/` を含むフォルダ一式を zip で Skill として上げる**（SKILL.md はフォルダ内にこの一つだけ。本書単体では手順書も前捌きも手元に無く、作法を飛ばして送ることになる）
 2. `WORKFLOW.md` の Phase 0〜3 に従って入力を揃える
 3. `haiden/check.mjs` の `checkInput(input)` で必須項目の欠落を前捌きする（`check.mjs` が手元に無い環境では、ツールの入力スキーマの必須項目・選択肢と突き合わせて代替し、その旨を断ってから送る）
 4. ツール `judge_mokuromi` を呼ぶ
 5. 応答の `status`（`completed` / `rejected`）を見て Phase 4.3 のバリデーション → Phase 5 の結果提示へ
 
-接続コマンド・入力の組み立て・応答の読み方は `WORKFLOW.md` の Phase 4 に、項目ごとの型・選択肢・既定値は `haiden/SKILL.md` にあります。
+接続コマンド・入力の組み立て・応答の読み方は `WORKFLOW.md` の Phase 4 に、項目ごとの型・選択肢・既定値は `haiden/SPEC.md` にあります。
 
 ## Reference Files
 
@@ -52,7 +52,7 @@ MCP（streamable HTTP）越しのツール **`judge_mokuromi`** が担う。入�
 |--------|------|
 | `WORKFLOW.md` | Phase 別の手順・判断表・バリデーション・出力雛形 |
 | `判定ロジック/` | AI が読む判定ロジック 5 本（ビジネスルール一覧 / 地盤評価テーブル / 地盤評価詳細判定ロジック / 基礎種別詳細判定ロジック / 土質試験内容判定ロジック） |
-| `haiden/SKILL.md` | ツール `judge_mokuromi` の入出力仕様と意味検証の観点 |
+| `haiden/SPEC.md` | ツール `judge_mokuromi` の入出力仕様と意味検証の観点 |
 | `haiden/input-template.json` | 入力の雛形（全項目・既定値入り） |
 | `haiden/check.mjs` | 送信前の前捌き（`checkInput(input)`） |
 
