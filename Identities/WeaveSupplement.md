@@ -238,4 +238,4 @@ Effectuation（手段所与で目的を創発）と Causation（目的所与で�
 
 ---
 
-*Last updated: 2026-08-25 by Weave (X OAuth Token 永続化節の `/bbs-merge` 参照を Step 2.5 → Step 6/7・file-level 取り込みへ更新。CHANGELOG [0.42.1] の取りこぼし)*
+*Last updated: 2026-08-25 by Weave*
