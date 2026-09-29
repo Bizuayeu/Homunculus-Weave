@@ -8,8 +8,8 @@
 |---|---|
 | Trigger | Schedule |
 | Cron (UTC) | `10 15 * * *`（= 0:10 JST） |
-| Model | `claude-opus-5` |
-| Thinking | `effortLevel: "high"`（adaptive thinking 既定 ON） |
+| Model | `claude-opus-5-5` |
+| Effort | `high`（環境の Environment variables に `CLAUDE_CODE_EFFORT_LEVEL=high`。Opus 5.5 の既定は `medium`） |
 
 Routine ID・編集 URL は `Homunculus-Weave-Private/Identities/RoutineRegistry.md`（非公開）が SSoT。
 

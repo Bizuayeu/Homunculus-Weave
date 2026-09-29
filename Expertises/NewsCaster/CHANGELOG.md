@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.1] - 2026-09-29 — 器を Opus 5.5 high へ（doc、コード変更なし）
+
+routine の実設定は、文書の `claude-opus-5` と食い違って `claude-opus-4-8[1m]` のまま残っていた
+（2026-05-29 から未更新）。大環主が routine の Model 欄を `claude-opus-5-5` へ上げ、共用の環境
+`BlueberrySprite` に `CLAUDE_CODE_EFFORT_LEVEL=high` を足した。
+
+### Changed
+
+- `ROUTINE_PROMPT.md` の Model を `claude-opus-5-5` へ。Thinking 行を Effort 行へ書き換え、effort は
+  環境変数で決まることを明記した（Opus 5.5 の既定は `medium`。複数リポを clone するセッションは
+  リポの `.claude/settings.json` を読まない）
+
 ## [0.3.0] - 2026-08-25 — 静的チェックを配線する：整形が溜まる経路を先に塞ぐ
 
 本リポの Python スイートで唯一 ruff / mypy を持たないプロジェクトだった。同日 BlueberrySprite で、
