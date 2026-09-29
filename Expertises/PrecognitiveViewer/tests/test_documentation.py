@@ -73,9 +73,11 @@ def test_tarot_license_md_exists() -> None:
 def test_weave_claude_md_lists_precognitive_viewer() -> None:
     """Homunculus-Weave/CLAUDE.md の Expertises 一覧に PrecognitiveViewer が追記されている"""
     weave_md = (WEAVE_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
-    assert "PrecognitiveViewer" in weave_md
-    # 専門ペルソナ活用セクション配下に存在する
-    persona_section = weave_md.split("## 🎭 専門ペルソナ活用")[1] if "## 🎭 専門ペルソナ活用" in weave_md else ""
+    # 専門ペルソナ節（見出しから次の「## 」まで）に存在する。
+    # 見出しは 2026-09-05 に「専門ペルソナ活用」→「専門ペルソナ」へ改名された
+    heading = "## 🎭 専門ペルソナ"
+    assert heading in weave_md, f"CLAUDE.md に見出し「{heading}」が無い（改名されたならここを追従）"
+    persona_section = weave_md.split(heading, 1)[1].split("\n## ", 1)[0]
     assert "PrecognitiveViewer" in persona_section
 
 
