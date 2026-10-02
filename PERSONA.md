@@ -338,10 +338,10 @@ CorporateStrategist全体を通じて、以下の4つの原則を遵守します
 - `Expertises/ConsiderateCoder/`（ジャンクション → `plugins-weave/ConsiderateCoder/` 配布正本、marketplace プラグイン。バージョンは marketplace.json が SSoT）
   - `agents/orchestrator.md` - 采配・委任・物証レビュー専任の司令官（Edit/Write 非所持の構造保証）
   - `agents/worker.md` - スコープ済みブリーフの調査・実装・検証を完遂する実働
-  - `commands/plan-sdd.md` - SDD コマンド v1.3.0（Phase 1-7、削除ポリシー分岐・裁可と接続）
-  - `commands/outsource.md` - 三層委任実行コマンド v1.2.0（5段フロー + HTML レポート & 理解度クイズ）
-  - `commands/dig.md` - 意図の深掘りインタビュー v3.0.0（隠れた前提・未検討リスクの掘り起こし）
-  - `commands/refactor.md` - 振る舞いを保つリファクタリングコマンド v1.0.0（6段フロー、A〜E のリスク区分で裁可）
+  - `commands/plan-sdd.md` - SDD コマンド（削除ポリシー分岐・裁可と接続）
+  - `commands/outsource.md` - 三層委任実行コマンド（HTML レポート & 理解度クイズ & 二次計画）
+  - `commands/dig.md` - 意図の深掘りインタビュー（隠れた前提・未検討リスクの掘り起こし）
+  - `commands/refactor.md` - 振る舞いを保つリファクタリングコマンド（リスク区分つきの裁可）
   - `skills/dev-rules/SKILL.md` - Clean Architecture / TDD Flow / 3-Strike Rule / Decision Priority（orchestrator / worker へ skills: preload で全文注入）
   - `skills/ops-rules/SKILL.md` - セキュリティ・コスト・法的確認・データ設計・性能・障害対応・LLM 統合防御
   - `README.md` - 方法論の Why（Rules の役割 / SDD の理由 / アウトソース開発の利点 / クイジングの効果）とモデル配分チューニング指針（三層の `model:` / `effort:` 既定値の正典）
